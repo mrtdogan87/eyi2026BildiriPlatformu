@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+}
+
+enum SubmissionLanguage {
+  TR
+  EN
+}
+
+enum PresentationMode {
+  ONLINE
+  IN_PERSON
+}
+
+model Congress {
+  id          String       @id @default(cuid())
+  slug        String       @unique
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  submissions Submission[]
+}
+
+model Submission {
+  id                 String                 @id @default(cuid())
+  congressId         String
+  status             SubmissionStatus       @default(DRAFT)
+  submissionLanguage SubmissionLanguage?
+  titleTr            String?
+  titleEn            String?
+  abstractTr         String?
+  abstractEn         String?
+  keywordsTr         String?
+  keywordsEn         String?
+  presentationMode   PresentationMode?
+  galaAttendance     Boolean              @default(false)
+  galaAttendeeCount  Int                  @default(0)
+  tripAttendance     Boolean              @default(false)
+  tripAttendeeCount  Int                  @default(0)
+  draftOwnerEmail    String
+  submittedAt        DateTime?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+  congress           Congress               @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  authors            SubmissionAuthor[]
+  file               SubmissionFile?
+  accessTokens       SubmissionAccessToken[]
+
+  @@index([congressId, status])
+  @@index([draftOwnerEmail])
+}
+
+model SubmissionAuthor {
+  id          String     @id @default(cuid())
+  submissionId String
+  fullName    String
+  email       String
+  institution String?
+  country     String?
+  isPresenter Boolean    @default(false)
+  sortOrder   Int
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  submission  Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@index([email])
+  @@unique([submissionId, email])
+}
+
+model SubmissionFile {
+  id           String     @id @default(cuid())
+  submissionId String     @unique
+  originalName String
+  mimeType     String
+  fileSize     Int
+  storageKey   String
+  uploadedAt   DateTime   @default(now())
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+}
+
+model SubmissionAccessToken {
+  id           String     @id @default(cuid())
+  submissionId String
+  email        String
+  tokenHash    String
+  expiresAt    DateTime
+  usedAt       DateTime?
+  createdAt    DateTime   @default(now())
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
+  @@index([email])
+  @@index([expiresAt])
+}
