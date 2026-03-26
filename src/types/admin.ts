@@ -10,6 +10,14 @@ export type AdminSubmissionListItem = {
   submittedAt: string | null;
 };
 
+export type AdminSubmissionListFilters = {
+  q: string;
+  language: "ALL" | "TR" | "EN";
+  presentationMode: "ALL" | "ONLINE" | "IN_PERSON";
+  gala: "ALL" | "YES" | "NO";
+  trip: "ALL" | "YES" | "NO";
+};
+
 export type AdminSubmissionDetail = {
   id: string;
   draftOwnerEmail: string;

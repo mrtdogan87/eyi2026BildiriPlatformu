@@ -346,6 +346,10 @@ textarea {
 
 .admin-table-head {
   margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
 }
 
 .admin-subtitle {
@@ -355,6 +359,23 @@ textarea {
 
 .admin-table-wrap {
   overflow-x: auto;
+}
+
+.admin-filter-grid {
+  display: grid;
+  grid-template-columns: 2fr repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-filter-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.admin-export-button {
+  white-space: nowrap;
 }
 
 .admin-table {
@@ -488,5 +509,15 @@ textarea {
   .admin-panel-card,
   .admin-login-card {
     padding: 22px;
+  }
+
+  .admin-table-head,
+  .admin-filter-grid,
+  .admin-filter-actions {
+    display: grid;
+  }
+
+  .admin-filter-grid {
+    grid-template-columns: 1fr;
   }
 }

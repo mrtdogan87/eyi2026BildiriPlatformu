@@ -2,7 +2,11 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import type { AdminSubmissionDetail, AdminSubmissionListItem } from "@/types/admin";
+import type {
+  AdminSubmissionDetail,
+  AdminSubmissionListFilters,
+  AdminSubmissionListItem,
+} from "@/types/admin";
 
 const ADMIN_COOKIE = "admin_session";
 const EYI_CONGRESS_SLUG = "eyi-2026";
@@ -89,13 +93,105 @@ function mapPresentationMode(mode: "ONLINE" | "IN_PERSON" | null) {
   return mode === "ONLINE" ? "Online" : "Yüz yüze";
 }
 
-export async function getAdminSubmissionList(): Promise<AdminSubmissionListItem[]> {
+export function normalizeAdminSubmissionFilters(
+  input?: Partial<AdminSubmissionListFilters> | URLSearchParams,
+): AdminSubmissionListFilters {
+  const getValue = (key: keyof AdminSubmissionListFilters) => {
+    if (!input) {
+      return "";
+    }
+
+    if (input instanceof URLSearchParams) {
+      return input.get(key) ?? "";
+    }
+
+    return input[key] ?? "";
+  };
+
+  const language = getValue("language");
+  const presentationMode = getValue("presentationMode");
+  const gala = getValue("gala");
+  const trip = getValue("trip");
+
+  return {
+    q: String(getValue("q") ?? "").trim(),
+    language: language === "TR" || language === "EN" ? language : "ALL",
+    presentationMode:
+      presentationMode === "ONLINE" || presentationMode === "IN_PERSON"
+        ? presentationMode
+        : "ALL",
+    gala: gala === "YES" || gala === "NO" ? gala : "ALL",
+    trip: trip === "YES" || trip === "NO" ? trip : "ALL",
+  };
+}
+
+export async function getAdminSubmissionList(
+  rawFilters?: Partial<AdminSubmissionListFilters> | URLSearchParams,
+): Promise<AdminSubmissionListItem[]> {
+  const filters = normalizeAdminSubmissionFilters(rawFilters);
   const submissions = await prisma.submission.findMany({
     where: {
       status: "SUBMITTED",
       congress: {
         slug: EYI_CONGRESS_SLUG,
       },
+      ...(filters.language !== "ALL"
+        ? {
+            submissionLanguage: filters.language,
+          }
+        : {}),
+      ...(filters.presentationMode !== "ALL"
+        ? {
+            presentationMode: filters.presentationMode,
+          }
+        : {}),
+      ...(filters.gala !== "ALL"
+        ? {
+            galaAttendance: filters.gala === "YES",
+          }
+        : {}),
+      ...(filters.trip !== "ALL"
+        ? {
+            tripAttendance: filters.trip === "YES",
+          }
+        : {}),
+      ...(filters.q
+        ? {
+            OR: [
+              {
+                titleTr: {
+                  contains: filters.q,
+                  mode: "insensitive",
+                },
+              },
+              {
+                titleEn: {
+                  contains: filters.q,
+                  mode: "insensitive",
+                },
+              },
+              {
+                authors: {
+                  some: {
+                    fullName: {
+                      contains: filters.q,
+                      mode: "insensitive",
+                    },
+                  },
+                },
+              },
+              {
+                authors: {
+                  some: {
+                    email: {
+                      contains: filters.q.toLowerCase(),
+                    },
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
     },
     orderBy: [
       {
@@ -146,6 +242,37 @@ export async function getAdminSubmissionList(): Promise<AdminSubmissionListItem[
       submittedAt: submission.submittedAt?.toISOString() ?? null,
     };
   });
+}
+
+function escapeCsv(value: string) {
+  const normalized = value.replaceAll('"', '""');
+  return `"${normalized}"`;
+}
+
+export function buildAdminSubmissionCsv(items: AdminSubmissionListItem[]) {
+  const header = [
+    "Baslik",
+    "Sunan Yazar",
+    "E-posta",
+    "Dil",
+    "Sunum",
+    "Gala",
+    "Gezi",
+    "Gonderim Tarihi",
+  ];
+
+  const rows = items.map((item) => [
+    item.title,
+    item.presenterName,
+    item.presenterEmail,
+    item.submissionLanguage,
+    item.presentationMode,
+    item.galaLabel,
+    item.tripLabel,
+    item.submittedAt ?? "",
+  ]);
+
+  return [header, ...rows].map((row) => row.map((cell) => escapeCsv(cell)).join(",")).join("\n");
 }
 
 export async function getAdminSubmissionDetail(

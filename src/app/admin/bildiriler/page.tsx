@@ -1,6 +1,16 @@
 import Link from "next/link";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
-import { getAdminSubmissionList, requireAdminPage } from "@/lib/admin";
+import { getAdminSubmissionList, normalizeAdminSubmissionFilters, requireAdminPage } from "@/lib/admin";
+
+type PageProps = {
+  searchParams: Promise<{
+    q?: string;
+    language?: string;
+    presentationMode?: string;
+    gala?: string;
+    trip?: string;
+  }>;
+};
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -13,9 +23,18 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
-export default async function AdminSubmissionsPage() {
+export default async function AdminSubmissionsPage({ searchParams }: PageProps) {
   await requireAdminPage();
-  const submissions = await getAdminSubmissionList();
+  const params = new URLSearchParams(
+    Object.entries(await searchParams).flatMap(([key, value]) =>
+      typeof value === "string" ? [[key, value]] : [],
+    ),
+  );
+  const filters = normalizeAdminSubmissionFilters(params);
+  const submissions = await getAdminSubmissionList(filters);
+  const exportHref = `/api/admin/submissions/export?${new URLSearchParams(
+    Object.entries(filters),
+  ).toString()}`;
 
   return (
     <main className="page-shell admin-page-shell">
@@ -33,7 +52,66 @@ export default async function AdminSubmissionsPage() {
             <h2 className="section-title">Bildiri Listesi</h2>
             <p className="admin-subtitle">{submissions.length} adet gönderilmiş bildiri bulundu.</p>
           </div>
+          <a className="button ghost admin-export-button" href={exportHref}>
+            CSV İndir
+          </a>
         </div>
+
+        <form className="admin-filter-grid" method="GET">
+          <div className="field">
+            <label htmlFor="q">Arama</label>
+            <input
+              id="q"
+              name="q"
+              defaultValue={filters.q}
+              placeholder="Başlık, yazar veya e-posta"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="language">Dil</label>
+            <select id="language" name="language" defaultValue={filters.language}>
+              <option value="ALL">Tümü</option>
+              <option value="TR">Türkçe</option>
+              <option value="EN">İngilizce</option>
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="presentationMode">Sunum</label>
+            <select
+              id="presentationMode"
+              name="presentationMode"
+              defaultValue={filters.presentationMode}
+            >
+              <option value="ALL">Tümü</option>
+              <option value="IN_PERSON">Yüz yüze</option>
+              <option value="ONLINE">Online</option>
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="gala">Gala</label>
+            <select id="gala" name="gala" defaultValue={filters.gala}>
+              <option value="ALL">Tümü</option>
+              <option value="YES">Katılacak</option>
+              <option value="NO">Katılmayacak</option>
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="trip">Gezi</label>
+            <select id="trip" name="trip" defaultValue={filters.trip}>
+              <option value="ALL">Tümü</option>
+              <option value="YES">Katılacak</option>
+              <option value="NO">Katılmayacak</option>
+            </select>
+          </div>
+          <div className="admin-filter-actions">
+            <button className="button primary" type="submit">
+              Filtrele
+            </button>
+            <Link className="button secondary" href="/admin/bildiriler">
+              Temizle
+            </Link>
+          </div>
+        </form>
 
         {submissions.length ? (
           <div className="admin-table-wrap">
