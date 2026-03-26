@@ -4,16 +4,16 @@ type DraftEmailInput = {
   magicLink: string;
 };
 
-type BrevoSendResponse = {
-  messageId?: string;
-  code?: string;
+type ResendSendResponse = {
+  id?: string;
   message?: string;
+  name?: string;
 };
 
-function getBrevoConfig() {
-  const apiKey = process.env.BREVO_API_KEY;
-  const senderEmail = process.env.BREVO_SENDER_EMAIL ?? process.env.SMTP_FROM;
-  const senderName = process.env.BREVO_SENDER_NAME ?? "EYI 2026 Bildiri Platformu";
+function getResendConfig() {
+  const apiKey = process.env.RESEND_API_KEY;
+  const senderEmail = process.env.RESEND_SENDER_EMAIL;
+  const senderName = process.env.RESEND_SENDER_NAME ?? "EYI 2026 Bildiri Platformu";
 
   return {
     apiKey,
@@ -23,8 +23,8 @@ function getBrevoConfig() {
   };
 }
 
-export function isBrevoConfigured() {
-  return getBrevoConfig().isConfigured;
+export function isResendConfigured() {
+  return getResendConfig().isConfigured;
 }
 
 export async function sendDraftAccessEmail({
@@ -32,41 +32,30 @@ export async function sendDraftAccessEmail({
   congressName,
   magicLink,
 }: DraftEmailInput) {
-  const brevo = getBrevoConfig();
+  const resend = getResendConfig();
 
-  if (!brevo.isConfigured || !brevo.apiKey || !brevo.senderEmail) {
-    throw new Error("Brevo API ayarları eksik.");
+  if (!resend.isConfigured || !resend.apiKey || !resend.senderEmail) {
+    throw new Error("Resend API ayarları eksik.");
   }
 
-  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
+  const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "api-key": brevo.apiKey,
+      Authorization: `Bearer ${resend.apiKey}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      sender: {
-        email: brevo.senderEmail,
-        name: brevo.senderName,
-      },
-      headers: {
-        "X-Mailin-Track": "0",
-      },
-      to: [
-        {
-          email: to,
-        },
-      ],
+      from: `${resend.senderName} <${resend.senderEmail}>`,
+      to: [to],
       subject: `${congressName} - Bildiri taslağınıza erişim linki`,
-      textContent: [
+      text: [
         `${congressName} için başlattığınız bildiri taslağına aşağıdaki bağlantı ile erişebilirsiniz.`,
         "",
         magicLink,
         "",
         "Bu bağlantı tek kullanımlıktır. Süresi dolduysa yeni bir bağlantı oluşturabilirsiniz.",
       ].join("\n"),
-      htmlContent: `
+      html: `
         <p>${congressName} için başlattığınız bildiri taslağına aşağıdaki bağlantı ile erişebilirsiniz.</p>
         <p><a href="${magicLink}">Taslağı aç</a></p>
         <p>Bu bağlantı tek kullanımlıktır. Süresi dolduysa yeni bir bağlantı oluşturabilirsiniz.</p>
@@ -75,9 +64,9 @@ export async function sendDraftAccessEmail({
   });
 
   if (!response.ok) {
-    const errorBody = (await response.json().catch(() => null)) as BrevoSendResponse | null;
-    throw new Error(errorBody?.message ?? "Brevo e-posta gönderimi başarısız oldu.");
+    const errorBody = (await response.json().catch(() => null)) as ResendSendResponse | null;
+    throw new Error(errorBody?.message ?? errorBody?.name ?? "Resend e-posta gönderimi başarısız oldu.");
   }
 
-  return (await response.json().catch(() => null)) as BrevoSendResponse | null;
+  return (await response.json().catch(() => null)) as ResendSendResponse | null;
 }

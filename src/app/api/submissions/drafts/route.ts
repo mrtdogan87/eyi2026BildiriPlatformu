@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { isBrevoConfigured, sendDraftAccessEmail } from "@/lib/email";
+import { isResendConfigured, sendDraftAccessEmail } from "@/lib/email";
 import {
   ensureCongress,
   getSubmissionSnapshot,
@@ -55,8 +55,8 @@ export async function POST(request: Request) {
   const magicLink = await issueDraftLink(submission.id, email, congress.slug);
   await setDraftAccessCookie(submission.id);
 
-  const isDevelopmentPreview = process.env.NODE_ENV !== "production" && !isBrevoConfigured();
-  if (isBrevoConfigured()) {
+  const isDevelopmentPreview = process.env.NODE_ENV !== "production" && !isResendConfigured();
+  if (isResendConfigured()) {
     try {
       await sendDraftAccessEmail({
         to: email,
@@ -65,13 +65,13 @@ export async function POST(request: Request) {
       });
     } catch {
       return NextResponse.json(
-        { error: "Taslak oluşturuldu ancak e-posta gönderilemedi. Brevo API ayarlarını kontrol edin." },
+        { error: "Taslak oluşturuldu ancak e-posta gönderilemedi. Resend API ayarlarını kontrol edin." },
         { status: 500 },
       );
     }
   } else if (process.env.NODE_ENV === "production") {
     return NextResponse.json(
-      { error: "Taslak linki göndermek için Brevo API ayarları eksik." },
+      { error: "Taslak linki göndermek için Resend API ayarları eksik." },
       { status: 500 },
     );
   }
