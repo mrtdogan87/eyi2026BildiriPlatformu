@@ -3,7 +3,7 @@
 ## 1. Yerel Hazırlık
 
 - `.env` dosyasındaki `DATABASE_URL` ve `DIRECT_URL` değerlerini Neon bağlantı dizgisi ile doldurun.
-- SMTP ayarlarını ücretsiz sağlayıcınızın bilgileri ile doldurun.
+- Brevo API ayarlarını ücretsiz sağlayıcınızın bilgileri ile doldurun.
 - `APP_BASE_URL` yerelde `http://localhost:3000`, production'da Vercel domain'i olmalı.
 
 ## 2. Neon
@@ -37,12 +37,9 @@ git push -u origin main
   - `DIRECT_URL`
   - `APP_BASE_URL`
   - `DRAFT_SESSION_SECRET`
-  - `SMTP_HOST`
-  - `SMTP_PORT`
-  - `SMTP_SECURE`
-  - `SMTP_USER`
-  - `SMTP_PASS`
-  - `SMTP_FROM`
+  - `BREVO_API_KEY`
+  - `BREVO_SENDER_EMAIL`
+  - `BREVO_SENDER_NAME`
 
 ## 5. Dosya Yükleme Notu
 
