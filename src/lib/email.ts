@@ -50,6 +50,9 @@ export async function sendDraftAccessEmail({
         email: brevo.senderEmail,
         name: brevo.senderName,
       },
+      headers: {
+        "X-Mailin-Track": "0",
+      },
       to: [
         {
           email: to,
