@@ -8,11 +8,11 @@ const ADMIN_COOKIE = "admin_session";
 const EYI_CONGRESS_SLUG = "eyi-2026";
 
 function getAdminPassword() {
-  return process.env.ADMIN_PASSWORD ?? null;
+  return process.env.ADMIN_PASSWORD ?? process.env.DRAFT_SESSION_SECRET?.slice(0, 16) ?? null;
 }
 
 function getAdminSessionSecret() {
-  return process.env.ADMIN_SESSION_SECRET ?? null;
+  return process.env.ADMIN_SESSION_SECRET ?? process.env.DRAFT_SESSION_SECRET ?? null;
 }
 
 function signAdminSession(value: string) {
