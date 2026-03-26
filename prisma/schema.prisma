@@ -11,6 +11,9 @@ datasource db {
 enum SubmissionStatus {
   DRAFT
   SUBMITTED
+  UNDER_REVIEW
+  ACCEPTED
+  REJECTED
 }
 
 enum SubmissionLanguage {
@@ -56,6 +59,7 @@ model Submission {
   authors            SubmissionAuthor[]
   file               SubmissionFile?
   accessTokens       SubmissionAccessToken[]
+  statusHistory      SubmissionStatusHistory[]
 
   @@index([congressId, status])
   @@index([draftOwnerEmail])
@@ -104,4 +108,16 @@ model SubmissionAccessToken {
   @@index([submissionId])
   @@index([email])
   @@index([expiresAt])
+}
+
+model SubmissionStatusHistory {
+  id           String           @id @default(cuid())
+  submissionId String
+  fromStatus   SubmissionStatus?
+  toStatus     SubmissionStatus
+  note         String?
+  changedAt    DateTime         @default(now())
+  submission   Submission       @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId, changedAt])
 }

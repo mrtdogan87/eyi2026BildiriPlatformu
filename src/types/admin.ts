@@ -3,6 +3,8 @@ export type AdminSubmissionListItem = {
   title: string;
   presenterName: string;
   presenterEmail: string;
+  status: "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
+  statusLabel: string;
   submissionLanguage: "TR" | "EN";
   presentationMode: string;
   galaLabel: string;
@@ -12,6 +14,7 @@ export type AdminSubmissionListItem = {
 
 export type AdminSubmissionListFilters = {
   q: string;
+  status: "ALL" | "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
   language: "ALL" | "TR" | "EN";
   presentationMode: "ALL" | "ONLINE" | "IN_PERSON";
   gala: "ALL" | "YES" | "NO";
@@ -21,6 +24,8 @@ export type AdminSubmissionListFilters = {
 export type AdminSubmissionDetail = {
   id: string;
   draftOwnerEmail: string;
+  status: "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
+  statusLabel: string;
   submissionLanguage: "TR" | "EN";
   titleTr: string;
   titleEn: string;
@@ -49,4 +54,11 @@ export type AdminSubmissionDetail = {
     uploadedAt: string;
     previewText: string | null;
   } | null;
+  statusHistory: Array<{
+    id: string;
+    fromStatus: string | null;
+    toStatus: string;
+    note: string;
+    changedAt: string;
+  }>;
 };

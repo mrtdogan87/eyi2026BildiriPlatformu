@@ -313,7 +313,9 @@ export async function countSubmittedEmailUsage(congressId: string, emails: strin
       },
       submission: {
         congressId,
-        status: "SUBMITTED",
+        submittedAt: {
+          not: null,
+        },
       },
     },
     select: {

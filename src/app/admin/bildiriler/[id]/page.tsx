@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
+import { AdminStatusForm } from "@/components/admin/admin-status-form";
 import { getAdminSubmissionDetail, requireAdminPage } from "@/lib/admin";
 
 type PageProps = {
@@ -51,6 +52,10 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           <h2>Bildiri Bilgileri</h2>
           <dl className="admin-definition-list">
             <div>
+              <dt>Durum</dt>
+              <dd>{submission.statusLabel}</dd>
+            </div>
+            <div>
               <dt>Bildiri Dili</dt>
               <dd>{submission.submissionLanguage === "TR" ? "Türkçe" : "İngilizce"}</dd>
             </div>
@@ -75,6 +80,11 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
               <dd>{submission.draftOwnerEmail}</dd>
             </div>
           </dl>
+        </div>
+
+        <div className="admin-detail-block">
+          <h2>Durum Yönetimi</h2>
+          <AdminStatusForm submissionId={submission.id} currentStatus={submission.status} />
         </div>
 
         <div className="admin-detail-block">
@@ -151,6 +161,29 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             </div>
           ) : (
             <div className="notice">Bu bildiri için dosya bulunamadı.</div>
+          )}
+        </div>
+
+        <div className="admin-detail-block">
+          <h2>Durum Geçmişi</h2>
+          {submission.statusHistory.length ? (
+            <div className="admin-history-list">
+              {submission.statusHistory.map((entry) => (
+                <div key={entry.id} className="admin-history-item">
+                  <p>
+                    <strong>{entry.toStatus}</strong> · {formatDate(entry.changedAt)}
+                  </p>
+                  <p>
+                    <strong>Önceki Durum:</strong> {entry.fromStatus ?? "İlk Kayıt"}
+                  </p>
+                  <p>
+                    <strong>Not:</strong> {entry.note || "-"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="notice">Henüz durum geçmişi kaydı bulunmuyor.</div>
           )}
         </div>
       </section>

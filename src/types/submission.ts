@@ -33,7 +33,7 @@ export type SubmissionSnapshot = SubmissionDetailsInput &
   id: string;
   congressSlug: string;
   draftOwnerEmail: string;
-  status: "DRAFT" | "SUBMITTED";
+  status: "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
   submittedAt: string | null;
   file: {
     originalName: string;

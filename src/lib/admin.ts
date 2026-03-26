@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import mammoth from "mammoth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import type { SubmissionStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import type {
   AdminSubmissionDetail,
@@ -11,6 +12,7 @@ import type {
 
 const ADMIN_COOKIE = "admin_session";
 const EYI_CONGRESS_SLUG = "eyi-2026";
+type ManageableSubmissionStatus = "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
 
 function getAdminPassword() {
   return process.env.ADMIN_PASSWORD ?? process.env.DRAFT_SESSION_SECRET?.slice(0, 16) ?? null;
@@ -94,6 +96,29 @@ function mapPresentationMode(mode: "ONLINE" | "IN_PERSON" | null) {
   return mode === "ONLINE" ? "Online" : "Yüz yüze";
 }
 
+export function mapSubmissionStatus(status: SubmissionStatus) {
+  switch (status) {
+    case "SUBMITTED":
+      return "Gönderildi";
+    case "UNDER_REVIEW":
+      return "İncelemede";
+    case "ACCEPTED":
+      return "Kabul Edildi";
+    case "REJECTED":
+      return "Reddedildi";
+    default:
+      return "Taslak";
+  }
+}
+
+function asManageableSubmissionStatus(status: SubmissionStatus): ManageableSubmissionStatus {
+  if (status === "DRAFT") {
+    return "SUBMITTED";
+  }
+
+  return status;
+}
+
 export function normalizeAdminSubmissionFilters(
   input?: Partial<AdminSubmissionListFilters> | URLSearchParams,
 ): AdminSubmissionListFilters {
@@ -110,12 +135,20 @@ export function normalizeAdminSubmissionFilters(
   };
 
   const language = getValue("language");
+  const status = getValue("status");
   const presentationMode = getValue("presentationMode");
   const gala = getValue("gala");
   const trip = getValue("trip");
 
   return {
     q: String(getValue("q") ?? "").trim(),
+    status:
+      status === "SUBMITTED" ||
+      status === "UNDER_REVIEW" ||
+      status === "ACCEPTED" ||
+      status === "REJECTED"
+        ? status
+        : "ALL",
     language: language === "TR" || language === "EN" ? language : "ALL",
     presentationMode:
       presentationMode === "ONLINE" || presentationMode === "IN_PERSON"
@@ -132,10 +165,17 @@ export async function getAdminSubmissionList(
   const filters = normalizeAdminSubmissionFilters(rawFilters);
   const submissions = await prisma.submission.findMany({
     where: {
-      status: "SUBMITTED",
+      status: {
+        not: "DRAFT",
+      },
       congress: {
         slug: EYI_CONGRESS_SLUG,
       },
+      ...(filters.status !== "ALL"
+        ? {
+            status: filters.status,
+          }
+        : {}),
       ...(filters.language !== "ALL"
         ? {
             submissionLanguage: filters.language,
@@ -204,6 +244,7 @@ export async function getAdminSubmissionList(
     ],
     select: {
       id: true,
+      status: true,
       submissionLanguage: true,
       titleTr: true,
       titleEn: true,
@@ -234,6 +275,8 @@ export async function getAdminSubmissionList(
     return {
       id: submission.id,
       title: language === "EN" ? submission.titleEn || "-" : submission.titleTr || "-",
+      status: asManageableSubmissionStatus(submission.status),
+      statusLabel: mapSubmissionStatus(submission.status),
       submissionLanguage: language,
       presenterName: presenter?.fullName ?? "-",
       presenterEmail: presenter?.email ?? "-",
@@ -255,6 +298,7 @@ export function buildAdminSubmissionCsv(items: AdminSubmissionListItem[]) {
     "Baslik",
     "Sunan Yazar",
     "E-posta",
+    "Durum",
     "Dil",
     "Sunum",
     "Gala",
@@ -266,6 +310,7 @@ export function buildAdminSubmissionCsv(items: AdminSubmissionListItem[]) {
     item.title,
     item.presenterName,
     item.presenterEmail,
+    item.statusLabel,
     item.submissionLanguage,
     item.presentationMode,
     item.galaLabel,
@@ -285,11 +330,14 @@ export async function getAdminSubmissionDetail(
       congress: {
         slug: EYI_CONGRESS_SLUG,
       },
-      status: "SUBMITTED",
+      status: {
+        not: "DRAFT",
+      },
     },
     select: {
       id: true,
       draftOwnerEmail: true,
+      status: true,
       submissionLanguage: true,
       titleTr: true,
       titleEn: true,
@@ -325,6 +373,18 @@ export async function getAdminSubmissionDetail(
           content: true,
         },
       },
+      statusHistory: {
+        orderBy: {
+          changedAt: "desc",
+        },
+        select: {
+          id: true,
+          fromStatus: true,
+          toStatus: true,
+          note: true,
+          changedAt: true,
+        },
+      },
     },
   });
 
@@ -352,6 +412,8 @@ export async function getAdminSubmissionDetail(
   return {
     id: submission.id,
     draftOwnerEmail: submission.draftOwnerEmail,
+    status: asManageableSubmissionStatus(submission.status),
+    statusLabel: mapSubmissionStatus(submission.status),
     submissionLanguage: (submission.submissionLanguage ?? "TR") as "TR" | "EN",
     titleTr: submission.titleTr ?? "",
     titleEn: submission.titleEn ?? "",
@@ -382,6 +444,13 @@ export async function getAdminSubmissionDetail(
           previewText,
         }
       : null,
+    statusHistory: submission.statusHistory.map((entry) => ({
+      id: entry.id,
+      fromStatus: entry.fromStatus ? mapSubmissionStatus(entry.fromStatus) : null,
+      toStatus: mapSubmissionStatus(entry.toStatus),
+      note: entry.note ?? "",
+      changedAt: entry.changedAt.toISOString(),
+    })),
   };
 }
 
@@ -390,7 +459,9 @@ export async function getAdminDownloadPayload(submissionId: string) {
     where: {
       submissionId,
       submission: {
-        status: "SUBMITTED",
+        status: {
+          not: "DRAFT",
+        },
         congress: {
           slug: EYI_CONGRESS_SLUG,
         },
@@ -402,4 +473,64 @@ export async function getAdminDownloadPayload(submissionId: string) {
       content: true,
     },
   });
+}
+
+const MANAGEABLE_STATUSES: SubmissionStatus[] = [
+  "SUBMITTED",
+  "UNDER_REVIEW",
+  "ACCEPTED",
+  "REJECTED",
+];
+
+export function isManageableSubmissionStatus(value: string): value is SubmissionStatus {
+  return MANAGEABLE_STATUSES.includes(value as SubmissionStatus);
+}
+
+export async function updateAdminSubmissionStatus(input: {
+  submissionId: string;
+  status: SubmissionStatus;
+  note?: string;
+}) {
+  const current = await prisma.submission.findFirst({
+    where: {
+      id: input.submissionId,
+      congress: {
+        slug: EYI_CONGRESS_SLUG,
+      },
+      status: {
+        not: "DRAFT",
+      },
+    },
+    select: {
+      id: true,
+      status: true,
+    },
+  });
+
+  if (!current) {
+    return null;
+  }
+
+  const note = input.note?.trim() ?? "";
+
+  await prisma.$transaction([
+    prisma.submission.update({
+      where: {
+        id: current.id,
+      },
+      data: {
+        status: input.status,
+      },
+    }),
+    prisma.submissionStatusHistory.create({
+      data: {
+        submissionId: current.id,
+        fromStatus: current.status,
+        toStatus: input.status,
+        note: note || null,
+      },
+    }),
+  ]);
+
+  return getAdminSubmissionDetail(current.id);
 }

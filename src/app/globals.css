@@ -363,7 +363,7 @@ textarea {
 
 .admin-filter-grid {
   display: grid;
-  grid-template-columns: 2fr repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -491,6 +491,32 @@ textarea {
   line-height: 1.7;
   color: var(--text);
   font-family: inherit;
+}
+
+.admin-status-form {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-status-form textarea {
+  min-height: 120px;
+}
+
+.admin-history-list {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-history-item {
+  padding: 16px 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.admin-history-item p {
+  margin: 0 0 8px;
+  line-height: 1.6;
 }
 
 .admin-back-link {

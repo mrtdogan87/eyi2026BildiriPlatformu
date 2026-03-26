@@ -5,6 +5,7 @@ import { getAdminSubmissionList, normalizeAdminSubmissionFilters, requireAdminPa
 type PageProps = {
   searchParams: Promise<{
     q?: string;
+    status?: string;
     language?: string;
     presentationMode?: string;
     gala?: string;
@@ -58,6 +59,16 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
         </div>
 
         <form className="admin-filter-grid" method="GET">
+          <div className="field">
+            <label htmlFor="status">Durum</label>
+            <select id="status" name="status" defaultValue={filters.status}>
+              <option value="ALL">Tümü</option>
+              <option value="SUBMITTED">Gönderildi</option>
+              <option value="UNDER_REVIEW">İncelemede</option>
+              <option value="ACCEPTED">Kabul Edildi</option>
+              <option value="REJECTED">Reddedildi</option>
+            </select>
+          </div>
           <div className="field">
             <label htmlFor="q">Arama</label>
             <input
@@ -121,6 +132,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                   <th>Başlık</th>
                   <th>Sunan Yazar</th>
                   <th>E-posta</th>
+                  <th>Durum</th>
                   <th>Dil</th>
                   <th>Sunum</th>
                   <th>Gala</th>
@@ -138,6 +150,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                     </td>
                     <td>{submission.presenterName}</td>
                     <td>{submission.presenterEmail}</td>
+                    <td>{submission.statusLabel}</td>
                     <td>{submission.submissionLanguage}</td>
                     <td>{submission.presentationMode}</td>
                     <td>{submission.galaLabel}</td>
