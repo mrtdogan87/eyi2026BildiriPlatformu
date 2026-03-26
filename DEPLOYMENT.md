@@ -5,6 +5,7 @@
 - `.env` dosyasındaki `DATABASE_URL` ve `DIRECT_URL` değerlerini Neon bağlantı dizgisi ile doldurun.
 - Resend API ayarlarını ücretsiz sağlayıcınızın bilgileri ile doldurun.
 - `APP_BASE_URL` yerelde `http://localhost:3000`, production'da Vercel domain'i olmalı.
+- Yönetim paneli için `ADMIN_PASSWORD` ve `ADMIN_SESSION_SECRET` değerlerini de tanımlayın.
 
 ## 2. Neon
 
@@ -37,12 +38,14 @@ git push -u origin main
   - `DIRECT_URL`
   - `APP_BASE_URL`
   - `DRAFT_SESSION_SECRET`
+  - `ADMIN_PASSWORD`
+  - `ADMIN_SESSION_SECRET`
   - `RESEND_API_KEY`
   - `RESEND_SENDER_EMAIL`
   - `RESEND_SENDER_NAME`
 
 ## 5. Dosya Yükleme Notu
 
-- Yüklenen DOCX dosyaları şu an uygulama dosya sistemine yazılıyor.
-- Vercel üzerinde bu kalıcı depolama sayılmaz.
-- İlk deploy demo amaçlıdır; kalıcı dosya arşivi için ileride Blob/S3 benzeri servis eklenmelidir.
+- Yüklenen DOCX dosyaları şu an PostgreSQL veritabanında saklanıyor.
+- Bu sayede Vercel dosya sistemi sınırlaması aşılmış durumda.
+- Uzun vadede daha büyük arşiv ihtiyacı için Blob/S3 benzeri obje depolama yine değerlendirilebilir.

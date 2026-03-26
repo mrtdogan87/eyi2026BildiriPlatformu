@@ -320,6 +320,142 @@ textarea {
   margin-top: 3px;
 }
 
+.admin-page-shell {
+  width: min(1280px, calc(100% - 32px));
+}
+
+.admin-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.admin-panel-card {
+  padding: 32px;
+}
+
+.admin-login-card {
+  max-width: 520px;
+  padding: 32px;
+}
+
+.admin-login-actions {
+  justify-content: flex-end;
+}
+
+.admin-table-head {
+  margin-bottom: 20px;
+}
+
+.admin-subtitle {
+  margin: 6px 0 0;
+  color: var(--text-muted);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-table th {
+  color: #66758d;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.admin-link-cell {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.admin-detail-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.admin-detail-block {
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--surface-muted);
+}
+
+.admin-detail-block h2 {
+  margin: 0 0 18px;
+  font-size: 1.35rem;
+}
+
+.admin-definition-list {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-definition-list div {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-definition-list dt {
+  color: #66758d;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.admin-definition-list dd {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.admin-author-list {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-author-item {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.admin-author-item h3 {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-author-item p {
+  margin: 8px 0 0;
+  line-height: 1.6;
+}
+
+.admin-file-box p {
+  margin: 0 0 12px;
+  line-height: 1.6;
+}
+
+.admin-back-link {
+  display: inline-flex;
+  margin-bottom: 16px;
+  color: rgba(232, 239, 249, 0.82);
+}
+
 @media (max-width: 840px) {
   .page-shell {
     width: min(100% - 20px, 1100px);
@@ -343,5 +479,14 @@ textarea {
 
   .button {
     width: 100%;
+  }
+
+  .admin-hero {
+    flex-direction: column;
+  }
+
+  .admin-panel-card,
+  .admin-login-card {
+    padding: 22px;
   }
 }
