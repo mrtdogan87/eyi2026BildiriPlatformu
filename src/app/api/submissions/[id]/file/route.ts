@@ -1,5 +1,3 @@
-import { mkdir, unlink, writeFile } from "fs/promises";
-import path from "path";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -29,18 +27,7 @@ export async function PUT(request: Request, { params }: RouteProps) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const uploadsDir = path.join(process.cwd(), "public", "uploads");
-  await mkdir(uploadsDir, { recursive: true });
-
-  const fileName = `${id}-${randomUUID()}.docx`;
-  const storageKey = path.posix.join("uploads", fileName);
-  const absolutePath = path.join(uploadsDir, fileName);
-
-  const previous = await prisma.submissionFile.findUnique({
-    where: { submissionId: id },
-  });
-
-  await writeFile(absolutePath, buffer);
+  const storageKey = `database:${id}:${randomUUID()}.docx`;
 
   await prisma.submissionFile.upsert({
     where: {
@@ -51,6 +38,7 @@ export async function PUT(request: Request, { params }: RouteProps) {
       mimeType: file.type,
       fileSize: file.size,
       storageKey,
+      content: buffer,
       uploadedAt: new Date(),
     },
     create: {
@@ -59,15 +47,9 @@ export async function PUT(request: Request, { params }: RouteProps) {
       mimeType: file.type,
       fileSize: file.size,
       storageKey,
+      content: buffer,
     },
   });
-
-  if (previous?.storageKey) {
-    const previousPath = path.join(process.cwd(), "public", previous.storageKey);
-    if (previousPath !== absolutePath) {
-      await unlink(previousPath).catch(() => undefined);
-    }
-  }
 
   return NextResponse.json({
     submission: await getSubmissionSnapshot(id),
