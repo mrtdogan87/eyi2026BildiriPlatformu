@@ -471,6 +471,28 @@ textarea {
   line-height: 1.6;
 }
 
+.admin-preview-box {
+  margin-top: 20px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.admin-preview-box h3 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.admin-preview-box pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+  color: var(--text);
+  font-family: inherit;
+}
+
 .admin-back-link {
   display: inline-flex;
   margin-bottom: 16px;

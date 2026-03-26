@@ -140,6 +140,14 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
               <a className="button primary" href={`/api/admin/submissions/${submission.id}/file`}>
                 DOCX İndir
               </a>
+              <div className="admin-preview-box">
+                <h3>Dosya Önizleme</h3>
+                {submission.file.previewText ? (
+                  <pre>{submission.file.previewText}</pre>
+                ) : (
+                  <p>Bu dosya için önizleme oluşturulamadı.</p>
+                )}
+              </div>
             </div>
           ) : (
             <div className="notice">Bu bildiri için dosya bulunamadı.</div>

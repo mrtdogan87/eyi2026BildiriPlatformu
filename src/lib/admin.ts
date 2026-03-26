@@ -1,4 +1,5 @@
 import { createHmac, timingSafeEqual } from "crypto";
+import mammoth from "mammoth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -321,6 +322,7 @@ export async function getAdminSubmissionDetail(
           fileSize: true,
           mimeType: true,
           uploadedAt: true,
+          content: true,
         },
       },
     },
@@ -328,6 +330,23 @@ export async function getAdminSubmissionDetail(
 
   if (!submission) {
     return null;
+  }
+
+  let previewText: string | null = null;
+  if (submission.file?.content) {
+    try {
+      const extracted = await mammoth.extractRawText({
+        buffer: Buffer.from(submission.file.content),
+      });
+      const normalized = extracted.value
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .join("\n");
+      previewText = normalized || null;
+    } catch {
+      previewText = null;
+    }
   }
 
   return {
@@ -360,6 +379,7 @@ export async function getAdminSubmissionDetail(
           fileSize: submission.file.fileSize,
           mimeType: submission.file.mimeType,
           uploadedAt: submission.file.uploadedAt.toISOString(),
+          previewText,
         }
       : null,
   };

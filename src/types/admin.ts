@@ -47,5 +47,6 @@ export type AdminSubmissionDetail = {
     fileSize: number;
     mimeType: string;
     uploadedAt: string;
+    previewText: string | null;
   } | null;
 };
