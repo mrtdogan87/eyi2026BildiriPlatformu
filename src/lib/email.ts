@@ -4,6 +4,14 @@ type DraftEmailInput = {
   magicLink: string;
 };
 
+type SubmissionStatusEmailInput = {
+  to: string;
+  congressName: string;
+  paperTitle: string;
+  statusLabel: string;
+  note?: string;
+};
+
 type ResendSendResponse = {
   id?: string;
   message?: string;
@@ -59,6 +67,57 @@ export async function sendDraftAccessEmail({
         <p>${congressName} için başlattığınız bildiri taslağına aşağıdaki bağlantı ile erişebilirsiniz.</p>
         <p><a href="${magicLink}">Taslağı aç</a></p>
         <p>Bu bağlantı tek kullanımlıktır. Süresi dolduysa yeni bir bağlantı oluşturabilirsiniz.</p>
+      `,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorBody = (await response.json().catch(() => null)) as ResendSendResponse | null;
+    throw new Error(errorBody?.message ?? errorBody?.name ?? "Resend e-posta gönderimi başarısız oldu.");
+  }
+
+  return (await response.json().catch(() => null)) as ResendSendResponse | null;
+}
+
+export async function sendSubmissionStatusEmail({
+  to,
+  congressName,
+  paperTitle,
+  statusLabel,
+  note,
+}: SubmissionStatusEmailInput) {
+  const resend = getResendConfig();
+
+  if (!resend.isConfigured || !resend.apiKey || !resend.senderEmail) {
+    throw new Error("Resend API ayarları eksik.");
+  }
+
+  const noteText = note?.trim() ? `Not: ${note.trim()}` : "";
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${resend.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: `${resend.senderName} <${resend.senderEmail}>`,
+      to: [to],
+      subject: `${congressName} - Bildiri durum güncellemesi`,
+      text: [
+        `${congressName} kapsamında gönderdiğiniz bildirinin durumu güncellendi.`,
+        "",
+        `Başlık: ${paperTitle}`,
+        `Yeni durum: ${statusLabel}`,
+        noteText,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      html: `
+        <p>${congressName} kapsamında gönderdiğiniz bildirinin durumu güncellendi.</p>
+        <p><strong>Başlık:</strong> ${paperTitle}</p>
+        <p><strong>Yeni durum:</strong> ${statusLabel}</p>
+        ${noteText ? `<p><strong>Not:</strong> ${note?.trim()}</p>` : ""}
       `,
     }),
   });

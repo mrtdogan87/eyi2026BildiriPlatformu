@@ -512,6 +512,13 @@ export async function updateAdminSubmissionStatus(input: {
   }
 
   const note = input.note?.trim() ?? "";
+  if (current.status === input.status) {
+    return {
+      submission: await getAdminSubmissionDetail(current.id),
+      changed: false,
+      previousStatus: current.status,
+    };
+  }
 
   await prisma.$transaction([
     prisma.submission.update({
@@ -532,5 +539,9 @@ export async function updateAdminSubmissionStatus(input: {
     }),
   ]);
 
-  return getAdminSubmissionDetail(current.id);
+  return {
+    submission: await getAdminSubmissionDetail(current.id),
+    changed: true,
+    previousStatus: current.status,
+  };
 }
