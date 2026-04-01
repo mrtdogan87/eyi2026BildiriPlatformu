@@ -13,7 +13,7 @@ const DRAFT_COOKIE = "draft_access";
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-function getBaseUrl() {
+export function getBaseUrl() {
   return process.env.APP_BASE_URL ?? "http://localhost:3000";
 }
 
