@@ -72,14 +72,6 @@ export function PlatformHero({ caption, variant = "default" }: Props) {
               </ul>
             </div>
           </div>
-          <div className="hero-highlight">
-            <h3>Önemli Not</h3>
-            <p>
-              Bu ekran, kongre ana sitesinden ayrı bir deneyim hissi oluşturmamak için aynı kurumsal
-              dil ve görsel çerçeve içinde düzenlenmiştir. Burada tamamladığınız başvuru, EYİ 2026
-              akademik değerlendirme sürecinin resmi parçasıdır.
-            </p>
-          </div>
         </>
       ) : null}
       {caption ? (

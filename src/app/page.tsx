@@ -1,17 +1,23 @@
-import Link from "next/link";
 import { PlatformHero } from "@/components/submission/platform-hero";
+import { SubmissionPortal } from "@/components/submission/submission-portal";
+import { canAccessDraft, getSubmissionSnapshot } from "@/lib/submission";
 
-export default function HomePage() {
+type HomePageProps = {
+  searchParams: Promise<{ draft?: string }>;
+};
+
+export default async function HomePage({ searchParams }: HomePageProps) {
+  const congressSlug = "eyi-2026";
+  const { draft } = await searchParams;
+  const initialSnapshot =
+    draft && (await canAccessDraft(draft)) ? await getSubmissionSnapshot(draft) : null;
+
   return (
-    <main className="page-shell">
-      <div className="page-box">
-        <PlatformHero />
+    <main className="page-shell submission-shell">
+      <div className="page-box submission-page-box">
+        <PlatformHero variant="submission" />
 
-        <div className="card start-card">
-          <Link className="button primary" href="/eyi-2026/bildiri-gonder">
-            Bildiri Gönder
-          </Link>
-        </div>
+        <SubmissionPortal congressSlug={congressSlug} initialSnapshot={initialSnapshot} />
       </div>
     </main>
   );
