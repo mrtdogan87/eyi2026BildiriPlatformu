@@ -16,9 +16,11 @@ export default async function SubmissionPage({ params, searchParams }: PageProps
 
   return (
     <main className="page-shell">
-      <PlatformHero />
+      <div className="page-box">
+        <PlatformHero />
 
-      <SubmissionPortal congressSlug={congressSlug} initialSnapshot={initialSnapshot} />
+        <SubmissionPortal congressSlug={congressSlug} initialSnapshot={initialSnapshot} />
+      </div>
     </main>
   );
 }

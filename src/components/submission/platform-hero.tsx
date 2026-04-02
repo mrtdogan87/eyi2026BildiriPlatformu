@@ -5,14 +5,20 @@ type Props = {
 export function PlatformHero({ caption }: Props) {
   return (
     <section className="hero">
-      <h1>23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu Bildiri Gönderme Platformu</h1>
-      <p>
-        Sistem dört adımda ilerler: önce bildiri bilgilerinizi ve dosyanızı eklersiniz, sonra
-        yazar bilgilerini tamamlarsınız, üçüncü adımda katılım ve sosyal faaliyet bilgilerini
-        girersiniz, son adımda ise tüm bilgileri kontrol ederek bildirinizi gönderirsiniz.
+      <h1 className="page-title">Bildiri Gönder</h1>
+      <p className="page-subtitle">
+        23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu
       </p>
+      <div className="intro">
+        <p>
+          Bildiri gönderim süreci dört adımdan oluşur. Önce bildiri bilgilerinizi ve dosyanızı
+          eklersiniz, ardından yazar bilgilerini tamamlarsınız, üçüncü adımda katılım ve sosyal
+          faaliyet tercihlerinizi girersiniz, son adımda ise tüm bilgileri kontrol ederek
+          bildirinizi gönderirsiniz.
+        </p>
+      </div>
       {caption ? (
-        <p style={{ marginTop: 12, color: "rgba(232, 239, 249, 0.92)" }}>
+        <p className="hero-caption">
           <strong>{caption}</strong>
         </p>
       ) : null}

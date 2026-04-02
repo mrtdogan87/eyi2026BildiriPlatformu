@@ -1,13 +1,13 @@
 :root {
-  --bg: #07111f;
-  --bg-accent: #0d1b31;
+  --bg: #f7f9fc;
+  --bg-accent: #eef4fb;
   --surface: #ffffff;
-  --surface-muted: #f5f7fb;
-  --text: #102038;
-  --text-muted: #617089;
-  --line: #d6ddea;
-  --primary: #284777;
-  --primary-strong: #173055;
+  --surface-muted: #f3f7fc;
+  --text: #1f2937;
+  --text-muted: #4b5563;
+  --line: #dbe5f1;
+  --primary: #002f6c;
+  --primary-strong: #001f4a;
   --danger: #b42318;
   --success: #157347;
 }
@@ -17,16 +17,14 @@
 }
 
 html {
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top, rgba(60, 104, 173, 0.18), transparent 30%),
-    linear-gradient(180deg, var(--bg), #050b14 70%);
-  color: #f8fbff;
+  background: var(--bg);
+  color: var(--text);
 }
 
 a {
@@ -42,9 +40,16 @@ textarea {
 }
 
 .page-shell {
-  width: min(1100px, calc(100% - 32px));
+  width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 48px 0 72px;
+  padding: 40px 0 72px;
+}
+
+.page-box {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  padding: 36px;
 }
 
 .hero {
@@ -52,29 +57,48 @@ textarea {
 }
 
 .hero h1 {
-  margin: 0 0 10px;
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
+  margin: 0 0 10px 0;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0;
+  line-height: 1.2;
 }
 
 .hero p {
   margin: 0;
-  color: rgba(232, 239, 249, 0.78);
-  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.page-subtitle {
+  margin: 0 0 28px 0;
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+.intro {
+  margin-bottom: 30px;
+  font-size: 16px;
+}
+
+.hero-caption {
+  margin-top: 12px;
+  color: var(--primary);
 }
 
 .card {
   background: var(--surface);
   color: var(--text);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 24px;
-  box-shadow: 0 24px 60px rgba(3, 11, 25, 0.25);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: none;
 }
 
 .start-card,
 .wizard-card {
-  padding: 36px;
+  padding: 24px;
+  background: var(--surface-muted);
 }
 
 .steps {
@@ -82,7 +106,7 @@ textarea {
   align-items: center;
   gap: 18px;
   margin: 26px 0 28px;
-  color: rgba(232, 239, 249, 0.8);
+  color: var(--text-muted);
   flex-wrap: wrap;
 }
 
@@ -100,13 +124,16 @@ textarea {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid #c8d8eb;
+  background: #ffffff;
+  color: var(--text-muted);
 }
 
 .step.active .step-badge,
 .step.done .step-badge {
-  background: #284777;
-  border-color: #284777;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
 
 .step-separator {
@@ -142,7 +169,7 @@ textarea {
 .field select,
 .field textarea {
   width: 100%;
-  border-radius: 14px;
+  border-radius: 10px;
   border: 1px solid var(--line);
   padding: 16px 18px;
   background: #fff;
@@ -162,7 +189,7 @@ textarea {
 
 .field-display {
   min-height: 72px;
-  border-radius: 14px;
+  border-radius: 10px;
   border: 1px solid var(--line);
   padding: 16px 18px;
   background: #fff;
@@ -191,10 +218,11 @@ textarea {
 
 .button {
   border: 0;
-  border-radius: 14px;
+  border-radius: 10px;
   padding: 15px 22px;
   cursor: pointer;
   transition: 0.2s ease;
+  font-weight: 600;
 }
 
 .button.primary {
@@ -212,8 +240,8 @@ textarea {
 }
 
 .button.ghost {
-  background: #eef3fb;
-  color: var(--text);
+  background: #eef4fb;
+  color: var(--primary);
 }
 
 .button:disabled {
@@ -232,10 +260,10 @@ textarea {
 .magic-preview {
   margin-top: 18px;
   padding: 18px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, #eef4ff, #e5efff);
-  border: 1px solid #b7caef;
-  color: #173055;
+  border-radius: 10px;
+  background: #eef4fb;
+  border-left: 5px solid var(--primary);
+  color: var(--primary);
 }
 
 .error {
@@ -248,7 +276,7 @@ textarea {
 
 .author-card {
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 14px;
   padding: 22px;
   background: var(--surface-muted);
 }
@@ -527,14 +555,18 @@ textarea {
 
 @media (max-width: 840px) {
   .page-shell {
-    width: min(100% - 20px, 1100px);
+    width: min(100% - 20px, 1200px);
     padding-top: 24px;
+  }
+
+  .page-box {
+    padding: 24px;
   }
 
   .start-card,
   .wizard-card {
     padding: 22px;
-    border-radius: 20px;
+    border-radius: 14px;
   }
 
   .grid.two {
