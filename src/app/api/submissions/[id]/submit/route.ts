@@ -21,7 +21,9 @@ export async function POST(_request: Request, { params }: RouteProps) {
       accuracy?: boolean;
       originality?: boolean;
       submissionLimit?: boolean;
-      kvkkConsent?: boolean;
+      coauthorApproval?: boolean;
+      personalDataConsent?: boolean;
+      registrationPresentationConsent?: boolean;
     };
   };
 
@@ -35,7 +37,9 @@ export async function POST(_request: Request, { params }: RouteProps) {
     !declarations?.accuracy ||
     !declarations.originality ||
     !declarations.submissionLimit ||
-    !declarations.kvkkConsent
+    !declarations.coauthorApproval ||
+    !declarations.personalDataConsent ||
+    !declarations.registrationPresentationConsent
   ) {
     return NextResponse.json(
       { error: "Bildirinizi gönderebilmek için tüm beyanları onaylamalısınız." },

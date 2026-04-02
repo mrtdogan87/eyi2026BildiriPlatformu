@@ -18,6 +18,15 @@ type AuthorDraft = SubmissionAuthorInput & {
   localId: string;
 };
 
+type SubmissionDeclarations = {
+  accuracy: boolean;
+  originality: boolean;
+  submissionLimit: boolean;
+  coauthorApproval: boolean;
+  personalDataConsent: boolean;
+  registrationPresentationConsent: boolean;
+};
+
 const emptyDetails: SubmissionDetailsInput = {
   submissionLanguage: "TR",
   titleTr: "",
@@ -44,6 +53,30 @@ const emptyAuthor = (): SubmissionAuthorInput => ({
   isPresenter: false,
 });
 
+const emptyDeclarations: SubmissionDeclarations = {
+  accuracy: false,
+  originality: false,
+  submissionLimit: false,
+  coauthorApproval: false,
+  personalDataConsent: false,
+  registrationPresentationConsent: false,
+};
+
+const declarationLabels: Record<keyof SubmissionDeclarations, string> = {
+  accuracy:
+    "Başvuru sahibi olarak, bu form kapsamında tarafımdan sunulan tüm bilgi ve belgelerin doğru, eksiksiz ve güncel olduğunu beyan ederim.",
+  originality:
+    "Başvurusu yapılan çalışmanın özgün olduğunu, intihal içermediğini ve aynı anda başka bir kongre, sempozyum ya da yayın organında değerlendirme sürecinde bulunmadığını kabul ederim.",
+  submissionLimit:
+    "Kongre kapsamında geçerli olan, bir araştırmacının en fazla iki bildiride yazar olarak yer alabileceği kuralını okuduğumu, anladığımı ve kabul ettiğimi beyan ederim.",
+  coauthorApproval:
+    "Başvurusu yapılan çalışmada adı geçen diğer yazarların çalışmadan, başvuru sürecinden ve bildiri içeriğinden haberdar olduğunu; tüm ortak yazarlardan gerekli izin ve onayın tarafımca alındığını beyan ederim.",
+  personalDataConsent:
+    "Kongre başvuru, değerlendirme, program oluşturma, sertifika düzenleme ve ilgili akademik/idari süreçlerin yürütülmesi amacıyla kişisel verilerimin işlenmesine onay verdiğimi kabul ederim.",
+  registrationPresentationConsent:
+    "Bildiri kabul edilse dahi, kongre kurallarında belirtilen kayıt ve sunum yükümlülüklerinin yerine getirilmemesi durumunda çalışmanın programa alınmayabileceğini veya yayımlanmayabileceğini kabul ederim.",
+};
+
 function createAuthorDraft(author?: Partial<SubmissionAuthorInput>, isPresenter = false): AuthorDraft {
   return {
     localId: crypto.randomUUID(),
@@ -68,12 +101,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [declarations, setDeclarations] = useState({
-    accuracy: false,
-    originality: false,
-    submissionLimit: false,
-    kvkkConsent: false,
-  });
+  const [declarations, setDeclarations] = useState<SubmissionDeclarations>(emptyDeclarations);
 
   const [details, setDetails] = useState<SubmissionDetailsInput>(
     initialSnapshot
@@ -835,52 +863,23 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
             <div className="summary-block">
               <h3>Etik & Beyanlar</h3>
               <div className="checklist">
-                <label className="check-item">
-                  <input
-                    checked={declarations.accuracy}
-                    onChange={(event) =>
-                      setDeclarations((current) => ({ ...current, accuracy: event.target.checked }))
-                    }
-                    type="checkbox"
-                  />
-                  <span>Başvuru sahibi olarak, bu formda verdiğim bilgilerin doğruluğunu beyan ederim.</span>
-                </label>
-                <label className="check-item">
-                  <input
-                    checked={declarations.originality}
-                    onChange={(event) =>
-                      setDeclarations((current) => ({ ...current, originality: event.target.checked }))
-                    }
-                    type="checkbox"
-                  />
-                  <span>Bu çalışma özgündür ve başka bir yerde değerlendirmede değildir.</span>
-                </label>
-                <label className="check-item">
-                  <input
-                    checked={declarations.submissionLimit}
-                    onChange={(event) =>
-                      setDeclarations((current) => ({
-                        ...current,
-                        submissionLimit: event.target.checked,
-                      }))
-                    }
-                    type="checkbox"
-                  />
-                  <span>Bir isim en fazla iki bildiride yer alabilir kuralını kabul ediyorum.</span>
-                </label>
-                <label className="check-item">
-                  <input
-                    checked={declarations.kvkkConsent}
-                    onChange={(event) =>
-                      setDeclarations((current) => ({
-                        ...current,
-                        kvkkConsent: event.target.checked,
-                      }))
-                    }
-                    type="checkbox"
-                  />
-                  <span>Kişisel verilerimin kongre süreçleri kapsamında işlenmesine onay veriyorum.</span>
-                </label>
+                {(Object.entries(declarationLabels) as Array<
+                  [keyof SubmissionDeclarations, string]
+                >).map(([key, label]) => (
+                  <label className="check-item" key={key}>
+                    <input
+                      checked={declarations[key]}
+                      onChange={(event) =>
+                        setDeclarations((current) => ({
+                          ...current,
+                          [key]: event.target.checked,
+                        }))
+                      }
+                      type="checkbox"
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
