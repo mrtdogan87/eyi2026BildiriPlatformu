@@ -390,7 +390,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
           Taslağınıza daha sonra tek kullanımlık link ile geri dönebilmeniz için e-posta adresinizi
           ve bildirinizin dilini seçin.
         </p>
-        <form onSubmit={startDraft}>
+        <form className="submission-form-panel" onSubmit={startDraft}>
           <div className="grid two">
             <div className="field">
               <label htmlFor="draft-email">
@@ -484,7 +484,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
         </h2>
 
         {step === 1 ? (
-          <form onSubmit={saveDetails}>
+          <form className="submission-form-panel" onSubmit={saveDetails}>
             <div className="grid two">
               <div className="field">
                 <label htmlFor="file">
@@ -603,7 +603,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
         ) : null}
 
         {step === 2 ? (
-          <form onSubmit={saveAuthors}>
+          <form className="submission-form-panel" onSubmit={saveAuthors}>
             <div className="grid" style={{ gap: 16 }}>
               {authors.map((author, index) => (
                 <div className="author-card" key={author.localId}>
@@ -689,7 +689,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
         ) : null}
 
         {step === 3 ? (
-          <form onSubmit={saveParticipation}>
+          <form className="submission-form-panel" onSubmit={saveParticipation}>
             <div className="grid two">
               <div className="field">
                 <label htmlFor="presentation-mode">
@@ -813,7 +813,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
         ) : null}
 
         {step === 4 ? (
-          <div className="summary">
+          <div className="summary submission-form-panel">
             <div className="summary-block">
               <h3>Dil</h3>
               <p>{selectedLanguageLabel}</p>
@@ -826,7 +826,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
               <h3>{details.submissionLanguage === "TR" ? "Başlık" : "Title"}</h3>
               <p>{details.submissionLanguage === "TR" ? details.titleTr : details.titleEn}</p>
             </div>
-            <div className="summary-block">
+            <div className="summary-block summary-block-wide">
               <h3>{details.submissionLanguage === "TR" ? "Özet" : "Abstract"}</h3>
               <p>{details.submissionLanguage === "TR" ? details.abstractTr : details.abstractEn}</p>
             </div>
@@ -838,7 +838,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
               <h3>Dosya</h3>
               <p>{snapshot.file?.originalName ?? "Dosya yüklenmedi"}</p>
             </div>
-            <div className="summary-block">
+            <div className="summary-block summary-block-wide">
               <h3>Yazarlar</h3>
               <ul className="summary-list">
                 {authors.map((author) => (
@@ -860,7 +860,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                 </li>
               </ul>
             </div>
-            <div className="summary-block">
+            <div className="summary-block summary-block-wide">
               <h3>Etik & Beyanlar</h3>
               <div className="checklist">
                 {(Object.entries(declarationLabels) as Array<

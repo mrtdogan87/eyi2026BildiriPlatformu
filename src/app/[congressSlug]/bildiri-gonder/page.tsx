@@ -15,9 +15,9 @@ export default async function SubmissionPage({ params, searchParams }: PageProps
     draft && (await canAccessDraft(draft)) ? await getSubmissionSnapshot(draft) : null;
 
   return (
-    <main className="page-shell">
-      <div className="page-box">
-        <PlatformHero />
+    <main className="page-shell submission-shell">
+      <div className="page-box submission-page-box">
+        <PlatformHero variant="submission" />
 
         <SubmissionPortal congressSlug={congressSlug} initialSnapshot={initialSnapshot} />
       </div>

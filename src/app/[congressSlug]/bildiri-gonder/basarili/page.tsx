@@ -9,8 +9,8 @@ export default async function SuccessPage({ params }: PageProps) {
   const { congressSlug } = await params;
 
   return (
-    <main className="page-shell">
-      <div className="page-box">
+    <main className="page-shell submission-shell">
+      <div className="page-box submission-page-box">
         <PlatformHero caption="Bildiriniz başarıyla alındı." />
 
         <div className="card start-card">

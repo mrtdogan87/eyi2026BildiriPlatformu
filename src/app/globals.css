@@ -87,6 +87,66 @@ textarea {
   color: var(--primary);
 }
 
+.hero-submission .intro {
+  max-width: 980px;
+  margin-bottom: 0;
+}
+
+.hero-submission .intro p + p {
+  margin-top: 14px;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.hero-panel {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.hero-panel h2 {
+  margin: 0 0 16px;
+  font-size: 22px;
+  color: var(--primary);
+}
+
+.hero-panel ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.hero-panel li {
+  margin-bottom: 10px;
+  color: var(--text);
+  line-height: 1.65;
+}
+
+.hero-highlight {
+  margin-top: 28px;
+  background: var(--bg-accent);
+  border-left: 5px solid var(--primary);
+  border-radius: 10px;
+  padding: 20px 22px;
+}
+
+.hero-highlight h3 {
+  margin: 0 0 10px;
+  color: var(--primary);
+  font-size: 20px;
+}
+
+.hero-highlight p {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.7;
+}
+
 .card {
   background: var(--surface);
   color: var(--text);
@@ -348,6 +408,99 @@ textarea {
   margin-top: 3px;
 }
 
+.submission-shell {
+  padding-top: 34px;
+}
+
+.submission-page-box {
+  padding: 36px;
+}
+
+.submission-page-box .hero {
+  margin-bottom: 32px;
+}
+
+.submission-page-box .start-card,
+.submission-page-box .wizard-card {
+  padding: 0;
+  background: transparent;
+  border: 0;
+}
+
+.submission-page-box .submission-form-panel {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 28px;
+}
+
+.submission-page-box .steps {
+  margin: 0 0 24px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-muted);
+  gap: 14px 20px;
+}
+
+.submission-page-box .step {
+  flex: 1 1 220px;
+}
+
+.submission-page-box .step-badge {
+  width: 40px;
+  height: 40px;
+}
+
+.submission-page-box .section-title {
+  margin-bottom: 20px;
+  color: var(--primary);
+}
+
+.submission-page-box .field input,
+.submission-page-box .field select,
+.submission-page-box .field textarea,
+.submission-page-box .field-display {
+  border-radius: 12px;
+}
+
+.submission-page-box .button.secondary {
+  background: #eef4fb;
+  color: var(--primary);
+  border: 1px solid var(--line);
+}
+
+.submission-page-box .button.ghost {
+  background: #ffffff;
+  border: 1px solid var(--line);
+}
+
+.submission-page-box .author-card,
+.submission-page-box .summary-block {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+}
+
+.submission-page-box .summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.submission-page-box .summary-block-wide {
+  grid-column: 1 / -1;
+}
+
+.submission-page-box .check-item {
+  grid-template-columns: 22px 1fr;
+  gap: 14px;
+}
+
+.submission-page-box .form-actions {
+  margin-top: 24px;
+}
+
 .admin-page-shell {
   width: min(1280px, calc(100% - 32px));
 }
@@ -573,6 +726,11 @@ textarea {
     grid-template-columns: 1fr;
   }
 
+  .hero-grid,
+  .submission-page-box .summary {
+    grid-template-columns: 1fr;
+  }
+
   .form-actions {
     flex-direction: column-reverse;
     align-items: stretch;
@@ -599,5 +757,13 @@ textarea {
 
   .admin-filter-grid {
     grid-template-columns: 1fr;
+  }
+
+  .submission-page-box {
+    padding: 24px;
+  }
+
+  .submission-page-box .submission-form-panel {
+    padding: 22px;
   }
 }
