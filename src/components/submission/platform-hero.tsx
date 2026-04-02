@@ -14,18 +14,11 @@ export function PlatformHero({ caption, variant = "default" }: Props) {
       </p>
       <div className="intro">
         {isSubmission ? (
-          <>
-            <p>
-              Bu sayfa, EYİ 2026 için resmi bildiri gönderim alanıdır. Kongre ana sayfasındaki
-              akademik çerçevenin devamı olarak tasarlanan bu ekranda bildirinizle ilgili tüm
-              bilgileri tek akışta tamamlayabilirsiniz.
-            </p>
-            <p>
-              Gönderim süreci dört adımdan oluşur: bildiri bilgileri ve dosya, yazar bilgileri,
-              katılım tercihleri ve son kontrol. Taslağınızı oluşturduktan sonra aynı başvuruya
-              güvenli bağlantı ile yeniden dönebilirsiniz.
-            </p>
-          </>
+          <p>
+            Gönderim süreci dört adımdan oluşur: bildiri bilgileri ve dosya, yazar bilgileri,
+            katılım tercihleri ve son kontrol. Taslağınızı oluşturduktan sonra aynı başvuruya
+            güvenli bağlantı ile yeniden dönebilirsiniz.
+          </p>
         ) : (
           <p>
             Bildiri gönderim süreci dört adımdan oluşur. Önce bildiri bilgilerinizi ve dosyanızı

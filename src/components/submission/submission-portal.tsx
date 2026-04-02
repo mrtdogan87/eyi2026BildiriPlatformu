@@ -189,10 +189,6 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
       if (data.magicLinkPreview) {
         setMagicLinkPreview(data.magicLinkPreview as string);
       }
-      if (!data.magicLinkPreview) {
-        router.push(`/${congressSlug}/bildiri-gonder?draft=${data.submissionId as string}`);
-        router.refresh();
-      }
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
     } finally {
