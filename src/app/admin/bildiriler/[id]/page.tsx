@@ -23,6 +23,18 @@ function formatFileSize(fileSize: number) {
   return `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
 }
 
+function formatCurrency(value: number | null) {
+  if (value == null) {
+    return "-";
+  }
+
+  return new Intl.NumberFormat("tr-TR", {
+    style: "currency",
+    currency: "TRY",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 export default async function AdminSubmissionDetailPage({ params }: PageProps) {
   await requireAdminPage();
   const { id } = await params;
@@ -135,6 +147,28 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
         </div>
 
         <div className="admin-detail-block">
+          <h2>Ücret Bilgisi</h2>
+          <dl className="admin-definition-list">
+            <div>
+              <dt>Kategori</dt>
+              <dd>{submission.payment.categoryLabel}</dd>
+            </div>
+            <div>
+              <dt>Kayıt Dönemi</dt>
+              <dd>{submission.payment.periodLabel}</dd>
+            </div>
+            <div>
+              <dt>Tutar</dt>
+              <dd>{formatCurrency(submission.payment.amount)}</dd>
+            </div>
+            <div>
+              <dt>Açıklama</dt>
+              <dd>{submission.payment.description || "-"}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className="admin-detail-block">
           <h2>Dosya</h2>
           {submission.file ? (
             <div className="admin-file-box">
@@ -161,6 +195,28 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             </div>
           ) : (
             <div className="notice">Bu bildiri için dosya bulunamadı.</div>
+          )}
+        </div>
+
+        <div className="admin-detail-block">
+          <h2>Ödeme Dekontu</h2>
+          {submission.paymentReceipt ? (
+            <div className="admin-file-box">
+              <p>
+                <strong>Dosya Adı:</strong> {submission.paymentReceipt.originalName}
+              </p>
+              <p>
+                <strong>Boyut:</strong> {formatFileSize(submission.paymentReceipt.fileSize)}
+              </p>
+              <p>
+                <strong>Yükleme Tarihi:</strong> {formatDate(submission.paymentReceipt.uploadedAt)}
+              </p>
+              <a className="button primary" href={`/api/admin/submissions/${submission.id}/receipt`}>
+                Dekontu İndir
+              </a>
+            </div>
+          ) : (
+            <div className="notice">Bu bildiri için ödeme dekontu yüklenmemiş.</div>
           )}
         </div>
 
