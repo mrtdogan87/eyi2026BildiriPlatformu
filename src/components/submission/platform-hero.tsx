@@ -15,16 +15,16 @@ export function PlatformHero({ caption, variant = "default" }: Props) {
       <div className="intro">
         {isSubmission ? (
           <p>
-            Gönderim süreci dört adımdan oluşur: bildiri bilgileri ve dosya, yazar bilgileri,
-            katılım tercihleri ve son kontrol. Taslağınızı oluşturduktan sonra aynı başvuruya
-            güvenli bağlantı ile yeniden dönebilirsiniz.
+            Gönderim süreci beş adımdan oluşur: bildiri bilgileri ve dosya, yazar bilgileri,
+            katılım tercihleri, ücret ve dekont, son kontrol. Taslağınızı oluşturduktan sonra aynı
+            başvuruya güvenli bağlantı ile yeniden dönebilirsiniz.
           </p>
         ) : (
           <p>
-            Bildiri gönderim süreci dört adımdan oluşur. Önce bildiri bilgilerinizi ve dosyanızı
+            Bildiri gönderim süreci beş adımdan oluşur. Önce bildiri bilgilerinizi ve dosyanızı
             eklersiniz, ardından yazar bilgilerini tamamlarsınız, üçüncü adımda katılım ve sosyal
-            faaliyet tercihlerinizi girersiniz, son adımda ise tüm bilgileri kontrol ederek
-            bildirinizi gönderirsiniz.
+            faaliyet tercihlerinizi girersiniz, dördüncü adımda ücret ve dekont işlemlerini
+            tamamlarsınız, son adımda ise tüm bilgileri kontrol ederek bildirinizi gönderirsiniz.
           </p>
         )}
       </div>
@@ -37,6 +37,7 @@ export function PlatformHero({ caption, variant = "default" }: Props) {
                 <li>Bildiri bilgileri ve DOCX dosyası birlikte kaydedilir.</li>
                 <li>Yazarlar ve sunan yazar bilgisi ikinci adımda tamamlanır.</li>
                 <li>Katılım biçimi ile sosyal faaliyet tercihleri üçüncü adımda seçilir.</li>
+                <li>Ücret hesabı ve dekont yükleme dördüncü adımda tamamlanır.</li>
                 <li>Son ekranda tüm bilgiler ve zorunlu beyanlar onaylanarak gönderim yapılır.</li>
               </ul>
             </div>
@@ -60,6 +61,7 @@ export function PlatformHero({ caption, variant = "default" }: Props) {
               <h2>Son Kontrol</h2>
               <ul>
                 <li>Gönderimden önce tüm alanlar tek sayfada özetlenir.</li>
+                <li>Ücret bilgisi ve yüklenen dekont da son kontrolde tekrar gösterilir.</li>
                 <li>Etik, yazarlık ve kişisel veri işleme beyanları son adımda onaylanır.</li>
                 <li>Gönderim tamamlandığında başvurunuz kongre değerlendirme sürecine alınır.</li>
               </ul>
