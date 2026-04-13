@@ -1,11 +1,10 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
+import { getPaymentClosedMessage, isPaymentClosed } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import {
   canAccessDraft,
-  getPaymentClosedMessage,
   getSubmissionSnapshot,
-  isPaymentClosed,
   isValidReceiptFile,
 } from "@/lib/submission";
 

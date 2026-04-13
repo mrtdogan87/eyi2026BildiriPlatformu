@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
+import { resolveSubmissionPayment } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import {
   canAccessDraft,
   findPresenter,
   getSubmissionSnapshot,
-  resolveSubmissionPayment,
 } from "@/lib/submission";
 import type { SubmissionPaymentInput } from "@/types/submission";
 

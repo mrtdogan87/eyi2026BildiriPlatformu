@@ -3,8 +3,8 @@ import mammoth from "mammoth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { SubmissionStatus } from "@prisma/client";
+import { mapPaymentCategory, mapPaymentPeriod } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
-import { mapPaymentCategory, mapPaymentPeriod } from "@/lib/submission";
 import type {
   AdminSubmissionDetail,
   AdminSubmissionListFilters,

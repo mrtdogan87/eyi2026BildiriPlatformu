@@ -1,16 +1,18 @@
 import { NextResponse } from "next/server";
+import {
+  derivePaymentInputFromCategory,
+  getPaymentClosedMessage,
+  isPaymentClosed,
+  resolveSubmissionPayment,
+} from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import {
   canAccessDraft,
   clearDraftAccessCookie,
   countSubmittedEmailUsage,
-  derivePaymentInputFromCategory,
   findPresenter,
-  getPaymentClosedMessage,
   getSubmissionSnapshot,
-  isPaymentClosed,
   normalizeParticipation,
-  resolveSubmissionPayment,
   validateAuthors,
   validateDetails,
   validateParticipation,

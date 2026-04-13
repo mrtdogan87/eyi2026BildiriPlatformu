@@ -2,6 +2,11 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  getCurrentPaymentPeriod,
+  mapPaymentPeriod,
+  resolveSubmissionPayment,
+} from "@/lib/payment";
 import type {
   SubmissionAuthorInput,
   SubmissionDetailsInput,
@@ -128,14 +133,7 @@ function getPaymentCategoryLabel(category: SubmissionSnapshot["payment"]["catego
 }
 
 function getPaymentPeriodLabel(period: SubmissionSnapshot["payment"]["period"]) {
-  switch (period) {
-    case "EARLY":
-      return "Erken Kayıt";
-    case "LATE":
-      return "Geç Kayıt";
-    default:
-      return "Hesaplama sonrası belirlenecek";
-  }
+  return period ? mapPaymentPeriod(period) : "Hesaplama sonrası belirlenecek";
 }
 
 export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
@@ -200,6 +198,33 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
     () => (details.submissionLanguage === "TR" ? "Türkçe" : "İngilizce"),
     [details.submissionLanguage],
   );
+  const presenterName = useMemo(() => {
+    const presenter = authors.find((author) => author.isPresenter) ?? authors[0];
+    return presenter?.fullName.trim() ?? "";
+  }, [authors]);
+  const paymentPreview = useMemo(() => {
+    const defaultPreview = {
+      period: getCurrentPaymentPeriod(),
+      amount: null,
+      description: "",
+    };
+
+    try {
+      const resolved = resolveSubmissionPayment({
+        payment,
+        presentationMode: participation.presentationMode,
+        presenterName,
+      });
+
+      return {
+        period: resolved.paymentPeriod,
+        amount: resolved.paymentAmount,
+        description: resolved.paymentDescription,
+      };
+    } catch {
+      return defaultPreview;
+    }
+  }, [participation.presentationMode, payment, presenterName]);
 
   function applySubmissionSnapshot(nextSubmission: SubmissionSnapshot | null) {
     setSnapshot(nextSubmission);
@@ -1017,12 +1042,12 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
 
                 <div className="field" style={{ marginTop: 16 }}>
                   <label>Kayıt Dönemi</label>
-                  <div className="field-display">{getPaymentPeriodLabel(snapshot.payment.period)}</div>
+                  <div className="field-display">{getPaymentPeriodLabel(paymentPreview.period)}</div>
                 </div>
 
                 <div className="field" style={{ marginTop: 16 }}>
                   <label>Tutar</label>
-                  <div className="field-display">{formatCurrency(snapshot.payment.amount)}</div>
+                  <div className="field-display">{formatCurrency(paymentPreview.amount)}</div>
                 </div>
               </div>
 
@@ -1048,7 +1073,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                   <label>Ödeme Açıklaması</label>
                   <input
                     readOnly
-                    value={snapshot.payment.description || "Ücretinizi kaydettikten sonra burada oluşur."}
+                    value={paymentPreview.description || "Seçim yaptığınızda burada otomatik oluşur."}
                   />
                 </div>
                 <p style={{ margin: "16px 0 0", color: "#617089", lineHeight: 1.6 }}>
@@ -1072,6 +1097,12 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                     PDF, JPG, JPEG veya PNG, maksimum 10 MB.
                     {snapshot.paymentReceipt ? ` Mevcut dekont: ${snapshot.paymentReceipt.originalName}` : ""}
                   </span>
+                  {participation.presentationMode === "ONLINE" && payment.onlinePaperCount === 2 ? (
+                    <span style={{ color: "#617089", fontSize: 14 }}>
+                      Çevrim içi iki bildiri ödemesinde aynı dekontu ikinci bildiriniz için de
+                      yeniden yükleyebilirsiniz.
+                    </span>
+                  ) : null}
                 </div>
               </div>
             </div>
