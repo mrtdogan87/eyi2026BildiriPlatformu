@@ -4,8 +4,13 @@ import {
   canAccessDraft,
   clearDraftAccessCookie,
   countSubmittedEmailUsage,
+  derivePaymentInputFromCategory,
+  findPresenter,
+  getPaymentClosedMessage,
   getSubmissionSnapshot,
+  isPaymentClosed,
   normalizeParticipation,
+  resolveSubmissionPayment,
   validateAuthors,
   validateDetails,
   validateParticipation,
@@ -52,6 +57,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
     include: {
       authors: true,
       file: true,
+      paymentReceipt: true,
     },
   });
 
@@ -99,6 +105,60 @@ export async function POST(_request: Request, { params }: RouteProps) {
 
   if (participationErrors.length) {
     return NextResponse.json({ error: participationErrors[0] }, { status: 400 });
+  }
+
+  if (isPaymentClosed()) {
+    return NextResponse.json({ error: getPaymentClosedMessage() }, { status: 400 });
+  }
+
+  const presenter = findPresenter(submission.authors);
+  if (!presenter?.fullName.trim()) {
+    return NextResponse.json({ error: "Sunan yazar bilgisi bulunamadı." }, { status: 400 });
+  }
+
+  if (
+    !submission.paymentCategory ||
+    !submission.paymentPeriod ||
+    submission.paymentAmount == null ||
+    !submission.paymentDescription
+  ) {
+    return NextResponse.json(
+      { error: "Bildirinizi gönderebilmek için önce ücret bilgisini hesaplayıp kaydetmelisiniz." },
+      { status: 400 },
+    );
+  }
+
+  let resolvedPayment;
+  try {
+    resolvedPayment = resolveSubmissionPayment({
+      payment: derivePaymentInputFromCategory(submission.paymentCategory),
+      presentationMode: (submission.presentationMode ?? "IN_PERSON") as "ONLINE" | "IN_PERSON",
+      presenterName: presenter.fullName,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Ücret bilgileri doğrulanamadı." },
+      { status: 400 },
+    );
+  }
+
+  if (
+    submission.paymentCategory !== resolvedPayment.paymentCategory ||
+    submission.paymentPeriod !== resolvedPayment.paymentPeriod ||
+    submission.paymentAmount !== resolvedPayment.paymentAmount ||
+    submission.paymentDescription !== resolvedPayment.paymentDescription
+  ) {
+    return NextResponse.json(
+      { error: "Ücret bilgileriniz güncel değil. Lütfen ücret adımını tekrar kaydedin." },
+      { status: 400 },
+    );
+  }
+
+  if (!submission.paymentReceipt) {
+    return NextResponse.json(
+      { error: "Bildirinizi gönderebilmek için ödeme dekontunu yüklemelisiniz." },
+      { status: 400 },
+    );
   }
 
   if (!submission.file) {

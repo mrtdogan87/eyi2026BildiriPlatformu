@@ -18,6 +18,10 @@ CREATE TABLE "Submission" (
     "keywordsTr" TEXT,
     "keywordsEn" TEXT,
     "presentationMode" TEXT,
+    "paymentCategory" TEXT,
+    "paymentPeriod" TEXT,
+    "paymentAmount" INTEGER,
+    "paymentDescription" TEXT,
     "galaAttendance" BOOLEAN NOT NULL DEFAULT false,
     "galaAttendeeCount" INTEGER NOT NULL DEFAULT 0,
     "tripAttendance" BOOLEAN NOT NULL DEFAULT false,
@@ -50,8 +54,21 @@ CREATE TABLE "SubmissionFile" (
     "mimeType" TEXT NOT NULL,
     "fileSize" INTEGER NOT NULL,
     "storageKey" TEXT NOT NULL,
+    "content" BLOB,
     "uploadedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "SubmissionFile_submissionId_fkey" FOREIGN KEY ("submissionId") REFERENCES "Submission" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE "SubmissionPaymentReceipt" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "submissionId" TEXT NOT NULL,
+    "originalName" TEXT NOT NULL,
+    "mimeType" TEXT NOT NULL,
+    "fileSize" INTEGER NOT NULL,
+    "storageKey" TEXT NOT NULL,
+    "content" BLOB,
+    "uploadedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "SubmissionPaymentReceipt_submissionId_fkey" FOREIGN KEY ("submissionId") REFERENCES "Submission" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE "SubmissionAccessToken" (
@@ -65,6 +82,16 @@ CREATE TABLE "SubmissionAccessToken" (
     CONSTRAINT "SubmissionAccessToken_submissionId_fkey" FOREIGN KEY ("submissionId") REFERENCES "Submission" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE "SubmissionStatusHistory" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "submissionId" TEXT NOT NULL,
+    "fromStatus" TEXT,
+    "toStatus" TEXT NOT NULL,
+    "note" TEXT,
+    "changedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "SubmissionStatusHistory_submissionId_fkey" FOREIGN KEY ("submissionId") REFERENCES "Submission" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 CREATE UNIQUE INDEX "Congress_slug_key" ON "Congress"("slug");
 CREATE INDEX "Submission_congressId_status_idx" ON "Submission"("congressId", "status");
 CREATE INDEX "Submission_draftOwnerEmail_idx" ON "Submission"("draftOwnerEmail");
@@ -72,6 +99,8 @@ CREATE INDEX "SubmissionAuthor_submissionId_idx" ON "SubmissionAuthor"("submissi
 CREATE INDEX "SubmissionAuthor_email_idx" ON "SubmissionAuthor"("email");
 CREATE UNIQUE INDEX "SubmissionAuthor_submissionId_email_key" ON "SubmissionAuthor"("submissionId", "email");
 CREATE UNIQUE INDEX "SubmissionFile_submissionId_key" ON "SubmissionFile"("submissionId");
+CREATE UNIQUE INDEX "SubmissionPaymentReceipt_submissionId_key" ON "SubmissionPaymentReceipt"("submissionId");
 CREATE INDEX "SubmissionAccessToken_submissionId_idx" ON "SubmissionAccessToken"("submissionId");
 CREATE INDEX "SubmissionAccessToken_email_idx" ON "SubmissionAccessToken"("email");
 CREATE INDEX "SubmissionAccessToken_expiresAt_idx" ON "SubmissionAccessToken"("expiresAt");
+CREATE INDEX "SubmissionStatusHistory_submissionId_changedAt_idx" ON "SubmissionStatusHistory"("submissionId", "changedAt");

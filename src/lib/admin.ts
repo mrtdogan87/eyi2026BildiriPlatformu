@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { SubmissionStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { mapPaymentCategory, mapPaymentPeriod } from "@/lib/submission";
 import type {
   AdminSubmissionDetail,
   AdminSubmissionListFilters,
@@ -346,6 +347,10 @@ export async function getAdminSubmissionDetail(
       keywordsTr: true,
       keywordsEn: true,
       presentationMode: true,
+      paymentCategory: true,
+      paymentPeriod: true,
+      paymentAmount: true,
+      paymentDescription: true,
       galaAttendance: true,
       galaAttendeeCount: true,
       tripAttendance: true,
@@ -371,6 +376,14 @@ export async function getAdminSubmissionDetail(
           mimeType: true,
           uploadedAt: true,
           content: true,
+        },
+      },
+      paymentReceipt: {
+        select: {
+          originalName: true,
+          fileSize: true,
+          mimeType: true,
+          uploadedAt: true,
         },
       },
       statusHistory: {
@@ -427,6 +440,12 @@ export async function getAdminSubmissionDetail(
     tripAttendance: submission.tripAttendance,
     tripAttendeeCount: submission.tripAttendeeCount,
     submittedAt: submission.submittedAt?.toISOString() ?? null,
+    payment: {
+      categoryLabel: mapPaymentCategory(submission.paymentCategory),
+      periodLabel: mapPaymentPeriod(submission.paymentPeriod),
+      amount: submission.paymentAmount ?? null,
+      description: submission.paymentDescription ?? "",
+    },
     authors: submission.authors.map((author) => ({
       id: author.id,
       fullName: author.fullName,
@@ -444,6 +463,14 @@ export async function getAdminSubmissionDetail(
           previewText,
         }
       : null,
+    paymentReceipt: submission.paymentReceipt
+      ? {
+          originalName: submission.paymentReceipt.originalName,
+          fileSize: submission.paymentReceipt.fileSize,
+          mimeType: submission.paymentReceipt.mimeType,
+          uploadedAt: submission.paymentReceipt.uploadedAt.toISOString(),
+        }
+      : null,
     statusHistory: submission.statusHistory.map((entry) => ({
       id: entry.id,
       fromStatus: entry.fromStatus ? mapSubmissionStatus(entry.fromStatus) : null,
@@ -456,6 +483,27 @@ export async function getAdminSubmissionDetail(
 
 export async function getAdminDownloadPayload(submissionId: string) {
   return prisma.submissionFile.findFirst({
+    where: {
+      submissionId,
+      submission: {
+        status: {
+          not: "DRAFT",
+        },
+        congress: {
+          slug: EYI_CONGRESS_SLUG,
+        },
+      },
+    },
+    select: {
+      originalName: true,
+      mimeType: true,
+      content: true,
+    },
+  });
+}
+
+export async function getAdminPaymentReceiptDownloadPayload(submissionId: string) {
+  return prisma.submissionPaymentReceipt.findFirst({
     where: {
       submissionId,
       submission: {

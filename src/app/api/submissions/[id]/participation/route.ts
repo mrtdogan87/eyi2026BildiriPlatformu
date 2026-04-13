@@ -26,6 +26,15 @@ export async function PATCH(request: Request, { params }: RouteProps) {
     return NextResponse.json({ error: errors[0] }, { status: 400 });
   }
 
+  const current = await prisma.submission.findUnique({
+    where: { id },
+    select: {
+      presentationMode: true,
+    },
+  });
+
+  const shouldResetPayment = current?.presentationMode && current.presentationMode !== normalized.presentationMode;
+
   await prisma.submission.update({
     where: { id },
     data: {
@@ -34,8 +43,24 @@ export async function PATCH(request: Request, { params }: RouteProps) {
       galaAttendeeCount: normalized.galaAttendeeCount,
       tripAttendance: normalized.tripAttendance,
       tripAttendeeCount: normalized.tripAttendeeCount,
+      ...(shouldResetPayment
+        ? {
+            paymentCategory: null,
+            paymentPeriod: null,
+            paymentAmount: null,
+            paymentDescription: null,
+          }
+        : {}),
     },
   });
+
+  if (shouldResetPayment) {
+    await prisma.submissionPaymentReceipt.deleteMany({
+      where: {
+        submissionId: id,
+      },
+    });
+  }
 
   return NextResponse.json({
     submission: await getSubmissionSnapshot(id),

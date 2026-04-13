@@ -26,6 +26,18 @@ enum PresentationMode {
   IN_PERSON
 }
 
+enum PaymentCategory {
+  ACADEMIC
+  STUDENT
+  ONLINE_ONE
+  ONLINE_TWO
+}
+
+enum PaymentPeriod {
+  EARLY
+  LATE
+}
+
 model Congress {
   id          String       @id @default(cuid())
   slug        String       @unique
@@ -47,6 +59,10 @@ model Submission {
   keywordsTr         String?
   keywordsEn         String?
   presentationMode   PresentationMode?
+  paymentCategory    PaymentCategory?
+  paymentPeriod      PaymentPeriod?
+  paymentAmount      Int?
+  paymentDescription String?
   galaAttendance     Boolean              @default(false)
   galaAttendeeCount  Int                  @default(0)
   tripAttendance     Boolean              @default(false)
@@ -58,6 +74,7 @@ model Submission {
   congress           Congress               @relation(fields: [congressId], references: [id], onDelete: Cascade)
   authors            SubmissionAuthor[]
   file               SubmissionFile?
+  paymentReceipt     SubmissionPaymentReceipt?
   accessTokens       SubmissionAccessToken[]
   statusHistory      SubmissionStatusHistory[]
 
@@ -84,6 +101,18 @@ model SubmissionAuthor {
 }
 
 model SubmissionFile {
+  id           String     @id @default(cuid())
+  submissionId String     @unique
+  originalName String
+  mimeType     String
+  fileSize     Int
+  storageKey   String
+  content      Bytes?
+  uploadedAt   DateTime   @default(now())
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+}
+
+model SubmissionPaymentReceipt {
   id           String     @id @default(cuid())
   submissionId String     @unique
   originalName String

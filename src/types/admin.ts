@@ -39,6 +39,12 @@ export type AdminSubmissionDetail = {
   tripAttendance: boolean;
   tripAttendeeCount: number;
   submittedAt: string | null;
+  payment: {
+    categoryLabel: string;
+    periodLabel: string;
+    amount: number | null;
+    description: string;
+  };
   authors: Array<{
     id: string;
     fullName: string;
@@ -50,9 +56,15 @@ export type AdminSubmissionDetail = {
   file: {
     originalName: string;
     fileSize: number;
+      mimeType: string;
+      uploadedAt: string;
+      previewText: string | null;
+    } | null;
+  paymentReceipt: {
+    originalName: string;
+    fileSize: number;
     mimeType: string;
     uploadedAt: string;
-    previewText: string | null;
   } | null;
   statusHistory: Array<{
     id: string;
