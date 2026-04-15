@@ -546,7 +546,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
       <div className="card start-card">
         <h2 className="section-title">Bildiri Gönderimine Başlayın</h2>
         <p style={{ marginTop: 0, color: "#617089" }}>
-          Taslağınıza daha sonra tek kullanımlık link ile geri dönebilmeniz için e-posta adresinizi
+          Taslağınıza daha sonra güvenli erişim linki ile geri dönebilmeniz için e-posta adresinizi
           ve bildirinizin dilini seçin.
         </p>
         <form className="submission-form-panel" onSubmit={startDraft}>

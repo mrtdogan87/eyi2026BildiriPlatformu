@@ -18,6 +18,7 @@ import { slugToTitle } from "@/lib/utils";
 const DRAFT_COOKIE = "draft_access";
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const DRAFT_TOKEN_GRACE_WINDOW_MS = 5 * 60 * 1000;
 const RECEIPT_ALLOWED_EXTENSIONS = [".pdf", ".jpg", ".jpeg", ".png"];
 const RECEIPT_ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
@@ -52,6 +53,10 @@ export function hashToken(token: string) {
 
 export function generateAccessToken() {
   return randomBytes(24).toString("hex");
+}
+
+export function getDraftTokenWindowMinutes() {
+  return DRAFT_TOKEN_GRACE_WINDOW_MS / (60 * 1000);
 }
 
 function signDraftSession(submissionId: string) {
@@ -107,17 +112,20 @@ export function buildMagicLink(congressSlug: string, token: string) {
 }
 
 export async function issueDraftLink(submissionId: string, email: string, congressSlug: string) {
+  const now = new Date();
   const token = generateAccessToken();
   const tokenHash = hashToken(token);
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
+  const expiresAt = new Date(now.getTime() + 1000 * 60 * 60 * 24);
 
   await prisma.submissionAccessToken.updateMany({
     where: {
       submissionId,
-      usedAt: null,
+      expiresAt: {
+        gt: now,
+      },
     },
     data: {
-      usedAt: new Date(),
+      expiresAt: now,
     },
   });
 
@@ -139,14 +147,15 @@ export async function issueDraftLink(submissionId: string, email: string, congre
   return magicLink;
 }
 
-export async function consumeDraftToken(token: string) {
-  const tokenHash = hashToken(token);
-  const now = new Date();
+function isDraftTokenUsable(usedAt: Date | null, now: Date) {
+  return !usedAt || now.getTime() - usedAt.getTime() <= DRAFT_TOKEN_GRACE_WINDOW_MS;
+}
 
-  const record = await prisma.submissionAccessToken.findFirst({
+async function findDraftTokenRecord(token: string, now: Date) {
+  const tokenHash = hashToken(token);
+  return prisma.submissionAccessToken.findFirst({
     where: {
       tokenHash,
-      usedAt: null,
       expiresAt: {
         gt: now,
       },
@@ -159,17 +168,34 @@ export async function consumeDraftToken(token: string) {
       },
     },
   });
+}
 
-  if (!record) {
+export async function inspectDraftToken(token: string) {
+  const now = new Date();
+  const record = await findDraftTokenRecord(token, now);
+  if (!record || !isDraftTokenUsable(record.usedAt, now)) {
     return null;
   }
 
-  await prisma.submissionAccessToken.update({
-    where: { id: record.id },
-    data: {
-      usedAt: now,
-    },
-  });
+  return record.submission;
+}
+
+export async function consumeDraftToken(token: string) {
+  const now = new Date();
+  const record = await findDraftTokenRecord(token, now);
+
+  if (!record || !isDraftTokenUsable(record.usedAt, now)) {
+    return null;
+  }
+
+  if (!record.usedAt) {
+    await prisma.submissionAccessToken.update({
+      where: { id: record.id },
+      data: {
+        usedAt: now,
+      },
+    });
+  }
 
   return record.submission;
 }

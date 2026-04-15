@@ -79,7 +79,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     message: isDevelopmentPreview
       ? "Taslak oluşturuldu. Geliştirme ortamında bağlantı aşağıda önizleme olarak gösteriliyor."
-      : "Taslak oluşturuldu. Tek kullanımlık giriş linki e-posta adresinize gönderildi.",
+      : "Taslak oluşturuldu. Güvenli giriş linki e-posta adresinize gönderildi.",
     submissionId: submission.id,
     submission: await getSubmissionSnapshot(submission.id),
     magicLinkPreview: isDevelopmentPreview ? magicLink : undefined,

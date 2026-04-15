@@ -61,12 +61,16 @@ export async function sendDraftAccessEmail({
         "",
         magicLink,
         "",
-        "Bu bağlantı tek kullanımlıktır. Süresi dolduysa yeni bir bağlantı oluşturabilirsiniz.",
+        "Bağlantıyı açtıktan sonra ekrandaki doğrulama adımı ile taslağınıza geçebilirsiniz.",
+        "Doğrulamanın ardından aynı cihazda 5 dakika boyunca devam edebilirsiniz.",
+        "Süresi dolduysa yeni bir bağlantı oluşturabilirsiniz.",
       ].join("\n"),
       html: `
         <p>${congressName} için başlattığınız bildiri taslağına aşağıdaki bağlantı ile erişebilirsiniz.</p>
         <p><a href="${magicLink}">Taslağı aç</a></p>
-        <p>Bu bağlantı tek kullanımlıktır. Süresi dolduysa yeni bir bağlantı oluşturabilirsiniz.</p>
+        <p>Bağlantıyı açtıktan sonra ekrandaki doğrulama adımı ile taslağınıza geçebilirsiniz.</p>
+        <p>Doğrulamanın ardından aynı cihazda 5 dakika boyunca devam edebilirsiniz.</p>
+        <p>Süresi dolduysa yeni bir bağlantı oluşturabilirsiniz.</p>
       `,
     }),
   });

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
   const submission = await consumeDraftToken(body.token);
   if (!submission) {
-    return NextResponse.json({ error: "Gecersiz veya suresi dolmus link." }, { status: 400 });
+    return NextResponse.json({ error: "Geçersiz veya süresi dolmuş link." }, { status: 400 });
   }
 
   await setDraftAccessCookie(submission.id);
