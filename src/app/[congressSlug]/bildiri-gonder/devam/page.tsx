@@ -2,6 +2,8 @@ import { DraftLinkGate } from "@/components/submission/draft-link-gate";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { getDraftTokenWindowMinutes, inspectDraftToken } from "@/lib/submission";
 
+export const dynamic = "force-dynamic";
+
 type ContinueDraftPageProps = {
   params: Promise<{ congressSlug: string }>;
   searchParams: Promise<{ token?: string }>;

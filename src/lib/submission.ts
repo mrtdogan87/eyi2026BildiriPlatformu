@@ -2,13 +2,20 @@ import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import {
-  derivePaymentInputFromCategory,
+  getCongressBankInfo,
+  getCongressGalaInfo,
+  getCongressTripInfo,
+  getCongressWithTiers,
+  getCurrentPaymentPeriod,
   isPaymentClosed,
+  tierToOption,
 } from "@/lib/payment";
 import type {
-  PaymentCategory,
+  AttendeeRole,
+  AudienceType,
   PaymentPeriod,
   SubmissionAuthorInput,
+  SubmissionConfig,
   SubmissionDetailsInput,
   SubmissionParticipationInput,
   SubmissionSnapshot,
@@ -299,6 +306,30 @@ export function validateParticipation(input: SubmissionParticipationInput) {
   return errors;
 }
 
+export async function getSubmissionConfig(
+  congressSlug: string,
+): Promise<SubmissionConfig | null> {
+  const congress = await getCongressWithTiers(congressSlug);
+  if (!congress) {
+    return null;
+  }
+
+  const period = getCurrentPaymentPeriod(congress);
+
+  return {
+    congressName: congress.name,
+    congressSlug: congress.slug,
+    earlyDeadline: congress.earlyDeadline?.toISOString() ?? null,
+    lateDeadline: congress.lateDeadline?.toISOString() ?? null,
+    currentPeriod: period,
+    bank: getCongressBankInfo(congress),
+    gala: getCongressGalaInfo(congress),
+    trip: getCongressTripInfo(congress),
+    tiers: congress.paymentTiers
+      .filter((tier) => tier.active)
+      .map(tierToOption),
+  };
+}
 
 export async function getSubmissionSnapshot(
   submissionId: string,
@@ -320,10 +351,6 @@ export async function getSubmissionSnapshot(
   if (!submission) {
     return null;
   }
-
-  const paymentInput = derivePaymentInputFromCategory(
-    (submission.paymentCategory ?? null) as PaymentCategory | null,
-  );
 
   return {
     id: submission.id,
@@ -350,12 +377,20 @@ export async function getSubmissionSnapshot(
         }
       : null,
     payment: {
-      ...paymentInput,
-      category: (submission.paymentCategory ?? null) as PaymentCategory | null,
+      attendeeRole: (submission.attendeeRole ?? null) as AttendeeRole | null,
+      audience: (submission.audience ?? null) as AudienceType | null,
+      onlinePaperCount:
+        submission.onlinePaperCount === 1 || submission.onlinePaperCount === 2
+          ? (submission.onlinePaperCount as 1 | 2)
+          : null,
       period: (submission.paymentPeriod ?? null) as PaymentPeriod | null,
       amount: submission.paymentAmount ?? null,
+      currency: submission.paymentCurrency ?? null,
       description: submission.paymentDescription ?? "",
-      isClosed: isPaymentClosed(),
+      isClosed: isPaymentClosed(submission.congress),
+      galaAmount: submission.galaFeeAmount ?? null,
+      galaCurrency: submission.galaFeeCurrency ?? null,
+      tierId: submission.paymentTierId ?? null,
     },
     paymentReceipt: submission.paymentReceipt
       ? {

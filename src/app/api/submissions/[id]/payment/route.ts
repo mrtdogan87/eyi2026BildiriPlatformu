@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { resolveSubmissionPayment } from "@/lib/payment";
+import {
+  getCongressWithTiers,
+  resolveSubmissionPayment,
+} from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import {
   canAccessDraft,
@@ -23,18 +26,20 @@ export async function PATCH(request: Request, { params }: RouteProps) {
     where: { id },
     select: {
       presentationMode: true,
-      paymentCategory: true,
-      paymentPeriod: true,
+      paymentTierId: true,
       paymentAmount: true,
+      paymentCurrency: true,
       paymentDescription: true,
+      attendeeRole: true,
+      audience: true,
+      onlinePaperCount: true,
+      paymentPeriod: true,
+      congress: {
+        select: { slug: true },
+      },
       authors: {
-        orderBy: {
-          sortOrder: "asc",
-        },
-        select: {
-          fullName: true,
-          isPresenter: true,
-        },
+        orderBy: { sortOrder: "asc" },
+        select: { fullName: true, isPresenter: true },
       },
     },
   });
@@ -44,17 +49,29 @@ export async function PATCH(request: Request, { params }: RouteProps) {
   }
 
   if (!submission.presentationMode) {
-    return NextResponse.json({ error: "Önce katılım bilgilerini tamamlamalısınız." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Önce katılım bilgilerini tamamlamalısınız." },
+      { status: 400 },
+    );
   }
 
   const presenter = findPresenter(submission.authors);
   if (!presenter?.fullName.trim()) {
-    return NextResponse.json({ error: "Önce sunan yazar bilgilerini tamamlamalısınız." }, { status: 400 });
+    return NextResponse.json(
+      { error: "Önce sunan yazar bilgilerini tamamlamalısınız." },
+      { status: 400 },
+    );
+  }
+
+  const congress = await getCongressWithTiers(submission.congress.slug);
+  if (!congress) {
+    return NextResponse.json({ error: "Kongre bilgisi bulunamadı." }, { status: 404 });
   }
 
   let resolved;
   try {
     resolved = resolveSubmissionPayment({
+      congress,
       payment: body,
       presentationMode: submission.presentationMode,
       presenterName: presenter.fullName,
@@ -67,38 +84,29 @@ export async function PATCH(request: Request, { params }: RouteProps) {
   }
 
   const paymentChanged =
-    submission.paymentCategory !== resolved.paymentCategory ||
-    submission.paymentPeriod !== resolved.paymentPeriod ||
+    submission.paymentTierId !== resolved.tier.id ||
     submission.paymentAmount !== resolved.paymentAmount ||
+    submission.paymentCurrency !== resolved.paymentCurrency ||
     submission.paymentDescription !== resolved.paymentDescription;
+
+  const updateData = {
+    paymentTierId: resolved.tier.id,
+    attendeeRole: resolved.input.attendeeRole,
+    audience: resolved.input.audience,
+    onlinePaperCount: resolved.input.onlinePaperCount,
+    paymentPeriod: resolved.paymentPeriod,
+    paymentAmount: resolved.paymentAmount,
+    paymentCurrency: resolved.paymentCurrency,
+    paymentDescription: resolved.paymentDescription,
+  };
 
   if (paymentChanged) {
     await prisma.$transaction([
-      prisma.submissionPaymentReceipt.deleteMany({
-        where: {
-          submissionId: id,
-        },
-      }),
-      prisma.submission.update({
-        where: { id },
-        data: {
-          paymentCategory: resolved.paymentCategory,
-          paymentPeriod: resolved.paymentPeriod,
-          paymentAmount: resolved.paymentAmount,
-          paymentDescription: resolved.paymentDescription,
-        },
-      }),
+      prisma.submissionPaymentReceipt.deleteMany({ where: { submissionId: id } }),
+      prisma.submission.update({ where: { id }, data: updateData }),
     ]);
   } else {
-    await prisma.submission.update({
-      where: { id },
-      data: {
-        paymentCategory: resolved.paymentCategory,
-        paymentPeriod: resolved.paymentPeriod,
-        paymentAmount: resolved.paymentAmount,
-        paymentDescription: resolved.paymentDescription,
-      },
-    });
+    await prisma.submission.update({ where: { id }, data: updateData });
   }
 
   return NextResponse.json({

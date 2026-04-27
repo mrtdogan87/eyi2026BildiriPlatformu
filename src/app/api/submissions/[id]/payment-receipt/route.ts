@@ -35,10 +35,6 @@ export async function PUT(request: Request, { params }: RouteProps) {
     return NextResponse.json({ error: "Bu taslağa erişim izniniz yok." }, { status: 403 });
   }
 
-  if (isPaymentClosed()) {
-    return NextResponse.json({ error: getPaymentClosedMessage() }, { status: 400 });
-  }
-
   const formData = await request.formData();
   const file = formData.get("file");
   if (!(file instanceof File)) {
@@ -55,9 +51,12 @@ export async function PUT(request: Request, { params }: RouteProps) {
   const submission = await prisma.submission.findUnique({
     where: { id },
     select: {
-      paymentCategory: true,
+      paymentTierId: true,
       paymentAmount: true,
       paymentDescription: true,
+      congress: {
+        select: { lateDeadline: true },
+      },
     },
   });
 
@@ -65,17 +64,29 @@ export async function PUT(request: Request, { params }: RouteProps) {
     return NextResponse.json({ error: "Bildiri bulunamadı." }, { status: 404 });
   }
 
-  if (!submission.paymentCategory || !submission.paymentAmount || !submission.paymentDescription) {
-    return NextResponse.json({ error: "Önce ücret bilgisini hesaplayıp kaydetmelisiniz." }, { status: 400 });
+  if (isPaymentClosed(submission.congress)) {
+    return NextResponse.json({ error: getPaymentClosedMessage() }, { status: 400 });
+  }
+
+  if (!submission.paymentTierId || submission.paymentAmount == null) {
+    return NextResponse.json(
+      { error: "Önce ücret bilgisini hesaplayıp kaydetmelisiniz." },
+      { status: 400 },
+    );
+  }
+
+  if (submission.paymentAmount === 0) {
+    return NextResponse.json(
+      { error: "Bu kategori için ücret 0 olduğundan dekont gerekmez." },
+      { status: 400 },
+    );
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
   const storageKey = `database:${id}:payment-receipt:${randomUUID()}`;
 
   await prisma.submissionPaymentReceipt.upsert({
-    where: {
-      submissionId: id,
-    },
+    where: { submissionId: id },
     update: {
       originalName: file.name,
       mimeType: resolveReceiptMimeType(file),

@@ -26,31 +26,66 @@ enum PresentationMode {
   IN_PERSON
 }
 
-enum PaymentCategory {
-  ACADEMIC
-  STUDENT
-  ONLINE_ONE
-  ONLINE_TWO
-}
-
 enum PaymentPeriod {
   EARLY
   LATE
 }
 
+enum AudienceType {
+  ACADEMIC
+  STUDENT
+}
+
+enum AttendeeRole {
+  PRESENTER
+  LISTENER
+}
+
 model Congress {
-  id          String       @id @default(cuid())
-  slug        String       @unique
-  name        String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  submissions Submission[]
+  id                String        @id @default(cuid())
+  slug              String        @unique
+  name              String
+  earlyDeadline     DateTime?
+  lateDeadline      DateTime?
+  galaFeeAmount     Int           @default(0)
+  galaFeeCurrency   String        @default("EUR")
+  galaFeeNote       String?
+  bankName          String?
+  bankAccountHolder String?
+  bankIban          String?
+  bankBranch        String?
+  tripNote          String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  submissions       Submission[]
+  paymentTiers      PaymentTier[]
+}
+
+model PaymentTier {
+  id               String           @id @default(cuid())
+  congressId       String
+  presentationMode PresentationMode
+  role             AttendeeRole
+  audience         AudienceType?
+  onlinePaperCount Int?
+  period           PaymentPeriod?
+  amount           Int              @default(0)
+  currency         String           @default("TRY")
+  active           Boolean          @default(true)
+  sortOrder        Int              @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  congress         Congress         @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  submissions      Submission[]
+
+  @@unique([congressId, presentationMode, role, audience, onlinePaperCount, period])
+  @@index([congressId, active])
 }
 
 model Submission {
-  id                 String                 @id @default(cuid())
+  id                 String                    @id @default(cuid())
   congressId         String
-  status             SubmissionStatus       @default(DRAFT)
+  status             SubmissionStatus          @default(DRAFT)
   submissionLanguage SubmissionLanguage?
   titleTr            String?
   titleEn            String?
@@ -59,19 +94,26 @@ model Submission {
   keywordsTr         String?
   keywordsEn         String?
   presentationMode   PresentationMode?
-  paymentCategory    PaymentCategory?
+  attendeeRole       AttendeeRole?
+  audience           AudienceType?
+  onlinePaperCount   Int?
+  paymentTierId      String?
   paymentPeriod      PaymentPeriod?
   paymentAmount      Int?
+  paymentCurrency    String?
   paymentDescription String?
-  galaAttendance     Boolean              @default(false)
-  galaAttendeeCount  Int                  @default(0)
-  tripAttendance     Boolean              @default(false)
-  tripAttendeeCount  Int                  @default(0)
+  galaAttendance     Boolean                   @default(false)
+  galaAttendeeCount  Int                       @default(0)
+  galaFeeAmount      Int?
+  galaFeeCurrency    String?
+  tripAttendance     Boolean                   @default(false)
+  tripAttendeeCount  Int                       @default(0)
   draftOwnerEmail    String
   submittedAt        DateTime?
-  createdAt          DateTime               @default(now())
-  updatedAt          DateTime               @updatedAt
-  congress           Congress               @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  createdAt          DateTime                  @default(now())
+  updatedAt          DateTime                  @updatedAt
+  congress           Congress                  @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  paymentTier        PaymentTier?              @relation(fields: [paymentTierId], references: [id])
   authors            SubmissionAuthor[]
   file               SubmissionFile?
   paymentReceipt     SubmissionPaymentReceipt?
@@ -83,21 +125,21 @@ model Submission {
 }
 
 model SubmissionAuthor {
-  id          String     @id @default(cuid())
+  id           String     @id @default(cuid())
   submissionId String
-  fullName    String
-  email       String
-  institution String?
-  country     String?
-  isPresenter Boolean    @default(false)
-  sortOrder   Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  submission  Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  fullName     String
+  email        String
+  institution  String?
+  country      String?
+  isPresenter  Boolean    @default(false)
+  sortOrder    Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
+  @@unique([submissionId, email])
   @@index([submissionId])
   @@index([email])
-  @@unique([submissionId, email])
 }
 
 model SubmissionFile {
@@ -140,13 +182,13 @@ model SubmissionAccessToken {
 }
 
 model SubmissionStatusHistory {
-  id           String           @id @default(cuid())
+  id           String            @id @default(cuid())
   submissionId String
   fromStatus   SubmissionStatus?
   toStatus     SubmissionStatus
   note         String?
-  changedAt    DateTime         @default(now())
-  submission   Submission       @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  changedAt    DateTime          @default(now())
+  submission   Submission        @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@index([submissionId, changedAt])
 }

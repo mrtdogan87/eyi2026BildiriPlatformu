@@ -1,14 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  getCurrentPaymentPeriod,
-  mapPaymentPeriod,
-  resolveSubmissionPayment,
-} from "@/lib/payment";
+import { mapAttendeeRole, mapAudience, mapPaymentPeriod } from "@/lib/payment";
 import type {
+  AttendeeRole,
+  AudienceType,
+  OnlinePaperCount,
+  PaymentTierOption,
   SubmissionAuthorInput,
+  SubmissionConfig,
   SubmissionDetailsInput,
   SubmissionParticipationInput,
   SubmissionPaymentInput,
@@ -18,6 +19,7 @@ import type {
 type Props = {
   congressSlug: string;
   initialSnapshot: SubmissionSnapshot | null;
+  config: SubmissionConfig;
 };
 
 type AuthorDraft = SubmissionAuthorInput & {
@@ -52,14 +54,9 @@ const emptyParticipation: SubmissionParticipationInput = {
 };
 
 const emptyPayment: SubmissionPaymentInput = {
-  inPersonCategory: null,
+  attendeeRole: null,
+  audience: null,
   onlinePaperCount: null,
-};
-
-const bankAccount = {
-  bankName: "Akbank Manisa Sanayi Şubesi",
-  accountHolder: "Yaşam Boyu Bilim ve Eğitime Destek Derneği",
-  iban: "TR61 0004 6006 5988 8000 2325 51",
 };
 
 const emptyAuthor = (): SubmissionAuthorInput => ({
@@ -105,38 +102,57 @@ function createAuthorDraft(author?: Partial<SubmissionAuthorInput>, isPresenter 
   };
 }
 
-function formatCurrency(value: number | null) {
-  if (value == null) {
+function formatCurrency(amount: number | null, currency: string | null) {
+  if (amount == null || !currency) {
     return "Henüz hesaplanmadı";
   }
 
-  return new Intl.NumberFormat("tr-TR", {
-    style: "currency",
-    currency: "TRY",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function getPaymentCategoryLabel(category: SubmissionSnapshot["payment"]["category"]) {
-  switch (category) {
-    case "ACADEMIC":
-      return "Yüz Yüze Akademik Personel";
-    case "STUDENT":
-      return "Yüz Yüze Öğrenci";
-    case "ONLINE_ONE":
-      return "Çevrim İçi Tek Bildiri";
-    case "ONLINE_TWO":
-      return "Çevrim İçi İki Bildiri";
-    default:
-      return "Henüz seçilmedi";
+  try {
+    return new Intl.NumberFormat("tr-TR", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(amount);
+  } catch {
+    return `${amount} ${currency}`;
   }
 }
 
-function getPaymentPeriodLabel(period: SubmissionSnapshot["payment"]["period"]) {
-  return period ? mapPaymentPeriod(period) : "Hesaplama sonrası belirlenecek";
+function findMatchingTier(
+  tiers: PaymentTierOption[],
+  selection: {
+    presentationMode: "IN_PERSON" | "ONLINE";
+    attendeeRole: AttendeeRole | null;
+    audience: AudienceType | null;
+    onlinePaperCount: OnlinePaperCount | null;
+    period: "EARLY" | "LATE" | null;
+  },
+): PaymentTierOption | null {
+  if (!selection.attendeeRole) return null;
+
+  return (
+    tiers.find((tier) => {
+      if (tier.presentationMode !== selection.presentationMode) return false;
+      if (tier.role !== selection.attendeeRole) return false;
+
+      if (selection.presentationMode === "IN_PERSON") {
+        if (tier.audience !== selection.audience) return false;
+        if (selection.period !== null && tier.period !== selection.period) return false;
+        if (selection.period === null && tier.period !== null) return false;
+        return true;
+      }
+
+      if (tier.audience !== null) return false;
+      if (tier.period !== null) return false;
+      if (selection.attendeeRole === "PRESENTER") {
+        return tier.onlinePaperCount === selection.onlinePaperCount;
+      }
+      return tier.onlinePaperCount === null;
+    }) ?? null
+  );
 }
 
-export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
+export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Props) {
   const router = useRouter();
   const [snapshot, setSnapshot] = useState<SubmissionSnapshot | null>(initialSnapshot);
   const [step, setStep] = useState(1);
@@ -178,7 +194,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
   const [payment, setPayment] = useState<SubmissionPaymentInput>(
     initialSnapshot
       ? {
-          inPersonCategory: initialSnapshot.payment.inPersonCategory,
+          attendeeRole: initialSnapshot.payment.attendeeRole,
+          audience: initialSnapshot.payment.audience,
           onlinePaperCount: initialSnapshot.payment.onlinePaperCount,
         }
       : emptyPayment,
@@ -193,6 +210,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
   const hasExistingFile = Boolean(snapshot?.file);
   const hasExistingReceipt = Boolean(snapshot?.paymentReceipt);
   const areDeclarationsComplete = Object.values(declarations).every(Boolean);
+  const isPaymentClosed = snapshot?.payment.isClosed ?? false;
 
   const selectedLanguageLabel = useMemo(
     () => (details.submissionLanguage === "TR" ? "Türkçe" : "İngilizce"),
@@ -202,35 +220,48 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
     const presenter = authors.find((author) => author.isPresenter) ?? authors[0];
     return presenter?.fullName.trim() ?? "";
   }, [authors]);
-  const paymentPreview = useMemo(() => {
-    const defaultPreview = {
-      period: getCurrentPaymentPeriod(),
-      amount: null,
-      description: "",
-    };
 
-    try {
-      const resolved = resolveSubmissionPayment({
-        payment,
+  const matchedTier = useMemo(
+    () =>
+      findMatchingTier(config.tiers, {
         presentationMode: participation.presentationMode,
-        presenterName,
-      });
+        attendeeRole: payment.attendeeRole,
+        audience: payment.audience,
+        onlinePaperCount: payment.onlinePaperCount,
+        period: participation.presentationMode === "IN_PERSON" ? config.currentPeriod : null,
+      }),
+    [config.tiers, config.currentPeriod, participation.presentationMode, payment],
+  );
 
-      return {
-        period: resolved.paymentPeriod,
-        amount: resolved.paymentAmount,
-        description: resolved.paymentDescription,
-      };
-    } catch {
-      return defaultPreview;
+  const requiresReceipt = (matchedTier?.amount ?? 0) > 0;
+
+  useEffect(() => {
+    if (participation.presentationMode === "ONLINE") {
+      setPayment((current) => {
+        if (!current.attendeeRole && !current.audience && !current.onlinePaperCount) {
+          return current;
+        }
+        return {
+          attendeeRole: current.attendeeRole,
+          audience: null,
+          onlinePaperCount: current.attendeeRole === "PRESENTER" ? current.onlinePaperCount : null,
+        };
+      });
+    } else {
+      setPayment((current) => ({
+        attendeeRole: current.attendeeRole,
+        audience: current.audience,
+        onlinePaperCount: null,
+      }));
     }
-  }, [participation.presentationMode, payment, presenterName]);
+  }, [participation.presentationMode]);
 
   function applySubmissionSnapshot(nextSubmission: SubmissionSnapshot | null) {
     setSnapshot(nextSubmission);
     if (nextSubmission) {
       setPayment({
-        inPersonCategory: nextSubmission.payment.inPersonCategory,
+        attendeeRole: nextSubmission.payment.attendeeRole,
+        audience: nextSubmission.payment.audience,
         onlinePaperCount: nextSubmission.payment.onlinePaperCount,
       });
     }
@@ -299,9 +330,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
     try {
       const response = await fetch(`/api/submissions/${snapshot.id}/details`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(details),
       });
       const data = await readResponsePayload(response);
@@ -347,9 +376,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
     try {
       const response = await fetch(`/api/submissions/${snapshot.id}/authors`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           authors: authors.map((author) => ({
             fullName: author.fullName,
@@ -384,9 +411,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
     try {
       const response = await fetch(`/api/submissions/${snapshot.id}/participation`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(participation),
       });
       const data = await readResponsePayload(response);
@@ -414,9 +439,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
     try {
       const response = await fetch(`/api/submissions/${snapshot.id}/payment`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payment),
       });
       const data = await readResponsePayload(response);
@@ -427,7 +450,13 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
       let nextSubmission = (data.submission as SubmissionSnapshot | undefined) ?? null;
       applySubmissionSnapshot(nextSubmission);
 
+      const requiresReceiptUpload = (nextSubmission?.payment.amount ?? 0) > 0;
+
       if (receiptFile) {
+        if (!requiresReceiptUpload) {
+          throw new Error("Bu kategori için dekont gerekmediğinden dekont yüklenemez.");
+        }
+
         const formData = new FormData();
         formData.append("file", receiptFile);
 
@@ -444,7 +473,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
         applySubmissionSnapshot(nextSubmission);
       }
 
-      if (!receiptFile && !nextSubmission?.paymentReceipt) {
+      if (requiresReceiptUpload && !nextSubmission?.paymentReceipt) {
         throw new Error("Sonraki adıma geçebilmek için ödeme dekontunu yüklemelisiniz.");
       }
 
@@ -470,9 +499,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
     try {
       const response = await fetch(`/api/submissions/${snapshot.id}/submit`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ declarations }),
       });
       const data = await readResponsePayload(response);
@@ -493,10 +520,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
     setAuthors((current) =>
       current.map((author, authorIndex) =>
         authorIndex === index
-          ? {
-              ...author,
-              ...patch,
-            }
+          ? { ...author, ...patch }
           : patch.isPresenter
             ? { ...author, isPresenter: false }
             : author,
@@ -527,18 +551,6 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
       tripAttendance: mode === "ONLINE" ? false : current.tripAttendance,
       tripAttendeeCount: mode === "ONLINE" ? 0 : current.tripAttendeeCount,
     }));
-
-    setPayment((current) =>
-      mode === "IN_PERSON"
-        ? {
-            inPersonCategory: current.inPersonCategory,
-            onlinePaperCount: null,
-          }
-        : {
-            inPersonCategory: null,
-            onlinePaperCount: current.onlinePaperCount,
-          },
-    );
   }
 
   if (!snapshot) {
@@ -866,13 +878,13 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                   }
                 >
                   <option value="IN_PERSON">Yüz yüze</option>
-                  <option value="ONLINE">Online</option>
+                  <option value="ONLINE">Çevrim içi</option>
                 </select>
               </div>
               <div className="field">
                 <label>Bilgilendirme</label>
                 <div className="field-display field-note">
-                  Online seçildiğinde gala ve gezi varsayılan olarak hayır olur. İsterseniz yine de
+                  Çevrim içi seçildiğinde gala ve gezi varsayılan olarak hayır olur. İsterseniz yine de
                   değiştirebilirsiniz.
                 </div>
               </div>
@@ -881,7 +893,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
             <div className="grid two" style={{ marginTop: 20 }}>
               <div className="author-card">
                 <div className="field">
-                  <label htmlFor="gala-attendance">Gala Katılımı</label>
+                  <label htmlFor="gala-attendance">Gala Yemeği Katılımı</label>
                   <select
                     id="gala-attendance"
                     value={participation.galaAttendance ? "yes" : "no"}
@@ -901,6 +913,10 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                     <option value="no">Hayır</option>
                     <option value="yes">Evet</option>
                   </select>
+                  <span className="field-hint">
+                    Kişi başı {formatCurrency(config.gala.amount, config.gala.currency)}.
+                    {config.gala.note ? ` ${config.gala.note}` : ""}
+                  </span>
                 </div>
                 <div className="field" style={{ marginTop: 16 }}>
                   <label htmlFor="gala-count">Kaç kişi katılmayı planlıyor?</label>
@@ -942,6 +958,9 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                     <option value="no">Hayır</option>
                     <option value="yes">Evet</option>
                   </select>
+                  {config.trip.note ? (
+                    <span className="field-hint">{config.trip.note}</span>
+                  ) : null}
                 </div>
                 <div className="field" style={{ marginTop: 16 }}>
                   <label htmlFor="trip-count">Kaç kişi katılmayı planlıyor?</label>
@@ -977,10 +996,9 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
 
         {step === 4 ? (
           <form className="submission-form-panel" onSubmit={savePayment}>
-            {snapshot.payment.isClosed ? (
+            {isPaymentClosed ? (
               <div className="error">
-                Kayıt süresi 30 Ağustos 2026 tarihinde sona erdiği için yeni ödeme ve gönderim
-                alınmıyor.
+                Kayıt süresi sona erdiği için yeni ödeme ve gönderim alınmıyor.
               </div>
             ) : null}
 
@@ -993,28 +1011,58 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                   </div>
                 </div>
 
+                <div className="field" style={{ marginTop: 16 }}>
+                  <label htmlFor="attendee-role">
+                    Katılım Türü <span className="required">*</span>
+                  </label>
+                  <select
+                    id="attendee-role"
+                    value={payment.attendeeRole ?? ""}
+                    onChange={(event) =>
+                      setPayment((current) => {
+                        const role = (event.target.value || null) as AttendeeRole | null;
+                        return {
+                          attendeeRole: role,
+                          audience:
+                            participation.presentationMode === "IN_PERSON" ? current.audience : null,
+                          onlinePaperCount:
+                            participation.presentationMode === "ONLINE" && role === "PRESENTER"
+                              ? current.onlinePaperCount
+                              : null,
+                        };
+                      })
+                    }
+                  >
+                    <option value="">Seçiniz</option>
+                    <option value="PRESENTER">Sunumlu Katılımcı</option>
+                    <option value="LISTENER">Dinleyici</option>
+                  </select>
+                </div>
+
                 {participation.presentationMode === "IN_PERSON" ? (
                   <div className="field" style={{ marginTop: 16 }}>
-                    <label htmlFor="in-person-category">
-                      Ücret Kategorisi <span className="required">*</span>
+                    <label htmlFor="audience">
+                      Akademik Statü <span className="required">*</span>
                     </label>
                     <select
-                      id="in-person-category"
-                      value={payment.inPersonCategory ?? ""}
+                      id="audience"
+                      value={payment.audience ?? ""}
                       onChange={(event) =>
-                        setPayment({
-                          inPersonCategory:
-                            (event.target.value as SubmissionPaymentInput["inPersonCategory"]) || null,
-                          onlinePaperCount: null,
-                        })
+                        setPayment((current) => ({
+                          ...current,
+                          audience: (event.target.value || null) as AudienceType | null,
+                        }))
                       }
                     >
                       <option value="">Seçiniz</option>
-                      <option value="ACADEMIC">Akademik Personel</option>
+                      <option value="ACADEMIC">Akademisyen</option>
                       <option value="STUDENT">Öğrenci</option>
                     </select>
                   </div>
-                ) : (
+                ) : null}
+
+                {participation.presentationMode === "ONLINE" &&
+                payment.attendeeRole === "PRESENTER" ? (
                   <div className="field" style={{ marginTop: 16 }}>
                     <label htmlFor="online-paper-count">
                       Bildiri Sayısı <span className="required">*</span>
@@ -1023,14 +1071,14 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                       id="online-paper-count"
                       value={payment.onlinePaperCount ?? ""}
                       onChange={(event) =>
-                        setPayment({
-                          inPersonCategory: null,
+                        setPayment((current) => ({
+                          ...current,
                           onlinePaperCount: event.target.value
                             ? Number(event.target.value) === 2
                               ? 2
                               : 1
                             : null,
-                        })
+                        }))
                       }
                     >
                       <option value="">Seçiniz</option>
@@ -1038,31 +1086,46 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                       <option value="2">İki Bildiri</option>
                     </select>
                   </div>
-                )}
+                ) : null}
 
-                <div className="field" style={{ marginTop: 16 }}>
-                  <label>Kayıt Dönemi</label>
-                  <div className="field-display">{getPaymentPeriodLabel(paymentPreview.period)}</div>
-                </div>
+                {participation.presentationMode === "IN_PERSON" ? (
+                  <div className="field" style={{ marginTop: 16 }}>
+                    <label>Kayıt Dönemi</label>
+                    <div className="field-display">
+                      {config.currentPeriod ? mapPaymentPeriod(config.currentPeriod) : "-"}
+                    </div>
+                  </div>
+                ) : null}
 
                 <div className="field" style={{ marginTop: 16 }}>
                   <label>Tutar</label>
-                  <div className="field-display">{formatCurrency(paymentPreview.amount)}</div>
+                  <div className="field-display">
+                    {matchedTier
+                      ? formatCurrency(matchedTier.amount, matchedTier.currency)
+                      : "Seçim tamamlandığında hesaplanır"}
+                  </div>
                 </div>
               </div>
 
               <div className="author-card">
+                <h3 style={{ margin: "0 0 12px", fontSize: "1.05rem" }}>Banka Hesap Bilgileri</h3>
                 <div className="field">
                   <label>Banka</label>
-                  <input readOnly value={bankAccount.bankName} />
+                  <input readOnly value={config.bank.bankName || "Belirtilmedi"} />
                 </div>
+                {config.bank.bankBranch ? (
+                  <div className="field" style={{ marginTop: 16 }}>
+                    <label>Şube</label>
+                    <input readOnly value={config.bank.bankBranch} />
+                  </div>
+                ) : null}
                 <div className="field" style={{ marginTop: 16 }}>
                   <label>Hesap Sahibi</label>
-                  <input readOnly value={bankAccount.accountHolder} />
+                  <input readOnly value={config.bank.bankAccountHolder || "Belirtilmedi"} />
                 </div>
                 <div className="field" style={{ marginTop: 16 }}>
                   <label>IBAN</label>
-                  <input readOnly value={bankAccount.iban} />
+                  <input readOnly value={config.bank.bankIban || "Belirtilmedi"} />
                 </div>
               </div>
             </div>
@@ -1073,7 +1136,11 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
                   <label>Ödeme Açıklaması</label>
                   <input
                     readOnly
-                    value={paymentPreview.description || "Seçim yaptığınızda burada otomatik oluşur."}
+                    value={
+                      matchedTier && presenterName
+                        ? `${presenterName} - ${matchedTier.label}`
+                        : "Seçim yaptığınızda burada otomatik oluşur."
+                    }
                   />
                 </div>
                 <p style={{ margin: "16px 0 0", color: "#617089", lineHeight: 1.6 }}>
@@ -1083,27 +1150,33 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
               </div>
 
               <div className="author-card">
-                <div className="field">
-                  <label htmlFor="payment-receipt">
-                    Dekont Yükle {!hasExistingReceipt ? <span className="required">*</span> : null}
-                  </label>
-                  <input
-                    id="payment-receipt"
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                    onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
-                  />
-                  <span style={{ color: "#617089", fontSize: 14 }}>
-                    PDF, JPG, JPEG veya PNG, maksimum 10 MB.
-                    {snapshot.paymentReceipt ? ` Mevcut dekont: ${snapshot.paymentReceipt.originalName}` : ""}
-                  </span>
-                  {participation.presentationMode === "ONLINE" && payment.onlinePaperCount === 2 ? (
+                {requiresReceipt ? (
+                  <div className="field">
+                    <label htmlFor="payment-receipt">
+                      Dekont Yükle {!hasExistingReceipt ? <span className="required">*</span> : null}
+                    </label>
+                    <input
+                      id="payment-receipt"
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                      onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
+                    />
                     <span style={{ color: "#617089", fontSize: 14 }}>
-                      Çevrim içi iki bildiri ödemesinde aynı dekontu ikinci bildiriniz için de
-                      yeniden yükleyebilirsiniz.
+                      PDF, JPG, JPEG veya PNG, maksimum 10 MB.
+                      {snapshot.paymentReceipt ? ` Mevcut dekont: ${snapshot.paymentReceipt.originalName}` : ""}
                     </span>
-                  ) : null}
-                </div>
+                    {participation.presentationMode === "ONLINE" && payment.onlinePaperCount === 2 ? (
+                      <span style={{ color: "#617089", fontSize: 14 }}>
+                        Çevrim içi iki bildiri ödemesinde aynı dekontu ikinci bildiriniz için de
+                        yeniden yükleyebilirsiniz.
+                      </span>
+                    ) : null}
+                  </div>
+                ) : (
+                  <div className="notice">
+                    Bu kategori için ücret alınmadığından dekont yüklemenize gerek yoktur.
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1113,7 +1186,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
               <button className="button secondary" onClick={() => setStep(3)} type="button">
                 Geri
               </button>
-              <button className="button primary" disabled={loading || snapshot.payment.isClosed} type="submit">
+              <button className="button primary" disabled={loading || isPaymentClosed} type="submit">
                 {loading ? "Kaydediliyor..." : "Kaydet ve İleri"}
               </button>
             </div>
@@ -1128,7 +1201,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
             </div>
             <div className="summary-block">
               <h3>Sunum Şekli</h3>
-              <p>{participation.presentationMode === "ONLINE" ? "Online" : "Yüz yüze"}</p>
+              <p>{participation.presentationMode === "ONLINE" ? "Çevrim içi" : "Yüz yüze"}</p>
             </div>
             <div className="summary-block">
               <h3>{details.submissionLanguage === "TR" ? "Başlık" : "Title"}</h3>
@@ -1171,15 +1244,21 @@ export function SubmissionPortal({ congressSlug, initialSnapshot }: Props) {
             <div className="summary-block">
               <h3>Ücret Bilgisi</h3>
               <ul className="summary-list">
-                <li>Kategori: {getPaymentCategoryLabel(snapshot.payment.category)}</li>
-                <li>Kayıt Dönemi: {getPaymentPeriodLabel(snapshot.payment.period)}</li>
-                <li>Tutar: {formatCurrency(snapshot.payment.amount)}</li>
+                <li>Katılım: {mapAttendeeRole(snapshot.payment.attendeeRole)}</li>
+                {snapshot.presentationMode === "IN_PERSON" ? (
+                  <li>Akademik Statü: {mapAudience(snapshot.payment.audience)}</li>
+                ) : null}
+                <li>Kayıt Dönemi: {snapshot.payment.period ? mapPaymentPeriod(snapshot.payment.period) : "-"}</li>
+                <li>Tutar: {formatCurrency(snapshot.payment.amount, snapshot.payment.currency)}</li>
                 <li>Açıklama: {snapshot.payment.description || "-"}</li>
               </ul>
             </div>
             <div className="summary-block">
               <h3>Dekont</h3>
-              <p>{snapshot.paymentReceipt?.originalName ?? "Dekont yüklenmedi"}</p>
+              <p>
+                {snapshot.paymentReceipt?.originalName ??
+                  ((snapshot.payment.amount ?? 0) > 0 ? "Dekont yüklenmedi" : "Bu kategori için dekont gerekmez")}
+              </p>
             </div>
             <div className="summary-block summary-block-wide">
               <h3>Etik & Beyanlar</h3>

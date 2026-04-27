@@ -2,6 +2,8 @@ import Link from "next/link";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { getAdminSubmissionList, normalizeAdminSubmissionFilters, requireAdminPage } from "@/lib/admin";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   searchParams: Promise<{
     q?: string;
@@ -41,10 +43,15 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
     <main className="page-shell admin-page-shell">
       <section className="hero admin-hero">
         <div>
-          <h1>Gönderilen Bildiriler</h1>
-          <p>EYİ 2026 için gönderilmiş bildirileri görüntüleyin, detaylarını inceleyin ve dosyaları indirin.</p>
+          <h1>Yönetim Paneli</h1>
+          <p>EYİ 2026 başvurularını yönetin, ücret tarifesini güncelleyin ve dosyaları indirin.</p>
         </div>
-        <AdminLogoutButton />
+        <div className="admin-hero-actions">
+          <Link className="button ghost" href="/admin/ucretler">
+            Ücret ve Ayarlar
+          </Link>
+          <AdminLogoutButton />
+        </div>
       </section>
 
       <section className="card admin-panel-card">
@@ -94,8 +101,8 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
               defaultValue={filters.presentationMode}
             >
               <option value="ALL">Tümü</option>
-              <option value="IN_PERSON">Yüz yüze</option>
-              <option value="ONLINE">Online</option>
+              <option value="IN_PERSON">Yüz Yüze</option>
+              <option value="ONLINE">Çevrim İçi</option>
             </select>
           </div>
           <div className="field">
@@ -135,6 +142,8 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                   <th>Durum</th>
                   <th>Dil</th>
                   <th>Sunum</th>
+                  <th>Kategori</th>
+                  <th>Ücret</th>
                   <th>Gala</th>
                   <th>Gezi</th>
                   <th>Gönderim</th>
@@ -153,6 +162,8 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                     <td>{submission.statusLabel}</td>
                     <td>{submission.submissionLanguage}</td>
                     <td>{submission.presentationMode}</td>
+                    <td>{submission.paymentLabel}</td>
+                    <td>{submission.paymentAmountLabel}</td>
                     <td>{submission.galaLabel}</td>
                     <td>{submission.tripLabel}</td>
                     <td>{formatDate(submission.submittedAt)}</td>

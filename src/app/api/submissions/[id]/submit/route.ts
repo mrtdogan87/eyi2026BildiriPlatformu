@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import {
-  derivePaymentInputFromCategory,
+  getCongressWithTiers,
   getPaymentClosedMessage,
   isPaymentClosed,
   resolveSubmissionPayment,
@@ -60,6 +60,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
       authors: true,
       file: true,
       paymentReceipt: true,
+      congress: true,
     },
   });
 
@@ -109,7 +110,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
     return NextResponse.json({ error: participationErrors[0] }, { status: 400 });
   }
 
-  if (isPaymentClosed()) {
+  if (isPaymentClosed(submission.congress)) {
     return NextResponse.json({ error: getPaymentClosedMessage() }, { status: 400 });
   }
 
@@ -119,9 +120,10 @@ export async function POST(_request: Request, { params }: RouteProps) {
   }
 
   if (
-    !submission.paymentCategory ||
-    !submission.paymentPeriod ||
+    !submission.paymentTierId ||
+    !submission.attendeeRole ||
     submission.paymentAmount == null ||
+    !submission.paymentCurrency ||
     !submission.paymentDescription
   ) {
     return NextResponse.json(
@@ -130,10 +132,23 @@ export async function POST(_request: Request, { params }: RouteProps) {
     );
   }
 
+  const congress = await getCongressWithTiers(submission.congress.slug);
+  if (!congress) {
+    return NextResponse.json({ error: "Kongre bilgisi bulunamadı." }, { status: 404 });
+  }
+
   let resolvedPayment;
   try {
     resolvedPayment = resolveSubmissionPayment({
-      payment: derivePaymentInputFromCategory(submission.paymentCategory),
+      congress,
+      payment: {
+        attendeeRole: submission.attendeeRole,
+        audience: submission.audience,
+        onlinePaperCount:
+          submission.onlinePaperCount === 1 || submission.onlinePaperCount === 2
+            ? (submission.onlinePaperCount as 1 | 2)
+            : null,
+      },
       presentationMode: (submission.presentationMode ?? "IN_PERSON") as "ONLINE" | "IN_PERSON",
       presenterName: presenter.fullName,
     });
@@ -145,9 +160,9 @@ export async function POST(_request: Request, { params }: RouteProps) {
   }
 
   if (
-    submission.paymentCategory !== resolvedPayment.paymentCategory ||
-    submission.paymentPeriod !== resolvedPayment.paymentPeriod ||
+    submission.paymentTierId !== resolvedPayment.tier.id ||
     submission.paymentAmount !== resolvedPayment.paymentAmount ||
+    submission.paymentCurrency !== resolvedPayment.paymentCurrency ||
     submission.paymentDescription !== resolvedPayment.paymentDescription
   ) {
     return NextResponse.json(
@@ -156,7 +171,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
     );
   }
 
-  if (!submission.paymentReceipt) {
+  if (resolvedPayment.paymentAmount > 0 && !submission.paymentReceipt) {
     return NextResponse.json(
       { error: "Bildirinizi gönderebilmek için ödeme dekontunu yüklemelisiniz." },
       { status: 400 },

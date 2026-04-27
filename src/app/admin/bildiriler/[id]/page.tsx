@@ -4,6 +4,8 @@ import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { AdminStatusForm } from "@/components/admin/admin-status-form";
 import { getAdminSubmissionDetail, requireAdminPage } from "@/lib/admin";
 
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   params: Promise<{ id: string }>;
 };
@@ -21,18 +23,6 @@ function formatDate(value: string | null) {
 
 function formatFileSize(fileSize: number) {
   return `${(fileSize / (1024 * 1024)).toFixed(2)} MB`;
-}
-
-function formatCurrency(value: number | null) {
-  if (value == null) {
-    return "-";
-  }
-
-  return new Intl.NumberFormat("tr-TR", {
-    style: "currency",
-    currency: "TRY",
-    maximumFractionDigits: 0,
-  }).format(value);
 }
 
 export default async function AdminSubmissionDetailPage({ params }: PageProps) {
@@ -132,10 +122,16 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
               <dd>{submission.presentationMode}</dd>
             </div>
             <div>
+              <dt>Katılım Türü</dt>
+              <dd>{submission.payment.roleLabel}</dd>
+            </div>
+            <div>
+              <dt>Akademik Statü</dt>
+              <dd>{submission.payment.audienceLabel}</dd>
+            </div>
+            <div>
               <dt>Gala Katılımı</dt>
-              <dd>
-                {submission.galaAttendance ? `Evet (${submission.galaAttendeeCount} kişi)` : "Hayır"}
-              </dd>
+              <dd>{submission.payment.galaAmountLabel}</dd>
             </div>
             <div>
               <dt>Gezi Katılımı</dt>
@@ -150,8 +146,8 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           <h2>Ücret Bilgisi</h2>
           <dl className="admin-definition-list">
             <div>
-              <dt>Kategori</dt>
-              <dd>{submission.payment.categoryLabel}</dd>
+              <dt>Tarife</dt>
+              <dd>{submission.payment.tierLabel}</dd>
             </div>
             <div>
               <dt>Kayıt Dönemi</dt>
@@ -159,7 +155,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             </div>
             <div>
               <dt>Tutar</dt>
-              <dd>{formatCurrency(submission.payment.amount)}</dd>
+              <dd>{submission.payment.amountLabel}</dd>
             </div>
             <div>
               <dt>Açıklama</dt>

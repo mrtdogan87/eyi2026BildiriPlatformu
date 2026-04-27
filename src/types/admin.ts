@@ -10,6 +10,8 @@ export type AdminSubmissionListItem = {
   galaLabel: string;
   tripLabel: string;
   submittedAt: string | null;
+  paymentLabel: string;
+  paymentAmountLabel: string;
 };
 
 export type AdminSubmissionListFilters = {
@@ -40,9 +42,14 @@ export type AdminSubmissionDetail = {
   tripAttendeeCount: number;
   submittedAt: string | null;
   payment: {
-    categoryLabel: string;
+    tierLabel: string;
     periodLabel: string;
+    audienceLabel: string;
+    roleLabel: string;
     amount: number | null;
+    currency: string | null;
+    amountLabel: string;
+    galaAmountLabel: string;
     description: string;
   };
   authors: Array<{
@@ -56,10 +63,10 @@ export type AdminSubmissionDetail = {
   file: {
     originalName: string;
     fileSize: number;
-      mimeType: string;
-      uploadedAt: string;
-      previewText: string | null;
-    } | null;
+    mimeType: string;
+    uploadedAt: string;
+    previewText: string | null;
+  } | null;
   paymentReceipt: {
     originalName: string;
     fileSize: number;
@@ -73,4 +80,39 @@ export type AdminSubmissionDetail = {
     note: string;
     changedAt: string;
   }>;
+};
+
+export type AdminPaymentTier = {
+  id: string;
+  presentationMode: "ONLINE" | "IN_PERSON";
+  role: "PRESENTER" | "LISTENER";
+  audience: "ACADEMIC" | "STUDENT" | null;
+  onlinePaperCount: 1 | 2 | null;
+  period: "EARLY" | "LATE" | null;
+  amount: number;
+  currency: string;
+  active: boolean;
+  sortOrder: number;
+  label: string;
+};
+
+export type AdminCongressSettings = {
+  slug: string;
+  name: string;
+  earlyDeadline: string | null;
+  lateDeadline: string | null;
+  galaFeeAmount: number;
+  galaFeeCurrency: string;
+  galaFeeNote: string;
+  bankName: string;
+  bankAccountHolder: string;
+  bankIban: string;
+  bankBranch: string;
+  tripNote: string;
+};
+
+export type AdminPricingPayload = {
+  congress: AdminCongressSettings;
+  tiers: AdminPaymentTier[];
+  currentPeriod: "EARLY" | "LATE" | null;
 };

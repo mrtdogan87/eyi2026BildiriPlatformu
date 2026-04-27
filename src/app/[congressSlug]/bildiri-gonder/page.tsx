@@ -1,6 +1,14 @@
+import { notFound } from "next/navigation";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { SubmissionPortal } from "@/components/submission/submission-portal";
-import { canAccessDraft, getSubmissionSnapshot } from "@/lib/submission";
+import {
+  canAccessDraft,
+  ensureCongress,
+  getSubmissionConfig,
+  getSubmissionSnapshot,
+} from "@/lib/submission";
+
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ congressSlug: string }>;
@@ -11,15 +19,25 @@ export default async function SubmissionPage({ params, searchParams }: PageProps
   const { congressSlug } = await params;
   const { draft } = await searchParams;
 
+  await ensureCongress(congressSlug);
+  const config = await getSubmissionConfig(congressSlug);
+  if (!config) {
+    notFound();
+  }
+
   const initialSnapshot =
     draft && (await canAccessDraft(draft)) ? await getSubmissionSnapshot(draft) : null;
 
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">
-        <PlatformHero variant="submission" />
+        <PlatformHero variant="submission" congressName={config.congressName} />
 
-        <SubmissionPortal congressSlug={congressSlug} initialSnapshot={initialSnapshot} />
+        <SubmissionPortal
+          congressSlug={congressSlug}
+          initialSnapshot={initialSnapshot}
+          config={config}
+        />
       </div>
     </main>
   );
