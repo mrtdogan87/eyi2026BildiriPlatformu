@@ -660,29 +660,30 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
         {step === 1 ? (
           <form className="submission-form-panel" onSubmit={saveDetails}>
-            <div className="grid two">
-              <div className="field">
-                <label htmlFor="file">
-                  Ana Dosya {!hasExistingFile ? <span className="required">*</span> : null}
-                </label>
-                <input
-                  id="file"
-                  type="file"
-                  accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  onChange={(event) => setFile(event.target.files?.[0] ?? null)}
-                />
-                <span style={{ color: "#617089", fontSize: 14 }}>
-                  Sadece DOCX, maksimum 10 MB.
-                  {snapshot.file ? ` Mevcut dosya: ${snapshot.file.originalName}` : ""}
-                </span>
-              </div>
-              <div className="field">
-                <label>Bildiri Dili</label>
-                <div className="field-display">{selectedLanguageLabel}</div>
-              </div>
+            <div className="field-row" style={{ marginBottom: 18 }}>
+              <span className="pill">Bildiri Dili: {selectedLanguageLabel}</span>
+              <span className="pill" style={{ background: "#eef4fb" }}>
+                Taslak Sahibi: {snapshot.draftOwnerEmail}
+              </span>
             </div>
 
-            <div className="grid" style={{ marginTop: 20 }}>
+            <div className="field" style={{ marginBottom: 20 }}>
+              <label htmlFor="file">
+                Ana Dosya {!hasExistingFile ? <span className="required">*</span> : null}
+              </label>
+              <input
+                id="file"
+                type="file"
+                accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+              />
+              <span className="field-hint">
+                Sadece DOCX, maksimum 10 MB.
+                {snapshot.file ? ` Mevcut dosya: ${snapshot.file.originalName}` : ""}
+              </span>
+            </div>
+
+            <div className="form-stack">
               {details.submissionLanguage === "TR" ? (
                 <>
                   <div className="field">
@@ -769,7 +770,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
             {error ? <div className="error">{error}</div> : null}
 
             <div className="form-actions">
-              <div className="pill">Taslak sahibi: {snapshot.draftOwnerEmail}</div>
+              <span />
               <button className="button primary" disabled={loading} type="submit">
                 {loading ? "Kaydediliyor..." : "İleri"}
               </button>
@@ -865,118 +866,135 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
         {step === 3 ? (
           <form className="submission-form-panel" onSubmit={saveParticipation}>
-            <div className="grid two">
-              <div className="field">
-                <label htmlFor="presentation-mode">
-                  Sunum Şekli <span className="required">*</span>
-                </label>
-                <select
-                  id="presentation-mode"
-                  value={participation.presentationMode}
-                  onChange={(event) =>
-                    updateParticipationMode(event.target.value as "ONLINE" | "IN_PERSON")
-                  }
+            <div className="field" style={{ marginBottom: 22 }}>
+              <label>
+                Sunum Şekli <span className="required">*</span>
+              </label>
+              <div className="option-cards">
+                <label
+                  className={`option-card${participation.presentationMode === "IN_PERSON" ? " is-selected" : ""}`}
                 >
-                  <option value="IN_PERSON">Yüz yüze</option>
-                  <option value="ONLINE">Çevrim içi</option>
-                </select>
-              </div>
-              <div className="field">
-                <label>Bilgilendirme</label>
-                <div className="field-display field-note">
-                  Çevrim içi seçildiğinde gala ve gezi varsayılan olarak hayır olur. İsterseniz yine de
-                  değiştirebilirsiniz.
-                </div>
+                  <input
+                    checked={participation.presentationMode === "IN_PERSON"}
+                    name="presentation-mode"
+                    onChange={() => updateParticipationMode("IN_PERSON")}
+                    type="radio"
+                  />
+                  <span className="option-card-title">Yüz Yüze</span>
+                  <span className="option-card-meta">
+                    Etkinlik salonunda fiziksel katılım
+                  </span>
+                </label>
+                <label
+                  className={`option-card${participation.presentationMode === "ONLINE" ? " is-selected" : ""}`}
+                >
+                  <input
+                    checked={participation.presentationMode === "ONLINE"}
+                    name="presentation-mode"
+                    onChange={() => updateParticipationMode("ONLINE")}
+                    type="radio"
+                  />
+                  <span className="option-card-title">Çevrim İçi</span>
+                  <span className="option-card-meta">
+                    Sosyal etkinlikler katılım dışıdır
+                  </span>
+                </label>
               </div>
             </div>
 
-            <div className="grid two" style={{ marginTop: 20 }}>
+            <div className="grid two">
               <div className="author-card">
-                <div className="field">
-                  <label htmlFor="gala-attendance">Gala Yemeği Katılımı</label>
-                  <select
-                    id="gala-attendance"
-                    value={participation.galaAttendance ? "yes" : "no"}
-                    onChange={(event) => {
-                      const attends = event.target.value === "yes";
-                      setParticipation((current) => ({
-                        ...current,
-                        galaAttendance: attends,
-                        galaAttendeeCount: attends
-                          ? current.galaAttendeeCount > 0
-                            ? current.galaAttendeeCount
-                            : 1
-                          : 0,
-                      }));
-                    }}
-                  >
-                    <option value="no">Hayır</option>
-                    <option value="yes">Evet</option>
-                  </select>
-                  <span className="field-hint">
-                    Kişi başı {formatCurrency(config.gala.amount, config.gala.currency)}.
-                    {config.gala.note ? ` ${config.gala.note}` : ""}
-                  </span>
-                </div>
-                <div className="field" style={{ marginTop: 16 }}>
-                  <label htmlFor="gala-count">Kaç kişi katılmayı planlıyor?</label>
-                  <input
-                    disabled={!participation.galaAttendance}
-                    id="gala-count"
-                    min={1}
-                    type="number"
-                    value={participation.galaAttendance ? participation.galaAttendeeCount : 0}
-                    onChange={(event) =>
-                      setParticipation((current) => ({
-                        ...current,
-                        galaAttendeeCount: Number(event.target.value) || 0,
-                      }))
-                    }
-                  />
+                <h3>Gala Yemeği</h3>
+                <div className="form-stack">
+                  <div className="field">
+                    <label htmlFor="gala-attendance">Katılım</label>
+                    <select
+                      id="gala-attendance"
+                      value={participation.galaAttendance ? "yes" : "no"}
+                      onChange={(event) => {
+                        const attends = event.target.value === "yes";
+                        setParticipation((current) => ({
+                          ...current,
+                          galaAttendance: attends,
+                          galaAttendeeCount: attends
+                            ? current.galaAttendeeCount > 0
+                              ? current.galaAttendeeCount
+                              : 1
+                            : 0,
+                        }));
+                      }}
+                    >
+                      <option value="no">Hayır, katılmayacağım</option>
+                      <option value="yes">Evet, katılacağım</option>
+                    </select>
+                    <span className="field-hint">
+                      Kişi başı {formatCurrency(config.gala.amount, config.gala.currency)}.
+                      {config.gala.note ? ` ${config.gala.note}` : ""}
+                    </span>
+                  </div>
+                  <div className="field">
+                    <label htmlFor="gala-count">Kaç kişi katılmayı planlıyor?</label>
+                    <input
+                      disabled={!participation.galaAttendance}
+                      id="gala-count"
+                      min={1}
+                      type="number"
+                      value={participation.galaAttendance ? participation.galaAttendeeCount : 0}
+                      onChange={(event) =>
+                        setParticipation((current) => ({
+                          ...current,
+                          galaAttendeeCount: Number(event.target.value) || 0,
+                        }))
+                      }
+                    />
+                  </div>
                 </div>
               </div>
 
               <div className="author-card">
-                <div className="field">
-                  <label htmlFor="trip-attendance">Gezi Katılımı</label>
-                  <select
-                    id="trip-attendance"
-                    value={participation.tripAttendance ? "yes" : "no"}
-                    onChange={(event) => {
-                      const attends = event.target.value === "yes";
-                      setParticipation((current) => ({
-                        ...current,
-                        tripAttendance: attends,
-                        tripAttendeeCount: attends
-                          ? current.tripAttendeeCount > 0
-                            ? current.tripAttendeeCount
-                            : 1
-                          : 0,
-                      }));
-                    }}
-                  >
-                    <option value="no">Hayır</option>
-                    <option value="yes">Evet</option>
-                  </select>
-                  {config.trip.note ? (
-                    <span className="field-hint">{config.trip.note}</span>
-                  ) : null}
-                </div>
-                <div className="field" style={{ marginTop: 16 }}>
-                  <label htmlFor="trip-count">Kaç kişi katılmayı planlıyor?</label>
-                  <input
-                    disabled={!participation.tripAttendance}
-                    id="trip-count"
-                    min={1}
-                    type="number"
-                    value={participation.tripAttendance ? participation.tripAttendeeCount : 0}
-                    onChange={(event) =>
-                      setParticipation((current) => ({
-                        ...current,
-                        tripAttendeeCount: Number(event.target.value) || 0,
-                      }))
-                    }
-                  />
+                <h3>Gezi</h3>
+                <div className="form-stack">
+                  <div className="field">
+                    <label htmlFor="trip-attendance">Katılım</label>
+                    <select
+                      id="trip-attendance"
+                      value={participation.tripAttendance ? "yes" : "no"}
+                      onChange={(event) => {
+                        const attends = event.target.value === "yes";
+                        setParticipation((current) => ({
+                          ...current,
+                          tripAttendance: attends,
+                          tripAttendeeCount: attends
+                            ? current.tripAttendeeCount > 0
+                              ? current.tripAttendeeCount
+                              : 1
+                            : 0,
+                        }));
+                      }}
+                    >
+                      <option value="no">Hayır, katılmayacağım</option>
+                      <option value="yes">Evet, katılacağım</option>
+                    </select>
+                    <span className="field-hint">
+                      {config.trip.note || "Gezi ücretsizdir."}
+                    </span>
+                  </div>
+                  <div className="field">
+                    <label htmlFor="trip-count">Kaç kişi katılmayı planlıyor?</label>
+                    <input
+                      disabled={!participation.tripAttendance}
+                      id="trip-count"
+                      min={1}
+                      type="number"
+                      value={participation.tripAttendance ? participation.tripAttendeeCount : 0}
+                      onChange={(event) =>
+                        setParticipation((current) => ({
+                          ...current,
+                          tripAttendeeCount: Number(event.target.value) || 0,
+                        }))
+                      }
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -1002,154 +1020,215 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
               </div>
             ) : null}
 
+            <div className="field-row" style={{ marginBottom: 18 }}>
+              <span className="pill">
+                Sunum: {participation.presentationMode === "ONLINE" ? "Çevrim İçi" : "Yüz Yüze"}
+              </span>
+              {participation.presentationMode === "IN_PERSON" && config.currentPeriod ? (
+                <span className="pill" style={{ background: "#eef4fb" }}>
+                  Dönem: {mapPaymentPeriod(config.currentPeriod)}
+                </span>
+              ) : null}
+            </div>
+
             <div className="grid two">
               <div className="author-card">
-                <div className="field">
-                  <label>Sunum Şekli</label>
-                  <div className="field-display">
-                    {participation.presentationMode === "ONLINE" ? "Çevrim içi" : "Yüz yüze"}
-                  </div>
-                </div>
-
-                <div className="field" style={{ marginTop: 16 }}>
-                  <label htmlFor="attendee-role">
-                    Katılım Türü <span className="required">*</span>
-                  </label>
-                  <select
-                    id="attendee-role"
-                    value={payment.attendeeRole ?? ""}
-                    onChange={(event) =>
-                      setPayment((current) => {
-                        const role = (event.target.value || null) as AttendeeRole | null;
-                        return {
-                          attendeeRole: role,
-                          audience:
-                            participation.presentationMode === "IN_PERSON" ? current.audience : null,
-                          onlinePaperCount:
-                            participation.presentationMode === "ONLINE" && role === "PRESENTER"
-                              ? current.onlinePaperCount
-                              : null,
-                        };
-                      })
-                    }
-                  >
-                    <option value="">Seçiniz</option>
-                    <option value="PRESENTER">Sunumlu Katılımcı</option>
-                    <option value="LISTENER">Dinleyici</option>
-                  </select>
-                </div>
-
-                {participation.presentationMode === "IN_PERSON" ? (
-                  <div className="field" style={{ marginTop: 16 }}>
-                    <label htmlFor="audience">
-                      Akademik Statü <span className="required">*</span>
+                <h3>Katılım Bilgileri</h3>
+                <div className="form-stack">
+                  <div className="field">
+                    <label>
+                      Katılım Türü <span className="required">*</span>
                     </label>
-                    <select
-                      id="audience"
-                      value={payment.audience ?? ""}
-                      onChange={(event) =>
-                        setPayment((current) => ({
-                          ...current,
-                          audience: (event.target.value || null) as AudienceType | null,
-                        }))
-                      }
-                    >
-                      <option value="">Seçiniz</option>
-                      <option value="ACADEMIC">Akademisyen</option>
-                      <option value="STUDENT">Öğrenci</option>
-                    </select>
-                  </div>
-                ) : null}
-
-                {participation.presentationMode === "ONLINE" &&
-                payment.attendeeRole === "PRESENTER" ? (
-                  <div className="field" style={{ marginTop: 16 }}>
-                    <label htmlFor="online-paper-count">
-                      Bildiri Sayısı <span className="required">*</span>
-                    </label>
-                    <select
-                      id="online-paper-count"
-                      value={payment.onlinePaperCount ?? ""}
-                      onChange={(event) =>
-                        setPayment((current) => ({
-                          ...current,
-                          onlinePaperCount: event.target.value
-                            ? Number(event.target.value) === 2
-                              ? 2
-                              : 1
-                            : null,
-                        }))
-                      }
-                    >
-                      <option value="">Seçiniz</option>
-                      <option value="1">Tek Bildiri</option>
-                      <option value="2">İki Bildiri</option>
-                    </select>
-                  </div>
-                ) : null}
-
-                {participation.presentationMode === "IN_PERSON" ? (
-                  <div className="field" style={{ marginTop: 16 }}>
-                    <label>Kayıt Dönemi</label>
-                    <div className="field-display">
-                      {config.currentPeriod ? mapPaymentPeriod(config.currentPeriod) : "-"}
+                    <div className="option-cards">
+                      <label
+                        className={`option-card${payment.attendeeRole === "PRESENTER" ? " is-selected" : ""}`}
+                      >
+                        <input
+                          checked={payment.attendeeRole === "PRESENTER"}
+                          name="attendee-role"
+                          onChange={() =>
+                            setPayment((current) => ({
+                              attendeeRole: "PRESENTER",
+                              audience:
+                                participation.presentationMode === "IN_PERSON"
+                                  ? current.audience
+                                  : null,
+                              onlinePaperCount:
+                                participation.presentationMode === "ONLINE"
+                                  ? current.onlinePaperCount
+                                  : null,
+                            }))
+                          }
+                          type="radio"
+                        />
+                        <span className="option-card-title">Sunumlu Katılımcı</span>
+                        <span className="option-card-meta">Bildiri sunacak</span>
+                      </label>
+                      <label
+                        className={`option-card${payment.attendeeRole === "LISTENER" ? " is-selected" : ""}`}
+                      >
+                        <input
+                          checked={payment.attendeeRole === "LISTENER"}
+                          name="attendee-role"
+                          onChange={() =>
+                            setPayment(() => ({
+                              attendeeRole: "LISTENER",
+                              audience:
+                                participation.presentationMode === "IN_PERSON"
+                                  ? payment.audience
+                                  : null,
+                              onlinePaperCount: null,
+                            }))
+                          }
+                          type="radio"
+                        />
+                        <span className="option-card-title">Dinleyici</span>
+                        <span className="option-card-meta">Sadece izleyecek</span>
+                      </label>
                     </div>
                   </div>
-                ) : null}
 
-                <div className="field" style={{ marginTop: 16 }}>
-                  <label>Tutar</label>
-                  <div className="field-display">
-                    {matchedTier
-                      ? formatCurrency(matchedTier.amount, matchedTier.currency)
-                      : "Seçim tamamlandığında hesaplanır"}
-                  </div>
+                  {participation.presentationMode === "IN_PERSON" ? (
+                    <div className="field">
+                      <label>
+                        Akademik Statü <span className="required">*</span>
+                      </label>
+                      <div className="option-cards">
+                        <label
+                          className={`option-card${payment.audience === "ACADEMIC" ? " is-selected" : ""}`}
+                        >
+                          <input
+                            checked={payment.audience === "ACADEMIC"}
+                            name="audience"
+                            onChange={() =>
+                              setPayment((current) => ({ ...current, audience: "ACADEMIC" }))
+                            }
+                            type="radio"
+                          />
+                          <span className="option-card-title">Akademisyen</span>
+                          <span className="option-card-meta">Öğretim üyesi / araştırmacı</span>
+                        </label>
+                        <label
+                          className={`option-card${payment.audience === "STUDENT" ? " is-selected" : ""}`}
+                        >
+                          <input
+                            checked={payment.audience === "STUDENT"}
+                            name="audience"
+                            onChange={() =>
+                              setPayment((current) => ({ ...current, audience: "STUDENT" }))
+                            }
+                            type="radio"
+                          />
+                          <span className="option-card-title">Öğrenci</span>
+                          <span className="option-card-meta">Lisans / yüksek lisans / doktora</span>
+                        </label>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {participation.presentationMode === "ONLINE" &&
+                  payment.attendeeRole === "PRESENTER" ? (
+                    <div className="field">
+                      <label>
+                        Bildiri Sayısı <span className="required">*</span>
+                      </label>
+                      <div className="option-cards">
+                        <label
+                          className={`option-card${payment.onlinePaperCount === 1 ? " is-selected" : ""}`}
+                        >
+                          <input
+                            checked={payment.onlinePaperCount === 1}
+                            name="online-paper-count"
+                            onChange={() =>
+                              setPayment((current) => ({ ...current, onlinePaperCount: 1 }))
+                            }
+                            type="radio"
+                          />
+                          <span className="option-card-title">Tek Bildiri</span>
+                          <span className="option-card-meta">Bir sunum hakkı</span>
+                        </label>
+                        <label
+                          className={`option-card${payment.onlinePaperCount === 2 ? " is-selected" : ""}`}
+                        >
+                          <input
+                            checked={payment.onlinePaperCount === 2}
+                            name="online-paper-count"
+                            onChange={() =>
+                              setPayment((current) => ({ ...current, onlinePaperCount: 2 }))
+                            }
+                            type="radio"
+                          />
+                          <span className="option-card-title">İki Bildiri</span>
+                          <span className="option-card-meta">İki ayrı sunum hakkı</span>
+                        </label>
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
 
               <div className="author-card">
-                <h3 style={{ margin: "0 0 12px", fontSize: "1.05rem" }}>Banka Hesap Bilgileri</h3>
-                <div className="field">
-                  <label>Banka</label>
-                  <input readOnly value={config.bank.bankName || "Belirtilmedi"} />
-                </div>
-                {config.bank.bankBranch ? (
-                  <div className="field" style={{ marginTop: 16 }}>
-                    <label>Şube</label>
-                    <input readOnly value={config.bank.bankBranch} />
+                <h3>Hesap Özeti</h3>
+                <div className="form-stack">
+                  <div className="field">
+                    <label>Hesaplanan Tutar</label>
+                    <div className="amount-display">
+                      {matchedTier
+                        ? formatCurrency(matchedTier.amount, matchedTier.currency)
+                        : "—"}
+                      <span className="amount-display-meta">
+                        {matchedTier
+                          ? matchedTier.label
+                          : "Seçimleri tamamladığınızda burada hesaplanır"}
+                      </span>
+                    </div>
                   </div>
-                ) : null}
-                <div className="field" style={{ marginTop: 16 }}>
-                  <label>Hesap Sahibi</label>
-                  <input readOnly value={config.bank.bankAccountHolder || "Belirtilmedi"} />
-                </div>
-                <div className="field" style={{ marginTop: 16 }}>
-                  <label>IBAN</label>
-                  <input readOnly value={config.bank.bankIban || "Belirtilmedi"} />
+
+                  <div className="field">
+                    <label>Ödeme Açıklaması (Havale/EFT)</label>
+                    <input
+                      readOnly
+                      value={
+                        matchedTier && presenterName
+                          ? `${presenterName} - ${matchedTier.label}`
+                          : "Seçim yaptığınızda burada otomatik oluşur."
+                      }
+                    />
+                    <span className="field-hint">
+                      Havale açıklamasına bu ifadeyi yazın. Sunan yazarın adına ve seçilen kategoriye göre üretilir.
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="grid two" style={{ marginTop: 20 }}>
+            <div className="grid two" style={{ marginTop: 18 }}>
               <div className="author-card">
-                <div className="field">
-                  <label>Ödeme Açıklaması</label>
-                  <input
-                    readOnly
-                    value={
-                      matchedTier && presenterName
-                        ? `${presenterName} - ${matchedTier.label}`
-                        : "Seçim yaptığınızda burada otomatik oluşur."
-                    }
-                  />
+                <h3>Banka Hesap Bilgileri</h3>
+                <div className="form-stack">
+                  <div className="field">
+                    <label>Banka</label>
+                    <input readOnly value={config.bank.bankName || "Belirtilmedi"} />
+                  </div>
+                  {config.bank.bankBranch ? (
+                    <div className="field">
+                      <label>Şube</label>
+                      <input readOnly value={config.bank.bankBranch} />
+                    </div>
+                  ) : null}
+                  <div className="field">
+                    <label>Hesap Sahibi</label>
+                    <input readOnly value={config.bank.bankAccountHolder || "Belirtilmedi"} />
+                  </div>
+                  <div className="field">
+                    <label>IBAN</label>
+                    <input readOnly value={config.bank.bankIban || "Belirtilmedi"} />
+                  </div>
                 </div>
-                <p style={{ margin: "16px 0 0", color: "#617089", lineHeight: 1.6 }}>
-                  Havale/EFT açıklamasında bu ifadeyi kullanın. Açıklama, sunan yazarın ad soyadı
-                  ve seçilen katılım tipine göre sistem tarafından oluşturulur.
-                </p>
               </div>
 
               <div className="author-card">
+                <h3>Dekont</h3>
                 {requiresReceipt ? (
                   <div className="field">
                     <label htmlFor="payment-receipt">
@@ -1161,19 +1240,21 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                       onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
                     />
-                    <span style={{ color: "#617089", fontSize: 14 }}>
+                    <span className="field-hint">
                       PDF, JPG, JPEG veya PNG, maksimum 10 MB.
-                      {snapshot.paymentReceipt ? ` Mevcut dekont: ${snapshot.paymentReceipt.originalName}` : ""}
+                      {snapshot.paymentReceipt
+                        ? ` Mevcut dekont: ${snapshot.paymentReceipt.originalName}`
+                        : ""}
                     </span>
                     {participation.presentationMode === "ONLINE" && payment.onlinePaperCount === 2 ? (
-                      <span style={{ color: "#617089", fontSize: 14 }}>
+                      <span className="field-hint">
                         Çevrim içi iki bildiri ödemesinde aynı dekontu ikinci bildiriniz için de
                         yeniden yükleyebilirsiniz.
                       </span>
                     ) : null}
                   </div>
                 ) : (
-                  <div className="notice">
+                  <div className="notice" style={{ marginTop: 0 }}>
                     Bu kategori için ücret alınmadığından dekont yüklemenize gerek yoktur.
                   </div>
                 )}

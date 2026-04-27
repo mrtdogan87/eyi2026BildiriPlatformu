@@ -260,17 +260,35 @@ textarea {
 
 .grid.two {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-stack > .field {
+  margin: 0;
 }
 
 .field {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .field label {
   color: #2c3a55;
   font-size: 14px;
   font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.3;
+  min-height: 18px;
 }
 
 .field input,
@@ -279,11 +297,20 @@ textarea {
   width: 100%;
   border-radius: var(--radius-md);
   border: 1px solid var(--line);
-  padding: 12px 14px;
+  padding: 0 14px;
+  height: 46px;
   background: #fff;
   color: var(--text);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
   font-size: 14.5px;
+}
+
+.field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='%234b5772' d='M4.5 6.5l3.5 3.5 3.5-3.5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
 }
 
 .field input:focus,
@@ -302,22 +329,25 @@ textarea {
 
 .field textarea {
   min-height: 150px;
+  height: auto;
+  padding: 12px 14px;
   resize: vertical;
+  line-height: 1.55;
 }
 
 .field input[type="file"] {
-  min-height: 60px;
-  display: flex;
-  align-items: center;
+  height: 46px;
+  padding: 10px 14px;
   cursor: pointer;
   background: var(--surface-muted);
+  font-size: 13.5px;
 }
 
 .field-display {
-  min-height: 50px;
+  height: 46px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--line);
-  padding: 12px 14px;
+  border: 1px dashed var(--line);
+  padding: 0 14px;
   background: var(--surface-muted);
   color: var(--text);
   display: flex;
@@ -331,16 +361,111 @@ textarea {
   line-height: 1.55;
   font-weight: 400;
   font-size: 14px;
+  height: auto;
+  min-height: 46px;
+  padding: 12px 14px;
 }
 
 .field-hint {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--text-muted);
-  line-height: 1.55;
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+.field-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
 .required {
   color: var(--danger);
+}
+
+.option-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.option-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.option-card:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-muted);
+}
+
+.option-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.option-card-title {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 14.5px;
+}
+
+.option-card-meta {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.option-card.is-selected {
+  border-color: var(--primary);
+  background: var(--info-bg);
+  box-shadow: 0 0 0 3px rgba(31, 79, 157, 0.1);
+}
+
+.option-card.is-selected .option-card-title {
+  color: var(--primary);
+}
+
+.option-card.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.amount-display {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(0, 47, 108, 0.06), rgba(29, 138, 255, 0.05));
+  border: 1px solid var(--line);
+  color: var(--primary);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  min-height: 60px;
+  justify-content: center;
+}
+
+.amount-display-meta {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0;
 }
 
 .form-actions {
@@ -440,6 +565,17 @@ textarea {
   padding: 22px;
   background: var(--surface);
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-self: start;
+}
+
+.author-card > h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--primary);
+  letter-spacing: 0;
 }
 
 .author-head {
@@ -447,7 +583,7 @@ textarea {
   justify-content: space-between;
   gap: 12px;
   align-items: center;
-  margin-bottom: 18px;
+  margin: 0;
 }
 
 .radio-line {
@@ -915,8 +1051,10 @@ textarea {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 14px;
+  align-self: start;
 }
 
 .pricing-card h3 {
@@ -957,8 +1095,10 @@ textarea {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: 22px;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
+  align-self: start;
 }
 
 .pricing-tier-card header h3 {
