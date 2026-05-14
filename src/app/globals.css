@@ -523,11 +523,45 @@ textarea {
   background: #dde9f9;
 }
 
+.button.danger {
+  background: var(--danger);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(180, 35, 24, 0.18);
+}
+
+.button.danger:hover:not(:disabled) {
+  background: #8a1c12;
+  box-shadow: 0 6px 18px rgba(180, 35, 24, 0.28);
+  transform: translateY(-1px);
+}
+
 .button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   box-shadow: none;
   transform: none;
+}
+
+.admin-detail-block-danger {
+  background: #fff5f4;
+  border: 1px solid #f3c4c0;
+}
+
+.admin-detail-block-danger h2 {
+  color: var(--danger);
+}
+
+.admin-danger-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-danger-lead {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: #6a1d15;
 }
 
 .notice {

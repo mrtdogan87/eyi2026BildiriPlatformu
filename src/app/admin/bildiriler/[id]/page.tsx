@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdminDeleteSubmission } from "@/components/admin/admin-delete-submission";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { AdminStatusForm } from "@/components/admin/admin-status-form";
 import { getAdminSubmissionDetail, requireAdminPage } from "@/lib/admin";
@@ -214,6 +215,14 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           ) : (
             <div className="notice">Bu bildiri için ödeme dekontu yüklenmemiş.</div>
           )}
+        </div>
+
+        <div className="admin-detail-block admin-detail-block-danger">
+          <h2>Tehlikeli İşlem · Bildiriyi Sil</h2>
+          <AdminDeleteSubmission
+            submissionId={submission.id}
+            submissionTitle={isTurkish ? submission.titleTr : submission.titleEn}
+          />
         </div>
 
         <div className="admin-detail-block">
