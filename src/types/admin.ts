@@ -84,10 +84,10 @@ export type AdminSubmissionDetail = {
 
 export type AdminPaymentTier = {
   id: string;
-  presentationMode: "ONLINE" | "IN_PERSON";
+  presentationMode: "ONLINE" | "IN_PERSON" | null;
   role: "PRESENTER" | "LISTENER";
   audience: "ACADEMIC" | "STUDENT" | null;
-  onlinePaperCount: 1 | 2 | null;
+  paperOrder: 1 | 2 | null;
   period: "EARLY" | "LATE" | null;
   amount: number;
   currency: string;

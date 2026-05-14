@@ -144,9 +144,9 @@ export async function POST(_request: Request, { params }: RouteProps) {
       payment: {
         attendeeRole: submission.attendeeRole,
         audience: submission.audience,
-        onlinePaperCount:
-          submission.onlinePaperCount === 1 || submission.onlinePaperCount === 2
-            ? (submission.onlinePaperCount as 1 | 2)
+        paperOrder:
+          submission.paperOrder === 1 || submission.paperOrder === 2
+            ? (submission.paperOrder as 1 | 2)
             : null,
       },
       presentationMode: (submission.presentationMode ?? "IN_PERSON") as "ONLINE" | "IN_PERSON",

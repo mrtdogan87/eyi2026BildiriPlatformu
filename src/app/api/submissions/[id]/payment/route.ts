@@ -32,7 +32,7 @@ export async function PATCH(request: Request, { params }: RouteProps) {
       paymentDescription: true,
       attendeeRole: true,
       audience: true,
-      onlinePaperCount: true,
+      paperOrder: true,
       paymentPeriod: true,
       congress: {
         select: { slug: true },
@@ -93,7 +93,7 @@ export async function PATCH(request: Request, { params }: RouteProps) {
     paymentTierId: resolved.tier.id,
     attendeeRole: resolved.input.attendeeRole,
     audience: resolved.input.audience,
-    onlinePaperCount: resolved.input.onlinePaperCount,
+    paperOrder: resolved.input.paperOrder,
     paymentPeriod: resolved.paymentPeriod,
     paymentAmount: resolved.paymentAmount,
     paymentCurrency: resolved.paymentCurrency,

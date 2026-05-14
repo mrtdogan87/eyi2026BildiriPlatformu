@@ -379,9 +379,9 @@ export async function getSubmissionSnapshot(
     payment: {
       attendeeRole: (submission.attendeeRole ?? null) as AttendeeRole | null,
       audience: (submission.audience ?? null) as AudienceType | null,
-      onlinePaperCount:
-        submission.onlinePaperCount === 1 || submission.onlinePaperCount === 2
-          ? (submission.onlinePaperCount as 1 | 2)
+      paperOrder:
+        submission.paperOrder === 1 || submission.paperOrder === 2
+          ? (submission.paperOrder as 1 | 2)
           : null,
       period: (submission.paymentPeriod ?? null) as PaymentPeriod | null,
       amount: submission.paymentAmount ?? null,

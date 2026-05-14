@@ -91,58 +91,67 @@ function buildGroups(tiers: AdminPaymentTier[]): TierGroup[] {
   const groups = new Map<string, TierGroup>();
 
   for (const tier of tiers) {
-    const key = [tier.presentationMode, tier.role, tier.audience ?? "ANY", tier.onlinePaperCount ?? "-"].join("|");
+    const key = [
+      tier.role,
+      tier.presentationMode ?? "ANY",
+      tier.audience ?? "ANY",
+      tier.paperOrder ?? "-",
+    ].join("|");
     if (!groups.has(key)) {
-      const title = buildGroupTitle(tier);
-      const description = buildGroupDescription(tier);
-      groups.set(key, { key, title, description, rows: [] });
+      groups.set(key, {
+        key,
+        title: buildGroupTitle(tier),
+        description: buildGroupDescription(tier),
+        rows: [],
+      });
     }
     groups.get(key)!.rows.push(tier);
   }
 
-  return Array.from(groups.values()).map((group) => ({
-    ...group,
-    rows: group.rows.sort((a, b) => a.sortOrder - b.sortOrder),
-  }));
+  return Array.from(groups.values())
+    .map((group) => ({
+      ...group,
+      rows: group.rows.sort((a, b) => a.sortOrder - b.sortOrder),
+    }))
+    .sort((a, b) => (a.rows[0]?.sortOrder ?? 0) - (b.rows[0]?.sortOrder ?? 0));
 }
 
 function buildGroupTitle(tier: AdminPaymentTier): string {
+  const audience =
+    tier.audience === "ACADEMIC"
+      ? "Akademik Personel"
+      : tier.audience === "STUDENT"
+        ? "Öğrenci"
+        : "";
+
+  if (tier.role === "PRESENTER") {
+    const order = tier.paperOrder === 2 ? "İkinci Bildiri" : "Birinci Bildiri";
+    return `Sunumlu · ${audience} · ${order}`;
+  }
+
   if (tier.presentationMode === "IN_PERSON") {
-    const audience =
-      tier.audience === "ACADEMIC" ? "Akademisyen" : tier.audience === "STUDENT" ? "Öğrenci" : "";
-    const role = tier.role === "PRESENTER" ? "Sunumlu" : "Dinleyici";
-    return `Yüz Yüze · ${audience} · ${role}`;
+    return `Yüz Yüze Dinleyici · ${audience}`;
   }
 
-  if (tier.role === "LISTENER") {
-    return "Çevrim İçi · Dinleyici";
-  }
-
-  if (tier.onlinePaperCount === 2) {
-    return "Çevrim İçi · İki Bildiri";
-  }
-
-  return "Çevrim İçi · Tek Bildiri";
+  return "Çevrim İçi Dinleyici";
 }
 
 function buildGroupDescription(tier: AdminPaymentTier): string {
+  if (tier.role === "PRESENTER") {
+    if (tier.paperOrder === 2) {
+      return "İkinci bildiri için indirimli tarife. Aynı sunucunun ikinci bildirisi olduğunda uygulanır.";
+    }
+    return "Yüz yüze ve çevrim içi sunumlarda aynı ücret uygulanır.";
+  }
   if (tier.presentationMode === "IN_PERSON") {
-    return "Erken ve geç kayıt fiyatları otomatik olarak kayıt tarihlerine göre uygulanır.";
+    return "Bildiride adı bulunmayan katılımcılara günlük yüz yüze dinleyici ücreti uygulanır.";
   }
-
-  if (tier.role === "LISTENER") {
-    return "Çevrim içi dinleyici katılımı ücretsiz olabilir; tutar 0 girilirse dekont istenmez.";
-  }
-
-  return "Çevrim içi sunum için tek tutar uygulanır, erken/geç ayrımı yoktur.";
+  return "Çevrim içi dinleyici katılımı her zaman ücretsizdir.";
 }
 
 function rowLabel(tier: AdminPaymentTier): string {
   if (tier.period) {
     return PERIOD_LABELS[tier.period] ?? tier.period;
-  }
-  if (tier.presentationMode === "ONLINE" && tier.role === "PRESENTER") {
-    return tier.onlinePaperCount === 2 ? "İki Bildiri" : "Tek Bildiri";
   }
   return "Tek Tutar";
 }

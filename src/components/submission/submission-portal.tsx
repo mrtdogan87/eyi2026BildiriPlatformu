@@ -2,11 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { mapAttendeeRole, mapAudience, mapPaymentPeriod } from "@/lib/payment";
+import {
+  mapAttendeeRole,
+  mapAudience,
+  mapPaperOrder,
+  mapPaymentPeriod,
+} from "@/lib/payment";
 import type {
   AttendeeRole,
   AudienceType,
-  OnlinePaperCount,
+  PaperOrder,
   PaymentTierOption,
   SubmissionAuthorInput,
   SubmissionConfig,
@@ -56,7 +61,7 @@ const emptyParticipation: SubmissionParticipationInput = {
 const emptyPayment: SubmissionPaymentInput = {
   attendeeRole: null,
   audience: null,
-  onlinePaperCount: null,
+  paperOrder: null,
 };
 
 const emptyAuthor = (): SubmissionAuthorInput => ({
@@ -124,7 +129,7 @@ function findMatchingTier(
     presentationMode: "IN_PERSON" | "ONLINE";
     attendeeRole: AttendeeRole | null;
     audience: AudienceType | null;
-    onlinePaperCount: OnlinePaperCount | null;
+    paperOrder: PaperOrder | null;
     period: "EARLY" | "LATE" | null;
   },
 ): PaymentTierOption | null {
@@ -132,9 +137,18 @@ function findMatchingTier(
 
   return (
     tiers.find((tier) => {
-      if (tier.presentationMode !== selection.presentationMode) return false;
       if (tier.role !== selection.attendeeRole) return false;
 
+      if (selection.attendeeRole === "PRESENTER") {
+        if (tier.presentationMode !== null) return false;
+        if (tier.audience !== selection.audience) return false;
+        if (tier.paperOrder !== selection.paperOrder) return false;
+        if (selection.period !== null && tier.period !== selection.period) return false;
+        if (selection.period === null && tier.period !== null) return false;
+        return true;
+      }
+
+      if (tier.presentationMode !== selection.presentationMode) return false;
       if (selection.presentationMode === "IN_PERSON") {
         if (tier.audience !== selection.audience) return false;
         if (selection.period !== null && tier.period !== selection.period) return false;
@@ -142,12 +156,7 @@ function findMatchingTier(
         return true;
       }
 
-      if (tier.audience !== null) return false;
-      if (tier.period !== null) return false;
-      if (selection.attendeeRole === "PRESENTER") {
-        return tier.onlinePaperCount === selection.onlinePaperCount;
-      }
-      return tier.onlinePaperCount === null;
+      return tier.audience === null && tier.period === null;
     }) ?? null
   );
 }
@@ -196,7 +205,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       ? {
           attendeeRole: initialSnapshot.payment.attendeeRole,
           audience: initialSnapshot.payment.audience,
-          onlinePaperCount: initialSnapshot.payment.onlinePaperCount,
+          paperOrder: initialSnapshot.payment.paperOrder,
         }
       : emptyPayment,
   );
@@ -221,38 +230,27 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
     return presenter?.fullName.trim() ?? "";
   }, [authors]);
 
-  const matchedTier = useMemo(
-    () =>
-      findMatchingTier(config.tiers, {
-        presentationMode: participation.presentationMode,
-        attendeeRole: payment.attendeeRole,
-        audience: payment.audience,
-        onlinePaperCount: payment.onlinePaperCount,
-        period: participation.presentationMode === "IN_PERSON" ? config.currentPeriod : null,
-      }),
-    [config.tiers, config.currentPeriod, participation.presentationMode, payment],
-  );
+  const matchedTier = useMemo(() => {
+    const isOnlineListener =
+      payment.attendeeRole === "LISTENER" && participation.presentationMode === "ONLINE";
+    return findMatchingTier(config.tiers, {
+      presentationMode: participation.presentationMode,
+      attendeeRole: payment.attendeeRole,
+      audience: payment.audience,
+      paperOrder: payment.paperOrder,
+      period: isOnlineListener ? null : config.currentPeriod,
+    });
+  }, [config.tiers, config.currentPeriod, participation.presentationMode, payment]);
 
   const requiresReceipt = (matchedTier?.amount ?? 0) > 0;
 
   useEffect(() => {
     if (participation.presentationMode === "ONLINE") {
       setPayment((current) => {
-        if (!current.attendeeRole && !current.audience && !current.onlinePaperCount) {
-          return current;
-        }
-        return {
-          attendeeRole: current.attendeeRole,
-          audience: null,
-          onlinePaperCount: current.attendeeRole === "PRESENTER" ? current.onlinePaperCount : null,
-        };
+        if (current.attendeeRole !== "LISTENER") return current;
+        if (!current.audience) return current;
+        return { ...current, audience: null };
       });
-    } else {
-      setPayment((current) => ({
-        attendeeRole: current.attendeeRole,
-        audience: current.audience,
-        onlinePaperCount: null,
-      }));
     }
   }, [participation.presentationMode]);
 
@@ -262,7 +260,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       setPayment({
         attendeeRole: nextSubmission.payment.attendeeRole,
         audience: nextSubmission.payment.audience,
-        onlinePaperCount: nextSubmission.payment.onlinePaperCount,
+        paperOrder: nextSubmission.payment.paperOrder,
       });
     }
   }
@@ -1053,9 +1051,9 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                                 participation.presentationMode === "IN_PERSON"
                                   ? current.audience
                                   : null,
-                              onlinePaperCount:
+                              paperOrder:
                                 participation.presentationMode === "ONLINE"
-                                  ? current.onlinePaperCount
+                                  ? current.paperOrder
                                   : null,
                             }))
                           }
@@ -1077,7 +1075,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                                 participation.presentationMode === "IN_PERSON"
                                   ? payment.audience
                                   : null,
-                              onlinePaperCount: null,
+                              paperOrder: null,
                             }))
                           }
                           type="radio"
@@ -1088,7 +1086,9 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     </div>
                   </div>
 
-                  {participation.presentationMode === "IN_PERSON" ? (
+                  {payment.attendeeRole === "PRESENTER" ||
+                  (payment.attendeeRole === "LISTENER" &&
+                    participation.presentationMode === "IN_PERSON") ? (
                     <div className="field">
                       <label>
                         Akademik Statü <span className="required">*</span>
@@ -1105,7 +1105,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                             }
                             type="radio"
                           />
-                          <span className="option-card-title">Akademisyen</span>
+                          <span className="option-card-title">Akademik Personel</span>
                           <span className="option-card-meta">Öğretim üyesi / araştırmacı</span>
                         </label>
                         <label
@@ -1126,42 +1126,52 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     </div>
                   ) : null}
 
-                  {participation.presentationMode === "ONLINE" &&
-                  payment.attendeeRole === "PRESENTER" ? (
+                  {payment.attendeeRole === "PRESENTER" ? (
                     <div className="field">
                       <label>
-                        Bildiri Sayısı <span className="required">*</span>
+                        Bildiri Sırası <span className="required">*</span>
                       </label>
                       <div className="option-cards">
                         <label
-                          className={`option-card${payment.onlinePaperCount === 1 ? " is-selected" : ""}`}
+                          className={`option-card${payment.paperOrder === 1 ? " is-selected" : ""}`}
                         >
                           <input
-                            checked={payment.onlinePaperCount === 1}
-                            name="online-paper-count"
+                            checked={payment.paperOrder === 1}
+                            name="paper-order"
                             onChange={() =>
-                              setPayment((current) => ({ ...current, onlinePaperCount: 1 }))
+                              setPayment((current) => ({ ...current, paperOrder: 1 }))
                             }
                             type="radio"
                           />
-                          <span className="option-card-title">Tek Bildiri</span>
-                          <span className="option-card-meta">Bir sunum hakkı</span>
+                          <span className="option-card-title">Birinci Bildiri</span>
+                          <span className="option-card-meta">Tam tarife uygulanır</span>
                         </label>
                         <label
-                          className={`option-card${payment.onlinePaperCount === 2 ? " is-selected" : ""}`}
+                          className={`option-card${payment.paperOrder === 2 ? " is-selected" : ""}`}
                         >
                           <input
-                            checked={payment.onlinePaperCount === 2}
-                            name="online-paper-count"
+                            checked={payment.paperOrder === 2}
+                            name="paper-order"
                             onChange={() =>
-                              setPayment((current) => ({ ...current, onlinePaperCount: 2 }))
+                              setPayment((current) => ({ ...current, paperOrder: 2 }))
                             }
                             type="radio"
                           />
-                          <span className="option-card-title">İki Bildiri</span>
-                          <span className="option-card-meta">İki ayrı sunum hakkı</span>
+                          <span className="option-card-title">İkinci Bildiri</span>
+                          <span className="option-card-meta">%50 indirim uygulanır</span>
                         </label>
                       </div>
+                      <span className="field-hint">
+                        İkinci bildiri indirimi yalnızca birinci bildiriyi sunan kişinin ikinci
+                        bildiriyi de sunması durumunda geçerlidir.
+                      </span>
+                    </div>
+                  ) : null}
+
+                  {payment.attendeeRole === "LISTENER" &&
+                  participation.presentationMode === "ONLINE" ? (
+                    <div className="notice" style={{ marginTop: 0 }}>
+                      Çevrim içi dinleyici katılımı ücretsizdir. Ödeme veya dekont gerekmez.
                     </div>
                   ) : null}
                 </div>
@@ -1246,10 +1256,10 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                         ? ` Mevcut dekont: ${snapshot.paymentReceipt.originalName}`
                         : ""}
                     </span>
-                    {participation.presentationMode === "ONLINE" && payment.onlinePaperCount === 2 ? (
+                    {payment.paperOrder === 2 ? (
                       <span className="field-hint">
-                        Çevrim içi iki bildiri ödemesinde aynı dekontu ikinci bildiriniz için de
-                        yeniden yükleyebilirsiniz.
+                        İkinci bildiri için ödeme açıklamasında bu bildirinin sunan yazarını ve
+                        &quot;İkinci Bildiri&quot; ifadesini belirtiniz.
                       </span>
                     ) : null}
                   </div>
@@ -1326,8 +1336,11 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
               <h3>Ücret Bilgisi</h3>
               <ul className="summary-list">
                 <li>Katılım: {mapAttendeeRole(snapshot.payment.attendeeRole)}</li>
-                {snapshot.presentationMode === "IN_PERSON" ? (
+                {snapshot.payment.audience ? (
                   <li>Akademik Statü: {mapAudience(snapshot.payment.audience)}</li>
+                ) : null}
+                {snapshot.payment.attendeeRole === "PRESENTER" ? (
+                  <li>Bildiri Sırası: {mapPaperOrder(snapshot.payment.paperOrder)}</li>
                 ) : null}
                 <li>Kayıt Dönemi: {snapshot.payment.period ? mapPaymentPeriod(snapshot.payment.period) : "-"}</li>
                 <li>Tutar: {formatCurrency(snapshot.payment.amount, snapshot.payment.currency)}</li>

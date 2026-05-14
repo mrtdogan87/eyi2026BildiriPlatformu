@@ -61,7 +61,7 @@ export async function PATCH(request: Request, { params }: RouteProps) {
             paymentTierId: null,
             attendeeRole: null,
             audience: null,
-            onlinePaperCount: null,
+            paperOrder: null,
             paymentPeriod: null,
             paymentAmount: null,
             paymentCurrency: null,

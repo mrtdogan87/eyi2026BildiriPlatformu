@@ -61,27 +61,31 @@ export function formatCurrencyAmount(amount: number, currency: string): string {
 export function tierLabel(
   tier: Pick<
     PaymentTier,
-    "presentationMode" | "role" | "audience" | "onlinePaperCount" | "period"
+    "presentationMode" | "role" | "audience" | "paperOrder" | "period"
   >,
 ): string {
   const parts: string[] = [];
 
-  if (tier.presentationMode === "IN_PERSON") {
-    parts.push("Yüz Yüze");
-    if (tier.audience === "ACADEMIC") parts.push("Akademisyen");
+  if (tier.role === "PRESENTER") {
+    if (tier.audience === "ACADEMIC") parts.push("Akademik Personel");
     if (tier.audience === "STUDENT") parts.push("Öğrenci");
-    parts.push(tier.role === "PRESENTER" ? "Sunumlu" : "Dinleyici");
+    if (tier.paperOrder === 1) parts.push("Birinci Bildiri");
+    if (tier.paperOrder === 2) parts.push("İkinci Bildiri (%50 İndirim)");
+    if (tier.period === "EARLY") parts.push("Erken Kayıt");
+    if (tier.period === "LATE") parts.push("Geç Kayıt");
+    return parts.join(" · ");
+  }
+
+  // LISTENER
+  if (tier.presentationMode === "IN_PERSON") {
+    parts.push("Yüz Yüze Dinleyici");
+    if (tier.audience === "ACADEMIC") parts.push("Akademik Personel");
+    if (tier.audience === "STUDENT") parts.push("Öğrenci");
     if (tier.period === "EARLY") parts.push("Erken Kayıt");
     if (tier.period === "LATE") parts.push("Geç Kayıt");
   } else {
-    parts.push("Çevrim İçi");
-    if (tier.role === "PRESENTER") {
-      parts.push(tier.onlinePaperCount === 2 ? "İki Bildiri" : "Tek Bildiri");
-    } else {
-      parts.push("Dinleyici");
-    }
+    parts.push("Çevrim İçi Dinleyici");
   }
-
   return parts.join(" · ");
 }
 
@@ -91,9 +95,9 @@ export function tierToOption(tier: PaymentTier): PaymentTierOption {
     presentationMode: tier.presentationMode,
     role: tier.role,
     audience: tier.audience,
-    onlinePaperCount:
-      tier.onlinePaperCount === 1 || tier.onlinePaperCount === 2
-        ? (tier.onlinePaperCount as 1 | 2)
+    paperOrder:
+      tier.paperOrder === 1 || tier.paperOrder === 2
+        ? (tier.paperOrder as 1 | 2)
         : null,
     period: tier.period,
     amount: tier.amount,
@@ -131,7 +135,7 @@ export function findApplicableTier(
     presentationMode: PresentationMode;
     attendeeRole: AttendeeRole;
     audience: AudienceType | null;
-    onlinePaperCount: number | null;
+    paperOrder: number | null;
     period: PaymentPeriod | null;
   },
   options: { onlyActive?: boolean } = {},
@@ -141,25 +145,28 @@ export function findApplicableTier(
   return (
     tiers.find((tier) => {
       if (onlyActive && !tier.active) return false;
-      if (tier.presentationMode !== selection.presentationMode) return false;
       if (tier.role !== selection.attendeeRole) return false;
 
+      if (selection.attendeeRole === "PRESENTER") {
+        // Presenter pricing: presentation mode irrelevant, audience + paperOrder + period.
+        if (tier.presentationMode !== null) return false;
+        if (tier.audience !== selection.audience) return false;
+        if (tier.paperOrder !== selection.paperOrder) return false;
+        if (selection.period !== null && tier.period !== selection.period) return false;
+        if (selection.period === null && tier.period !== null) return false;
+        return true;
+      }
+
+      // LISTENER
+      if (tier.presentationMode !== selection.presentationMode) return false;
       if (selection.presentationMode === "IN_PERSON") {
         if (tier.audience !== selection.audience) return false;
-        if (selection.period !== null && tier.period !== selection.period) {
-          return false;
-        }
+        if (selection.period !== null && tier.period !== selection.period) return false;
         if (selection.period === null && tier.period !== null) return false;
-      } else {
-        if (tier.audience !== null) return false;
-        if (tier.period !== null) return false;
-        if (selection.attendeeRole === "PRESENTER") {
-          if (tier.onlinePaperCount !== selection.onlinePaperCount) return false;
-        } else if (tier.onlinePaperCount !== null) {
-          return false;
-        }
+        return true;
       }
-      return true;
+      // ONLINE listener: single tier, audience/period irrelevant
+      return tier.audience === null && tier.period === null;
     }) ?? null
   );
 }
@@ -168,27 +175,26 @@ export function normalizePaymentInput(
   input: SubmissionPaymentInput,
   presentationMode: PresentationMode,
 ): SubmissionPaymentInput {
-  if (presentationMode === "IN_PERSON") {
-    return {
-      attendeeRole: input.attendeeRole,
-      audience: input.audience,
-      onlinePaperCount: null,
-    };
-  }
-
   if (input.attendeeRole === "LISTENER") {
+    if (presentationMode === "ONLINE") {
+      return { attendeeRole: "LISTENER", audience: null, paperOrder: null };
+    }
     return {
       attendeeRole: "LISTENER",
-      audience: null,
-      onlinePaperCount: null,
+      audience: input.audience,
+      paperOrder: null,
     };
   }
 
-  return {
-    attendeeRole: input.attendeeRole,
-    audience: null,
-    onlinePaperCount: input.onlinePaperCount,
-  };
+  if (input.attendeeRole === "PRESENTER") {
+    return {
+      attendeeRole: "PRESENTER",
+      audience: input.audience,
+      paperOrder: input.paperOrder,
+    };
+  }
+
+  return { attendeeRole: null, audience: null, paperOrder: null };
 }
 
 export function validatePaymentSelection(
@@ -203,16 +209,19 @@ export function validatePaymentSelection(
     return errors;
   }
 
-  if (presentationMode === "IN_PERSON" && !normalized.audience) {
-    errors.push("Yüz yüze katılım için akademisyen veya öğrenci seçmelisiniz.");
+  if (normalized.attendeeRole === "PRESENTER") {
+    if (!normalized.audience) {
+      errors.push("Sunumlu katılım için akademisyen veya öğrenci seçmelisiniz.");
+    }
+    if (normalized.paperOrder !== 1 && normalized.paperOrder !== 2) {
+      errors.push("Sunacağınız bildiri kaçıncı sırada olduğunu seçmelisiniz.");
+    }
+    return errors;
   }
 
-  if (
-    presentationMode === "ONLINE" &&
-    normalized.attendeeRole === "PRESENTER" &&
-    !normalized.onlinePaperCount
-  ) {
-    errors.push("Çevrim içi sunum için bildiri sayısını seçmelisiniz.");
+  // LISTENER
+  if (presentationMode === "IN_PERSON" && !normalized.audience) {
+    errors.push("Yüz yüze dinleyici katılımı için akademisyen veya öğrenci seçmelisiniz.");
   }
 
   return errors;
@@ -251,22 +260,25 @@ export function resolveSubmissionPayment(input: {
     throw new Error("Ödeme açıklaması için sunan yazar adı zorunludur.");
   }
 
-  const period =
-    input.presentationMode === "IN_PERSON"
-      ? getCurrentPaymentPeriod(input.congress, now)
-      : null;
+  const normalized = normalizePaymentInput(input.payment, input.presentationMode);
 
-  if (input.presentationMode === "IN_PERSON" && !period) {
+  // ONLINE LISTENER pays nothing — no period applied.
+  const isOnlineListener =
+    normalized.attendeeRole === "LISTENER" && input.presentationMode === "ONLINE";
+
+  const period = isOnlineListener
+    ? null
+    : getCurrentPaymentPeriod(input.congress, now);
+
+  if (!isOnlineListener && !period) {
     throw new Error(PAYMENT_CLOSED_MESSAGE);
   }
-
-  const normalized = normalizePaymentInput(input.payment, input.presentationMode);
 
   const tier = findApplicableTier(input.congress.paymentTiers, {
     presentationMode: input.presentationMode,
     attendeeRole: normalized.attendeeRole as AttendeeRole,
     audience: normalized.audience,
-    onlinePaperCount: normalized.onlinePaperCount,
+    paperOrder: normalized.paperOrder,
     period,
   });
 
@@ -314,7 +326,7 @@ export function mapPaymentPeriod(period: PaymentPeriod | null) {
 export function mapAudience(audience: AudienceType | null) {
   switch (audience) {
     case "ACADEMIC":
-      return "Akademisyen";
+      return "Akademik Personel";
     case "STUDENT":
       return "Öğrenci";
     default:
@@ -331,4 +343,10 @@ export function mapAttendeeRole(role: AttendeeRole | null) {
     default:
       return "-";
   }
+}
+
+export function mapPaperOrder(order: number | null) {
+  if (order === 1) return "Birinci Bildiri";
+  if (order === 2) return "İkinci Bildiri (%50 İndirim)";
+  return "-";
 }

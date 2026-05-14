@@ -265,7 +265,7 @@ export async function getAdminSubmissionList(
       presentationMode: true,
       attendeeRole: true,
       audience: true,
-      onlinePaperCount: true,
+      paperOrder: true,
       paymentPeriod: true,
       paymentAmount: true,
       paymentCurrency: true,
@@ -298,7 +298,7 @@ export async function getAdminSubmissionList(
             presentationMode: submission.presentationMode,
             role: submission.attendeeRole,
             audience: submission.audience,
-            onlinePaperCount: submission.onlinePaperCount,
+            paperOrder: submission.paperOrder,
             period: submission.paymentPeriod,
           })
         : "-";
@@ -390,7 +390,7 @@ export async function getAdminSubmissionDetail(
       presentationMode: true,
       attendeeRole: true,
       audience: true,
-      onlinePaperCount: true,
+      paperOrder: true,
       paymentPeriod: true,
       paymentAmount: true,
       paymentCurrency: true,
@@ -474,7 +474,7 @@ export async function getAdminSubmissionDetail(
           presentationMode: submission.presentationMode,
           role: submission.attendeeRole,
           audience: submission.audience,
-          onlinePaperCount: submission.onlinePaperCount,
+          paperOrder: submission.paperOrder,
           period: submission.paymentPeriod,
         })
       : "-";
@@ -683,9 +683,9 @@ export async function getAdminPricingPayload(): Promise<AdminPricingPayload | nu
       presentationMode: tier.presentationMode,
       role: tier.role,
       audience: tier.audience,
-      onlinePaperCount:
-        tier.onlinePaperCount === 1 || tier.onlinePaperCount === 2
-          ? (tier.onlinePaperCount as 1 | 2)
+      paperOrder:
+        tier.paperOrder === 1 || tier.paperOrder === 2
+          ? (tier.paperOrder as 1 | 2)
           : null,
       period: tier.period,
       amount: tier.amount,

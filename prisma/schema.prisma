@@ -62,23 +62,23 @@ model Congress {
 }
 
 model PaymentTier {
-  id               String           @id @default(cuid())
+  id               String            @id @default(cuid())
   congressId       String
-  presentationMode PresentationMode
+  presentationMode PresentationMode?
   role             AttendeeRole
   audience         AudienceType?
-  onlinePaperCount Int?
+  paperOrder       Int?
   period           PaymentPeriod?
-  amount           Int              @default(0)
-  currency         String           @default("TRY")
-  active           Boolean          @default(true)
-  sortOrder        Int              @default(0)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  congress         Congress         @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  amount           Int               @default(0)
+  currency         String            @default("TRY")
+  active           Boolean           @default(true)
+  sortOrder        Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  congress         Congress          @relation(fields: [congressId], references: [id], onDelete: Cascade)
   submissions      Submission[]
 
-  @@unique([congressId, presentationMode, role, audience, onlinePaperCount, period])
+  @@unique([congressId, presentationMode, role, audience, paperOrder, period])
   @@index([congressId, active])
 }
 
@@ -96,7 +96,7 @@ model Submission {
   presentationMode   PresentationMode?
   attendeeRole       AttendeeRole?
   audience           AudienceType?
-  onlinePaperCount   Int?
+  paperOrder         Int?
   paymentTierId      String?
   paymentPeriod      PaymentPeriod?
   paymentAmount      Int?

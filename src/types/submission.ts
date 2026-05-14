@@ -3,7 +3,7 @@ export type PresentationMode = "ONLINE" | "IN_PERSON";
 export type AudienceType = "ACADEMIC" | "STUDENT";
 export type AttendeeRole = "PRESENTER" | "LISTENER";
 export type PaymentPeriod = "EARLY" | "LATE";
-export type OnlinePaperCount = 1 | 2;
+export type PaperOrder = 1 | 2;
 
 export type SubmissionAuthorInput = {
   id?: string;
@@ -35,7 +35,7 @@ export type SubmissionParticipationInput = {
 export type SubmissionPaymentInput = {
   attendeeRole: AttendeeRole | null;
   audience: AudienceType | null;
-  onlinePaperCount: OnlinePaperCount | null;
+  paperOrder: PaperOrder | null;
 };
 
 export type CongressBankInfo = {
@@ -57,20 +57,20 @@ export type CongressTripInfo = {
 
 export type PaymentTierOption = {
   id: string;
-  presentationMode: PresentationMode;
+  presentationMode: PresentationMode | null;
   role: AttendeeRole;
   audience: AudienceType | null;
-  onlinePaperCount: OnlinePaperCount | null;
+  paperOrder: PaperOrder | null;
   period: PaymentPeriod | null;
   amount: number;
   currency: string;
   label: string;
 };
 
-export type SubmissionPaymentSummary = SubmissionPaymentInput & {
+export type SubmissionPaymentSummary = {
   attendeeRole: AttendeeRole | null;
   audience: AudienceType | null;
-  onlinePaperCount: OnlinePaperCount | null;
+  paperOrder: PaperOrder | null;
   period: PaymentPeriod | null;
   amount: number | null;
   currency: string | null;
