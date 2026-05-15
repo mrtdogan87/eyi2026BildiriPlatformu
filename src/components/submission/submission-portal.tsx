@@ -33,7 +33,6 @@ type AuthorDraft = SubmissionAuthorInput & {
 
 type SubmissionDeclarations = {
   accuracy: boolean;
-  originality: boolean;
   submissionLimit: boolean;
   coauthorApproval: boolean;
   personalDataConsent: boolean;
@@ -74,7 +73,6 @@ const emptyAuthor = (): SubmissionAuthorInput => ({
 
 const emptyDeclarations: SubmissionDeclarations = {
   accuracy: false,
-  originality: false,
   submissionLimit: false,
   coauthorApproval: false,
   personalDataConsent: false,
@@ -84,8 +82,6 @@ const emptyDeclarations: SubmissionDeclarations = {
 const declarationLabels: Record<keyof SubmissionDeclarations, string> = {
   accuracy:
     "Başvuru sahibi olarak, bu form kapsamında tarafımdan sunulan tüm bilgi ve belgelerin doğru, eksiksiz ve güncel olduğunu beyan ederim.",
-  originality:
-    "Başvurusu yapılan çalışmanın özgün olduğunu, intihal içermediğini ve aynı anda başka bir kongre, sempozyum ya da yayın organında değerlendirme sürecinde bulunmadığını kabul ederim.",
   submissionLimit:
     "Kongre kapsamında geçerli olan, bir araştırmacının en fazla iki bildiride yazar olarak yer alabileceği kuralını okuduğumu, anladığımı ve kabul ettiğimi beyan ederim.",
   coauthorApproval:

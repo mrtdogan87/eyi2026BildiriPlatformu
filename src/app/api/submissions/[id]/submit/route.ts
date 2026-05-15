@@ -26,7 +26,6 @@ export async function POST(_request: Request, { params }: RouteProps) {
   const body = (await _request.json()) as {
     declarations?: {
       accuracy?: boolean;
-      originality?: boolean;
       submissionLimit?: boolean;
       coauthorApproval?: boolean;
       personalDataConsent?: boolean;
@@ -42,7 +41,6 @@ export async function POST(_request: Request, { params }: RouteProps) {
   const declarations = body.declarations;
   if (
     !declarations?.accuracy ||
-    !declarations.originality ||
     !declarations.submissionLimit ||
     !declarations.coauthorApproval ||
     !declarations.personalDataConsent ||
