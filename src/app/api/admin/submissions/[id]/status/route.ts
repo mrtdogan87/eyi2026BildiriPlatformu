@@ -1,11 +1,13 @@
 import { NextResponse } from "next/server";
 import {
+  ADMIN_DEFAULT_CONGRESS_SLUG,
   assertAdminApiAccess,
   isManageableSubmissionStatus,
   mapSubmissionStatus,
   updateAdminSubmissionStatus,
 } from "@/lib/admin";
 import { isResendConfigured, sendSubmissionStatusEmail } from "@/lib/email";
+import { getBaseUrl } from "@/lib/submission";
 
 type RouteProps = {
   params: Promise<{ id: string }>;
@@ -48,9 +50,15 @@ export async function POST(request: Request, { params }: RouteProps) {
       await sendSubmissionStatusEmail({
         to: submission.submission.draftOwnerEmail,
         congressName: "EYİ 2026",
+        congressSlug: ADMIN_DEFAULT_CONGRESS_SLUG,
         paperTitle,
         statusLabel: mapSubmissionStatus(body.status),
+        status: body.status,
         note: body.note,
+        registrationUrl:
+          body.status === "ACCEPTED"
+            ? `${getBaseUrl()}/${ADMIN_DEFAULT_CONGRESS_SLUG}/kayit`
+            : undefined,
       });
     } catch {
       warning = "Durum güncellendi ancak bildirim e-postası gönderilemedi.";

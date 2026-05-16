@@ -2,12 +2,11 @@ import { createHmac, timingSafeEqual } from "crypto";
 import mammoth from "mammoth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import type { SubmissionStatus } from "@prisma/client";
+import type { PaymentPeriod, SubmissionStatus } from "@prisma/client";
 import {
   formatCurrencyAmount,
   getCongressWithTiers,
   getCurrentPaymentPeriod,
-  mapAttendeeRole,
   mapAudience,
   mapPaymentPeriod,
   tierLabel,
@@ -17,6 +16,8 @@ import type {
   AdminCongressSettings,
   AdminPaymentTier,
   AdminPricingPayload,
+  AdminRegistrationDetail,
+  AdminRegistrationListItem,
   AdminSubmissionDetail,
   AdminSubmissionListFilters,
   AdminSubmissionListItem,
@@ -38,10 +39,7 @@ function getAdminSessionSecret() {
 
 function signAdminSession(value: string) {
   const secret = getAdminSessionSecret();
-  if (!secret) {
-    return null;
-  }
-
+  if (!secret) return null;
   return createHmac("sha256", secret).update(value).digest("hex");
 }
 
@@ -52,13 +50,9 @@ async function readAdminCookie() {
 
 export async function setAdminSessionCookie() {
   const signature = signAdminSession(EYI_CONGRESS_SLUG);
-  if (!signature) {
-    throw new Error("Admin oturumu için sunucu yapılandırması eksik.");
-  }
-
+  if (!signature) throw new Error("Admin oturumu için sunucu yapılandırması eksik.");
   const cookieStore = await cookies();
-  const value = `${EYI_CONGRESS_SLUG}.${signature}`;
-  cookieStore.set(ADMIN_COOKIE, value, {
+  cookieStore.set(ADMIN_COOKIE, `${EYI_CONGRESS_SLUG}.${signature}`, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -74,27 +68,16 @@ export async function clearAdminSessionCookie() {
 
 export async function isAdminAuthenticated() {
   const value = await readAdminCookie();
-  if (!value) {
-    return false;
-  }
-
+  if (!value) return false;
   const [slug, signature] = value.split(".");
-  if (!slug || !signature || slug !== EYI_CONGRESS_SLUG) {
-    return false;
-  }
-
+  if (!slug || !signature || slug !== EYI_CONGRESS_SLUG) return false;
   const expected = signAdminSession(EYI_CONGRESS_SLUG);
-  if (!expected || expected.length !== signature.length) {
-    return false;
-  }
-
+  if (!expected || expected.length !== signature.length) return false;
   return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }
 
 export async function requireAdminPage() {
-  if (!(await isAdminAuthenticated())) {
-    redirect("/admin");
-  }
+  if (!(await isAdminAuthenticated())) redirect("/admin");
 }
 
 export async function assertAdminApiAccess() {
@@ -107,7 +90,7 @@ export function isValidAdminPassword(password: string) {
 }
 
 function mapPresentationMode(mode: "ONLINE" | "IN_PERSON" | null) {
-  return mode === "ONLINE" ? "Çevrim İçi" : "Yüz Yüze";
+  return mode === "ONLINE" ? "Çevrim İçi" : mode === "IN_PERSON" ? "Yüz Yüze" : "-";
 }
 
 export function mapSubmissionStatus(status: SubmissionStatus) {
@@ -126,10 +109,7 @@ export function mapSubmissionStatus(status: SubmissionStatus) {
 }
 
 function asManageableSubmissionStatus(status: SubmissionStatus): ManageableSubmissionStatus {
-  if (status === "DRAFT") {
-    return "SUBMITTED";
-  }
-
+  if (status === "DRAFT") return "SUBMITTED";
   return status;
 }
 
@@ -137,39 +117,27 @@ export function normalizeAdminSubmissionFilters(
   input?: Partial<AdminSubmissionListFilters> | URLSearchParams,
 ): AdminSubmissionListFilters {
   const getValue = (key: keyof AdminSubmissionListFilters) => {
-    if (!input) {
-      return "";
-    }
-
-    if (input instanceof URLSearchParams) {
-      return input.get(key) ?? "";
-    }
-
+    if (!input) return "";
+    if (input instanceof URLSearchParams) return input.get(key) ?? "";
     return input[key] ?? "";
   };
 
   const language = getValue("language");
   const status = getValue("status");
   const presentationMode = getValue("presentationMode");
-  const gala = getValue("gala");
-  const trip = getValue("trip");
+  const registration = getValue("registration");
 
   return {
     q: String(getValue("q") ?? "").trim(),
     status:
-      status === "SUBMITTED" ||
-      status === "UNDER_REVIEW" ||
-      status === "ACCEPTED" ||
-      status === "REJECTED"
+      status === "SUBMITTED" || status === "UNDER_REVIEW" || status === "ACCEPTED" || status === "REJECTED"
         ? status
         : "ALL",
     language: language === "TR" || language === "EN" ? language : "ALL",
     presentationMode:
-      presentationMode === "ONLINE" || presentationMode === "IN_PERSON"
-        ? presentationMode
-        : "ALL",
-    gala: gala === "YES" || gala === "NO" ? gala : "ALL",
-    trip: trip === "YES" || trip === "NO" ? trip : "ALL",
+      presentationMode === "ONLINE" || presentationMode === "IN_PERSON" ? presentationMode : "ALL",
+    registration:
+      registration === "PAID" || registration === "PENDING" ? registration : "ALL",
   };
 }
 
@@ -179,83 +147,33 @@ export async function getAdminSubmissionList(
   const filters = normalizeAdminSubmissionFilters(rawFilters);
   const submissions = await prisma.submission.findMany({
     where: {
-      status: {
-        not: "DRAFT",
-      },
-      congress: {
-        slug: EYI_CONGRESS_SLUG,
-      },
-      ...(filters.status !== "ALL"
-        ? {
-            status: filters.status,
-          }
-        : {}),
-      ...(filters.language !== "ALL"
-        ? {
-            submissionLanguage: filters.language,
-          }
-        : {}),
-      ...(filters.presentationMode !== "ALL"
-        ? {
-            presentationMode: filters.presentationMode,
-          }
-        : {}),
-      ...(filters.gala !== "ALL"
-        ? {
-            galaAttendance: filters.gala === "YES",
-          }
-        : {}),
-      ...(filters.trip !== "ALL"
-        ? {
-            tripAttendance: filters.trip === "YES",
-          }
-        : {}),
+      status: { not: "DRAFT" },
+      congress: { slug: EYI_CONGRESS_SLUG },
+      ...(filters.status !== "ALL" ? { status: filters.status } : {}),
+      ...(filters.language !== "ALL" ? { submissionLanguage: filters.language } : {}),
+      ...(filters.presentationMode !== "ALL" ? { presentationMode: filters.presentationMode } : {}),
+      ...(filters.registration === "PAID"
+        ? { paperItem: { registration: { paidAt: { not: null } } } }
+        : filters.registration === "PENDING"
+          ? {
+              OR: [
+                { paperItem: null },
+                { paperItem: { registration: { paidAt: null } } },
+              ],
+            }
+          : {}),
       ...(filters.q
         ? {
             OR: [
-              {
-                titleTr: {
-                  contains: filters.q,
-                  mode: "insensitive",
-                },
-              },
-              {
-                titleEn: {
-                  contains: filters.q,
-                  mode: "insensitive",
-                },
-              },
-              {
-                authors: {
-                  some: {
-                    fullName: {
-                      contains: filters.q,
-                      mode: "insensitive",
-                    },
-                  },
-                },
-              },
-              {
-                authors: {
-                  some: {
-                    email: {
-                      contains: filters.q.toLowerCase(),
-                    },
-                  },
-                },
-              },
+              { titleTr: { contains: filters.q, mode: "insensitive" } },
+              { titleEn: { contains: filters.q, mode: "insensitive" } },
+              { authors: { some: { fullName: { contains: filters.q, mode: "insensitive" } } } },
+              { authors: { some: { email: { contains: filters.q.toLowerCase() } } } },
             ],
           }
         : {}),
     },
-    orderBy: [
-      {
-        submittedAt: "desc",
-      },
-      {
-        createdAt: "desc",
-      },
-    ],
+    orderBy: [{ submittedAt: "desc" }, { createdAt: "desc" }],
     select: {
       id: true,
       status: true,
@@ -263,25 +181,16 @@ export async function getAdminSubmissionList(
       titleTr: true,
       titleEn: true,
       presentationMode: true,
-      attendeeRole: true,
       audience: true,
-      paperOrder: true,
-      paymentPeriod: true,
-      paymentAmount: true,
-      paymentCurrency: true,
-      galaAttendance: true,
-      galaAttendeeCount: true,
-      tripAttendance: true,
-      tripAttendeeCount: true,
       submittedAt: true,
       authors: {
-        orderBy: {
-          sortOrder: "asc",
-        },
+        orderBy: { sortOrder: "asc" },
+        select: { fullName: true, email: true, isPresenter: true },
+      },
+      paperItem: {
         select: {
-          fullName: true,
-          email: true,
-          isPresenter: true,
+          paperOrder: true,
+          registration: { select: { paidAt: true } },
         },
       },
     },
@@ -291,22 +200,7 @@ export async function getAdminSubmissionList(
     const presenter =
       submission.authors.find((author) => author.isPresenter) ?? submission.authors[0] ?? null;
     const language = submission.submissionLanguage ?? "TR";
-
-    const paymentLabel =
-      submission.presentationMode && submission.attendeeRole
-        ? tierLabel({
-            presentationMode: submission.presentationMode,
-            role: submission.attendeeRole,
-            audience: submission.audience,
-            paperOrder: submission.paperOrder,
-            period: submission.paymentPeriod,
-          })
-        : "-";
-
-    const paymentAmountLabel =
-      submission.paymentAmount != null && submission.paymentCurrency
-        ? formatCurrencyAmount(submission.paymentAmount, submission.paymentCurrency)
-        : "-";
+    const paid = Boolean(submission.paperItem?.registration?.paidAt);
 
     return {
       id: submission.id,
@@ -317,11 +211,11 @@ export async function getAdminSubmissionList(
       presenterName: presenter?.fullName ?? "-",
       presenterEmail: presenter?.email ?? "-",
       presentationMode: mapPresentationMode(submission.presentationMode),
-      galaLabel: submission.galaAttendance ? `Evet (${submission.galaAttendeeCount})` : "Hayır",
-      tripLabel: submission.tripAttendance ? `Evet (${submission.tripAttendeeCount})` : "Hayır",
+      audienceLabel: mapAudience(submission.audience),
+      registrationStatusLabel: paid
+        ? `Ödendi (${submission.paperItem?.paperOrder === 2 ? "İkinci" : "Birinci"})`
+        : "Bekleniyor",
       submittedAt: submission.submittedAt?.toISOString() ?? null,
-      paymentLabel,
-      paymentAmountLabel,
     };
   });
 }
@@ -339,10 +233,8 @@ export function buildAdminSubmissionCsv(items: AdminSubmissionListItem[]) {
     "Durum",
     "Dil",
     "Sunum",
-    "Kategori",
-    "Ucret",
-    "Gala",
-    "Gezi",
+    "Akademik Statu",
+    "Kayit",
     "Gonderim Tarihi",
   ];
 
@@ -353,10 +245,8 @@ export function buildAdminSubmissionCsv(items: AdminSubmissionListItem[]) {
     item.statusLabel,
     item.submissionLanguage,
     item.presentationMode,
-    item.paymentLabel,
-    item.paymentAmountLabel,
-    item.galaLabel,
-    item.tripLabel,
+    item.audienceLabel,
+    item.registrationStatusLabel,
     item.submittedAt ?? "",
   ]);
 
@@ -369,12 +259,8 @@ export async function getAdminSubmissionDetail(
   const submission = await prisma.submission.findFirst({
     where: {
       id: submissionId,
-      congress: {
-        slug: EYI_CONGRESS_SLUG,
-      },
-      status: {
-        not: "DRAFT",
-      },
+      congress: { slug: EYI_CONGRESS_SLUG },
+      status: { not: "DRAFT" },
     },
     select: {
       id: true,
@@ -388,24 +274,10 @@ export async function getAdminSubmissionDetail(
       keywordsTr: true,
       keywordsEn: true,
       presentationMode: true,
-      attendeeRole: true,
       audience: true,
-      paperOrder: true,
-      paymentPeriod: true,
-      paymentAmount: true,
-      paymentCurrency: true,
-      paymentDescription: true,
-      galaAttendance: true,
-      galaAttendeeCount: true,
-      galaFeeAmount: true,
-      galaFeeCurrency: true,
-      tripAttendance: true,
-      tripAttendeeCount: true,
       submittedAt: true,
       authors: {
-        orderBy: {
-          sortOrder: "asc",
-        },
+        orderBy: { sortOrder: "asc" },
         select: {
           id: true,
           fullName: true,
@@ -424,32 +296,17 @@ export async function getAdminSubmissionDetail(
           content: true,
         },
       },
-      paymentReceipt: {
-        select: {
-          originalName: true,
-          fileSize: true,
-          mimeType: true,
-          uploadedAt: true,
-        },
+      paperItem: {
+        include: { registration: true },
       },
       statusHistory: {
-        orderBy: {
-          changedAt: "desc",
-        },
-        select: {
-          id: true,
-          fromStatus: true,
-          toStatus: true,
-          note: true,
-          changedAt: true,
-        },
+        orderBy: { changedAt: "desc" },
+        select: { id: true, fromStatus: true, toStatus: true, note: true, changedAt: true },
       },
     },
   });
 
-  if (!submission) {
-    return null;
-  }
+  if (!submission) return null;
 
   let previewText: string | null = null;
   if (submission.file?.content) {
@@ -468,31 +325,20 @@ export async function getAdminSubmissionDetail(
     }
   }
 
-  const tierLabelText =
-    submission.presentationMode && submission.attendeeRole
-      ? tierLabel({
-          presentationMode: submission.presentationMode,
-          role: submission.attendeeRole,
-          audience: submission.audience,
-          paperOrder: submission.paperOrder,
-          period: submission.paymentPeriod,
-        })
-      : "-";
-
-  const amountLabel =
-    submission.paymentAmount != null && submission.paymentCurrency
-      ? formatCurrencyAmount(submission.paymentAmount, submission.paymentCurrency)
-      : "-";
-
-  const galaAmountLabel =
-    submission.galaAttendance && submission.galaFeeAmount != null && submission.galaFeeCurrency
-      ? `${submission.galaAttendeeCount} kişi · ${formatCurrencyAmount(
-          submission.galaFeeAmount * submission.galaAttendeeCount,
-          submission.galaFeeCurrency,
-        )}`
-      : submission.galaAttendance
-        ? `${submission.galaAttendeeCount} kişi`
-        : "Hayır";
+  const paperItem = submission.paperItem;
+  const registration = paperItem
+    ? {
+        id: paperItem.registration.id,
+        paidAt: paperItem.registration.paidAt?.toISOString() ?? null,
+        amount: paperItem.amount,
+        currency: paperItem.currency,
+        amountLabel: formatCurrencyAmount(paperItem.amount, paperItem.currency),
+        description: paperItem.registration.paymentDescription,
+        paperOrder: (paperItem.paperOrder === 1 || paperItem.paperOrder === 2
+          ? paperItem.paperOrder
+          : null) as 1 | 2 | null,
+      }
+    : null;
 
   return {
     id: submission.id,
@@ -507,22 +353,9 @@ export async function getAdminSubmissionDetail(
     keywordsTr: submission.keywordsTr ?? "",
     keywordsEn: submission.keywordsEn ?? "",
     presentationMode: mapPresentationMode(submission.presentationMode),
-    galaAttendance: submission.galaAttendance,
-    galaAttendeeCount: submission.galaAttendeeCount,
-    tripAttendance: submission.tripAttendance,
-    tripAttendeeCount: submission.tripAttendeeCount,
+    audienceLabel: mapAudience(submission.audience),
     submittedAt: submission.submittedAt?.toISOString() ?? null,
-    payment: {
-      tierLabel: tierLabelText,
-      periodLabel: mapPaymentPeriod(submission.paymentPeriod),
-      audienceLabel: mapAudience(submission.audience),
-      roleLabel: mapAttendeeRole(submission.attendeeRole),
-      amount: submission.paymentAmount ?? null,
-      currency: submission.paymentCurrency ?? null,
-      amountLabel,
-      galaAmountLabel,
-      description: submission.paymentDescription ?? "",
-    },
+    registration,
     authors: submission.authors.map((author) => ({
       id: author.id,
       fullName: author.fullName,
@@ -540,14 +373,6 @@ export async function getAdminSubmissionDetail(
           previewText,
         }
       : null,
-    paymentReceipt: submission.paymentReceipt
-      ? {
-          originalName: submission.paymentReceipt.originalName,
-          fileSize: submission.paymentReceipt.fileSize,
-          mimeType: submission.paymentReceipt.mimeType,
-          uploadedAt: submission.paymentReceipt.uploadedAt.toISOString(),
-        }
-      : null,
     statusHistory: submission.statusHistory.map((entry) => ({
       id: entry.id,
       fromStatus: entry.fromStatus ? mapSubmissionStatus(entry.fromStatus) : null,
@@ -563,49 +388,25 @@ export async function getAdminDownloadPayload(submissionId: string) {
     where: {
       submissionId,
       submission: {
-        status: {
-          not: "DRAFT",
-        },
-        congress: {
-          slug: EYI_CONGRESS_SLUG,
-        },
+        status: { not: "DRAFT" },
+        congress: { slug: EYI_CONGRESS_SLUG },
       },
     },
-    select: {
-      originalName: true,
-      mimeType: true,
-      content: true,
-    },
+    select: { originalName: true, mimeType: true, content: true },
   });
 }
 
-export async function getAdminPaymentReceiptDownloadPayload(submissionId: string) {
-  return prisma.submissionPaymentReceipt.findFirst({
+export async function getAdminRegistrationReceiptPayload(registrationId: string) {
+  return prisma.registrationReceipt.findFirst({
     where: {
-      submissionId,
-      submission: {
-        status: {
-          not: "DRAFT",
-        },
-        congress: {
-          slug: EYI_CONGRESS_SLUG,
-        },
-      },
+      registrationId,
+      registration: { congress: { slug: EYI_CONGRESS_SLUG } },
     },
-    select: {
-      originalName: true,
-      mimeType: true,
-      content: true,
-    },
+    select: { originalName: true, mimeType: true, content: true },
   });
 }
 
-const MANAGEABLE_STATUSES: SubmissionStatus[] = [
-  "SUBMITTED",
-  "UNDER_REVIEW",
-  "ACCEPTED",
-  "REJECTED",
-];
+const MANAGEABLE_STATUSES: SubmissionStatus[] = ["SUBMITTED", "UNDER_REVIEW", "ACCEPTED", "REJECTED"];
 
 export function isManageableSubmissionStatus(value: string): value is SubmissionStatus {
   return MANAGEABLE_STATUSES.includes(value as SubmissionStatus);
@@ -619,22 +420,13 @@ export async function updateAdminSubmissionStatus(input: {
   const current = await prisma.submission.findFirst({
     where: {
       id: input.submissionId,
-      congress: {
-        slug: EYI_CONGRESS_SLUG,
-      },
-      status: {
-        not: "DRAFT",
-      },
+      congress: { slug: EYI_CONGRESS_SLUG },
+      status: { not: "DRAFT" },
     },
-    select: {
-      id: true,
-      status: true,
-    },
+    select: { id: true, status: true },
   });
 
-  if (!current) {
-    return null;
-  }
+  if (!current) return null;
 
   const note = input.note?.trim() ?? "";
   if (current.status === input.status) {
@@ -647,12 +439,8 @@ export async function updateAdminSubmissionStatus(input: {
 
   await prisma.$transaction([
     prisma.submission.update({
-      where: {
-        id: current.id,
-      },
-      data: {
-        status: input.status,
-      },
+      where: { id: current.id },
+      data: { status: input.status },
     }),
     prisma.submissionStatusHistory.create({
       data: {
@@ -673,9 +461,7 @@ export async function updateAdminSubmissionStatus(input: {
 
 export async function getAdminPricingPayload(): Promise<AdminPricingPayload | null> {
   const congress = await getCongressWithTiers(EYI_CONGRESS_SLUG);
-  if (!congress) {
-    return null;
-  }
+  if (!congress) return null;
 
   const tiers: AdminPaymentTier[] = congress.paymentTiers
     .map((tier) => ({
@@ -684,9 +470,7 @@ export async function getAdminPricingPayload(): Promise<AdminPricingPayload | nu
       role: tier.role,
       audience: tier.audience,
       paperOrder:
-        tier.paperOrder === 1 || tier.paperOrder === 2
-          ? (tier.paperOrder as 1 | 2)
-          : null,
+        tier.paperOrder === 1 || tier.paperOrder === 2 ? (tier.paperOrder as 1 | 2) : null,
       period: tier.period,
       amount: tier.amount,
       currency: tier.currency,
@@ -728,9 +512,7 @@ export async function updateAdminTier(input: {
     where: { id: input.id },
     include: { congress: { select: { slug: true } } },
   });
-  if (!tier || tier.congress.slug !== EYI_CONGRESS_SLUG) {
-    return null;
-  }
+  if (!tier || tier.congress.slug !== EYI_CONGRESS_SLUG) return null;
 
   return prisma.paymentTier.update({
     where: { id: input.id },
@@ -776,9 +558,7 @@ export async function updateAdminCongressSettings(input: {
   }
   if (typeof input.galaFeeNote === "string") data.galaFeeNote = input.galaFeeNote.trim() || null;
   if (typeof input.bankName === "string") data.bankName = input.bankName.trim() || null;
-  if (typeof input.bankAccountHolder === "string") {
-    data.bankAccountHolder = input.bankAccountHolder.trim() || null;
-  }
+  if (typeof input.bankAccountHolder === "string") data.bankAccountHolder = input.bankAccountHolder.trim() || null;
   if (typeof input.bankIban === "string") data.bankIban = input.bankIban.trim() || null;
   if (typeof input.bankBranch === "string") data.bankBranch = input.bankBranch.trim() || null;
   if (typeof input.tripNote === "string") data.tripNote = input.tripNote.trim() || null;
@@ -787,4 +567,131 @@ export async function updateAdminCongressSettings(input: {
     where: { slug: EYI_CONGRESS_SLUG },
     data,
   });
+}
+
+function mapRegistrationKind(kind: "PAPERS" | "LISTENER") {
+  return kind === "PAPERS" ? "Bildiri Ödemesi" : "Dinleyici";
+}
+
+function mapPeriodLabel(period: PaymentPeriod): string {
+  return mapPaymentPeriod(period);
+}
+
+export async function getAdminRegistrationList(): Promise<AdminRegistrationListItem[]> {
+  const registrations = await prisma.registration.findMany({
+    where: { congress: { slug: EYI_CONGRESS_SLUG } },
+    orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }],
+    select: {
+      id: true,
+      email: true,
+      kind: true,
+      totalAmount: true,
+      currency: true,
+      paymentPeriod: true,
+      paidAt: true,
+      createdAt: true,
+      paperItems: { select: { id: true } },
+    },
+  });
+
+  return registrations.map((registration) => ({
+    id: registration.id,
+    email: registration.email,
+    kindLabel: mapRegistrationKind(registration.kind),
+    paperCount: registration.paperItems.length,
+    totalAmountLabel: formatCurrencyAmount(registration.totalAmount, registration.currency),
+    paymentPeriodLabel: mapPeriodLabel(registration.paymentPeriod),
+    paidAt: registration.paidAt?.toISOString() ?? null,
+    createdAt: registration.createdAt.toISOString(),
+  }));
+}
+
+export async function getAdminRegistrationDetail(
+  registrationId: string,
+): Promise<AdminRegistrationDetail | null> {
+  const registration = await prisma.registration.findFirst({
+    where: { id: registrationId, congress: { slug: EYI_CONGRESS_SLUG } },
+    include: {
+      paperItems: {
+        include: {
+          submission: {
+            select: { id: true, titleTr: true, titleEn: true, submissionLanguage: true },
+          },
+        },
+      },
+      receipt: true,
+    },
+  });
+
+  if (!registration) return null;
+
+  const totalAmountLabel = formatCurrencyAmount(
+    registration.totalAmount,
+    registration.currency,
+  );
+
+  const galaAmountLabel =
+    registration.galaAttendance && registration.galaFeeAmount != null && registration.galaFeeCurrency
+      ? `${registration.galaAttendeeCount} kişi · ${formatCurrencyAmount(
+          registration.galaFeeAmount * registration.galaAttendeeCount,
+          registration.galaFeeCurrency,
+        )}`
+      : registration.galaAttendance
+        ? `${registration.galaAttendeeCount} kişi`
+        : "Hayır";
+
+  return {
+    id: registration.id,
+    email: registration.email,
+    kind: registration.kind,
+    kindLabel: mapRegistrationKind(registration.kind),
+    audienceLabel: mapAudience(registration.audience),
+    listenerPresentationModeLabel: mapPresentationMode(registration.listenerPresentationMode),
+    paymentDescription: registration.paymentDescription,
+    paymentPeriod: registration.paymentPeriod,
+    paymentPeriodLabel: mapPeriodLabel(registration.paymentPeriod),
+    totalAmount: registration.totalAmount,
+    currency: registration.currency,
+    totalAmountLabel,
+    galaAttendance: registration.galaAttendance,
+    galaAttendeeCount: registration.galaAttendeeCount,
+    galaAmountLabel,
+    tripAttendance: registration.tripAttendance,
+    tripAttendeeCount: registration.tripAttendeeCount,
+    paidAt: registration.paidAt?.toISOString() ?? null,
+    createdAt: registration.createdAt.toISOString(),
+    receipt: registration.receipt
+      ? {
+          originalName: registration.receipt.originalName,
+          fileSize: registration.receipt.fileSize,
+          mimeType: registration.receipt.mimeType,
+          uploadedAt: registration.receipt.uploadedAt.toISOString(),
+        }
+      : null,
+    paperItems: registration.paperItems.map((item) => {
+      const language = item.submission.submissionLanguage ?? "TR";
+      const title =
+        language === "EN"
+          ? item.submission.titleEn || item.submission.titleTr || "-"
+          : item.submission.titleTr || item.submission.titleEn || "-";
+      return {
+        submissionId: item.submissionId,
+        title,
+        paperOrder: (item.paperOrder === 2 ? 2 : 1) as 1 | 2,
+        amount: item.amount,
+        currency: item.currency,
+        amountLabel: formatCurrencyAmount(item.amount, item.currency),
+      };
+    }),
+  };
+}
+
+export async function deleteAdminRegistration(registrationId: string) {
+  const registration = await prisma.registration.findFirst({
+    where: { id: registrationId, congress: { slug: EYI_CONGRESS_SLUG } },
+    select: { id: true },
+  });
+  if (!registration) return false;
+  await prisma.registration.delete({ where: { id: registration.id } });
+  return true;
 }

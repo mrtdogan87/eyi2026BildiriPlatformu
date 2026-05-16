@@ -12,10 +12,7 @@ type PageProps = {
 };
 
 function formatDate(value: string | null) {
-  if (!value) {
-    return "-";
-  }
-
+  if (!value) return "-";
   return new Intl.DateTimeFormat("tr-TR", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -31,9 +28,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
   const { id } = await params;
   const submission = await getAdminSubmissionDetail(id);
 
-  if (!submission) {
-    notFound();
-  }
+  if (!submission) notFound();
 
   const isTurkish = submission.submissionLanguage === "TR";
 
@@ -45,7 +40,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             ← Bildiri listesine dön
           </Link>
           <h1>Bildiri Detayı</h1>
-          <p>Gönderilen bildirinin tüm içerik, yazar ve katılım bilgileri aşağıda gösterilmektedir.</p>
+          <p>Gönderilen bildirinin tüm içerik, yazar ve katılım bilgileri aşağıdadır.</p>
         </div>
         <AdminLogoutButton />
       </section>
@@ -75,6 +70,14 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
               <dd>{isTurkish ? submission.keywordsTr : submission.keywordsEn}</dd>
             </div>
             <div>
+              <dt>Sunum Şekli</dt>
+              <dd>{submission.presentationMode}</dd>
+            </div>
+            <div>
+              <dt>Akademik Statü</dt>
+              <dd>{submission.audienceLabel}</dd>
+            </div>
+            <div>
               <dt>Gönderim Tarihi</dt>
               <dd>{formatDate(submission.submittedAt)}</dd>
             </div>
@@ -96,7 +99,8 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             {submission.authors.map((author, index) => (
               <div key={author.id} className="admin-author-item">
                 <h3>
-                  {index + 1}. Yazar {author.isPresenter ? <span className="pill">Sunan yazar</span> : null}
+                  {index + 1}. Yazar{" "}
+                  {author.isPresenter ? <span className="pill">Sunan yazar</span> : null}
                 </h3>
                 <p>
                   <strong>Ad Soyad:</strong> {author.fullName}
@@ -116,53 +120,38 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
         </div>
 
         <div className="admin-detail-block">
-          <h2>Katılım ve Sosyal Faaliyetler</h2>
-          <dl className="admin-definition-list">
-            <div>
-              <dt>Sunum Şekli</dt>
-              <dd>{submission.presentationMode}</dd>
+          <h2>Kayıt Durumu</h2>
+          {submission.registration ? (
+            <div className="admin-author-item">
+              <p>
+                <strong>Ödenen Tutar:</strong> {submission.registration.amountLabel}
+              </p>
+              <p>
+                <strong>Sıra:</strong>{" "}
+                {submission.registration.paperOrder === 2
+                  ? "İkinci Bildiri (%50 İndirim)"
+                  : "Birinci Bildiri"}
+              </p>
+              <p>
+                <strong>Açıklama:</strong> {submission.registration.description}
+              </p>
+              <p>
+                <strong>Ödeme Tarihi:</strong> {formatDate(submission.registration.paidAt)}
+              </p>
+              <Link
+                className="button primary"
+                href={`/admin/kayitlar/${submission.registration.id}`}
+                style={{ marginTop: 12, display: "inline-flex" }}
+              >
+                Kayıt Detayına Git
+              </Link>
             </div>
-            <div>
-              <dt>Katılım Türü</dt>
-              <dd>{submission.payment.roleLabel}</dd>
+          ) : (
+            <div className="notice">
+              Bu bildiri için henüz kayıt ücreti yatırılmamış. Yazar Kayıt Ol sayfasından ödemesini
+              tamamlayabilir.
             </div>
-            <div>
-              <dt>Akademik Statü</dt>
-              <dd>{submission.payment.audienceLabel}</dd>
-            </div>
-            <div>
-              <dt>Gala Katılımı</dt>
-              <dd>{submission.payment.galaAmountLabel}</dd>
-            </div>
-            <div>
-              <dt>Gezi Katılımı</dt>
-              <dd>
-                {submission.tripAttendance ? `Evet (${submission.tripAttendeeCount} kişi)` : "Hayır"}
-              </dd>
-            </div>
-          </dl>
-        </div>
-
-        <div className="admin-detail-block">
-          <h2>Ücret Bilgisi</h2>
-          <dl className="admin-definition-list">
-            <div>
-              <dt>Tarife</dt>
-              <dd>{submission.payment.tierLabel}</dd>
-            </div>
-            <div>
-              <dt>Kayıt Dönemi</dt>
-              <dd>{submission.payment.periodLabel}</dd>
-            </div>
-            <div>
-              <dt>Tutar</dt>
-              <dd>{submission.payment.amountLabel}</dd>
-            </div>
-            <div>
-              <dt>Açıklama</dt>
-              <dd>{submission.payment.description || "-"}</dd>
-            </div>
-          </dl>
+          )}
         </div>
 
         <div className="admin-detail-block">
@@ -192,28 +181,6 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             </div>
           ) : (
             <div className="notice">Bu bildiri için dosya bulunamadı.</div>
-          )}
-        </div>
-
-        <div className="admin-detail-block">
-          <h2>Ödeme Dekontu</h2>
-          {submission.paymentReceipt ? (
-            <div className="admin-file-box">
-              <p>
-                <strong>Dosya Adı:</strong> {submission.paymentReceipt.originalName}
-              </p>
-              <p>
-                <strong>Boyut:</strong> {formatFileSize(submission.paymentReceipt.fileSize)}
-              </p>
-              <p>
-                <strong>Yükleme Tarihi:</strong> {formatDate(submission.paymentReceipt.uploadedAt)}
-              </p>
-              <a className="button primary" href={`/api/admin/submissions/${submission.id}/receipt`}>
-                Dekontu İndir
-              </a>
-            </div>
-          ) : (
-            <div className="notice">Bu bildiri için ödeme dekontu yüklenmemiş.</div>
           )}
         </div>
 

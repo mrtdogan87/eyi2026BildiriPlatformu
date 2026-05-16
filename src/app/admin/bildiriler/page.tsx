@@ -10,16 +10,12 @@ type PageProps = {
     status?: string;
     language?: string;
     presentationMode?: string;
-    gala?: string;
-    trip?: string;
+    registration?: string;
   }>;
 };
 
 function formatDate(value: string | null) {
-  if (!value) {
-    return "-";
-  }
-
+  if (!value) return "-";
   return new Intl.DateTimeFormat("tr-TR", {
     dateStyle: "medium",
     timeStyle: "short",
@@ -44,9 +40,12 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
       <section className="hero admin-hero">
         <div>
           <h1>Yönetim Paneli</h1>
-          <p>EYİ 2026 başvurularını yönetin, ücret tarifesini güncelleyin ve dosyaları indirin.</p>
+          <p>EYİ 2026 başvurularını yönetin, kayıt ödemelerini takip edin.</p>
         </div>
         <div className="admin-hero-actions">
+          <Link className="button ghost" href="/admin/kayitlar">
+            Kayıtlar
+          </Link>
           <Link className="button ghost" href="/admin/ucretler">
             Ücret ve Ayarlar
           </Link>
@@ -106,19 +105,11 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
             </select>
           </div>
           <div className="field">
-            <label htmlFor="gala">Gala</label>
-            <select id="gala" name="gala" defaultValue={filters.gala}>
+            <label htmlFor="registration">Kayıt</label>
+            <select id="registration" name="registration" defaultValue={filters.registration}>
               <option value="ALL">Tümü</option>
-              <option value="YES">Katılacak</option>
-              <option value="NO">Katılmayacak</option>
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="trip">Gezi</label>
-            <select id="trip" name="trip" defaultValue={filters.trip}>
-              <option value="ALL">Tümü</option>
-              <option value="YES">Katılacak</option>
-              <option value="NO">Katılmayacak</option>
+              <option value="PAID">Ödendi</option>
+              <option value="PENDING">Bekleniyor</option>
             </select>
           </div>
           <div className="admin-filter-actions">
@@ -142,10 +133,8 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                   <th>Durum</th>
                   <th>Dil</th>
                   <th>Sunum</th>
-                  <th>Kategori</th>
-                  <th>Ücret</th>
-                  <th>Gala</th>
-                  <th>Gezi</th>
+                  <th>Akademik Statü</th>
+                  <th>Kayıt</th>
                   <th>Gönderim</th>
                 </tr>
               </thead>
@@ -162,10 +151,8 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                     <td>{submission.statusLabel}</td>
                     <td>{submission.submissionLanguage}</td>
                     <td>{submission.presentationMode}</td>
-                    <td>{submission.paymentLabel}</td>
-                    <td>{submission.paymentAmountLabel}</td>
-                    <td>{submission.galaLabel}</td>
-                    <td>{submission.tripLabel}</td>
+                    <td>{submission.audienceLabel}</td>
+                    <td>{submission.registrationStatusLabel}</td>
                     <td>{formatDate(submission.submittedAt)}</td>
                   </tr>
                 ))}

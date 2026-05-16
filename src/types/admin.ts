@@ -7,11 +7,9 @@ export type AdminSubmissionListItem = {
   statusLabel: string;
   submissionLanguage: "TR" | "EN";
   presentationMode: string;
-  galaLabel: string;
-  tripLabel: string;
+  audienceLabel: string;
+  registrationStatusLabel: string;
   submittedAt: string | null;
-  paymentLabel: string;
-  paymentAmountLabel: string;
 };
 
 export type AdminSubmissionListFilters = {
@@ -19,8 +17,7 @@ export type AdminSubmissionListFilters = {
   status: "ALL" | "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
   language: "ALL" | "TR" | "EN";
   presentationMode: "ALL" | "ONLINE" | "IN_PERSON";
-  gala: "ALL" | "YES" | "NO";
-  trip: "ALL" | "YES" | "NO";
+  registration: "ALL" | "PAID" | "PENDING";
 };
 
 export type AdminSubmissionDetail = {
@@ -36,22 +33,17 @@ export type AdminSubmissionDetail = {
   keywordsTr: string;
   keywordsEn: string;
   presentationMode: string;
-  galaAttendance: boolean;
-  galaAttendeeCount: number;
-  tripAttendance: boolean;
-  tripAttendeeCount: number;
+  audienceLabel: string;
   submittedAt: string | null;
-  payment: {
-    tierLabel: string;
-    periodLabel: string;
-    audienceLabel: string;
-    roleLabel: string;
-    amount: number | null;
-    currency: string | null;
+  registration: {
+    id: string;
+    paidAt: string | null;
+    amount: number;
+    currency: string;
     amountLabel: string;
-    galaAmountLabel: string;
     description: string;
-  };
+    paperOrder: 1 | 2 | null;
+  } | null;
   authors: Array<{
     id: string;
     fullName: string;
@@ -66,12 +58,6 @@ export type AdminSubmissionDetail = {
     mimeType: string;
     uploadedAt: string;
     previewText: string | null;
-  } | null;
-  paymentReceipt: {
-    originalName: string;
-    fileSize: number;
-    mimeType: string;
-    uploadedAt: string;
   } | null;
   statusHistory: Array<{
     id: string;
@@ -115,4 +101,51 @@ export type AdminPricingPayload = {
   congress: AdminCongressSettings;
   tiers: AdminPaymentTier[];
   currentPeriod: "EARLY" | "LATE" | null;
+};
+
+export type AdminRegistrationListItem = {
+  id: string;
+  email: string;
+  kindLabel: string;
+  paperCount: number;
+  totalAmountLabel: string;
+  paymentPeriodLabel: string;
+  paidAt: string | null;
+  createdAt: string;
+};
+
+export type AdminRegistrationDetail = {
+  id: string;
+  email: string;
+  kind: "PAPERS" | "LISTENER";
+  kindLabel: string;
+  audienceLabel: string;
+  listenerPresentationModeLabel: string;
+  paymentDescription: string;
+  paymentPeriod: "EARLY" | "LATE";
+  paymentPeriodLabel: string;
+  totalAmount: number;
+  currency: string;
+  totalAmountLabel: string;
+  galaAttendance: boolean;
+  galaAttendeeCount: number;
+  galaAmountLabel: string;
+  tripAttendance: boolean;
+  tripAttendeeCount: number;
+  paidAt: string | null;
+  createdAt: string;
+  receipt: {
+    originalName: string;
+    fileSize: number;
+    mimeType: string;
+    uploadedAt: string;
+  } | null;
+  paperItems: Array<{
+    submissionId: string;
+    title: string;
+    paperOrder: 1 | 2;
+    amount: number;
+    currency: string;
+    amountLabel: string;
+  }>;
 };

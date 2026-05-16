@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { assertAdminApiAccess, getAdminPaymentReceiptDownloadPayload } from "@/lib/admin";
+import {
+  assertAdminApiAccess,
+  getAdminRegistrationReceiptPayload,
+} from "@/lib/admin";
 
 type RouteProps = {
   params: Promise<{ id: string }>;
@@ -11,17 +14,15 @@ export async function GET(_: Request, { params }: RouteProps) {
   }
 
   const { id } = await params;
-  const file = await getAdminPaymentReceiptDownloadPayload(id);
-
-  if (!file || !file.content) {
+  const payload = await getAdminRegistrationReceiptPayload(id);
+  if (!payload?.content) {
     return NextResponse.json({ error: "Dekont bulunamadı." }, { status: 404 });
   }
 
-  return new Response(Buffer.from(file.content), {
+  return new NextResponse(payload.content, {
     headers: {
-      "Content-Type": file.mimeType,
-      "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(file.originalName)}`,
-      "Cache-Control": "no-store",
+      "Content-Type": payload.mimeType,
+      "Content-Disposition": `attachment; filename="${encodeURIComponent(payload.originalName)}"`,
     },
   });
 }

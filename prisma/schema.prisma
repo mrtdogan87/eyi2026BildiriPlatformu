@@ -41,42 +41,49 @@ enum AttendeeRole {
   LISTENER
 }
 
+enum RegistrationKind {
+  PAPERS
+  LISTENER
+}
+
 model Congress {
-  id                String        @id @default(cuid())
-  slug              String        @unique
-  name              String
-  earlyDeadline     DateTime?
-  lateDeadline      DateTime?
-  galaFeeAmount     Int           @default(0)
-  galaFeeCurrency   String        @default("EUR")
-  galaFeeNote       String?
-  bankName          String?
-  bankAccountHolder String?
-  bankIban          String?
-  bankBranch        String?
-  tripNote          String?
-  createdAt         DateTime      @default(now())
-  updatedAt         DateTime      @updatedAt
-  submissions       Submission[]
-  paymentTiers      PaymentTier[]
+  id                       String                    @id @default(cuid())
+  slug                     String                    @unique
+  name                     String
+  earlyDeadline            DateTime?
+  lateDeadline             DateTime?
+  galaFeeAmount            Int                       @default(0)
+  galaFeeCurrency          String                    @default("EUR")
+  galaFeeNote              String?
+  bankName                 String?
+  bankAccountHolder        String?
+  bankIban                 String?
+  bankBranch               String?
+  tripNote                 String?
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  submissions              Submission[]
+  paymentTiers             PaymentTier[]
+  registrations            Registration[]
+  registrationAccessTokens RegistrationAccessToken[]
 }
 
 model PaymentTier {
-  id               String            @id @default(cuid())
+  id               String                  @id @default(cuid())
   congressId       String
   presentationMode PresentationMode?
   role             AttendeeRole
   audience         AudienceType?
   paperOrder       Int?
   period           PaymentPeriod?
-  amount           Int               @default(0)
-  currency         String            @default("TRY")
-  active           Boolean           @default(true)
-  sortOrder        Int               @default(0)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  congress         Congress          @relation(fields: [congressId], references: [id], onDelete: Cascade)
-  submissions      Submission[]
+  amount           Int                     @default(0)
+  currency         String                  @default("TRY")
+  active           Boolean                 @default(true)
+  sortOrder        Int                     @default(0)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  congress         Congress                @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  paperItems       RegistrationPaperItem[]
 
   @@unique([congressId, presentationMode, role, audience, paperOrder, period])
   @@index([congressId, active])
@@ -94,31 +101,17 @@ model Submission {
   keywordsTr         String?
   keywordsEn         String?
   presentationMode   PresentationMode?
-  attendeeRole       AttendeeRole?
   audience           AudienceType?
-  paperOrder         Int?
-  paymentTierId      String?
-  paymentPeriod      PaymentPeriod?
-  paymentAmount      Int?
-  paymentCurrency    String?
-  paymentDescription String?
-  galaAttendance     Boolean                   @default(false)
-  galaAttendeeCount  Int                       @default(0)
-  galaFeeAmount      Int?
-  galaFeeCurrency    String?
-  tripAttendance     Boolean                   @default(false)
-  tripAttendeeCount  Int                       @default(0)
   draftOwnerEmail    String
   submittedAt        DateTime?
   createdAt          DateTime                  @default(now())
   updatedAt          DateTime                  @updatedAt
   congress           Congress                  @relation(fields: [congressId], references: [id], onDelete: Cascade)
-  paymentTier        PaymentTier?              @relation(fields: [paymentTierId], references: [id])
   authors            SubmissionAuthor[]
   file               SubmissionFile?
-  paymentReceipt     SubmissionPaymentReceipt?
   accessTokens       SubmissionAccessToken[]
   statusHistory      SubmissionStatusHistory[]
+  paperItem          RegistrationPaperItem?
 
   @@index([congressId, status])
   @@index([draftOwnerEmail])
@@ -143,18 +136,6 @@ model SubmissionAuthor {
 }
 
 model SubmissionFile {
-  id           String     @id @default(cuid())
-  submissionId String     @unique
-  originalName String
-  mimeType     String
-  fileSize     Int
-  storageKey   String
-  content      Bytes?
-  uploadedAt   DateTime   @default(now())
-  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-}
-
-model SubmissionPaymentReceipt {
   id           String     @id @default(cuid())
   submissionId String     @unique
   originalName String
@@ -191,4 +172,74 @@ model SubmissionStatusHistory {
   submission   Submission        @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
   @@index([submissionId, changedAt])
+}
+
+model Registration {
+  id                       String                  @id @default(cuid())
+  congressId               String
+  email                    String
+  kind                     RegistrationKind
+  audience                 AudienceType?
+  listenerPresentationMode PresentationMode?
+  galaAttendance           Boolean                 @default(false)
+  galaAttendeeCount        Int                     @default(0)
+  galaFeeAmount            Int?
+  galaFeeCurrency          String?
+  tripAttendance           Boolean                 @default(false)
+  tripAttendeeCount        Int                     @default(0)
+  paymentPeriod            PaymentPeriod
+  totalAmount              Int
+  currency                 String                  @default("TRY")
+  paymentDescription       String
+  paidAt                   DateTime?
+  createdAt                DateTime                @default(now())
+  updatedAt                DateTime                @updatedAt
+  congress                 Congress                @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  receipt                  RegistrationReceipt?
+  paperItems               RegistrationPaperItem[]
+
+  @@index([congressId, email])
+  @@index([email])
+}
+
+model RegistrationPaperItem {
+  id             String       @id @default(cuid())
+  registrationId String
+  submissionId   String       @unique
+  paperOrder     Int
+  amount         Int
+  currency       String
+  tierId         String?
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  submission     Submission   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  tier           PaymentTier? @relation(fields: [tierId], references: [id])
+
+  @@index([registrationId])
+}
+
+model RegistrationReceipt {
+  id             String       @id @default(cuid())
+  registrationId String       @unique
+  originalName   String
+  mimeType       String
+  fileSize       Int
+  storageKey     String
+  content        Bytes?
+  uploadedAt     DateTime     @default(now())
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+}
+
+model RegistrationAccessToken {
+  id         String    @id @default(cuid())
+  congressId String
+  email      String
+  tokenHash  String
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+  congress   Congress  @relation(fields: [congressId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([tokenHash])
+  @@index([expiresAt])
 }

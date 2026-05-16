@@ -12,13 +12,12 @@ import type {
   PaymentPeriod,
   PaymentTierOption,
   PresentationMode,
-  SubmissionPaymentInput,
 } from "@/types/submission";
 
 export type CongressWithTiers = Congress & { paymentTiers: PaymentTier[] };
 
 const PAYMENT_CLOSED_MESSAGE =
-  "Kayıt süresi sona erdiği için yeni ödeme ve gönderim alınmıyor.";
+  "Kayıt süresi sona erdiği için yeni ödeme alınmıyor.";
 
 export function getPaymentClosedMessage() {
   return PAYMENT_CLOSED_MESSAGE;
@@ -76,7 +75,6 @@ export function tierLabel(
     return parts.join(" · ");
   }
 
-  // LISTENER
   if (tier.presentationMode === "IN_PERSON") {
     parts.push("Yüz Yüze Dinleyici");
     if (tier.audience === "ACADEMIC") parts.push("Akademik Personel");
@@ -148,7 +146,6 @@ export function findApplicableTier(
       if (tier.role !== selection.attendeeRole) return false;
 
       if (selection.attendeeRole === "PRESENTER") {
-        // Presenter pricing: presentation mode irrelevant, audience + paperOrder + period.
         if (tier.presentationMode !== null) return false;
         if (tier.audience !== selection.audience) return false;
         if (tier.paperOrder !== selection.paperOrder) return false;
@@ -157,7 +154,6 @@ export function findApplicableTier(
         return true;
       }
 
-      // LISTENER
       if (tier.presentationMode !== selection.presentationMode) return false;
       if (selection.presentationMode === "IN_PERSON") {
         if (tier.audience !== selection.audience) return false;
@@ -165,138 +161,9 @@ export function findApplicableTier(
         if (selection.period === null && tier.period !== null) return false;
         return true;
       }
-      // ONLINE listener: single tier, audience/period irrelevant
       return tier.audience === null && tier.period === null;
     }) ?? null
   );
-}
-
-export function normalizePaymentInput(
-  input: SubmissionPaymentInput,
-  presentationMode: PresentationMode,
-): SubmissionPaymentInput {
-  if (input.attendeeRole === "LISTENER") {
-    if (presentationMode === "ONLINE") {
-      return { attendeeRole: "LISTENER", audience: null, paperOrder: null };
-    }
-    return {
-      attendeeRole: "LISTENER",
-      audience: input.audience,
-      paperOrder: null,
-    };
-  }
-
-  if (input.attendeeRole === "PRESENTER") {
-    return {
-      attendeeRole: "PRESENTER",
-      audience: input.audience,
-      paperOrder: input.paperOrder,
-    };
-  }
-
-  return { attendeeRole: null, audience: null, paperOrder: null };
-}
-
-export function validatePaymentSelection(
-  input: SubmissionPaymentInput,
-  presentationMode: PresentationMode,
-): string[] {
-  const errors: string[] = [];
-  const normalized = normalizePaymentInput(input, presentationMode);
-
-  if (!normalized.attendeeRole) {
-    errors.push("Katılım türü (sunumlu / dinleyici) seçmelisiniz.");
-    return errors;
-  }
-
-  if (normalized.attendeeRole === "PRESENTER") {
-    if (!normalized.audience) {
-      errors.push("Sunumlu katılım için akademisyen veya öğrenci seçmelisiniz.");
-    }
-    if (normalized.paperOrder !== 1 && normalized.paperOrder !== 2) {
-      errors.push("Sunacağınız bildiri kaçıncı sırada olduğunu seçmelisiniz.");
-    }
-    return errors;
-  }
-
-  // LISTENER
-  if (presentationMode === "IN_PERSON" && !normalized.audience) {
-    errors.push("Yüz yüze dinleyici katılımı için akademisyen veya öğrenci seçmelisiniz.");
-  }
-
-  return errors;
-}
-
-export type ResolvedSubmissionPayment = {
-  input: SubmissionPaymentInput;
-  presentationMode: PresentationMode;
-  tier: PaymentTier;
-  paymentPeriod: PaymentPeriod | null;
-  paymentAmount: number;
-  paymentCurrency: string;
-  paymentDescription: string;
-};
-
-export function resolveSubmissionPayment(input: {
-  congress: CongressWithTiers;
-  payment: SubmissionPaymentInput;
-  presentationMode: PresentationMode;
-  presenterName: string;
-  now?: Date;
-}): ResolvedSubmissionPayment {
-  const now = input.now ?? new Date();
-
-  if (isPaymentClosed(input.congress, now)) {
-    throw new Error(PAYMENT_CLOSED_MESSAGE);
-  }
-
-  const errors = validatePaymentSelection(input.payment, input.presentationMode);
-  if (errors.length) {
-    throw new Error(errors[0]);
-  }
-
-  const presenterName = input.presenterName.trim();
-  if (!presenterName) {
-    throw new Error("Ödeme açıklaması için sunan yazar adı zorunludur.");
-  }
-
-  const normalized = normalizePaymentInput(input.payment, input.presentationMode);
-
-  // ONLINE LISTENER pays nothing — no period applied.
-  const isOnlineListener =
-    normalized.attendeeRole === "LISTENER" && input.presentationMode === "ONLINE";
-
-  const period = isOnlineListener
-    ? null
-    : getCurrentPaymentPeriod(input.congress, now);
-
-  if (!isOnlineListener && !period) {
-    throw new Error(PAYMENT_CLOSED_MESSAGE);
-  }
-
-  const tier = findApplicableTier(input.congress.paymentTiers, {
-    presentationMode: input.presentationMode,
-    attendeeRole: normalized.attendeeRole as AttendeeRole,
-    audience: normalized.audience,
-    paperOrder: normalized.paperOrder,
-    period,
-  });
-
-  if (!tier) {
-    throw new Error(
-      "Seçtiğiniz katılım için tanımlı bir ücret bulunamadı. Yöneticinizle iletişime geçin.",
-    );
-  }
-
-  return {
-    input: normalized,
-    presentationMode: input.presentationMode,
-    tier,
-    paymentPeriod: tier.period,
-    paymentAmount: tier.amount,
-    paymentCurrency: tier.currency,
-    paymentDescription: `${presenterName} - ${tierLabel(tier)}`,
-  };
 }
 
 export async function getCongressWithTiers(
@@ -349,4 +216,34 @@ export function mapPaperOrder(order: number | null) {
   if (order === 1) return "Birinci Bildiri";
   if (order === 2) return "İkinci Bildiri (%50 İndirim)";
   return "-";
+}
+
+export function getEstimatedPresenterFee(
+  tiers: PaymentTier[],
+  audience: AudienceType | null,
+): { earlyAmount: number | null; lateAmount: number | null; currency: string } {
+  const early = tiers.find(
+    (tier) =>
+      tier.role === "PRESENTER" &&
+      tier.presentationMode === null &&
+      tier.audience === audience &&
+      tier.paperOrder === 1 &&
+      tier.period === "EARLY" &&
+      tier.active,
+  );
+  const late = tiers.find(
+    (tier) =>
+      tier.role === "PRESENTER" &&
+      tier.presentationMode === null &&
+      tier.audience === audience &&
+      tier.paperOrder === 1 &&
+      tier.period === "LATE" &&
+      tier.active,
+  );
+
+  return {
+    earlyAmount: early?.amount ?? null,
+    lateAmount: late?.amount ?? null,
+    currency: early?.currency ?? late?.currency ?? "TRY",
+  };
 }

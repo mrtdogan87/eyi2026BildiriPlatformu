@@ -2,18 +2,13 @@ import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import {
-  getCongressBankInfo,
-  getCongressGalaInfo,
-  getCongressTripInfo,
   getCongressWithTiers,
   getCurrentPaymentPeriod,
-  isPaymentClosed,
   tierToOption,
 } from "@/lib/payment";
 import type {
-  AttendeeRole,
   AudienceType,
-  PaymentPeriod,
+  PresentationMode,
   SubmissionAuthorInput,
   SubmissionConfig,
   SubmissionDetailsInput,
@@ -127,13 +122,9 @@ export async function issueDraftLink(submissionId: string, email: string, congre
   await prisma.submissionAccessToken.updateMany({
     where: {
       submissionId,
-      expiresAt: {
-        gt: now,
-      },
+      expiresAt: { gt: now },
     },
-    data: {
-      expiresAt: now,
-    },
+    data: { expiresAt: now },
   });
 
   await prisma.submissionAccessToken.create({
@@ -163,16 +154,10 @@ async function findDraftTokenRecord(token: string, now: Date) {
   return prisma.submissionAccessToken.findFirst({
     where: {
       tokenHash,
-      expiresAt: {
-        gt: now,
-      },
+      expiresAt: { gt: now },
     },
     include: {
-      submission: {
-        include: {
-          congress: true,
-        },
-      },
+      submission: { include: { congress: true } },
     },
   });
 }
@@ -198,9 +183,7 @@ export async function consumeDraftToken(token: string) {
   if (!record.usedAt) {
     await prisma.submissionAccessToken.update({
       where: { id: record.id },
-      data: {
-        usedAt: now,
-      },
+      data: { usedAt: now },
     });
   }
 
@@ -272,37 +255,14 @@ export function findPresenter<T extends { isPresenter: boolean }>(authors: T[]) 
   return authors.find((author) => author.isPresenter) ?? authors[0] ?? null;
 }
 
-export function normalizeParticipation(input: SubmissionParticipationInput): SubmissionParticipationInput {
-  const galaAttendeeCount = input.galaAttendance
-    ? Math.max(0, Number.isFinite(input.galaAttendeeCount) ? input.galaAttendeeCount : 0)
-    : 0;
-  const tripAttendeeCount = input.tripAttendance
-    ? Math.max(0, Number.isFinite(input.tripAttendeeCount) ? input.tripAttendeeCount : 0)
-    : 0;
-
-  return {
-    presentationMode: input.presentationMode,
-    galaAttendance: input.galaAttendance,
-    galaAttendeeCount,
-    tripAttendance: input.tripAttendance,
-    tripAttendeeCount,
-  };
-}
-
 export function validateParticipation(input: SubmissionParticipationInput) {
   const errors: string[] = [];
   if (!input.presentationMode) {
     errors.push("Sunum şekli zorunludur.");
   }
-
-  if (input.galaAttendance && input.galaAttendeeCount < 1) {
-    errors.push("Gala katılımı için kişi sayısı en az 1 olmalıdır.");
+  if (!input.audience) {
+    errors.push("Akademik statünüzü seçmelisiniz.");
   }
-
-  if (input.tripAttendance && input.tripAttendeeCount < 1) {
-    errors.push("Gezi katılımı için kişi sayısı en az 1 olmalıdır.");
-  }
-
   return errors;
 }
 
@@ -314,20 +274,13 @@ export async function getSubmissionConfig(
     return null;
   }
 
-  const period = getCurrentPaymentPeriod(congress);
-
   return {
     congressName: congress.name,
     congressSlug: congress.slug,
     earlyDeadline: congress.earlyDeadline?.toISOString() ?? null,
     lateDeadline: congress.lateDeadline?.toISOString() ?? null,
-    currentPeriod: period,
-    bank: getCongressBankInfo(congress),
-    gala: getCongressGalaInfo(congress),
-    trip: getCongressTripInfo(congress),
-    tiers: congress.paymentTiers
-      .filter((tier) => tier.active)
-      .map(tierToOption),
+    currentPeriod: getCurrentPaymentPeriod(congress),
+    tiers: congress.paymentTiers.filter((tier) => tier.active).map(tierToOption),
   };
 }
 
@@ -338,13 +291,8 @@ export async function getSubmissionSnapshot(
     where: { id: submissionId },
     include: {
       congress: true,
-      authors: {
-        orderBy: {
-          sortOrder: "asc",
-        },
-      },
+      authors: { orderBy: { sortOrder: "asc" } },
       file: true,
-      paymentReceipt: true,
     },
   });
 
@@ -364,39 +312,13 @@ export async function getSubmissionSnapshot(
     abstractEn: submission.abstractEn ?? "",
     keywordsTr: submission.keywordsTr ?? "",
     keywordsEn: submission.keywordsEn ?? "",
-    presentationMode: (submission.presentationMode ?? "IN_PERSON") as "ONLINE" | "IN_PERSON",
-    galaAttendance: submission.galaAttendance,
-    galaAttendeeCount: submission.galaAttendeeCount,
-    tripAttendance: submission.tripAttendance,
-    tripAttendeeCount: submission.tripAttendeeCount,
+    presentationMode: (submission.presentationMode ?? null) as PresentationMode | null,
+    audience: (submission.audience ?? null) as AudienceType | null,
     submittedAt: submission.submittedAt?.toISOString() ?? null,
     file: submission.file
       ? {
           originalName: submission.file.originalName,
           fileSize: submission.file.fileSize,
-        }
-      : null,
-    payment: {
-      attendeeRole: (submission.attendeeRole ?? null) as AttendeeRole | null,
-      audience: (submission.audience ?? null) as AudienceType | null,
-      paperOrder:
-        submission.paperOrder === 1 || submission.paperOrder === 2
-          ? (submission.paperOrder as 1 | 2)
-          : null,
-      period: (submission.paymentPeriod ?? null) as PaymentPeriod | null,
-      amount: submission.paymentAmount ?? null,
-      currency: submission.paymentCurrency ?? null,
-      description: submission.paymentDescription ?? "",
-      isClosed: isPaymentClosed(submission.congress),
-      galaAmount: submission.galaFeeAmount ?? null,
-      galaCurrency: submission.galaFeeCurrency ?? null,
-      tierId: submission.paymentTierId ?? null,
-    },
-    paymentReceipt: submission.paymentReceipt
-      ? {
-          originalName: submission.paymentReceipt.originalName,
-          fileSize: submission.paymentReceipt.fileSize,
-          uploadedAt: submission.paymentReceipt.uploadedAt.toISOString(),
         }
       : null,
     authors: submission.authors.map((author) => ({
@@ -414,19 +336,13 @@ export async function countSubmittedEmailUsage(congressId: string, emails: strin
   const normalized = [...new Set(emails.map((email) => email.trim().toLowerCase()))];
   const authors = await prisma.submissionAuthor.findMany({
     where: {
-      email: {
-        in: normalized,
-      },
+      email: { in: normalized },
       submission: {
         congressId,
-        submittedAt: {
-          not: null,
-        },
+        submittedAt: { not: null },
       },
     },
-    select: {
-      email: true,
-    },
+    select: { email: true },
   });
 
   return authors.reduce<Record<string, number>>((acc, author) => {

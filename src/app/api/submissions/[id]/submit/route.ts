@@ -1,10 +1,4 @@
 import { NextResponse } from "next/server";
-import {
-  getCongressWithTiers,
-  getPaymentClosedMessage,
-  isPaymentClosed,
-  resolveSubmissionPayment,
-} from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import {
   canAccessDraft,
@@ -12,7 +6,6 @@ import {
   countSubmittedEmailUsage,
   findPresenter,
   getSubmissionSnapshot,
-  normalizeParticipation,
   validateAuthors,
   validateDetails,
   validateParticipation,
@@ -54,12 +47,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
 
   const submission = await prisma.submission.findUnique({
     where: { id },
-    include: {
-      authors: true,
-      file: true,
-      paymentReceipt: true,
-      congress: true,
-    },
+    include: { authors: true, file: true },
   });
 
   if (!submission) {
@@ -94,86 +82,25 @@ export async function POST(_request: Request, { params }: RouteProps) {
     return NextResponse.json({ error: authorErrors[0] }, { status: 400 });
   }
 
-  const participationErrors = validateParticipation(
-    normalizeParticipation({
-      presentationMode: (submission.presentationMode ?? "IN_PERSON") as "ONLINE" | "IN_PERSON",
-      galaAttendance: submission.galaAttendance,
-      galaAttendeeCount: submission.galaAttendeeCount,
-      tripAttendance: submission.tripAttendance,
-      tripAttendeeCount: submission.tripAttendeeCount,
-    }),
-  );
+  if (!submission.presentationMode || !submission.audience) {
+    return NextResponse.json(
+      { error: "Sunum bilgilerinizi (yüz yüze/çevrim içi ve akademik statü) seçmelisiniz." },
+      { status: 400 },
+    );
+  }
+
+  const participationErrors = validateParticipation({
+    presentationMode: submission.presentationMode,
+    audience: submission.audience,
+  });
 
   if (participationErrors.length) {
     return NextResponse.json({ error: participationErrors[0] }, { status: 400 });
   }
 
-  if (isPaymentClosed(submission.congress)) {
-    return NextResponse.json({ error: getPaymentClosedMessage() }, { status: 400 });
-  }
-
   const presenter = findPresenter(submission.authors);
   if (!presenter?.fullName.trim()) {
     return NextResponse.json({ error: "Sunan yazar bilgisi bulunamadı." }, { status: 400 });
-  }
-
-  if (
-    !submission.paymentTierId ||
-    !submission.attendeeRole ||
-    submission.paymentAmount == null ||
-    !submission.paymentCurrency ||
-    !submission.paymentDescription
-  ) {
-    return NextResponse.json(
-      { error: "Bildirinizi gönderebilmek için önce ücret bilgisini hesaplayıp kaydetmelisiniz." },
-      { status: 400 },
-    );
-  }
-
-  const congress = await getCongressWithTiers(submission.congress.slug);
-  if (!congress) {
-    return NextResponse.json({ error: "Kongre bilgisi bulunamadı." }, { status: 404 });
-  }
-
-  let resolvedPayment;
-  try {
-    resolvedPayment = resolveSubmissionPayment({
-      congress,
-      payment: {
-        attendeeRole: submission.attendeeRole,
-        audience: submission.audience,
-        paperOrder:
-          submission.paperOrder === 1 || submission.paperOrder === 2
-            ? (submission.paperOrder as 1 | 2)
-            : null,
-      },
-      presentationMode: (submission.presentationMode ?? "IN_PERSON") as "ONLINE" | "IN_PERSON",
-      presenterName: presenter.fullName,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Ücret bilgileri doğrulanamadı." },
-      { status: 400 },
-    );
-  }
-
-  if (
-    submission.paymentTierId !== resolvedPayment.tier.id ||
-    submission.paymentAmount !== resolvedPayment.paymentAmount ||
-    submission.paymentCurrency !== resolvedPayment.paymentCurrency ||
-    submission.paymentDescription !== resolvedPayment.paymentDescription
-  ) {
-    return NextResponse.json(
-      { error: "Ücret bilgileriniz güncel değil. Lütfen ücret adımını tekrar kaydedin." },
-      { status: 400 },
-    );
-  }
-
-  if (resolvedPayment.paymentAmount > 0 && !submission.paymentReceipt) {
-    return NextResponse.json(
-      { error: "Bildirinizi gönderebilmek için ödeme dekontunu yüklemelisiniz." },
-      { status: 400 },
-    );
   }
 
   if (!submission.file) {
@@ -195,10 +122,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
 
   await prisma.submission.update({
     where: { id },
-    data: {
-      status: "SUBMITTED",
-      submittedAt: new Date(),
-    },
+    data: { status: "SUBMITTED", submittedAt: new Date() },
   });
 
   await clearDraftAccessCookie();

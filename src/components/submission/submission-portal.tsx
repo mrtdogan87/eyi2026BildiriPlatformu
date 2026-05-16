@@ -1,23 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  mapAttendeeRole,
-  mapAudience,
-  mapPaperOrder,
-  mapPaymentPeriod,
-} from "@/lib/payment";
+import { formatCurrencyAmount, mapAudience } from "@/lib/payment";
 import type {
-  AttendeeRole,
   AudienceType,
-  PaperOrder,
   PaymentTierOption,
+  PresentationMode,
   SubmissionAuthorInput,
   SubmissionConfig,
   SubmissionDetailsInput,
-  SubmissionParticipationInput,
-  SubmissionPaymentInput,
   SubmissionSnapshot,
 } from "@/types/submission";
 
@@ -27,9 +19,7 @@ type Props = {
   config: SubmissionConfig;
 };
 
-type AuthorDraft = SubmissionAuthorInput & {
-  localId: string;
-};
+type AuthorDraft = SubmissionAuthorInput & { localId: string };
 
 type SubmissionDeclarations = {
   accuracy: boolean;
@@ -49,18 +39,9 @@ const emptyDetails: SubmissionDetailsInput = {
   keywordsEn: "",
 };
 
-const emptyParticipation: SubmissionParticipationInput = {
-  presentationMode: "IN_PERSON",
-  galaAttendance: false,
-  galaAttendeeCount: 0,
-  tripAttendance: false,
-  tripAttendeeCount: 0,
-};
-
-const emptyPayment: SubmissionPaymentInput = {
-  attendeeRole: null,
-  audience: null,
-  paperOrder: null,
+const emptyParticipation = {
+  presentationMode: null as PresentationMode | null,
+  audience: null as AudienceType | null,
 };
 
 const emptyAuthor = (): SubmissionAuthorInput => ({
@@ -99,61 +80,21 @@ function createAuthorDraft(author?: Partial<SubmissionAuthorInput>, isPresenter 
     email: author?.email ?? "",
     institution: author?.institution ?? "",
     country: author?.country ?? "",
-    isPresenter: isPresenter,
+    isPresenter,
   };
 }
 
-function formatCurrency(amount: number | null, currency: string | null) {
-  if (amount == null || !currency) {
-    return "Henüz hesaplanmadı";
-  }
-
-  try {
-    return new Intl.NumberFormat("tr-TR", {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  } catch {
-    return `${amount} ${currency}`;
-  }
-}
-
-function findMatchingTier(
+function findPresenterPaperTiers(
   tiers: PaymentTierOption[],
-  selection: {
-    presentationMode: "IN_PERSON" | "ONLINE";
-    attendeeRole: AttendeeRole | null;
-    audience: AudienceType | null;
-    paperOrder: PaperOrder | null;
-    period: "EARLY" | "LATE" | null;
-  },
-): PaymentTierOption | null {
-  if (!selection.attendeeRole) return null;
-
-  return (
-    tiers.find((tier) => {
-      if (tier.role !== selection.attendeeRole) return false;
-
-      if (selection.attendeeRole === "PRESENTER") {
-        if (tier.presentationMode !== null) return false;
-        if (tier.audience !== selection.audience) return false;
-        if (tier.paperOrder !== selection.paperOrder) return false;
-        if (selection.period !== null && tier.period !== selection.period) return false;
-        if (selection.period === null && tier.period !== null) return false;
-        return true;
-      }
-
-      if (tier.presentationMode !== selection.presentationMode) return false;
-      if (selection.presentationMode === "IN_PERSON") {
-        if (tier.audience !== selection.audience) return false;
-        if (selection.period !== null && tier.period !== selection.period) return false;
-        if (selection.period === null && tier.period !== null) return false;
-        return true;
-      }
-
-      return tier.audience === null && tier.period === null;
-    }) ?? null
+  audience: AudienceType | null,
+) {
+  if (!audience) return [];
+  return tiers.filter(
+    (tier) =>
+      tier.role === "PRESENTER" &&
+      tier.presentationMode === null &&
+      tier.audience === audience &&
+      tier.paperOrder === 1,
   );
 }
 
@@ -170,8 +111,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [declarations, setDeclarations] = useState<SubmissionDeclarations>(emptyDeclarations);
+
   const [details, setDetails] = useState<SubmissionDetailsInput>(
     initialSnapshot
       ? {
@@ -185,26 +126,16 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
         }
       : emptyDetails,
   );
-  const [participation, setParticipation] = useState<SubmissionParticipationInput>(
+
+  const [participation, setParticipation] = useState<typeof emptyParticipation>(
     initialSnapshot
       ? {
           presentationMode: initialSnapshot.presentationMode,
-          galaAttendance: initialSnapshot.galaAttendance,
-          galaAttendeeCount: initialSnapshot.galaAttendeeCount,
-          tripAttendance: initialSnapshot.tripAttendance,
-          tripAttendeeCount: initialSnapshot.tripAttendeeCount,
+          audience: initialSnapshot.audience,
         }
       : emptyParticipation,
   );
-  const [payment, setPayment] = useState<SubmissionPaymentInput>(
-    initialSnapshot
-      ? {
-          attendeeRole: initialSnapshot.payment.attendeeRole,
-          audience: initialSnapshot.payment.audience,
-          paperOrder: initialSnapshot.payment.paperOrder,
-        }
-      : emptyPayment,
-  );
+
   const [authors, setAuthors] = useState<AuthorDraft[]>(
     initialSnapshot?.authors.length
       ? initialSnapshot.authors.map((author) => createAuthorDraft(author, author.isPresenter))
@@ -213,60 +144,23 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
   const activeStep = snapshot ? step : 0;
   const hasExistingFile = Boolean(snapshot?.file);
-  const hasExistingReceipt = Boolean(snapshot?.paymentReceipt);
   const areDeclarationsComplete = Object.values(declarations).every(Boolean);
-  const isPaymentClosed = snapshot?.payment.isClosed ?? false;
-
   const selectedLanguageLabel = useMemo(
     () => (details.submissionLanguage === "TR" ? "Türkçe" : "İngilizce"),
     [details.submissionLanguage],
   );
-  const presenterName = useMemo(() => {
-    const presenter = authors.find((author) => author.isPresenter) ?? authors[0];
-    return presenter?.fullName.trim() ?? "";
-  }, [authors]);
 
-  const matchedTier = useMemo(() => {
-    const isOnlineListener =
-      payment.attendeeRole === "LISTENER" && participation.presentationMode === "ONLINE";
-    return findMatchingTier(config.tiers, {
-      presentationMode: participation.presentationMode,
-      attendeeRole: payment.attendeeRole,
-      audience: payment.audience,
-      paperOrder: payment.paperOrder,
-      period: isOnlineListener ? null : config.currentPeriod,
-    });
-  }, [config.tiers, config.currentPeriod, participation.presentationMode, payment]);
+  const presenterPaperTiers = useMemo(
+    () => findPresenterPaperTiers(config.tiers, participation.audience),
+    [config.tiers, participation.audience],
+  );
 
-  const requiresReceipt = (matchedTier?.amount ?? 0) > 0;
-
-  useEffect(() => {
-    if (participation.presentationMode === "ONLINE") {
-      setPayment((current) => {
-        if (current.attendeeRole !== "LISTENER") return current;
-        if (!current.audience) return current;
-        return { ...current, audience: null };
-      });
-    }
-  }, [participation.presentationMode]);
-
-  function applySubmissionSnapshot(nextSubmission: SubmissionSnapshot | null) {
-    setSnapshot(nextSubmission);
-    if (nextSubmission) {
-      setPayment({
-        attendeeRole: nextSubmission.payment.attendeeRole,
-        audience: nextSubmission.payment.audience,
-        paperOrder: nextSubmission.payment.paperOrder,
-      });
-    }
-  }
+  const earlyTier = presenterPaperTiers.find((tier) => tier.period === "EARLY");
+  const lateTier = presenterPaperTiers.find((tier) => tier.period === "LATE");
 
   async function readResponsePayload(response: Response) {
     const text = await response.text();
-    if (!text) {
-      return {} as Record<string, unknown>;
-    }
-
+    if (!text) return {} as Record<string, unknown>;
     try {
       return JSON.parse(text) as Record<string, unknown>;
     } catch {
@@ -284,14 +178,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
     try {
       const response = await fetch("/api/submissions/drafts", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          congressSlug,
-          email,
-          submissionLanguage: draftLanguage,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ congressSlug, email, submissionLanguage: draftLanguage }),
       });
 
       const data = await readResponsePayload(response);
@@ -300,13 +188,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       }
 
       setDraftMessage((data.message as string | undefined) ?? "");
-      setDetails((current) => ({
-        ...current,
-        submissionLanguage: draftLanguage,
-      }));
-      if (data.magicLinkPreview) {
-        setMagicLinkPreview(data.magicLinkPreview as string);
-      }
+      setDetails((current) => ({ ...current, submissionLanguage: draftLanguage }));
+      if (data.magicLinkPreview) setMagicLinkPreview(data.magicLinkPreview as string);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
     } finally {
@@ -346,11 +229,10 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
         if (!fileResponse.ok) {
           throw new Error((fileData.error as string | undefined) ?? "Dosya yüklenemedi.");
         }
-
         nextSubmission = (fileData.submission as SubmissionSnapshot | undefined) ?? nextSubmission;
       }
 
-      applySubmissionSnapshot(nextSubmission);
+      setSnapshot(nextSubmission);
       setStep(2);
       setFile(null);
     } catch (caughtError) {
@@ -385,8 +267,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       if (!response.ok) {
         throw new Error((data.error as string | undefined) ?? "Yazar bilgileri kaydedilemedi.");
       }
-
-      applySubmissionSnapshot((data.submission as SubmissionSnapshot | undefined) ?? null);
+      setSnapshot((data.submission as SubmissionSnapshot | undefined) ?? null);
       setStep(3);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
@@ -398,6 +279,10 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
   async function saveParticipation(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!snapshot) return;
+    if (!participation.presentationMode || !participation.audience) {
+      setError("Sunum şekli ve akademik statü seçmelisiniz.");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -406,73 +291,17 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       const response = await fetch(`/api/submissions/${snapshot.id}/participation`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(participation),
+        body: JSON.stringify({
+          presentationMode: participation.presentationMode,
+          audience: participation.audience,
+        }),
       });
       const data = await readResponsePayload(response);
       if (!response.ok) {
-        throw new Error((data.error as string | undefined) ?? "Katılım bilgileri kaydedilemedi.");
+        throw new Error((data.error as string | undefined) ?? "Sunum bilgileri kaydedilemedi.");
       }
-
-      applySubmissionSnapshot((data.submission as SubmissionSnapshot | undefined) ?? null);
-      setReceiptFile(null);
+      setSnapshot((data.submission as SubmissionSnapshot | undefined) ?? null);
       setStep(4);
-    } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function savePayment(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!snapshot) return;
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await fetch(`/api/submissions/${snapshot.id}/payment`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payment),
-      });
-      const data = await readResponsePayload(response);
-      if (!response.ok) {
-        throw new Error((data.error as string | undefined) ?? "Ücret bilgileri kaydedilemedi.");
-      }
-
-      let nextSubmission = (data.submission as SubmissionSnapshot | undefined) ?? null;
-      applySubmissionSnapshot(nextSubmission);
-
-      const requiresReceiptUpload = (nextSubmission?.payment.amount ?? 0) > 0;
-
-      if (receiptFile) {
-        if (!requiresReceiptUpload) {
-          throw new Error("Bu kategori için dekont gerekmediğinden dekont yüklenemez.");
-        }
-
-        const formData = new FormData();
-        formData.append("file", receiptFile);
-
-        const receiptResponse = await fetch(`/api/submissions/${snapshot.id}/payment-receipt`, {
-          method: "PUT",
-          body: formData,
-        });
-        const receiptData = await readResponsePayload(receiptResponse);
-        if (!receiptResponse.ok) {
-          throw new Error((receiptData.error as string | undefined) ?? "Dekont yüklenemedi.");
-        }
-
-        nextSubmission = (receiptData.submission as SubmissionSnapshot | undefined) ?? nextSubmission;
-        applySubmissionSnapshot(nextSubmission);
-      }
-
-      if (requiresReceiptUpload && !nextSubmission?.paymentReceipt) {
-        throw new Error("Sonraki adıma geçebilmek için ödeme dekontunu yüklemelisiniz.");
-      }
-
-      setReceiptFile(null);
-      setStep(5);
     } catch (caughtError) {
       setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
     } finally {
@@ -500,7 +329,6 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       if (!response.ok) {
         throw new Error((data.error as string | undefined) ?? "Bildiri gönderilemedi.");
       }
-
       router.push(`/${congressSlug}/bildiri-gonder/basarili?id=${snapshot.id}`);
       router.refresh();
     } catch (caughtError) {
@@ -536,17 +364,6 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
     });
   }
 
-  function updateParticipationMode(mode: "ONLINE" | "IN_PERSON") {
-    setParticipation((current) => ({
-      ...current,
-      presentationMode: mode,
-      galaAttendance: mode === "ONLINE" ? false : current.galaAttendance,
-      galaAttendeeCount: mode === "ONLINE" ? 0 : current.galaAttendeeCount,
-      tripAttendance: mode === "ONLINE" ? false : current.tripAttendance,
-      tripAttendeeCount: mode === "ONLINE" ? 0 : current.tripAttendeeCount,
-    }));
-  }
-
   if (!snapshot) {
     return (
       <div className="card start-card">
@@ -580,10 +397,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                 onChange={(event) => {
                   const nextLanguage = event.target.value as "TR" | "EN";
                   setDraftLanguage(nextLanguage);
-                  setDetails((current) => ({
-                    ...current,
-                    submissionLanguage: nextLanguage,
-                  }));
+                  setDetails((current) => ({ ...current, submissionLanguage: nextLanguage }));
                 }}
               >
                 <option value="TR">Türkçe</option>
@@ -620,7 +434,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
   return (
     <>
       <div className="steps">
-        {[1, 2, 3, 4, 5].map((item) => (
+        {[1, 2, 3, 4].map((item) => (
           <div className={`step ${activeStep === item ? "active" : activeStep > item ? "done" : ""}`} key={item}>
             <span className="step-badge">{item}</span>
             <span>
@@ -629,12 +443,10 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                 : item === 2
                   ? "Yazarlar"
                   : item === 3
-                    ? "Katılım"
-                    : item === 4
-                      ? "Ücret"
-                      : "Gönder"}
+                    ? "Sunum Bilgileri"
+                    : "Onay ve Gönder"}
             </span>
-            {item < 5 ? <span className="step-separator">→</span> : null}
+            {item < 4 ? <span className="step-separator">→</span> : null}
           </div>
         ))}
       </div>
@@ -646,10 +458,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
             : step === 2
               ? "Yazarlar"
               : step === 3
-                ? "Katılım ve Sosyal Faaliyetler"
-                : step === 4
-                  ? "Ücret ve Dekont"
-                  : "Son Kontrol"}
+                ? "Sunum Bilgileri"
+                : "Onay ve Gönder"}
         </h2>
 
         {step === 1 ? (
@@ -871,13 +681,11 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                   <input
                     checked={participation.presentationMode === "IN_PERSON"}
                     name="presentation-mode"
-                    onChange={() => updateParticipationMode("IN_PERSON")}
+                    onChange={() => setParticipation((current) => ({ ...current, presentationMode: "IN_PERSON" }))}
                     type="radio"
                   />
                   <span className="option-card-title">Yüz Yüze</span>
-                  <span className="option-card-meta">
-                    Etkinlik salonunda fiziksel katılım
-                  </span>
+                  <span className="option-card-meta">Etkinlik salonunda fiziksel sunum</span>
                 </label>
                 <label
                   className={`option-card${participation.presentationMode === "ONLINE" ? " is-selected" : ""}`}
@@ -885,111 +693,47 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                   <input
                     checked={participation.presentationMode === "ONLINE"}
                     name="presentation-mode"
-                    onChange={() => updateParticipationMode("ONLINE")}
+                    onChange={() => setParticipation((current) => ({ ...current, presentationMode: "ONLINE" }))}
                     type="radio"
                   />
                   <span className="option-card-title">Çevrim İçi</span>
-                  <span className="option-card-meta">
-                    Sosyal etkinlikler katılım dışıdır
-                  </span>
+                  <span className="option-card-meta">Uzaktan sunum</span>
                 </label>
               </div>
+              <span className="field-hint">
+                Yüz yüze ve çevrim içi sunumlarda aynı ücretlendirme uygulanır.
+              </span>
             </div>
 
-            <div className="grid two">
-              <div className="author-card">
-                <h3>Gala Yemeği</h3>
-                <div className="form-stack">
-                  <div className="field">
-                    <label htmlFor="gala-attendance">Katılım</label>
-                    <select
-                      id="gala-attendance"
-                      value={participation.galaAttendance ? "yes" : "no"}
-                      onChange={(event) => {
-                        const attends = event.target.value === "yes";
-                        setParticipation((current) => ({
-                          ...current,
-                          galaAttendance: attends,
-                          galaAttendeeCount: attends
-                            ? current.galaAttendeeCount > 0
-                              ? current.galaAttendeeCount
-                              : 1
-                            : 0,
-                        }));
-                      }}
-                    >
-                      <option value="no">Hayır, katılmayacağım</option>
-                      <option value="yes">Evet, katılacağım</option>
-                    </select>
-                    <span className="field-hint">
-                      Kişi başı {formatCurrency(config.gala.amount, config.gala.currency)}.
-                      {config.gala.note ? ` ${config.gala.note}` : ""}
-                    </span>
-                  </div>
-                  <div className="field">
-                    <label htmlFor="gala-count">Kaç kişi katılmayı planlıyor?</label>
-                    <input
-                      disabled={!participation.galaAttendance}
-                      id="gala-count"
-                      min={1}
-                      type="number"
-                      value={participation.galaAttendance ? participation.galaAttendeeCount : 0}
-                      onChange={(event) =>
-                        setParticipation((current) => ({
-                          ...current,
-                          galaAttendeeCount: Number(event.target.value) || 0,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="author-card">
-                <h3>Gezi</h3>
-                <div className="form-stack">
-                  <div className="field">
-                    <label htmlFor="trip-attendance">Katılım</label>
-                    <select
-                      id="trip-attendance"
-                      value={participation.tripAttendance ? "yes" : "no"}
-                      onChange={(event) => {
-                        const attends = event.target.value === "yes";
-                        setParticipation((current) => ({
-                          ...current,
-                          tripAttendance: attends,
-                          tripAttendeeCount: attends
-                            ? current.tripAttendeeCount > 0
-                              ? current.tripAttendeeCount
-                              : 1
-                            : 0,
-                        }));
-                      }}
-                    >
-                      <option value="no">Hayır, katılmayacağım</option>
-                      <option value="yes">Evet, katılacağım</option>
-                    </select>
-                    <span className="field-hint">
-                      {config.trip.note || "Gezi ücretsizdir."}
-                    </span>
-                  </div>
-                  <div className="field">
-                    <label htmlFor="trip-count">Kaç kişi katılmayı planlıyor?</label>
-                    <input
-                      disabled={!participation.tripAttendance}
-                      id="trip-count"
-                      min={1}
-                      type="number"
-                      value={participation.tripAttendance ? participation.tripAttendeeCount : 0}
-                      onChange={(event) =>
-                        setParticipation((current) => ({
-                          ...current,
-                          tripAttendeeCount: Number(event.target.value) || 0,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
+            <div className="field" style={{ marginBottom: 22 }}>
+              <label>
+                Akademik Statü <span className="required">*</span>
+              </label>
+              <div className="option-cards">
+                <label
+                  className={`option-card${participation.audience === "ACADEMIC" ? " is-selected" : ""}`}
+                >
+                  <input
+                    checked={participation.audience === "ACADEMIC"}
+                    name="audience"
+                    onChange={() => setParticipation((current) => ({ ...current, audience: "ACADEMIC" }))}
+                    type="radio"
+                  />
+                  <span className="option-card-title">Akademik Personel</span>
+                  <span className="option-card-meta">Öğretim üyesi / araştırmacı</span>
+                </label>
+                <label
+                  className={`option-card${participation.audience === "STUDENT" ? " is-selected" : ""}`}
+                >
+                  <input
+                    checked={participation.audience === "STUDENT"}
+                    name="audience"
+                    onChange={() => setParticipation((current) => ({ ...current, audience: "STUDENT" }))}
+                    type="radio"
+                  />
+                  <span className="option-card-title">Öğrenci</span>
+                  <span className="option-card-meta">Lisans / yüksek lisans / doktora</span>
+                </label>
               </div>
             </div>
 
@@ -1007,351 +751,64 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
         ) : null}
 
         {step === 4 ? (
-          <form className="submission-form-panel" onSubmit={savePayment}>
-            {isPaymentClosed ? (
-              <div className="error">
-                Kayıt süresi sona erdiği için yeni ödeme ve gönderim alınmıyor.
-              </div>
-            ) : null}
-
-            <div className="field-row" style={{ marginBottom: 18 }}>
-              <span className="pill">
-                Sunum: {participation.presentationMode === "ONLINE" ? "Çevrim İçi" : "Yüz Yüze"}
-              </span>
-              {participation.presentationMode === "IN_PERSON" && config.currentPeriod ? (
-                <span className="pill" style={{ background: "#eef4fb" }}>
-                  Dönem: {mapPaymentPeriod(config.currentPeriod)}
-                </span>
-              ) : null}
-            </div>
-
-            <div className="grid two">
+          <div className="submission-form-panel">
+            <div className="grid two" style={{ marginBottom: 22 }}>
               <div className="author-card">
-                <h3>Katılım Bilgileri</h3>
-                <div className="form-stack">
-                  <div className="field">
-                    <label>
-                      Katılım Türü <span className="required">*</span>
-                    </label>
-                    <div className="option-cards">
-                      <label
-                        className={`option-card${payment.attendeeRole === "PRESENTER" ? " is-selected" : ""}`}
-                      >
-                        <input
-                          checked={payment.attendeeRole === "PRESENTER"}
-                          name="attendee-role"
-                          onChange={() =>
-                            setPayment((current) => ({
-                              attendeeRole: "PRESENTER",
-                              audience:
-                                participation.presentationMode === "IN_PERSON"
-                                  ? current.audience
-                                  : null,
-                              paperOrder:
-                                participation.presentationMode === "ONLINE"
-                                  ? current.paperOrder
-                                  : null,
-                            }))
-                          }
-                          type="radio"
-                        />
-                        <span className="option-card-title">Sunumlu Katılımcı</span>
-                        <span className="option-card-meta">Bildiri sunacak</span>
-                      </label>
-                      <label
-                        className={`option-card${payment.attendeeRole === "LISTENER" ? " is-selected" : ""}`}
-                      >
-                        <input
-                          checked={payment.attendeeRole === "LISTENER"}
-                          name="attendee-role"
-                          onChange={() =>
-                            setPayment(() => ({
-                              attendeeRole: "LISTENER",
-                              audience:
-                                participation.presentationMode === "IN_PERSON"
-                                  ? payment.audience
-                                  : null,
-                              paperOrder: null,
-                            }))
-                          }
-                          type="radio"
-                        />
-                        <span className="option-card-title">Dinleyici</span>
-                        <span className="option-card-meta">Sadece izleyecek</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  {payment.attendeeRole === "PRESENTER" ||
-                  (payment.attendeeRole === "LISTENER" &&
-                    participation.presentationMode === "IN_PERSON") ? (
+                <h3>Bildirinin Tahmini Ücreti</h3>
+                {participation.audience ? (
+                  <div className="form-stack">
                     <div className="field">
-                      <label>
-                        Akademik Statü <span className="required">*</span>
-                      </label>
-                      <div className="option-cards">
-                        <label
-                          className={`option-card${payment.audience === "ACADEMIC" ? " is-selected" : ""}`}
-                        >
-                          <input
-                            checked={payment.audience === "ACADEMIC"}
-                            name="audience"
-                            onChange={() =>
-                              setPayment((current) => ({ ...current, audience: "ACADEMIC" }))
-                            }
-                            type="radio"
-                          />
-                          <span className="option-card-title">Akademik Personel</span>
-                          <span className="option-card-meta">Öğretim üyesi / araştırmacı</span>
-                        </label>
-                        <label
-                          className={`option-card${payment.audience === "STUDENT" ? " is-selected" : ""}`}
-                        >
-                          <input
-                            checked={payment.audience === "STUDENT"}
-                            name="audience"
-                            onChange={() =>
-                              setPayment((current) => ({ ...current, audience: "STUDENT" }))
-                            }
-                            type="radio"
-                          />
-                          <span className="option-card-title">Öğrenci</span>
-                          <span className="option-card-meta">Lisans / yüksek lisans / doktora</span>
-                        </label>
+                      <label>Kategori</label>
+                      <div className="field-display">{mapAudience(participation.audience)}</div>
+                    </div>
+                    <div className="field">
+                      <label>Erken Kayıt</label>
+                      <div className="amount-display">
+                        {earlyTier
+                          ? formatCurrencyAmount(earlyTier.amount, earlyTier.currency)
+                          : "Tanımlı değil"}
+                        <span className="amount-display-meta">Birinci bildiri için</span>
                       </div>
                     </div>
-                  ) : null}
-
-                  {payment.attendeeRole === "PRESENTER" ? (
                     <div className="field">
-                      <label>
-                        Bildiri Sırası <span className="required">*</span>
-                      </label>
-                      <div className="option-cards">
-                        <label
-                          className={`option-card${payment.paperOrder === 1 ? " is-selected" : ""}`}
-                        >
-                          <input
-                            checked={payment.paperOrder === 1}
-                            name="paper-order"
-                            onChange={() =>
-                              setPayment((current) => ({ ...current, paperOrder: 1 }))
-                            }
-                            type="radio"
-                          />
-                          <span className="option-card-title">Birinci Bildiri</span>
-                          <span className="option-card-meta">Tam tarife uygulanır</span>
-                        </label>
-                        <label
-                          className={`option-card${payment.paperOrder === 2 ? " is-selected" : ""}`}
-                        >
-                          <input
-                            checked={payment.paperOrder === 2}
-                            name="paper-order"
-                            onChange={() =>
-                              setPayment((current) => ({ ...current, paperOrder: 2 }))
-                            }
-                            type="radio"
-                          />
-                          <span className="option-card-title">İkinci Bildiri</span>
-                          <span className="option-card-meta">%50 indirim uygulanır</span>
-                        </label>
+                      <label>Geç Kayıt</label>
+                      <div className="amount-display">
+                        {lateTier
+                          ? formatCurrencyAmount(lateTier.amount, lateTier.currency)
+                          : "Tanımlı değil"}
+                        <span className="amount-display-meta">Birinci bildiri için</span>
                       </div>
-                      <span className="field-hint">
-                        İkinci bildiri indirimi yalnızca birinci bildiriyi sunan kişinin ikinci
-                        bildiriyi de sunması durumunda geçerlidir.
-                      </span>
                     </div>
-                  ) : null}
-
-                  {payment.attendeeRole === "LISTENER" &&
-                  participation.presentationMode === "ONLINE" ? (
-                    <div className="notice" style={{ marginTop: 0 }}>
-                      Çevrim içi dinleyici katılımı ücretsizdir. Ödeme veya dekont gerekmez.
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-
-              <div className="author-card">
-                <h3>Hesap Özeti</h3>
-                <div className="form-stack">
-                  <div className="field">
-                    <label>Hesaplanan Tutar</label>
-                    <div className="amount-display">
-                      {matchedTier
-                        ? formatCurrency(matchedTier.amount, matchedTier.currency)
-                        : "—"}
-                      <span className="amount-display-meta">
-                        {matchedTier
-                          ? matchedTier.label
-                          : "Seçimleri tamamladığınızda burada hesaplanır"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="field">
-                    <label>Ödeme Açıklaması (Havale/EFT)</label>
-                    <input
-                      readOnly
-                      value={
-                        matchedTier && presenterName
-                          ? `${presenterName} - ${matchedTier.label}`
-                          : "Seçim yaptığınızda burada otomatik oluşur."
-                      }
-                    />
                     <span className="field-hint">
-                      Havale açıklamasına bu ifadeyi yazın. Sunan yazarın adına ve seçilen kategoriye göre üretilir.
+                      Ödeme tarihinizdeki dönem (erken veya geç) uygulanır. İkinci bildiri için aynı
+                      kategoride %50 indirim sağlanır.
                     </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid two" style={{ marginTop: 18 }}>
-              <div className="author-card">
-                <h3>Banka Hesap Bilgileri</h3>
-                <div className="form-stack">
-                  <div className="field">
-                    <label>Banka</label>
-                    <input readOnly value={config.bank.bankName || "Belirtilmedi"} />
-                  </div>
-                  {config.bank.bankBranch ? (
-                    <div className="field">
-                      <label>Şube</label>
-                      <input readOnly value={config.bank.bankBranch} />
-                    </div>
-                  ) : null}
-                  <div className="field">
-                    <label>Hesap Sahibi</label>
-                    <input readOnly value={config.bank.bankAccountHolder || "Belirtilmedi"} />
-                  </div>
-                  <div className="field">
-                    <label>IBAN</label>
-                    <input readOnly value={config.bank.bankIban || "Belirtilmedi"} />
-                  </div>
-                </div>
-              </div>
-
-              <div className="author-card">
-                <h3>Dekont</h3>
-                {requiresReceipt ? (
-                  <div className="field">
-                    <label htmlFor="payment-receipt">
-                      Dekont Yükle {!hasExistingReceipt ? <span className="required">*</span> : null}
-                    </label>
-                    <input
-                      id="payment-receipt"
-                      type="file"
-                      accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                      onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
-                    />
-                    <span className="field-hint">
-                      PDF, JPG, JPEG veya PNG, maksimum 10 MB.
-                      {snapshot.paymentReceipt
-                        ? ` Mevcut dekont: ${snapshot.paymentReceipt.originalName}`
-                        : ""}
-                    </span>
-                    {payment.paperOrder === 2 ? (
-                      <span className="field-hint">
-                        İkinci bildiri için ödeme açıklamasında bu bildirinin sunan yazarını ve
-                        &quot;İkinci Bildiri&quot; ifadesini belirtiniz.
-                      </span>
-                    ) : null}
                   </div>
                 ) : (
-                  <div className="notice" style={{ marginTop: 0 }}>
-                    Bu kategori için ücret alınmadığından dekont yüklemenize gerek yoktur.
-                  </div>
+                  <p style={{ margin: 0, color: "#617089" }}>
+                    Akademik statünüz seçili değil. Önceki adımda seçim yaparsanız tutar burada hesaplanır.
+                  </p>
                 )}
+              </div>
+
+              <div className="author-card">
+                <h3>Ödeme Bilgisi</h3>
+                <div className="form-stack">
+                  <p style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.55 }}>
+                    Bildiriniz yalnızca <strong>kabul edildikten sonra</strong> ücret yatırılır. Bunu
+                    kongre web sayfasındaki <strong>“Kayıt Ol”</strong> bağlantısı üzerinden,
+                    e-postanızla giriş yaparak yapabilirsiniz.
+                  </p>
+                  <p style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.55 }}>
+                    Birden fazla bildiriniz kabul edilirse hepsini tek seferde, indirimler uygulanmış
+                    biçimde tek dekontla ödeyebilirsiniz.
+                  </p>
+                </div>
               </div>
             </div>
 
-            {error ? <div className="error">{error}</div> : null}
-
-            <div className="form-actions">
-              <button className="button secondary" onClick={() => setStep(3)} type="button">
-                Geri
-              </button>
-              <button className="button primary" disabled={loading || isPaymentClosed} type="submit">
-                {loading ? "Kaydediliyor..." : "Kaydet ve İleri"}
-              </button>
-            </div>
-          </form>
-        ) : null}
-
-        {step === 5 ? (
-          <div className="summary submission-form-panel">
-            <div className="summary-block">
-              <h3>Dil</h3>
-              <p>{selectedLanguageLabel}</p>
-            </div>
-            <div className="summary-block">
-              <h3>Sunum Şekli</h3>
-              <p>{participation.presentationMode === "ONLINE" ? "Çevrim içi" : "Yüz yüze"}</p>
-            </div>
-            <div className="summary-block">
-              <h3>{details.submissionLanguage === "TR" ? "Başlık" : "Title"}</h3>
-              <p>{details.submissionLanguage === "TR" ? details.titleTr : details.titleEn}</p>
-            </div>
-            <div className="summary-block summary-block-wide">
-              <h3>{details.submissionLanguage === "TR" ? "Özet" : "Abstract"}</h3>
-              <p>{details.submissionLanguage === "TR" ? details.abstractTr : details.abstractEn}</p>
-            </div>
-            <div className="summary-block">
-              <h3>{details.submissionLanguage === "TR" ? "Anahtar Kelimeler" : "Keywords"}</h3>
-              <p>{details.submissionLanguage === "TR" ? details.keywordsTr : details.keywordsEn}</p>
-            </div>
-            <div className="summary-block">
-              <h3>Dosya</h3>
-              <p>{snapshot.file?.originalName ?? "Dosya yüklenmedi"}</p>
-            </div>
-            <div className="summary-block summary-block-wide">
-              <h3>Yazarlar</h3>
-              <ul className="summary-list">
-                {authors.map((author) => (
-                  <li key={author.localId}>
-                    {author.fullName} - {author.email}
-                    {author.isPresenter ? " (Sunan yazar)" : ""}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="summary-block">
-              <h3>Sosyal Faaliyetler</h3>
-              <ul className="summary-list">
-                <li>
-                  Gala: {participation.galaAttendance ? `Evet (${participation.galaAttendeeCount} kişi)` : "Hayır"}
-                </li>
-                <li>
-                  Gezi: {participation.tripAttendance ? `Evet (${participation.tripAttendeeCount} kişi)` : "Hayır"}
-                </li>
-              </ul>
-            </div>
-            <div className="summary-block">
-              <h3>Ücret Bilgisi</h3>
-              <ul className="summary-list">
-                <li>Katılım: {mapAttendeeRole(snapshot.payment.attendeeRole)}</li>
-                {snapshot.payment.audience ? (
-                  <li>Akademik Statü: {mapAudience(snapshot.payment.audience)}</li>
-                ) : null}
-                {snapshot.payment.attendeeRole === "PRESENTER" ? (
-                  <li>Bildiri Sırası: {mapPaperOrder(snapshot.payment.paperOrder)}</li>
-                ) : null}
-                <li>Kayıt Dönemi: {snapshot.payment.period ? mapPaymentPeriod(snapshot.payment.period) : "-"}</li>
-                <li>Tutar: {formatCurrency(snapshot.payment.amount, snapshot.payment.currency)}</li>
-                <li>Açıklama: {snapshot.payment.description || "-"}</li>
-              </ul>
-            </div>
-            <div className="summary-block">
-              <h3>Dekont</h3>
-              <p>
-                {snapshot.paymentReceipt?.originalName ??
-                  ((snapshot.payment.amount ?? 0) > 0 ? "Dekont yüklenmedi" : "Bu kategori için dekont gerekmez")}
-              </p>
-            </div>
-            <div className="summary-block summary-block-wide">
-              <h3>Etik & Beyanlar</h3>
+            <div className="author-card" style={{ marginBottom: 22 }}>
+              <h3>Etik ve Beyanlar</h3>
               <div className="checklist">
                 {(Object.entries(declarationLabels) as Array<
                   [keyof SubmissionDeclarations, string]
@@ -1360,10 +817,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     <input
                       checked={declarations[key]}
                       onChange={(event) =>
-                        setDeclarations((current) => ({
-                          ...current,
-                          [key]: event.target.checked,
-                        }))
+                        setDeclarations((current) => ({ ...current, [key]: event.target.checked }))
                       }
                       type="checkbox"
                     />
@@ -1376,7 +830,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
             {error ? <div className="error">{error}</div> : null}
 
             <div className="form-actions">
-              <button className="button secondary" onClick={() => setStep(4)} type="button">
+              <button className="button secondary" onClick={() => setStep(3)} type="button">
                 Geri
               </button>
               <button
