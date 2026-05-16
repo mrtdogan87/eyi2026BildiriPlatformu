@@ -1,7 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ArrowRight, ClipboardCheck, FileText } from "lucide-react";
-import { ensureCongress } from "@/lib/submission";
+import { slugToTitle } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -11,18 +10,14 @@ type PageProps = {
 
 export default async function CongressHubPage({ params }: PageProps) {
   const { congressSlug } = await params;
-  const congress = await ensureCongress(congressSlug);
-
-  if (!congress) {
-    notFound();
-  }
+  const congressTitle = congressSlug === "eyi-2026" ? "EYİ 2026" : slugToTitle(congressSlug);
 
   return (
     <main className="page-shell hub-shell">
       <div className="page-box hub-page-box">
         <section className="hub-hero">
           <div>
-            <span className="hub-eyebrow">EYİ 2026 Başvuru Merkezi</span>
+            <span className="hub-eyebrow">{congressTitle} Başvuru Merkezi</span>
             <h1>Bildiri gönderimi ve kongre kaydı</h1>
             <p>
               Akademik başvurunuzu başlatın veya kabul sonrası kayıt işleminizi güvenli bağlantı
