@@ -64,12 +64,16 @@ export async function POST(request: Request) {
   }
 
   // Validate the selected papers belong to this email & ACCEPTED
+  const normalizedEmail = session.email.toLowerCase();
   const selectedSubmissions = await prisma.submission.findMany({
     where: {
       id: { in: paperSubmissionIds },
       congressId: congress.id,
       status: "ACCEPTED",
-      authors: { some: { email: session.email } },
+      OR: [
+        { draftOwnerEmail: normalizedEmail },
+        { authors: { some: { email: normalizedEmail } } },
+      ],
     },
     include: { paperItem: true },
     orderBy: [{ submittedAt: "asc" }, { createdAt: "asc" }],
@@ -120,9 +124,9 @@ export async function POST(request: Request) {
     );
   }
 
-  // Receipt file is required if there is a non-zero amount
+  // Receipt file is required only for the ana ücret (gala is collected separately)
   const receiptFile = formData.get("receipt");
-  const needsReceipt = calculation.quote.totalAmount > 0 || calculation.galaLine !== null;
+  const needsReceipt = calculation.quote.totalAmount > 0;
   if (needsReceipt) {
     if (!(receiptFile instanceof File)) {
       return NextResponse.json({ error: "Dekont yüklemelisiniz." }, { status: 400 });

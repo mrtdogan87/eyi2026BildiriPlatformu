@@ -378,9 +378,9 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
       label: `Gala Yemeği · ${input.galaAttendeeCount} kişi`,
       amount: galaAmount,
       currency: input.congress.galaFeeCurrency,
-      detail: `Kişi başı ${input.congress.galaFeeAmount} ${input.congress.galaFeeCurrency}`,
+      detail: "Ayrıca toplanacaktır",
     });
-    // Gala is a separate currency potentially (EUR); do not add to main TRY total.
+    // Gala kayıt ücretiyle birlikte toplanmaz; ekran ve özette bilgi olarak görünür.
   }
 
   if (input.tripAttendance) {

@@ -14,6 +14,35 @@ type Props = {
   context: RegistrationContext;
 };
 
+type RegistrationDeclarations = {
+  accuracy: boolean;
+  submissionLimit: boolean;
+  coauthorApproval: boolean;
+  personalDataConsent: boolean;
+  registrationPresentationConsent: boolean;
+};
+
+const emptyDeclarations: RegistrationDeclarations = {
+  accuracy: false,
+  submissionLimit: false,
+  coauthorApproval: false,
+  personalDataConsent: false,
+  registrationPresentationConsent: false,
+};
+
+const declarationLabels: Record<keyof RegistrationDeclarations, string> = {
+  accuracy:
+    "Başvuru sahibi olarak, bu form kapsamında tarafımdan sunulan tüm bilgi ve belgelerin doğru, eksiksiz ve güncel olduğunu beyan ederim.",
+  submissionLimit:
+    "Kongre kapsamında geçerli olan, bir araştırmacının en fazla iki bildiride yazar olarak yer alabileceği kuralını okuduğumu, anladığımı ve kabul ettiğimi beyan ederim.",
+  coauthorApproval:
+    "Başvurusu yapılan çalışmada adı geçen diğer yazarların çalışmadan, başvuru sürecinden ve bildiri içeriğinden haberdar olduğunu; tüm ortak yazarlardan gerekli izin ve onayın tarafımca alındığını beyan ederim.",
+  personalDataConsent:
+    "Kongre başvuru, değerlendirme, program oluşturma, sertifika düzenleme ve ilgili akademik/idari süreçlerin yürütülmesi amacıyla kişisel verilerimin işlenmesine onay verdiğimi kabul ederim.",
+  registrationPresentationConsent:
+    "Bildiri kabul edilse dahi, kongre kurallarında belirtilen kayıt ve sunum yükümlülüklerinin yerine getirilmemesi durumunda çalışmanın programa alınmayabileceğini veya yayımlanmayabileceğini kabul ederim.",
+};
+
 type ListenerTierKey = "ONLINE" | "IN_PERSON_ACADEMIC" | "IN_PERSON_STUDENT";
 
 const LISTENER_TIER_KEYS: Array<{
@@ -100,9 +129,12 @@ export function RegistrationPortal({ context }: Props) {
   const [tripAttendance, setTripAttendance] = useState(false);
   const [tripAttendeeCount, setTripAttendeeCount] = useState(1);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [declarations, setDeclarations] = useState<RegistrationDeclarations>(emptyDeclarations);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copiedDescription, setCopiedDescription] = useState(false);
+
+  const areDeclarationsComplete = Object.values(declarations).every(Boolean);
 
   const hasAcceptedPapers = context.acceptedPapers.length > 0;
   const period = config.currentPeriod ?? null;
@@ -293,6 +325,10 @@ export function RegistrationPortal({ context }: Props) {
       setError("En az bir bildiri seçmeli ya da dinleyici olarak kaydolmalısınız.");
       return;
     }
+    if (!areDeclarationsComplete) {
+      setError("Kaydı tamamlamak için tüm beyanları onaylamalısınız.");
+      return;
+    }
     if (needsReceipt && !receiptFile) {
       setError("Dekont yüklemelisiniz.");
       return;
@@ -464,7 +500,7 @@ export function RegistrationPortal({ context }: Props) {
                 <option value="yes">Evet, katılacağım</option>
               </select>
               <span className="field-hint">
-                Kişi başı {formatCurrencyAmount(config.gala.amount, config.gala.currency)}.
+                Kişi başı {formatCurrencyAmount(config.gala.amount, config.gala.currency)} · <strong>Gala ücretleri kayıt ücretinden ayrıca toplanacaktır.</strong>
                 {config.gala.note ? ` ${config.gala.note}` : ""}
               </span>
             </div>
@@ -519,28 +555,31 @@ export function RegistrationPortal({ context }: Props) {
       <div className="author-card" style={{ marginTop: 18 }}>
         <h3>Hesap Özeti</h3>
         <div className="quote-list">
-          {computed.grandLines.map((line) => (
-            <div className="quote-row" key={line.key}>
-              <div>
-                <strong>{line.label}</strong>
-                {line.detail ? <p>{line.detail}</p> : null}
+          {computed.grandLines
+            .filter((line) => line.key !== "gala")
+            .map((line) => (
+              <div className="quote-row" key={line.key}>
+                <div>
+                  <strong>{line.label}</strong>
+                  {line.detail ? <p>{line.detail}</p> : null}
+                </div>
+                <span>
+                  {line.amount === 0 && line.currency === computed.paperCurrency
+                    ? "Ücretsiz"
+                    : formatCurrencyAmount(line.amount, line.currency)}
+                </span>
               </div>
-              <span>
-                {line.amount === 0 && line.currency === computed.paperCurrency
-                  ? "Ücretsiz"
-                  : formatCurrencyAmount(line.amount, line.currency)}
-              </span>
-            </div>
-          ))}
+            ))}
         </div>
         <div className="quote-total">
-          <span>Toplam (Ana Ücret)</span>
+          <span>Dekont Tutarı (Bildiri / Dinleyici)</span>
           <strong>{formatCurrencyAmount(computed.paperTotal, computed.paperCurrency)}</strong>
         </div>
         {computed.galaLine ? (
-          <div className="quote-total quote-total-secondary">
-            <span>Gala (Ek Ödeme)</span>
-            <strong>{formatCurrencyAmount(computed.galaLine.amount, computed.galaLine.currency)}</strong>
+          <div className="notice" style={{ marginTop: 14 }}>
+            <strong>Gala Yemeği · {galaAttendeeCount} kişi</strong> kaydınıza eklendi (toplam{" "}
+            {formatCurrencyAmount(computed.galaLine.amount, computed.galaLine.currency)}). Gala
+            ücretleri kayıt ücretinden ayrıdır ve kongre sekretaryası tarafından ayrıca toplanacaktır.
           </div>
         ) : null}
       </div>
@@ -606,7 +645,10 @@ export function RegistrationPortal({ context }: Props) {
                 onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
                 type="file"
               />
-              <span className="field-hint">PDF, JPG, JPEG veya PNG, maksimum 10 MB.</span>
+              <span className="field-hint">
+                PDF, JPG, JPEG veya PNG, maksimum 10 MB. Yukarıdaki dekont tutarı için yapılan
+                havalenin dekontunu yükleyin.
+              </span>
             </div>
           </div>
         ) : (
@@ -614,6 +656,26 @@ export function RegistrationPortal({ context }: Props) {
             Seçtiğiniz kategoriler için ücret alınmadığından dekont gerekmez.
           </div>
         )}
+      </div>
+
+      <div className="author-card" style={{ marginTop: 18 }}>
+        <h3>Etik ve Beyanlar</h3>
+        <div className="checklist">
+          {(Object.entries(declarationLabels) as Array<
+            [keyof RegistrationDeclarations, string]
+          >).map(([key, label]) => (
+            <label className="check-item" key={key}>
+              <input
+                checked={declarations[key]}
+                onChange={(event) =>
+                  setDeclarations((current) => ({ ...current, [key]: event.target.checked }))
+                }
+                type="checkbox"
+              />
+              <span>{label}</span>
+            </label>
+          ))}
+        </div>
       </div>
 
       {error || computed.error ? (
@@ -624,7 +686,11 @@ export function RegistrationPortal({ context }: Props) {
 
       <div className="form-actions">
         <span />
-        <button className="button primary" disabled={loading} type="submit">
+        <button
+          className="button primary"
+          disabled={loading || !areDeclarationsComplete}
+          type="submit"
+        >
           {loading ? "Kaydediliyor..." : "Kaydı Tamamla"}
         </button>
       </div>
