@@ -190,13 +190,15 @@ export async function getRegistrationContext(input: {
   const congress = await getCongressWithTiers(input.congressSlug);
   if (!congress) return null;
 
+  const normalizedEmail = input.email.toLowerCase();
   const submissions = await prisma.submission.findMany({
     where: {
       congressId: congress.id,
       status: "ACCEPTED",
-      authors: {
-        some: { email: input.email.toLowerCase() },
-      },
+      OR: [
+        { draftOwnerEmail: normalizedEmail },
+        { authors: { some: { email: normalizedEmail } } },
+      ],
     },
     orderBy: [{ submittedAt: "asc" }, { createdAt: "asc" }],
     select: {

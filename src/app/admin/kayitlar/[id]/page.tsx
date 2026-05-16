@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { AdminDeleteRegistration } from "@/components/admin/admin-delete-registration";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { getAdminRegistrationDetail, requireAdminPage } from "@/lib/admin";
 
@@ -128,6 +129,14 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
           ) : (
             <div className="notice">Bu kayıt yalnızca dinleyici katılımını içeriyor.</div>
           )}
+        </div>
+
+        <div className="admin-detail-block admin-detail-block-danger">
+          <h2>Tehlikeli İşlem · Kaydı Sil</h2>
+          <AdminDeleteRegistration
+            registrationId={registration.id}
+            registrationEmail={registration.email}
+          />
         </div>
 
         <div className="admin-detail-block">

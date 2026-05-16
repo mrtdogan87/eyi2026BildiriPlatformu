@@ -22,27 +22,31 @@ const LISTENER_TIER_KEYS: Array<{
   audience: AudienceType | null;
   label: string;
   description: string;
+  icon: string;
 }> = [
   {
     key: "IN_PERSON_ACADEMIC",
     presentationMode: "IN_PERSON",
     audience: "ACADEMIC",
     label: "Yüz Yüze · Akademik Personel",
-    description: "Salonda fiziksel katılım, akademik personel ücret tarifesi",
+    description: "Salon katılımı, akademik personel tarifesi",
+    icon: "🎓",
   },
   {
     key: "IN_PERSON_STUDENT",
     presentationMode: "IN_PERSON",
     audience: "STUDENT",
     label: "Yüz Yüze · Öğrenci",
-    description: "Salonda fiziksel katılım, öğrenci ücret tarifesi",
+    description: "Salon katılımı, öğrenci tarifesi",
+    icon: "📘",
   },
   {
     key: "ONLINE",
     presentationMode: "ONLINE",
     audience: null,
     label: "Çevrim İçi",
-    description: "Uzaktan dinleyici katılımı — ücretsiz",
+    description: "Uzaktan katılım · ücretsiz",
+    icon: "💻",
   },
 ];
 
@@ -419,11 +423,11 @@ export function RegistrationPortal({ context }: Props) {
           </label>
 
           {listenerEnabled ? (
-            <div className="option-cards">
+            <div className="option-cards option-cards-rich">
               {LISTENER_TIER_KEYS.map((entry) => (
                 <label
                   key={entry.key}
-                  className={`option-card${listenerSelection === entry.key ? " is-selected" : ""}`}
+                  className={`option-card option-card-rich${listenerSelection === entry.key ? " is-selected" : ""}`}
                 >
                   <input
                     checked={listenerSelection === entry.key}
@@ -431,6 +435,7 @@ export function RegistrationPortal({ context }: Props) {
                     onChange={() => setListenerSelection(entry.key)}
                     type="radio"
                   />
+                  <span className="option-card-icon" aria-hidden>{entry.icon}</span>
                   <span className="option-card-title">{entry.label}</span>
                   <span className="option-card-meta">{entry.description}</span>
                 </label>

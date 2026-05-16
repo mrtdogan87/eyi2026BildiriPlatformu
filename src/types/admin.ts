@@ -114,6 +114,13 @@ export type AdminRegistrationListItem = {
   createdAt: string;
 };
 
+export type AdminRegistrationListFilters = {
+  q: string;
+  kind: "ALL" | "PAPERS" | "LISTENER";
+  status: "ALL" | "PAID" | "PENDING";
+  period: "ALL" | "EARLY" | "LATE";
+};
+
 export type AdminRegistrationDetail = {
   id: string;
   email: string;

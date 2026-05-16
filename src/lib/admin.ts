@@ -17,6 +17,7 @@ import type {
   AdminPaymentTier,
   AdminPricingPayload,
   AdminRegistrationDetail,
+  AdminRegistrationListFilters,
   AdminRegistrationListItem,
   AdminSubmissionDetail,
   AdminSubmissionListFilters,
@@ -577,9 +578,59 @@ function mapPeriodLabel(period: PaymentPeriod): string {
   return mapPaymentPeriod(period);
 }
 
-export async function getAdminRegistrationList(): Promise<AdminRegistrationListItem[]> {
+export function normalizeAdminRegistrationFilters(
+  input?: Partial<AdminRegistrationListFilters> | URLSearchParams,
+): AdminRegistrationListFilters {
+  const getValue = (key: keyof AdminRegistrationListFilters) => {
+    if (!input) return "";
+    if (input instanceof URLSearchParams) return input.get(key) ?? "";
+    return input[key] ?? "";
+  };
+
+  const kind = getValue("kind");
+  const status = getValue("status");
+  const period = getValue("period");
+
+  return {
+    q: String(getValue("q") ?? "").trim(),
+    kind: kind === "PAPERS" || kind === "LISTENER" ? kind : "ALL",
+    status: status === "PAID" || status === "PENDING" ? status : "ALL",
+    period: period === "EARLY" || period === "LATE" ? period : "ALL",
+  };
+}
+
+export async function getAdminRegistrationList(
+  rawFilters?: Partial<AdminRegistrationListFilters> | URLSearchParams,
+): Promise<AdminRegistrationListItem[]> {
+  const filters = normalizeAdminRegistrationFilters(rawFilters);
   const registrations = await prisma.registration.findMany({
-    where: { congress: { slug: EYI_CONGRESS_SLUG } },
+    where: {
+      congress: { slug: EYI_CONGRESS_SLUG },
+      ...(filters.kind !== "ALL" ? { kind: filters.kind } : {}),
+      ...(filters.status === "PAID" ? { paidAt: { not: null } } : {}),
+      ...(filters.status === "PENDING" ? { paidAt: null } : {}),
+      ...(filters.period !== "ALL" ? { paymentPeriod: filters.period } : {}),
+      ...(filters.q
+        ? {
+            OR: [
+              { email: { contains: filters.q.toLowerCase() } },
+              { paymentDescription: { contains: filters.q, mode: "insensitive" } },
+              {
+                paperItems: {
+                  some: {
+                    submission: {
+                      OR: [
+                        { titleTr: { contains: filters.q, mode: "insensitive" } },
+                        { titleEn: { contains: filters.q, mode: "insensitive" } },
+                      ],
+                    },
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
+    },
     orderBy: [{ paidAt: "desc" }, { createdAt: "desc" }],
     select: {
       id: true,

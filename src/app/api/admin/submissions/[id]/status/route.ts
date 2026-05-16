@@ -54,7 +54,6 @@ export async function POST(request: Request, { params }: RouteProps) {
         paperTitle,
         statusLabel: mapSubmissionStatus(body.status),
         status: body.status,
-        note: body.note,
         registrationUrl:
           body.status === "ACCEPTED"
             ? `${getBaseUrl()}/${ADMIN_DEFAULT_CONGRESS_SLUG}/kayit`
