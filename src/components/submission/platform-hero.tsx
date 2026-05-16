@@ -6,6 +6,15 @@ type Props = {
 };
 
 export function PlatformHero({ caption, variant = "default", congressName, subtitle }: Props) {
+  const eyebrow =
+    variant === "submission"
+      ? "Akademik Başvuru"
+      : variant === "registration"
+        ? "Katılım ve Ödeme"
+        : variant === "hub"
+          ? "EYİ 2026 Başvuru Merkezi"
+          : "EYİ 2026";
+
   const title =
     variant === "submission"
       ? "Bildiri Gönderimi"
@@ -19,9 +28,12 @@ export function PlatformHero({ caption, variant = "default", congressName, subti
     subtitle ?? congressName ?? "23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu";
 
   return (
-    <section className="hero">
-      <h1 className="page-title">{title}</h1>
-      <p className="page-subtitle">{heroSubtitle}</p>
+    <section className={`hero platform-hero platform-hero-${variant}`}>
+      <div>
+        <span className="platform-hero-eyebrow">{eyebrow}</span>
+        <h1 className="page-title">{title}</h1>
+        <p className="page-subtitle">{heroSubtitle}</p>
+      </div>
       {caption ? (
         <p className="hero-caption">
           <strong>{caption}</strong>

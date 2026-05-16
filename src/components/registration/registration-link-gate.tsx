@@ -50,9 +50,9 @@ export function RegistrationLinkGate({ congressSlug, isValid, token }: Props) {
 
   return (
     <div>
-      <p style={{ margin: "0 0 16px", color: "var(--text-muted)" }}>
-        Aşağıdaki butona basarak kayıt panelinize geçiş yapın. Aynı cihazda 5 dakika içinde işlemleri
-        tamamlayabilirsiniz.
+      <p className="flow-intro">
+        Bağlantınızı doğrulayıp kayıt panelinizi açacağız. Aynı cihazda 5 dakika içinde işlemlerinizi
+        sürdürebilirsiniz.
       </p>
       {error ? <div className="error">{error}</div> : null}
       <div className="form-actions">

@@ -34,7 +34,11 @@ export default async function RegistrationPanelPage({ params }: PageProps) {
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">
-        <PlatformHero variant="registration" congressName={congress.name} />
+        <PlatformHero
+          variant="registration"
+          congressName={congress.name}
+          subtitle="Kayıt paneli"
+        />
         <RegistrationPortal context={context} />
       </div>
     </main>

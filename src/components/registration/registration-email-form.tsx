@@ -72,11 +72,11 @@ export function RegistrationEmailForm({ congressSlug }: Props) {
           {magicLinkPreview ? (
             <div className="magic-preview">
               <strong>Test için oluşturulan erişim linki</strong>
-              <p style={{ margin: "10px 0 14px", color: "#284777" }}>
+              <p>
                 Gerçek e-posta servisi bağlı olmadığı için bu link ekranda gösteriliyor.
                 Tıklayarak kayıt panelini açabilirsiniz.
               </p>
-              <a className="button primary" href={magicLinkPreview} style={{ display: "inline-flex" }}>
+              <a className="button primary" href={magicLinkPreview}>
                 Kayıt Panelini Aç
               </a>
             </div>

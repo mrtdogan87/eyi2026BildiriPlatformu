@@ -21,10 +21,13 @@ export default async function ContinueDraftPage({
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">
-        <PlatformHero variant="submission" />
+        <PlatformHero
+          variant="submission"
+          subtitle="Güvenli bağlantı doğrulaması"
+        />
 
         <div className="card start-card">
-          <h2 className="section-title">Taslağa Güvenli Devam</h2>
+          <h2 className="section-title">Taslağa Devam Et</h2>
           <DraftLinkGate
             congressSlug={congressSlug}
             isValid={Boolean(trimmedToken && submission)}

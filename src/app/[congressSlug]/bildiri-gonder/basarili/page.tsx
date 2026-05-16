@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CheckCircle2 } from "lucide-react";
 import { PlatformHero } from "@/components/submission/platform-hero";
 
 type PageProps = {
@@ -11,19 +12,29 @@ export default async function SuccessPage({ params }: PageProps) {
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">
-        <PlatformHero caption="Bildiriniz başarıyla alındı." />
+        <PlatformHero
+          variant="submission"
+          subtitle="Gönderim tamamlandı"
+          caption="Bildiriniz başarıyla alındı."
+        />
 
-        <div className="card start-card">
-          <h2 className="section-title">Sonraki Adım</h2>
-          <p style={{ color: "#617089", marginTop: 0 }}>
-            Yeni bir taslak başlatabilir veya kongre ana sayfasına dönebilirsiniz.
-          </p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <div className="completion-panel">
+          <div className="completion-icon" aria-hidden="true">
+            <CheckCircle2 size={34} strokeWidth={1.9} />
+          </div>
+          <div>
+            <h2 className="section-title">Başvurunuz Alındı</h2>
+            <p className="flow-intro">
+              Bildiriniz kongre değerlendirme sürecine aktarıldı. Yeni bir bildiri başlatabilir
+              veya başvuru merkezine dönebilirsiniz.
+            </p>
+          </div>
+          <div className="completion-actions">
             <Link className="button primary" href={`/${congressSlug}/bildiri-gonder`}>
               Yeni Bildiri
             </Link>
-            <Link className="button ghost" href="/">
-              Ana Sayfa
+            <Link className="button ghost" href={`/${congressSlug}`}>
+              Başvuru Merkezi
             </Link>
           </div>
         </div>

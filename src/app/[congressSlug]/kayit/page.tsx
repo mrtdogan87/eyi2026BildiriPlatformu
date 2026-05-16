@@ -19,18 +19,17 @@ export default async function RegistrationStartPage({ params }: PageProps) {
         <PlatformHero variant="registration" congressName={congress.name} />
 
         <div className="card start-card">
-          <h2 className="section-title">Kayıt İçin E-posta Doğrulama</h2>
-          <p style={{ marginTop: 0, color: "#617089" }}>
-            E-postanızı girin; size güvenli bir bağlantı gönderelim. Linke tıkladığınızda kayıt
-            paneliniz açılır. Kabul edilen bildirileriniz otomatik listelenir; dilerseniz yalnızca
-            dinleyici olarak da kaydolabilirsiniz.
+          <h2 className="section-title">Kayıt Bağlantısı Alın</h2>
+          <p className="flow-intro">
+            E-postanıza gelen güvenli bağlantıyla kayıt paneliniz açılır. Kabul edilen bildiriler
+            otomatik listelenir; dinleyici kaydı da aynı ekrandan yapılır.
           </p>
           <RegistrationEmailForm congressSlug={congressSlug} />
         </div>
 
-        <p style={{ marginTop: 14, color: "#617089" }}>
+        <p className="flow-note">
           Henüz bildiri göndermediyseniz{" "}
-          <Link href={`/${congressSlug}/bildiri-gonder`} style={{ color: "var(--primary)", fontWeight: 600 }}>
+          <Link href={`/${congressSlug}/bildiri-gonder`}>
             Bildiri Gönder
           </Link>{" "}
           bölümünden başlayabilirsiniz.

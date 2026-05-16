@@ -22,10 +22,14 @@ export default async function RegistrationContinuePage({ params, searchParams }:
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">
-        <PlatformHero variant="registration" congressName={congress.name} />
+        <PlatformHero
+          variant="registration"
+          congressName={congress.name}
+          subtitle="Güvenli bağlantı doğrulaması"
+        />
 
         <div className="card start-card">
-          <h2 className="section-title">Kayıt Bağlantınızı Doğrulayın</h2>
+          <h2 className="section-title">Kayıt Paneline Geç</h2>
           <RegistrationLinkGate
             congressSlug={congressSlug}
             isValid={isValid}

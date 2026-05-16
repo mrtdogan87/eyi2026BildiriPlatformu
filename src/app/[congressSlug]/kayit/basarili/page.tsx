@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CheckCircle2 } from "lucide-react";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { ensureCongress } from "@/lib/submission";
 
@@ -21,15 +22,20 @@ export default async function RegistrationSuccessPage({ params }: PageProps) {
           caption="Kaydınız ve dekontunuz incelemeye alındı."
         />
 
-        <div className="card start-card">
-          <h2 className="section-title">Kaydınız Başarıyla Alındı</h2>
-          <p style={{ marginTop: 0, color: "var(--text-muted)" }}>
-            Kayıt detaylarınız ve dekontunuz kongre yönetimine iletildi. Onaylandığında size geri
-            dönüş yapılacaktır.
-          </p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 16 }}>
+        <div className="completion-panel">
+          <div className="completion-icon" aria-hidden="true">
+            <CheckCircle2 size={34} strokeWidth={1.9} />
+          </div>
+          <div>
+            <h2 className="section-title">Kaydınız Alındı</h2>
+            <p className="flow-intro">
+              Kayıt detaylarınız ve dekontunuz kongre yönetimine iletildi. Onay süreci tamamlandığında
+              size geri dönüş yapılacaktır.
+            </p>
+          </div>
+          <div className="completion-actions">
             <Link className="button primary" href={`/${congressSlug}`}>
-              Ana Sayfaya Dön
+              Başvuru Merkezine Dön
             </Link>
           </div>
         </div>

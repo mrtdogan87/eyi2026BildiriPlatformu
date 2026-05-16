@@ -74,9 +74,8 @@ export function DraftLinkGate({ congressSlug, token, isValid, windowMinutes }: P
 
   return (
     <div className="submission-form-panel">
-      <p style={{ marginTop: 0, color: "#617089", lineHeight: 1.7 }}>
-        Kurumsal e-posta sistemleri bağlantıları bazen ön kontrol için açabildiğinden, taslağınıza
-        geçmeden önce bu ekranda onay alıyoruz. Devam ettiğinizde bağlantı aynı cihazda{" "}
+      <p className="flow-intro">
+        Taslağınıza geçmeden önce bağlantıyı doğruluyoruz. Devam ettiğinizde bağlantı aynı cihazda{" "}
         {windowMinutes} dakika boyunca geçerli kalır.
       </p>
 
