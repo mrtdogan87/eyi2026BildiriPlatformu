@@ -128,6 +128,7 @@ export type AdminRegistrationDetail = {
   kindLabel: string;
   audienceLabel: string;
   listenerPresentationModeLabel: string;
+  listenerDaysLabel: string;
   paymentDescription: string;
   paymentPeriod: "EARLY" | "LATE";
   paymentPeriodLabel: string;

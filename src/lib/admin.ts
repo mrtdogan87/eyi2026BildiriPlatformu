@@ -691,6 +691,17 @@ export async function getAdminRegistrationDetail(
         ? `${registration.galaAttendeeCount} kişi`
         : "Hayır";
 
+  const listenerDaysLabel =
+    registration.kind === "LISTENER" || registration.listenerDayOne || registration.listenerDayTwo
+      ? registration.listenerDayOne && registration.listenerDayTwo
+        ? "1. Gün + 2. Gün"
+        : registration.listenerDayOne
+          ? "1. Gün"
+          : registration.listenerDayTwo
+            ? "2. Gün"
+            : "-"
+      : "-";
+
   return {
     id: registration.id,
     email: registration.email,
@@ -698,6 +709,7 @@ export async function getAdminRegistrationDetail(
     kindLabel: mapRegistrationKind(registration.kind),
     audienceLabel: mapAudience(registration.audience),
     listenerPresentationModeLabel: mapPresentationMode(registration.listenerPresentationMode),
+    listenerDaysLabel,
     paymentDescription: registration.paymentDescription,
     paymentPeriod: registration.paymentPeriod,
     paymentPeriodLabel: mapPeriodLabel(registration.paymentPeriod),

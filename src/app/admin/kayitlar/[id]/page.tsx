@@ -55,10 +55,16 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
               <dd>{registration.audienceLabel}</dd>
             </div>
             {registration.kind === "LISTENER" ? (
-              <div>
-                <dt>Dinleyici Sunum Şekli</dt>
-                <dd>{registration.listenerPresentationModeLabel}</dd>
-              </div>
+              <>
+                <div>
+                  <dt>Dinleyici Sunum Şekli</dt>
+                  <dd>{registration.listenerPresentationModeLabel}</dd>
+                </div>
+                <div>
+                  <dt>Katılım Günleri</dt>
+                  <dd>{registration.listenerDaysLabel}</dd>
+                </div>
+              </>
             ) : null}
             <div>
               <dt>Dönem</dt>

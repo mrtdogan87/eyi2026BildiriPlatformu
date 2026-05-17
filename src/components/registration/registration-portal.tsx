@@ -124,6 +124,8 @@ export function RegistrationPortal({ context }: Props) {
   const [selectedSubmissionIds, setSelectedSubmissionIds] = useState<string[]>([]);
   const [listenerEnabled, setListenerEnabled] = useState(false);
   const [listenerSelection, setListenerSelection] = useState<ListenerTierKey | null>(null);
+  const [listenerDayOne, setListenerDayOne] = useState(true);
+  const [listenerDayTwo, setListenerDayTwo] = useState(false);
   const [galaAttendance, setGalaAttendance] = useState(false);
   const [galaAttendeeCount, setGalaAttendeeCount] = useState(1);
   const [tripAttendance, setTripAttendance] = useState(false);
@@ -208,6 +210,8 @@ export function RegistrationPortal({ context }: Props) {
     if (listenerEnabled) {
       if (!listenerSelection) {
         runningError = "Dinleyici tipini seçin.";
+      } else if (!listenerDayOne && !listenerDayTwo) {
+        runningError = "Dinleyici katılımı için en az bir gün seçin.";
       } else {
         const selection = LISTENER_TIER_KEYS.find((key) => key.key === listenerSelection)!;
         const tier = findListenerTier(
@@ -219,15 +223,28 @@ export function RegistrationPortal({ context }: Props) {
         if (!tier) {
           runningError = "Dinleyici için ücret tanımı bulunamadı.";
         } else {
+          const dayCount = (listenerDayOne ? 1 : 0) + (listenerDayTwo ? 1 : 0);
+          const listenerAmount = tier.amount * dayCount;
+          const dayLabel =
+            listenerDayOne && listenerDayTwo
+              ? "1. Gün + 2. Gün"
+              : listenerDayOne
+                ? "1. Gün"
+                : "2. Gün";
           listenerLine = {
             key: "listener",
-            label: selection.label,
-            detail: tier.amount === 0 ? "Ücretsiz" : undefined,
-            amount: tier.amount,
+            label: `${selection.label} · ${dayLabel}`,
+            detail:
+              tier.amount === 0
+                ? "Ücretsiz"
+                : dayCount > 1
+                  ? `Günlük ${formatCurrencyAmount(tier.amount, tier.currency)} · 2 gün`
+                  : undefined,
+            amount: listenerAmount,
             currency: tier.currency,
           };
-          paperTotal += tier.amount;
-          if (tier.amount > 0) paperCurrency = tier.currency;
+          paperTotal += listenerAmount;
+          if (listenerAmount > 0) paperCurrency = tier.currency;
         }
       }
     }
@@ -284,6 +301,8 @@ export function RegistrationPortal({ context }: Props) {
     config.trip,
     listenerEnabled,
     listenerSelection,
+    listenerDayOne,
+    listenerDayTwo,
     galaAttendance,
     galaAttendeeCount,
     tripAttendance,
@@ -350,6 +369,8 @@ export function RegistrationPortal({ context }: Props) {
       if (listenerSelectionEntry.audience) {
         formData.append("listenerAudience", listenerSelectionEntry.audience);
       }
+      formData.append("listenerDayOne", listenerDayOne ? "true" : "false");
+      formData.append("listenerDayTwo", listenerDayTwo ? "true" : "false");
     }
     formData.append("galaAttendance", galaAttendance ? "true" : "false");
     formData.append("galaAttendeeCount", String(galaAttendance ? galaAttendeeCount : 0));
@@ -455,28 +476,86 @@ export function RegistrationPortal({ context }: Props) {
               }}
               type="checkbox"
             />
-            Dinleyici olarak da katılmak istiyorum
+            Dinleyici olarak katılmak istiyorum
           </label>
 
           {listenerEnabled ? (
-            <div className="option-cards option-cards-rich">
-              {LISTENER_TIER_KEYS.map((entry) => (
-                <label
-                  key={entry.key}
-                  className={`option-card option-card-rich${listenerSelection === entry.key ? " is-selected" : ""}`}
-                >
-                  <input
-                    checked={listenerSelection === entry.key}
-                    name="listener-tier"
-                    onChange={() => setListenerSelection(entry.key)}
-                    type="radio"
-                  />
-                  <span className="option-card-icon" aria-hidden>{entry.icon}</span>
-                  <span className="option-card-title">{entry.label}</span>
-                  <span className="option-card-meta">{entry.description}</span>
+            <>
+              <div className="option-cards option-cards-rich">
+                {LISTENER_TIER_KEYS.map((entry) => (
+                  <label
+                    key={entry.key}
+                    className={`option-card option-card-rich${listenerSelection === entry.key ? " is-selected" : ""}`}
+                  >
+                    <input
+                      checked={listenerSelection === entry.key}
+                      name="listener-tier"
+                      onChange={() => setListenerSelection(entry.key)}
+                      type="radio"
+                    />
+                    <span className="option-card-icon" aria-hidden>{entry.icon}</span>
+                    <span className="option-card-title">{entry.label}</span>
+                    <span className="option-card-meta">{entry.description}</span>
+                  </label>
+                ))}
+              </div>
+
+              <div className="field" style={{ marginTop: 6 }}>
+                <label>
+                  Hangi gün(ler) katılacaksınız? <span className="required">*</span>
                 </label>
-              ))}
-            </div>
+                <div className="option-cards">
+                  <label
+                    className={`option-card${listenerDayOne && !listenerDayTwo ? " is-selected" : ""}`}
+                  >
+                    <input
+                      checked={listenerDayOne && !listenerDayTwo}
+                      name="listener-days"
+                      onChange={() => {
+                        setListenerDayOne(true);
+                        setListenerDayTwo(false);
+                      }}
+                      type="radio"
+                    />
+                    <span className="option-card-title">1. Gün</span>
+                    <span className="option-card-meta">Tek gün katılım</span>
+                  </label>
+                  <label
+                    className={`option-card${!listenerDayOne && listenerDayTwo ? " is-selected" : ""}`}
+                  >
+                    <input
+                      checked={!listenerDayOne && listenerDayTwo}
+                      name="listener-days"
+                      onChange={() => {
+                        setListenerDayOne(false);
+                        setListenerDayTwo(true);
+                      }}
+                      type="radio"
+                    />
+                    <span className="option-card-title">2. Gün</span>
+                    <span className="option-card-meta">Tek gün katılım</span>
+                  </label>
+                  <label
+                    className={`option-card${listenerDayOne && listenerDayTwo ? " is-selected" : ""}`}
+                  >
+                    <input
+                      checked={listenerDayOne && listenerDayTwo}
+                      name="listener-days"
+                      onChange={() => {
+                        setListenerDayOne(true);
+                        setListenerDayTwo(true);
+                      }}
+                      type="radio"
+                    />
+                    <span className="option-card-title">İki Gün</span>
+                    <span className="option-card-meta">Günlük ücret × 2</span>
+                  </label>
+                </div>
+                <span className="field-hint">
+                  İki gün katılım, günlük dinleyici tarifesinin iki katı olarak hesaplanır.
+                </span>
+              </div>
+            </>
           ) : null}
         </div>
       </div>

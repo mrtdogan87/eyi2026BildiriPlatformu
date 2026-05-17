@@ -251,6 +251,8 @@ export type RegistrationCalculationInput = {
   listenerEnabled: boolean;
   listenerPresentationMode: PresentationMode | null;
   listenerAudience: AudienceType | null;
+  listenerDayOne: boolean;
+  listenerDayTwo: boolean;
   galaAttendance: boolean;
   galaAttendeeCount: number;
   tripAttendance: boolean;
@@ -336,6 +338,9 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
     if (input.listenerPresentationMode === "IN_PERSON" && !input.listenerAudience) {
       throw new Error("Yüz yüze dinleyici için akademik statü seçmelisiniz.");
     }
+    if (!input.listenerDayOne && !input.listenerDayTwo) {
+      throw new Error("Dinleyici katılımı için en az bir gün seçmelisiniz.");
+    }
 
     const tier = findApplicableTier(tiers, {
       presentationMode: input.listenerPresentationMode,
@@ -347,8 +352,19 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
     if (!tier) {
       throw new Error("Dinleyici katılımı için ücret tanımı bulunamadı.");
     }
+
+    const dayCount =
+      (input.listenerDayOne ? 1 : 0) + (input.listenerDayTwo ? 1 : 0);
+    const listenerAmount = tier.amount * dayCount;
+    const dayLabel =
+      input.listenerDayOne && input.listenerDayTwo
+        ? "1. Gün + 2. Gün"
+        : input.listenerDayOne
+          ? "1. Gün"
+          : "2. Gün";
+
     listenerLine = {
-      amount: tier.amount,
+      amount: listenerAmount,
       currency: tier.currency,
       tierId: tier.id,
     };
@@ -356,14 +372,19 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
       key: "listener",
       label:
         input.listenerPresentationMode === "IN_PERSON"
-          ? "Yüz Yüze Dinleyici"
-          : "Çevrim İçi Dinleyici",
-      amount: tier.amount,
+          ? `Yüz Yüze Dinleyici · ${dayLabel}`
+          : `Çevrim İçi Dinleyici · ${dayLabel}`,
+      amount: listenerAmount,
       currency: tier.currency,
-      detail: tier.amount === 0 ? "Ücretsiz" : undefined,
+      detail:
+        tier.amount === 0
+          ? "Ücretsiz"
+          : dayCount > 1
+            ? `Günlük ${tier.amount} ${tier.currency} · 2 gün`
+            : undefined,
     });
-    total += tier.amount;
-    if (!currency || tier.amount > 0) currency = tier.currency;
+    total += listenerAmount;
+    if (!currency || listenerAmount > 0) currency = tier.currency;
   }
 
   let galaLine: CalculatedRegistration["galaLine"] = null;

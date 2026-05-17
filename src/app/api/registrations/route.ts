@@ -43,6 +43,8 @@ export async function POST(request: Request) {
   const listenerEnabled = formData.get("listenerEnabled") === "true";
   const listenerPresentationMode = formData.get("listenerPresentationMode") as PresentationMode | null;
   const listenerAudience = formData.get("listenerAudience") as AudienceType | null;
+  const listenerDayOne = formData.get("listenerDayOne") === "true";
+  const listenerDayTwo = formData.get("listenerDayTwo") === "true";
   const galaAttendance = formData.get("galaAttendance") === "true";
   const galaAttendeeCount = Math.max(0, Number(formData.get("galaAttendeeCount") ?? 0));
   const tripAttendance = formData.get("tripAttendance") === "true";
@@ -112,6 +114,8 @@ export async function POST(request: Request) {
       listenerEnabled,
       listenerPresentationMode,
       listenerAudience,
+      listenerDayOne,
+      listenerDayTwo,
       galaAttendance,
       galaAttendeeCount,
       tripAttendance,
@@ -150,6 +154,8 @@ export async function POST(request: Request) {
         kind: paperSubmissionIds.length > 0 ? "PAPERS" : "LISTENER",
         audience: listenerEnabled ? listenerAudience : null,
         listenerPresentationMode: listenerEnabled ? listenerPresentationMode : null,
+        listenerDayOne: listenerEnabled ? listenerDayOne : false,
+        listenerDayTwo: listenerEnabled ? listenerDayTwo : false,
         galaAttendance,
         galaAttendeeCount: galaAttendance ? galaAttendeeCount : 0,
         galaFeeAmount: galaAttendance ? congress.galaFeeAmount : null,

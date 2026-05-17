@@ -181,6 +181,8 @@ model Registration {
   kind                     RegistrationKind
   audience                 AudienceType?
   listenerPresentationMode PresentationMode?
+  listenerDayOne           Boolean                 @default(true)
+  listenerDayTwo           Boolean                 @default(false)
   galaAttendance           Boolean                 @default(false)
   galaAttendeeCount        Int                     @default(0)
   galaFeeAmount            Int?

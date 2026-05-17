@@ -754,7 +754,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
           <div className="submission-form-panel">
             <div className="grid two" style={{ marginBottom: 22 }}>
               <div className="author-card">
-                <h3>Bildirinin Tahmini Ücreti</h3>
+                <h3>Bildiri Ücreti</h3>
                 {participation.audience ? (
                   <div className="form-stack">
                     <div className="field">
