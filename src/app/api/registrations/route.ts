@@ -146,6 +146,19 @@ export async function POST(request: Request) {
   const buffer =
     receiptFile instanceof File ? Buffer.from(await receiptFile.arrayBuffer()) : null;
 
+  // Öğrenci belgesi isteğe bağlıdır; varsa dekontun yanına yüklenir.
+  const studentDocumentFile = formData.get("studentDocument");
+  if (studentDocumentFile instanceof File && !isValidReceiptFile(studentDocumentFile)) {
+    return NextResponse.json(
+      { error: "Öğrenci belgesi PDF, JPG, JPEG veya PNG olmalı ve 10 MB sınırını aşmamalı." },
+      { status: 400 },
+    );
+  }
+  const studentDocumentBuffer =
+    studentDocumentFile instanceof File
+      ? Buffer.from(await studentDocumentFile.arrayBuffer())
+      : null;
+
   const registration = await prisma.$transaction(async (tx) => {
     const created = await tx.registration.create({
       data: {
@@ -188,6 +201,19 @@ export async function POST(request: Request) {
           fileSize: receiptFile.size,
           storageKey: `database:registration:${created.id}:${randomUUID()}`,
           content: buffer,
+        },
+      });
+    }
+
+    if (studentDocumentBuffer && studentDocumentFile instanceof File) {
+      await tx.registrationStudentDocument.create({
+        data: {
+          registrationId: created.id,
+          originalName: studentDocumentFile.name,
+          mimeType: resolveReceiptMimeType(studentDocumentFile),
+          fileSize: studentDocumentFile.size,
+          storageKey: `database:registration-student:${created.id}:${randomUUID()}`,
+          content: studentDocumentBuffer,
         },
       });
     }

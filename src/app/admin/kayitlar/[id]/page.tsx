@@ -169,6 +169,31 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
             <div className="notice">Dekont yüklenmemiş.</div>
           )}
         </div>
+
+        <div className="admin-detail-block">
+          <h2>Öğrenci Belgesi</h2>
+          {registration.studentDocument ? (
+            <div className="admin-file-box">
+              <p>
+                <strong>Dosya Adı:</strong> {registration.studentDocument.originalName}
+              </p>
+              <p>
+                <strong>Boyut:</strong> {formatFileSize(registration.studentDocument.fileSize)}
+              </p>
+              <p>
+                <strong>Yükleme Tarihi:</strong> {formatDate(registration.studentDocument.uploadedAt)}
+              </p>
+              <a
+                className="button primary"
+                href={`/api/admin/registrations/${registration.id}/student-document`}
+              >
+                Öğrenci Belgesini İndir
+              </a>
+            </div>
+          ) : (
+            <div className="notice">Öğrenci belgesi yüklenmemiş.</div>
+          )}
+        </div>
       </section>
     </main>
   );

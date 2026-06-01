@@ -199,6 +199,7 @@ model Registration {
   updatedAt                DateTime                @updatedAt
   congress                 Congress                @relation(fields: [congressId], references: [id], onDelete: Cascade)
   receipt                  RegistrationReceipt?
+  studentDocument          RegistrationStudentDocument?
   paperItems               RegistrationPaperItem[]
 
   @@index([congressId, email])
@@ -221,6 +222,18 @@ model RegistrationPaperItem {
 }
 
 model RegistrationReceipt {
+  id             String       @id @default(cuid())
+  registrationId String       @unique
+  originalName   String
+  mimeType       String
+  fileSize       Int
+  storageKey     String
+  content        Bytes?
+  uploadedAt     DateTime     @default(now())
+  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+}
+
+model RegistrationStudentDocument {
   id             String       @id @default(cuid())
   registrationId String       @unique
   originalName   String

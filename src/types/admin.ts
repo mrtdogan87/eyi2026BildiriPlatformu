@@ -149,6 +149,12 @@ export type AdminRegistrationDetail = {
     mimeType: string;
     uploadedAt: string;
   } | null;
+  studentDocument: {
+    originalName: string;
+    fileSize: number;
+    mimeType: string;
+    uploadedAt: string;
+  } | null;
   paperItems: Array<{
     submissionId: string;
     title: string;

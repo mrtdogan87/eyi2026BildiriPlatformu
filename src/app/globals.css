@@ -929,6 +929,12 @@ textarea {
   gap: 0;
 }
 
+/* Doğrudan çocuk olan tam genişlik kartlar (Hesap Özeti, Dekont, Beyanlar)
+   içeriğe göre daralmasın; gala seçimine göre genişlik değişmesin. */
+.registration-portal > .author-card {
+  align-self: stretch;
+}
+
 .paper-list {
   display: flex;
   flex-direction: column;

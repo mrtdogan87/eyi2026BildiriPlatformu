@@ -409,6 +409,16 @@ export async function getAdminRegistrationReceiptPayload(registrationId: string)
   });
 }
 
+export async function getAdminRegistrationStudentDocumentPayload(registrationId: string) {
+  return prisma.registrationStudentDocument.findFirst({
+    where: {
+      registrationId,
+      registration: { congress: { slug: EYI_CONGRESS_SLUG } },
+    },
+    select: { originalName: true, mimeType: true, content: true },
+  });
+}
+
 const MANAGEABLE_STATUSES: SubmissionStatus[] = ["SUBMITTED", "UNDER_REVIEW", "ACCEPTED", "REJECTED"];
 
 export function isManageableSubmissionStatus(value: string): value is SubmissionStatus {
@@ -673,6 +683,7 @@ export async function getAdminRegistrationDetail(
         },
       },
       receipt: true,
+      studentDocument: true,
     },
   });
 
@@ -731,6 +742,14 @@ export async function getAdminRegistrationDetail(
           fileSize: registration.receipt.fileSize,
           mimeType: registration.receipt.mimeType,
           uploadedAt: registration.receipt.uploadedAt.toISOString(),
+        }
+      : null,
+    studentDocument: registration.studentDocument
+      ? {
+          originalName: registration.studentDocument.originalName,
+          fileSize: registration.studentDocument.fileSize,
+          mimeType: registration.studentDocument.mimeType,
+          uploadedAt: registration.studentDocument.uploadedAt.toISOString(),
         }
       : null,
     paperItems: registration.paperItems.map((item) => {

@@ -134,6 +134,7 @@ export function RegistrationPortal({ context }: Props) {
   const [tripAttendance, setTripAttendance] = useState(false);
   const [tripAttendeeCount, setTripAttendeeCount] = useState(1);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [studentDocumentFile, setStudentDocumentFile] = useState<File | null>(null);
   const [declarations, setDeclarations] = useState<RegistrationDeclarations>(emptyDeclarations);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -392,6 +393,7 @@ export function RegistrationPortal({ context }: Props) {
     formData.append("tripAttendance", tripAttendance ? "true" : "false");
     formData.append("tripAttendeeCount", String(tripAttendance ? tripAttendeeCount : 0));
     if (receiptFile) formData.append("receipt", receiptFile);
+    if (studentDocumentFile) formData.append("studentDocument", studentDocumentFile);
 
     try {
       const response = await fetch("/api/registrations", {
@@ -627,10 +629,9 @@ export function RegistrationPortal({ context }: Props) {
                 <option value="no">Hayır, katılmayacağım</option>
                 <option value="yes">Evet, katılacağım</option>
               </select>
-              <span className="field-hint">
-                Kişi başı {formatCurrencyAmount(config.gala.amount, config.gala.currency)} · <strong>Gala ücretleri kayıt ücretinden ayrıca toplanacaktır.</strong>
-                {config.gala.note ? ` ${config.gala.note}` : ""}
-              </span>
+              {config.gala.note ? (
+                <span className="field-hint">{config.gala.note}</span>
+              ) : null}
             </div>
             <div className="field">
               <label htmlFor="gala-count">Kaç kişi?</label>
@@ -760,9 +761,9 @@ export function RegistrationPortal({ context }: Props) {
       </div>
 
       <div className="author-card" style={{ marginTop: 18 }}>
-        <h3>Dekont</h3>
-        {needsReceipt ? (
-          <div className="form-stack">
+        <h3>Dekont ve Öğrenci Belgesi</h3>
+        <div className="form-stack">
+          {needsReceipt ? (
             <div className="field">
               <label htmlFor="receipt">
                 Dekont Yükle <span className="required">*</span>
@@ -778,12 +779,25 @@ export function RegistrationPortal({ context }: Props) {
                 havalenin dekontunu yükleyin.
               </span>
             </div>
+          ) : (
+            <div className="notice" style={{ marginTop: 0 }}>
+              Seçtiğiniz kategoriler için ücret alınmadığından dekont gerekmez.
+            </div>
+          )}
+          <div className="field">
+            <label htmlFor="student-document">Öğrenci Belgesi (İsteğe Bağlı)</label>
+            <input
+              accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+              id="student-document"
+              onChange={(event) => setStudentDocumentFile(event.target.files?.[0] ?? null)}
+              type="file"
+            />
+            <span className="field-hint">
+              Öğrenci ücretinden yararlanıyorsanız öğrenci belgenizi de yükleyin. PDF, JPG, JPEG
+              veya PNG, maksimum 10 MB.
+            </span>
           </div>
-        ) : (
-          <div className="notice" style={{ marginTop: 0 }}>
-            Seçtiğiniz kategoriler için ücret alınmadığından dekont gerekmez.
-          </div>
-        )}
+        </div>
       </div>
 
       <div className="author-card" style={{ marginTop: 18 }}>
