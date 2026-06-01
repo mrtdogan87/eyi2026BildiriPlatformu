@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrencyAmount, mapAudience } from "@/lib/payment";
+import { ACADEMIC_TITLES, OTHER_TITLE } from "@/lib/titles";
 import type {
   AudienceType,
   PaymentTierOption,
@@ -19,7 +20,11 @@ type Props = {
   config: SubmissionConfig;
 };
 
-type AuthorDraft = SubmissionAuthorInput & { localId: string };
+type AuthorDraft = SubmissionAuthorInput & { localId: string; titleOther: boolean };
+
+const KNOWN_TITLES: readonly string[] = ACADEMIC_TITLES.filter(
+  (item) => item !== OTHER_TITLE,
+);
 
 type SubmissionDeclarations = {
   accuracy: boolean;
@@ -46,6 +51,7 @@ const emptyParticipation = {
 
 const emptyAuthor = (): SubmissionAuthorInput => ({
   fullName: "",
+  title: "",
   email: "",
   institution: "",
   country: "",
@@ -74,9 +80,12 @@ const declarationLabels: Record<keyof SubmissionDeclarations, string> = {
 };
 
 function createAuthorDraft(author?: Partial<SubmissionAuthorInput>, isPresenter = false): AuthorDraft {
+  const title = author?.title ?? "";
   return {
     localId: crypto.randomUUID(),
     fullName: author?.fullName ?? "",
+    title,
+    titleOther: title !== "" && !KNOWN_TITLES.includes(title),
     email: author?.email ?? "",
     institution: author?.institution ?? "",
     country: author?.country ?? "",
@@ -256,6 +265,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
         body: JSON.stringify({
           authors: authors.map((author) => ({
             fullName: author.fullName,
+            title: author.title,
             email: author.email,
             institution: author.institution,
             country: author.country,
@@ -622,6 +632,37 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     </div>
                     <div className="field">
                       <label>
+                        Unvan <span className="required">*</span>
+                      </label>
+                      <select
+                        value={author.titleOther ? OTHER_TITLE : author.title}
+                        onChange={(event) => {
+                          const value = event.target.value;
+                          if (value === OTHER_TITLE) {
+                            updateAuthor(index, { titleOther: true, title: "" });
+                          } else {
+                            updateAuthor(index, { titleOther: false, title: value });
+                          }
+                        }}
+                      >
+                        <option value="">Seçiniz</option>
+                        {ACADEMIC_TITLES.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                      {author.titleOther ? (
+                        <input
+                          style={{ marginTop: 8 }}
+                          placeholder="Unvanınızı yazınız"
+                          value={author.title}
+                          onChange={(event) => updateAuthor(index, { title: event.target.value })}
+                        />
+                      ) : null}
+                    </div>
+                    <div className="field">
+                      <label>
                         E-posta <span className="required">*</span>
                       </label>
                       <input
@@ -780,8 +821,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       </div>
                     </div>
                     <span className="field-hint">
-                      Ödeme tarihinizdeki dönem (erken veya geç) uygulanır. İkinci bildiri için aynı
-                      kategoride %50 indirim sağlanır.
+                      Ödeme tarihinizdeki dönem (erken veya geç) uygulanır. İkinci bildiriniz
+                      ücretsizdir.
                     </span>
                   </div>
                 ) : (
@@ -800,8 +841,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     e-postanızla giriş yaparak yapabilirsiniz.
                   </p>
                   <p style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.55 }}>
-                    Birden fazla bildiriniz kabul edilirse hepsini tek seferde, indirimler uygulanmış
-                    biçimde tek dekontla ödeyebilirsiniz.
+                    Birden fazla bildiriniz kabul edilirse hepsini tek seferde, tek dekontla
+                    ödeyebilirsiniz.
                   </p>
                 </div>
               </div>

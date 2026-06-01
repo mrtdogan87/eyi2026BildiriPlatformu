@@ -159,7 +159,7 @@ export async function sendRegistrationAccessEmail({
     <p><a class="cta" href="${magicLink}">Kayıt Sayfasını Aç</a></p>
     <p>
       Kabul edilmiş bildirileriniz panele otomatik gelecektir; birden fazla bildiri için tek
-      seferde, indirimler uygulanmış biçimde ödeme yapabilirsiniz. Dilerseniz dinleyici olarak da
+      seferde ödeme yapabilirsiniz. Dilerseniz dinleyici olarak da
       kayıt yapabilirsiniz.
     </p>
     <p class="small">
@@ -198,7 +198,7 @@ export async function sendSubmissionStatusEmail({
         <p>
           Bildiriniz kongre programına kabul edilmiştir. Kayıt ücretinizi yatırmak ve programa
           dahil olmak için aşağıdaki bağlantıyı kullanabilirsiniz. Birden fazla kabul edilmiş
-          bildiriniz varsa hepsini tek seferde, indirimler uygulanmış biçimde ödeyebilirsiniz.
+          bildiriniz varsa hepsini tek seferde ödeyebilirsiniz.
         </p>
         ${registrationUrl ? `<p><a class="cta" href="${registrationUrl}">Kayıt Sayfasına Git</a></p>` : ""}
       `

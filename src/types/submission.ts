@@ -9,6 +9,7 @@ export type RegistrationKind = "PAPERS" | "LISTENER";
 export type SubmissionAuthorInput = {
   id?: string;
   fullName: string;
+  title: string;
   email: string;
   institution: string;
   country: string;

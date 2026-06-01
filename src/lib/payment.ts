@@ -69,7 +69,7 @@ export function tierLabel(
     if (tier.audience === "ACADEMIC") parts.push("Akademik Personel");
     if (tier.audience === "STUDENT") parts.push("Öğrenci");
     if (tier.paperOrder === 1) parts.push("Birinci Bildiri");
-    if (tier.paperOrder === 2) parts.push("İkinci Bildiri (%50 İndirim)");
+    if (tier.paperOrder === 2) parts.push("İkinci Bildiri (Ücretsiz)");
     if (tier.period === "EARLY") parts.push("Erken Kayıt");
     if (tier.period === "LATE") parts.push("Geç Kayıt");
     return parts.join(" · ");
@@ -214,7 +214,7 @@ export function mapAttendeeRole(role: AttendeeRole | null) {
 
 export function mapPaperOrder(order: number | null) {
   if (order === 1) return "Birinci Bildiri";
-  if (order === 2) return "İkinci Bildiri (%50 İndirim)";
+  if (order === 2) return "İkinci Bildiri (Ücretsiz)";
   return "-";
 }
 

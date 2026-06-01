@@ -30,6 +30,7 @@ export async function PATCH(request: Request, { params }: RouteProps) {
       data: authors.map((author, index) => ({
         submissionId: id,
         fullName: author.fullName.trim(),
+        title: author.title?.trim() || null,
         email: author.email.trim().toLowerCase(),
         institution: author.institution.trim(),
         country: author.country.trim(),

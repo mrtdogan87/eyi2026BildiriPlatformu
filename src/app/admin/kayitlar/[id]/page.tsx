@@ -114,7 +114,7 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
               {registration.paperItems.map((item) => (
                 <div key={item.submissionId} className="admin-author-item">
                   <h3>
-                    {item.paperOrder === 2 ? "İkinci Bildiri (%50 İndirim)" : "Birinci Bildiri"}
+                    {item.paperOrder === 2 ? "İkinci Bildiri (Ücretsiz)" : "Birinci Bildiri"}
                   </h3>
                   <p>
                     <strong>Başlık:</strong> {item.title}

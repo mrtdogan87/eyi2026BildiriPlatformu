@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrencyAmount, mapPaymentPeriod } from "@/lib/payment";
+import { ACADEMIC_TITLES, OTHER_TITLE } from "@/lib/titles";
 import type {
   AudienceType,
   PaymentTierOption,
@@ -121,6 +122,8 @@ export function RegistrationPortal({ context }: Props) {
   const { config } = context;
 
   const [presenterName, setPresenterName] = useState("");
+  const [presenterTitle, setPresenterTitle] = useState("");
+  const [presenterTitleOther, setPresenterTitleOther] = useState(false);
   const [selectedSubmissionIds, setSelectedSubmissionIds] = useState<string[]>([]);
   const [listenerEnabled, setListenerEnabled] = useState(false);
   const [listenerSelection, setListenerSelection] = useState<ListenerTierKey | null>(null);
@@ -189,20 +192,22 @@ export function RegistrationPortal({ context }: Props) {
       const tier = period
         ? findPaperTier(config.tiers, paper.audience, order, period)
         : null;
-      if (!tier) {
+      // İkinci ve sonraki bildiriler ücretsizdir; yalnızca birinci bildiride ücret tanımı zorunlu.
+      if (order === 1 && !tier) {
         runningError = `Bildiri için ücret tanımı bulunamadı: ${paper.title}`;
         return;
       }
-      paperTotal += tier.amount;
-      paperCurrency = tier.currency;
+      const amount = order === 1 ? (tier?.amount ?? 0) : 0;
+      paperTotal += amount;
+      paperCurrency = tier?.currency ?? paperCurrency;
       paperLines.push({
         key: `paper:${paper.submissionId}`,
         label: paper.title,
         detail:
-          (order === 1 ? "Birinci Bildiri" : "İkinci Bildiri (%50 İndirim)") +
+          (order === 1 ? "Birinci Bildiri" : "İkinci Bildiri (Ücretsiz)") +
           (paper.audience === "ACADEMIC" ? " · Akademik Personel" : paper.audience === "STUDENT" ? " · Öğrenci" : ""),
-        amount: tier.amount,
-        currency: tier.currency,
+        amount,
+        currency: tier?.currency ?? paperCurrency,
       });
     });
 
@@ -274,7 +279,9 @@ export function RegistrationPortal({ context }: Props) {
     if (galaLine) lines.push(galaLine);
     lines.push(tripLine);
 
-    const trimmedName = presenterName.trim();
+    const trimmedName = [presenterTitle.trim(), presenterName.trim()]
+      .filter(Boolean)
+      .join(" ");
     const descriptionParts: string[] = [];
     if (trimmedName) descriptionParts.push(trimmedName);
     if (paperLines.length === 1) descriptionParts.push("1 Bildiri");
@@ -308,6 +315,7 @@ export function RegistrationPortal({ context }: Props) {
     tripAttendance,
     tripAttendeeCount,
     presenterName,
+    presenterTitle,
   ]);
 
   const needsReceipt = computed.paperTotal > 0 || Boolean(computed.galaLine);
@@ -340,6 +348,10 @@ export function RegistrationPortal({ context }: Props) {
       setError("Ad soyad alanını doldurmalısınız.");
       return;
     }
+    if (!presenterTitle.trim()) {
+      setError("Unvan seçmelisiniz.");
+      return;
+    }
     if (!selectedSubmissionIds.length && !listenerEnabled) {
       setError("En az bir bildiri seçmeli ya da dinleyici olarak kaydolmalısınız.");
       return;
@@ -361,7 +373,10 @@ export function RegistrationPortal({ context }: Props) {
       : null;
 
     const formData = new FormData();
-    formData.append("presenterName", presenterName.trim());
+    formData.append(
+      "presenterName",
+      [presenterTitle.trim(), presenterName.trim()].filter(Boolean).join(" "),
+    );
     formData.append("paperSubmissionIds", JSON.stringify(selectedSubmissionIds));
     formData.append("listenerEnabled", listenerEnabled ? "true" : "false");
     if (listenerSelectionEntry) {
@@ -413,7 +428,7 @@ export function RegistrationPortal({ context }: Props) {
 
       <div className="grid two">
         <div className="author-card">
-          <h3>Ad Soyad</h3>
+          <h3>Ad Soyad ve Unvan</h3>
           <div className="form-stack">
             <div className="field">
               <label htmlFor="presenter-name">
@@ -425,6 +440,40 @@ export function RegistrationPortal({ context }: Props) {
                 placeholder="Ad Soyad"
                 value={presenterName}
               />
+            </div>
+            <div className="field">
+              <label htmlFor="presenter-title">
+                Unvan <span className="required">*</span>
+              </label>
+              <select
+                id="presenter-title"
+                value={presenterTitleOther ? OTHER_TITLE : presenterTitle}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (value === OTHER_TITLE) {
+                    setPresenterTitleOther(true);
+                    setPresenterTitle("");
+                  } else {
+                    setPresenterTitleOther(false);
+                    setPresenterTitle(value);
+                  }
+                }}
+              >
+                <option value="">Seçiniz</option>
+                {ACADEMIC_TITLES.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+              {presenterTitleOther ? (
+                <input
+                  style={{ marginTop: 8 }}
+                  placeholder="Unvanınızı yazınız"
+                  value={presenterTitle}
+                  onChange={(event) => setPresenterTitle(event.target.value)}
+                />
+              ) : null}
             </div>
           </div>
         </div>

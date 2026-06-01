@@ -139,7 +139,7 @@ function buildGroupTitle(tier: AdminPaymentTier): string {
 function buildGroupDescription(tier: AdminPaymentTier): string {
   if (tier.role === "PRESENTER") {
     if (tier.paperOrder === 2) {
-      return "İkinci bildiri için indirimli tarife. Aynı sunucunun ikinci bildirisi olduğunda uygulanır.";
+      return "İkinci bildiri ücretsizdir; bu tutar uygulanmaz.";
     }
     return "Yüz yüze ve çevrim içi sunumlarda aynı ücret uygulanır.";
   }

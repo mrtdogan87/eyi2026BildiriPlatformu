@@ -71,6 +71,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
   const authorErrors = validateAuthors(
     submission.authors.map((author) => ({
       fullName: author.fullName,
+      title: author.title ?? "",
       email: author.email,
       institution: author.institution ?? "",
       country: author.country ?? "",

@@ -121,6 +121,7 @@ model SubmissionAuthor {
   id           String     @id @default(cuid())
   submissionId String
   fullName     String
+  title        String?
   email        String
   institution  String?
   country      String?

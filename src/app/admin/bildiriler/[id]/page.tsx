@@ -106,6 +106,9 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
                   <strong>Ad Soyad:</strong> {author.fullName}
                 </p>
                 <p>
+                  <strong>Unvan:</strong> {author.title || "-"}
+                </p>
+                <p>
                   <strong>E-posta:</strong> {author.email}
                 </p>
                 <p>
@@ -129,7 +132,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
               <p>
                 <strong>Sıra:</strong>{" "}
                 {submission.registration.paperOrder === 2
-                  ? "İkinci Bildiri (%50 İndirim)"
+                  ? "İkinci Bildiri (Ücretsiz)"
                   : "Birinci Bildiri"}
               </p>
               <p>

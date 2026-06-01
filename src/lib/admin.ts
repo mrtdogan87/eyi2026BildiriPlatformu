@@ -282,6 +282,7 @@ export async function getAdminSubmissionDetail(
         select: {
           id: true,
           fullName: true,
+          title: true,
           email: true,
           institution: true,
           country: true,
@@ -360,6 +361,7 @@ export async function getAdminSubmissionDetail(
     authors: submission.authors.map((author) => ({
       id: author.id,
       fullName: author.fullName,
+      title: author.title ?? "",
       email: author.email,
       institution: author.institution ?? "",
       country: author.country ?? "",

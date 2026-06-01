@@ -267,7 +267,7 @@ export type CalculatedRegistration = {
     paperOrder: 1 | 2;
     amount: number;
     currency: string;
-    tierId: string;
+    tierId: string | null;
   }>;
   listenerLine: {
     amount: number;
@@ -309,25 +309,27 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
       paperOrder: order,
       period,
     });
-    if (!tier) {
+    // İkinci ve sonraki bildiriler ücretsizdir (Word kuralı); yalnızca birinci bildiride ücret tanımı zorunlu.
+    if (order === 1 && !tier) {
       throw new Error(`Bildiri için ücret tanımı bulunamadı (${paper.title}).`);
     }
+    const amount = order === 1 ? tier!.amount : 0;
+    currency = tier?.currency ?? currency;
     paperAssignments.push({
       submissionId: paper.submissionId,
       paperOrder: order as 1 | 2,
-      amount: tier.amount,
-      currency: tier.currency,
-      tierId: tier.id,
+      amount,
+      currency,
+      tierId: tier?.id ?? null,
     });
     lines.push({
       key: `paper:${paper.submissionId}`,
       label: paper.title,
-      amount: tier.amount,
-      currency: tier.currency,
-      detail: order === 1 ? "Birinci Bildiri" : "İkinci Bildiri (%50 İndirim)",
+      amount,
+      currency,
+      detail: order === 1 ? "Birinci Bildiri" : "İkinci Bildiri (Ücretsiz)",
     });
-    total += tier.amount;
-    currency = tier.currency;
+    total += amount;
   }
 
   let listenerLine: CalculatedRegistration["listenerLine"] = null;

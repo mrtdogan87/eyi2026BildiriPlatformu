@@ -47,6 +47,7 @@ export type AdminSubmissionDetail = {
   authors: Array<{
     id: string;
     fullName: string;
+    title: string;
     email: string;
     institution: string;
     country: string;

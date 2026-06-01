@@ -227,6 +227,11 @@ export function validateAuthors(authors: SubmissionAuthorInput[]) {
       break;
     }
 
+    if (!author.title.trim()) {
+      errors.push("Tüm yazarlar için unvan zorunludur.");
+      break;
+    }
+
     if (!author.email.trim()) {
       errors.push("Tüm yazarlar için e-posta zorunludur.");
       break;
@@ -324,6 +329,7 @@ export async function getSubmissionSnapshot(
     authors: submission.authors.map((author) => ({
       id: author.id,
       fullName: author.fullName,
+      title: author.title ?? "",
       email: author.email,
       institution: author.institution ?? "",
       country: author.country ?? "",
