@@ -173,7 +173,7 @@ export function RegistrationPortal({ context }: Props) {
     paperLines: Line[];
     listenerLine: Line | null;
     galaLine: Line | null;
-    tripLine: Line;
+    tripLine: Line | null;
     paperTotal: number;
     grandLines: Line[];
     paperCurrency: string;
@@ -257,24 +257,29 @@ export function RegistrationPortal({ context }: Props) {
       galaLine = {
         key: "gala",
         label: `Gala Yemeği · ${galaAttendeeCount} kişi`,
-        detail: `Kişi başı ${formatCurrencyAmount(config.gala.amount, config.gala.currency)}`,
+        detail:
+          config.gala.amount === 0
+            ? "Gala Yemeği Ücretsizdir."
+            : `Kişi başı ${formatCurrencyAmount(config.gala.amount, config.gala.currency)}`,
         amount: galaTotal,
         currency: config.gala.currency,
       };
     }
 
-    const tripLine: Line = {
-      key: "trip",
-      label: tripAttendance ? `Gezi · ${tripAttendeeCount} kişi` : "Gezi",
-      detail: config.trip.note || "Ücretsiz",
-      amount: 0,
-      currency: paperCurrency,
-    };
+    const tripLine: Line | null = tripAttendance
+      ? {
+          key: "trip",
+          label: `Gezi · ${tripAttendeeCount} kişi`,
+          detail: config.trip.note || "Ücretsiz",
+          amount: 0,
+          currency: paperCurrency,
+        }
+      : null;
 
     const lines = [...paperLines];
     if (listenerLine) lines.push(listenerLine);
     if (galaLine) lines.push(galaLine);
-    lines.push(tripLine);
+    if (tripLine) lines.push(tripLine);
 
     const trimmedName = [presenterTitle.trim(), presenterName.trim()]
       .filter(Boolean)
@@ -315,7 +320,8 @@ export function RegistrationPortal({ context }: Props) {
     presenterTitle,
   ]);
 
-  const needsReceipt = computed.paperTotal > 0 || Boolean(computed.galaLine);
+  // Gala ücretsiz ve kayıt tutarına dahil değil; dekont yalnızca ödenecek tutar varsa gerekir.
+  const needsReceipt = computed.paperTotal > 0;
 
   function toggleSubmission(submissionId: string) {
     setSelectedSubmissionIds((current) =>
@@ -633,7 +639,7 @@ export function RegistrationPortal({ context }: Props) {
                 {line.detail ? <p>{line.detail}</p> : null}
               </div>
               <span>
-                {line.amount === 0 && line.currency === computed.paperCurrency
+                {line.amount === 0
                   ? "Ücretsiz"
                   : formatCurrencyAmount(line.amount, line.currency)}
               </span>
