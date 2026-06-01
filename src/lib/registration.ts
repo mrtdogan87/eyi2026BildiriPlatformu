@@ -355,9 +355,8 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
       throw new Error("Dinleyici katılımı için ücret tanımı bulunamadı.");
     }
 
-    const dayCount =
-      (input.listenerDayOne ? 1 : 0) + (input.listenerDayTwo ? 1 : 0);
-    const listenerAmount = tier.amount * dayCount;
+    // Dinleyici iki gün katılır ancak ücret günlük değil, tek (sabit) ücrettir.
+    const listenerAmount = tier.amount;
     const dayLabel =
       input.listenerDayOne && input.listenerDayTwo
         ? "1. Gün + 2. Gün"
@@ -378,12 +377,7 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
           : `Çevrim İçi Dinleyici · ${dayLabel}`,
       amount: listenerAmount,
       currency: tier.currency,
-      detail:
-        tier.amount === 0
-          ? "Ücretsiz"
-          : dayCount > 1
-            ? `Günlük ${tier.amount} ${tier.currency} · 2 gün`
-            : undefined,
+      detail: tier.amount === 0 ? "Ücretsiz" : undefined,
     });
     total += listenerAmount;
     if (!currency || listenerAmount > 0) currency = tier.currency;

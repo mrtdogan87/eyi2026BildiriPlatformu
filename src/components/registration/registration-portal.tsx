@@ -230,8 +230,8 @@ export function RegistrationPortal({ context }: Props) {
         if (!tier) {
           runningError = "Dinleyici için ücret tanımı bulunamadı.";
         } else {
-          const dayCount = (listenerDayOne ? 1 : 0) + (listenerDayTwo ? 1 : 0);
-          const listenerAmount = tier.amount * dayCount;
+          // Dinleyici iki gün katılır ancak ücret günlük değil, tek (sabit) ücrettir.
+          const listenerAmount = tier.amount;
           const dayLabel =
             listenerDayOne && listenerDayTwo
               ? "1. Gün + 2. Gün"
@@ -241,12 +241,7 @@ export function RegistrationPortal({ context }: Props) {
           listenerLine = {
             key: "listener",
             label: `${selection.label} · ${dayLabel}`,
-            detail:
-              tier.amount === 0
-                ? "Ücretsiz"
-                : dayCount > 1
-                  ? `Günlük ${formatCurrencyAmount(tier.amount, tier.currency)} · 2 gün`
-                  : undefined,
+            detail: tier.amount === 0 ? "Ücretsiz" : undefined,
             amount: listenerAmount,
             currency: tier.currency,
           };
