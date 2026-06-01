@@ -684,33 +684,24 @@ export function RegistrationPortal({ context }: Props) {
       <div className="author-card" style={{ marginTop: 18 }}>
         <h3>Hesap Özeti</h3>
         <div className="quote-list">
-          {computed.grandLines
-            .filter((line) => line.key !== "gala")
-            .map((line) => (
-              <div className="quote-row" key={line.key}>
-                <div>
-                  <strong>{line.label}</strong>
-                  {line.detail ? <p>{line.detail}</p> : null}
-                </div>
-                <span>
-                  {line.amount === 0 && line.currency === computed.paperCurrency
-                    ? "Ücretsiz"
-                    : formatCurrencyAmount(line.amount, line.currency)}
-                </span>
+          {computed.grandLines.map((line) => (
+            <div className="quote-row" key={line.key}>
+              <div>
+                <strong>{line.label}</strong>
+                {line.detail ? <p>{line.detail}</p> : null}
               </div>
-            ))}
+              <span>
+                {line.amount === 0 && line.currency === computed.paperCurrency
+                  ? "Ücretsiz"
+                  : formatCurrencyAmount(line.amount, line.currency)}
+              </span>
+            </div>
+          ))}
         </div>
         <div className="quote-total">
           <span>Dekont Tutarı (Bildiri / Dinleyici)</span>
           <strong>{formatCurrencyAmount(computed.paperTotal, computed.paperCurrency)}</strong>
         </div>
-        {computed.galaLine ? (
-          <div className="notice" style={{ marginTop: 14 }}>
-            <strong>Gala Yemeği · {galaAttendeeCount} kişi</strong> kaydınıza eklendi (toplam{" "}
-            {formatCurrencyAmount(computed.galaLine.amount, computed.galaLine.currency)}). Gala
-            ücretleri kayıt ücretinden ayrıdır ve kongre sekretaryası tarafından ayrıca toplanacaktır.
-          </div>
-        ) : null}
       </div>
 
       <div className="grid two" style={{ marginTop: 18 }}>
