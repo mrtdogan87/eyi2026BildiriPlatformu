@@ -127,8 +127,9 @@ export function RegistrationPortal({ context }: Props) {
   const [selectedSubmissionIds, setSelectedSubmissionIds] = useState<string[]>([]);
   const [listenerEnabled, setListenerEnabled] = useState(false);
   const [listenerSelection, setListenerSelection] = useState<ListenerTierKey | null>(null);
-  const [listenerDayOne, setListenerDayOne] = useState(true);
-  const [listenerDayTwo, setListenerDayTwo] = useState(false);
+  // Dinleyici her zaman iki gün katılır; gün seçimi kaldırıldı.
+  const [listenerDayOne] = useState(true);
+  const [listenerDayTwo] = useState(true);
   const [galaAttendance, setGalaAttendance] = useState(false);
   const [galaAttendeeCount, setGalaAttendeeCount] = useState(1);
   const [tripAttendance, setTripAttendance] = useState(false);
@@ -515,6 +516,7 @@ export function RegistrationPortal({ context }: Props) {
         </div>
       </div>
 
+      {!hasAcceptedPapers ? (
       <div className="author-card" style={{ marginTop: 18 }}>
         <h3>Dinleyici Katılımı</h3>
         <div className="form-stack">
@@ -550,66 +552,11 @@ export function RegistrationPortal({ context }: Props) {
                   </label>
                 ))}
               </div>
-
-              <div className="field" style={{ marginTop: 6 }}>
-                <label>
-                  Hangi gün(ler) katılacaksınız? <span className="required">*</span>
-                </label>
-                <div className="option-cards">
-                  <label
-                    className={`option-card${listenerDayOne && !listenerDayTwo ? " is-selected" : ""}`}
-                  >
-                    <input
-                      checked={listenerDayOne && !listenerDayTwo}
-                      name="listener-days"
-                      onChange={() => {
-                        setListenerDayOne(true);
-                        setListenerDayTwo(false);
-                      }}
-                      type="radio"
-                    />
-                    <span className="option-card-title">1. Gün</span>
-                    <span className="option-card-meta">Tek gün katılım</span>
-                  </label>
-                  <label
-                    className={`option-card${!listenerDayOne && listenerDayTwo ? " is-selected" : ""}`}
-                  >
-                    <input
-                      checked={!listenerDayOne && listenerDayTwo}
-                      name="listener-days"
-                      onChange={() => {
-                        setListenerDayOne(false);
-                        setListenerDayTwo(true);
-                      }}
-                      type="radio"
-                    />
-                    <span className="option-card-title">2. Gün</span>
-                    <span className="option-card-meta">Tek gün katılım</span>
-                  </label>
-                  <label
-                    className={`option-card${listenerDayOne && listenerDayTwo ? " is-selected" : ""}`}
-                  >
-                    <input
-                      checked={listenerDayOne && listenerDayTwo}
-                      name="listener-days"
-                      onChange={() => {
-                        setListenerDayOne(true);
-                        setListenerDayTwo(true);
-                      }}
-                      type="radio"
-                    />
-                    <span className="option-card-title">İki Gün</span>
-                    <span className="option-card-meta">Günlük ücret × 2</span>
-                  </label>
-                </div>
-                <span className="field-hint">
-                  İki gün katılım, günlük dinleyici tarifesinin iki katı olarak hesaplanır.
-                </span>
-              </div>
             </>
           ) : null}
         </div>
       </div>
+      ) : null}
 
       <div className="grid two" style={{ marginTop: 18 }}>
         <div className="author-card">
