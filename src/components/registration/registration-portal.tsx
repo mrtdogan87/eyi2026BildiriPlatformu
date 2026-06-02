@@ -58,8 +58,8 @@ const LISTENER_TIER_KEYS: Array<{
     key: "IN_PERSON_ACADEMIC",
     presentationMode: "IN_PERSON",
     audience: "ACADEMIC",
-    label: "Yüz Yüze · Akademik Personel",
-    description: "Salon katılımı, akademik personel tarifesi",
+    label: "Yüz Yüze · Öğretim Üyesi/Diğer Katılımcı",
+    description: "Salon katılımı, öğretim üyesi / diğer katılımcı tarifesi",
     icon: "🎓",
   },
   {
@@ -207,7 +207,7 @@ export function RegistrationPortal({ context }: Props) {
         label: paper.title,
         detail:
           (order === 1 ? "Birinci Bildiri" : "İkinci Bildiri (Ücretsiz)") +
-          (paper.audience === "ACADEMIC" ? " · Akademik Personel" : paper.audience === "STUDENT" ? " · Öğrenci" : ""),
+          (paper.audience === "ACADEMIC" ? " · Öğretim Üyesi/Diğer Katılımcı" : paper.audience === "STUDENT" ? " · Öğrenci" : ""),
         amount,
         currency: tier?.currency ?? paperCurrency,
       });
@@ -281,7 +281,7 @@ export function RegistrationPortal({ context }: Props) {
     if (galaLine) lines.push(galaLine);
     if (tripLine) lines.push(tripLine);
 
-    const trimmedName = [presenterTitle.trim(), presenterName.trim()]
+    const trimmedName = ["EYİ2026", presenterName.trim()]
       .filter(Boolean)
       .join(" ");
     const descriptionParts: string[] = [];
@@ -317,7 +317,6 @@ export function RegistrationPortal({ context }: Props) {
     tripAttendance,
     tripAttendeeCount,
     presenterName,
-    presenterTitle,
   ]);
 
   // Gala ücretsiz ve kayıt tutarına dahil değil; dekont yalnızca ödenecek tutar varsa gerekir.
@@ -500,7 +499,7 @@ export function RegistrationPortal({ context }: Props) {
                   <div>
                     <strong>{paper.title}</strong>
                     <p>
-                      {paper.audience === "ACADEMIC" ? "Akademik Personel" : paper.audience === "STUDENT" ? "Öğrenci" : "—"}
+                      {paper.audience === "ACADEMIC" ? "Öğretim Üyesi/Diğer Katılımcı" : paper.audience === "STUDENT" ? "Öğrenci" : "—"}
                       {" · "}
                       {paper.presentationMode === "IN_PERSON" ? "Yüz Yüze" : paper.presentationMode === "ONLINE" ? "Çevrim İçi" : "—"}
                       {paper.alreadyPaid ? " · ✅ Ödendi" : ""}
@@ -650,6 +649,11 @@ export function RegistrationPortal({ context }: Props) {
           <span>Dekont Tutarı (Bildiri / Dinleyici)</span>
           <strong>{formatCurrencyAmount(computed.paperTotal, computed.paperCurrency)}</strong>
         </div>
+        <p className="field-hint" style={{ marginTop: 12 }}>
+          Belirtilen tutar, kongre kaydı için tahsil edilecek net tutardır. Havale/EFT sırasında
+          doğabilecek tüm bankacılık işlem masrafları gönderen katılımcıya aittir; lütfen tutarın
+          eksiksiz olarak hesabımıza ulaştığından emin olun.
+        </p>
       </div>
 
       <div className="grid two" style={{ marginTop: 18 }}>

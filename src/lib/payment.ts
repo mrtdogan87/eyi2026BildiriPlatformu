@@ -66,7 +66,7 @@ export function tierLabel(
   const parts: string[] = [];
 
   if (tier.role === "PRESENTER") {
-    if (tier.audience === "ACADEMIC") parts.push("Akademik Personel");
+    if (tier.audience === "ACADEMIC") parts.push("Öğretim Üyesi/Diğer Katılımcı");
     if (tier.audience === "STUDENT") parts.push("Öğrenci");
     if (tier.paperOrder === 1) parts.push("Birinci Bildiri");
     if (tier.paperOrder === 2) parts.push("İkinci Bildiri (Ücretsiz)");
@@ -77,7 +77,7 @@ export function tierLabel(
 
   if (tier.presentationMode === "IN_PERSON") {
     parts.push("Yüz Yüze Dinleyici");
-    if (tier.audience === "ACADEMIC") parts.push("Akademik Personel");
+    if (tier.audience === "ACADEMIC") parts.push("Öğretim Üyesi/Diğer Katılımcı");
     if (tier.audience === "STUDENT") parts.push("Öğrenci");
     if (tier.period === "EARLY") parts.push("Erken Kayıt");
     if (tier.period === "LATE") parts.push("Geç Kayıt");
@@ -193,7 +193,7 @@ export function mapPaymentPeriod(period: PaymentPeriod | null) {
 export function mapAudience(audience: AudienceType | null) {
   switch (audience) {
     case "ACADEMIC":
-      return "Akademik Personel";
+      return "Öğretim Üyesi/Diğer Katılımcı";
     case "STUDENT":
       return "Öğrenci";
     default:

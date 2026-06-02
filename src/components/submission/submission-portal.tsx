@@ -382,6 +382,10 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
           E-postanıza gelen güvenli bağlantıyla aynı taslağa dönebilir, bildiriyi adım adım
           tamamlayabilirsiniz.
         </p>
+        <div className="notice" style={{ marginBottom: 18 }}>
+          İkinci bildiriniz için de aynı e-posta adresini kullanmalısınız; sistem yazarları
+          e-posta üzerinden eşleştirir.
+        </div>
         <form className="submission-form-panel" onSubmit={startDraft}>
           <div className="grid two">
             <div className="field">
@@ -760,7 +764,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     onChange={() => setParticipation((current) => ({ ...current, audience: "ACADEMIC" }))}
                     type="radio"
                   />
-                  <span className="option-card-title">Akademik Personel</span>
+                  <span className="option-card-title">Öğretim Üyesi/Diğer Katılımcı</span>
                   <span className="option-card-meta">Öğretim üyesi / araştırmacı</span>
                 </label>
                 <label
@@ -836,9 +840,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                 <h3>Ödeme Bilgisi</h3>
                 <div className="form-stack">
                   <p style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.55 }}>
-                    Bildiriniz yalnızca <strong>kabul edildikten sonra</strong> ücret yatırılır. Bunu
-                    kongre web sayfasındaki <strong>“Kayıt Ol”</strong> bağlantısı üzerinden,
-                    e-postanızla giriş yaparak yapabilirsiniz.
+                    Katılımcılar, bildirilerinin hakem değerlendirme süreci sonucunda kabul
+                    edilmesinin ardından kayıt ücretini yatırmalıdır.
                   </p>
                   <p style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.55 }}>
                     Birden fazla bildiriniz kabul edilirse hepsini tek seferde, tek dekontla

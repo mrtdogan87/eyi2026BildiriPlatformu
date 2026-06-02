@@ -6,7 +6,9 @@ export const ACADEMIC_TITLES = [
   "Arş. Gör.",
   "Öğr. Gör.",
   "Uzm.",
-  "Öğrenci",
+  "Öğrenci (Lisans)",
+  "Öğrenci (Yüksek Lisans)",
+  "Öğrenci (Doktora)",
   "Diğer",
 ] as const;
 

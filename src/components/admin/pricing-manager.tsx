@@ -119,7 +119,7 @@ function buildGroups(tiers: AdminPaymentTier[]): TierGroup[] {
 function buildGroupTitle(tier: AdminPaymentTier): string {
   const audience =
     tier.audience === "ACADEMIC"
-      ? "Akademik Personel"
+      ? "Öğretim Üyesi/Diğer Katılımcı"
       : tier.audience === "STUDENT"
         ? "Öğrenci"
         : "";
