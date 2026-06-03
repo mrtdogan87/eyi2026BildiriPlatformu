@@ -67,8 +67,6 @@ export const registration = {
     tripHeading: "Gezi",
     summaryHeading: "Hesap Özeti",
     receiptAmountRow: "Dekont Tutarı (Bildiri / Dinleyici)",
-    summaryHint:
-      "Belirtilen tutar, kongre kaydı için tahsil edilecek net tutardır. Havale/EFT sırasında doğabilecek tüm bankacılık işlem masrafları gönderen katılımcıya aittir; lütfen tutarın eksiksiz olarak hesabımıza ulaştığından emin olun.",
     bankHeading: "Banka Hesap Bilgileri",
     bankName: "Banka",
     bankBranch: "Şube",
@@ -182,8 +180,6 @@ export const registration = {
     tripHeading: "Trip",
     summaryHeading: "Account Summary",
     receiptAmountRow: "Receipt Amount (Paper / Listener)",
-    summaryHint:
-      "The stated amount is the net amount to be collected for congress registration. Any banking transaction fees that may arise during the wire/EFT transfer belong to the sending participant; please make sure the amount reaches our account in full.",
     bankHeading: "Bank Account Details",
     bankName: "Bank",
     bankBranch: "Branch",

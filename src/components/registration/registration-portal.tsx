@@ -104,10 +104,9 @@ export function RegistrationPortal({ context }: Props) {
   // Dinleyici her zaman iki gün katılır; gün seçimi kaldırıldı.
   const [listenerDayOne] = useState(true);
   const [listenerDayTwo] = useState(true);
+  // Gala/gezi ücretsiz; yalnızca kişinin kendisi katılacak mı sorulur, kişi sayısı alınmaz.
   const [galaAttendance, setGalaAttendance] = useState(false);
-  const [galaAttendeeCount, setGalaAttendeeCount] = useState(1);
   const [tripAttendance, setTripAttendance] = useState(false);
-  const [tripAttendeeCount, setTripAttendeeCount] = useState(1);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [studentDocumentFile, setStudentDocumentFile] = useState<File | null>(null);
   const [declarations, setDeclarations] = useState<RegistrationDeclarations>(emptyDeclarations);
@@ -225,11 +224,11 @@ export function RegistrationPortal({ context }: Props) {
     }
 
     let galaLine: Line | null = null;
-    if (galaAttendance && galaAttendeeCount > 0) {
-      const galaTotal = config.gala.amount * galaAttendeeCount;
+    if (galaAttendance) {
+      const galaTotal = config.gala.amount;
       galaLine = {
         key: "gala",
-        label: t("quote.galaLine", { count: galaAttendeeCount }),
+        label: t("quote.galaLine"),
         detail:
           config.gala.amount === 0
             ? t("quote.galaFree")
@@ -244,7 +243,7 @@ export function RegistrationPortal({ context }: Props) {
     const tripLine: Line | null = tripAttendance
       ? {
           key: "trip",
-          label: t("quote.tripLine", { count: tripAttendeeCount }),
+          label: t("quote.tripLine"),
           detail: config.trip.note || t("quote.tripFree"),
           amount: 0,
           currency: paperCurrency,
@@ -288,9 +287,7 @@ export function RegistrationPortal({ context }: Props) {
     listenerDayOne,
     listenerDayTwo,
     galaAttendance,
-    galaAttendeeCount,
     tripAttendance,
-    tripAttendeeCount,
     presenterName,
     t,
   ]);
@@ -366,9 +363,9 @@ export function RegistrationPortal({ context }: Props) {
       formData.append("listenerDayTwo", listenerDayTwo ? "true" : "false");
     }
     formData.append("galaAttendance", galaAttendance ? "true" : "false");
-    formData.append("galaAttendeeCount", String(galaAttendance ? galaAttendeeCount : 0));
+    formData.append("galaAttendeeCount", galaAttendance ? "1" : "0");
     formData.append("tripAttendance", tripAttendance ? "true" : "false");
-    formData.append("tripAttendeeCount", String(tripAttendance ? tripAttendeeCount : 0));
+    formData.append("tripAttendeeCount", tripAttendance ? "1" : "0");
     if (receiptFile) formData.append("receipt", receiptFile);
     if (studentDocumentFile) formData.append("studentDocument", studentDocumentFile);
 
@@ -548,11 +545,7 @@ export function RegistrationPortal({ context }: Props) {
               <label htmlFor="gala">{t("registration.attendanceLabel")}</label>
               <select
                 id="gala"
-                onChange={(event) => {
-                  const yes = event.target.value === "yes";
-                  setGalaAttendance(yes);
-                  if (yes && galaAttendeeCount < 1) setGalaAttendeeCount(1);
-                }}
+                onChange={(event) => setGalaAttendance(event.target.value === "yes")}
                 value={galaAttendance ? "yes" : "no"}
               >
                 <option value="no">{t("registration.attendanceNo")}</option>
@@ -561,17 +554,6 @@ export function RegistrationPortal({ context }: Props) {
               {config.gala.note ? (
                 <span className="field-hint">{config.gala.note}</span>
               ) : null}
-            </div>
-            <div className="field">
-              <label htmlFor="gala-count">{t("registration.howManyPeople")}</label>
-              <input
-                disabled={!galaAttendance}
-                id="gala-count"
-                min={1}
-                onChange={(event) => setGalaAttendeeCount(Number(event.target.value) || 0)}
-                type="number"
-                value={galaAttendance ? galaAttendeeCount : 0}
-              />
             </div>
           </div>
         </div>
@@ -583,28 +565,13 @@ export function RegistrationPortal({ context }: Props) {
               <label htmlFor="trip">{t("registration.attendanceLabel")}</label>
               <select
                 id="trip"
-                onChange={(event) => {
-                  const yes = event.target.value === "yes";
-                  setTripAttendance(yes);
-                  if (yes && tripAttendeeCount < 1) setTripAttendeeCount(1);
-                }}
+                onChange={(event) => setTripAttendance(event.target.value === "yes")}
                 value={tripAttendance ? "yes" : "no"}
               >
                 <option value="no">{t("registration.attendanceNo")}</option>
                 <option value="yes">{t("registration.attendanceYes")}</option>
               </select>
               <span className="field-hint">{config.trip.note || t("quote.tripFree")}</span>
-            </div>
-            <div className="field">
-              <label htmlFor="trip-count">{t("registration.howManyPeople")}</label>
-              <input
-                disabled={!tripAttendance}
-                id="trip-count"
-                min={1}
-                onChange={(event) => setTripAttendeeCount(Number(event.target.value) || 0)}
-                type="number"
-                value={tripAttendance ? tripAttendeeCount : 0}
-              />
             </div>
           </div>
         </div>
@@ -631,9 +598,6 @@ export function RegistrationPortal({ context }: Props) {
           <span>{t("registration.receiptAmountRow")}</span>
           <strong>{formatCurrencyAmount(computed.paperTotal, computed.paperCurrency)}</strong>
         </div>
-        <p className="field-hint" style={{ marginTop: 12 }}>
-          {t("registration.summaryHint")}
-        </p>
       </div>
 
       <div className="grid two" style={{ marginTop: 18 }}>
