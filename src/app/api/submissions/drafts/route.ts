@@ -7,8 +7,10 @@ import {
   issueDraftLink,
   setDraftAccessCookie,
 } from "@/lib/submission";
+import { getServerT } from "@/lib/i18n/server";
 
 export async function POST(request: Request) {
+  const { t } = await getServerT();
   const body = (await request.json()) as {
     congressSlug?: string;
     email?: string;
@@ -20,7 +22,7 @@ export async function POST(request: Request) {
   const submissionLanguage = body.submissionLanguage === "EN" ? "EN" : "TR";
 
   if (!email || !congressSlug) {
-    return NextResponse.json({ error: "Kongre ve e-posta zorunludur." }, { status: 400 });
+    return NextResponse.json({ error: t("api.congressEmailRequired") }, { status: 400 });
   }
 
   const congress = await ensureCongress(congressSlug);
@@ -64,22 +66,14 @@ export async function POST(request: Request) {
         magicLink,
       });
     } catch {
-      return NextResponse.json(
-        { error: "Taslak oluşturuldu ancak e-posta gönderilemedi. Resend API ayarlarını kontrol edin." },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: t("api.draftEmailFailed") }, { status: 500 });
     }
   } else if (process.env.NODE_ENV === "production") {
-    return NextResponse.json(
-      { error: "Taslak linki göndermek için Resend API ayarları eksik." },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: t("api.draftResendMissing") }, { status: 500 });
   }
 
   return NextResponse.json({
-    message: isDevelopmentPreview
-      ? "Taslak oluşturuldu. Geliştirme ortamında bağlantı aşağıda önizleme olarak gösteriliyor."
-      : "Taslak oluşturuldu. Güvenli giriş linki e-posta adresinize gönderildi.",
+    message: isDevelopmentPreview ? t("api.draftCreatedDev") : t("api.draftCreated"),
     submissionId: submission.id,
     submission: await getSubmissionSnapshot(submission.id),
     magicLinkPreview: isDevelopmentPreview ? magicLink : undefined,

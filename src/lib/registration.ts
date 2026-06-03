@@ -12,6 +12,7 @@ import {
 } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import { getBaseUrl } from "@/lib/submission";
+import type { TFunction } from "@/lib/i18n";
 import type {
   AudienceType,
   PresentationMode,
@@ -258,6 +259,7 @@ export type RegistrationCalculationInput = {
   tripAttendance: boolean;
   tripAttendeeCount: number;
   now?: Date;
+  t: TFunction;
 };
 
 export type CalculatedRegistration = {
@@ -283,12 +285,12 @@ export type CalculatedRegistration = {
 export function calculateRegistration(input: RegistrationCalculationInput): CalculatedRegistration {
   const now = input.now ?? new Date();
   if (isPaymentClosed(input.congress, now)) {
-    throw new Error("Kayıt süresi sona erdiği için ödeme alınmıyor.");
+    throw new Error(input.t("api.paymentClosed"));
   }
 
   const period = getCurrentPaymentPeriod(input.congress, now);
   if (!period) {
-    throw new Error("Kayıt süresi sona erdiği için ödeme alınmıyor.");
+    throw new Error(input.t("api.paymentClosed"));
   }
 
   const tiers = input.congress.paymentTiers;
@@ -299,7 +301,7 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
 
   for (const [index, paper] of input.selectedPapers.entries()) {
     if (!paper.audience) {
-      throw new Error("Bildiriler için akademik statü bilgisi eksik.");
+      throw new Error(input.t("api.audienceMissingForPapers"));
     }
     const order = index === 0 ? 1 : 2;
     const tier = findApplicableTier(tiers, {
@@ -311,7 +313,7 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
     });
     // İkinci ve sonraki bildiriler ücretsizdir (Word kuralı); yalnızca birinci bildiride ücret tanımı zorunlu.
     if (order === 1 && !tier) {
-      throw new Error(`Bildiri için ücret tanımı bulunamadı (${paper.title}).`);
+      throw new Error(input.t("api.paperTierNotFound", { title: paper.title }));
     }
     const amount = order === 1 ? tier!.amount : 0;
     currency = tier?.currency ?? currency;
@@ -335,13 +337,13 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
   let listenerLine: CalculatedRegistration["listenerLine"] = null;
   if (input.listenerEnabled) {
     if (!input.listenerPresentationMode) {
-      throw new Error("Dinleyici katılımı için sunum şekli seçmelisiniz.");
+      throw new Error(input.t("api.listenerModeRequired"));
     }
     if (input.listenerPresentationMode === "IN_PERSON" && !input.listenerAudience) {
-      throw new Error("Yüz yüze dinleyici için akademik statü seçmelisiniz.");
+      throw new Error(input.t("api.listenerAudienceRequired"));
     }
     if (!input.listenerDayOne && !input.listenerDayTwo) {
-      throw new Error("Dinleyici katılımı için en az bir gün seçmelisiniz.");
+      throw new Error(input.t("api.listenerDayRequired"));
     }
 
     const tier = findApplicableTier(tiers, {
@@ -352,7 +354,7 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
       period: input.listenerPresentationMode === "IN_PERSON" ? period : null,
     });
     if (!tier) {
-      throw new Error("Dinleyici katılımı için ücret tanımı bulunamadı.");
+      throw new Error(input.t("api.listenerTierNotFound"));
     }
 
     // Dinleyici iki gün katılır ancak ücret günlük değil, tek (sabit) ücrettir.

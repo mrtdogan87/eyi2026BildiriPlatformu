@@ -2,28 +2,27 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { canAccessDraft, getSubmissionSnapshot, isValidDocx } from "@/lib/submission";
+import { getServerT } from "@/lib/i18n/server";
 
 type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
 export async function PUT(request: Request, { params }: RouteProps) {
+  const { t } = await getServerT();
   const { id } = await params;
   if (!(await canAccessDraft(id))) {
-    return NextResponse.json({ error: "Bu taslaga erisim izniniz yok." }, { status: 403 });
+    return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
   }
 
   const formData = await request.formData();
   const file = formData.get("file");
   if (!(file instanceof File)) {
-    return NextResponse.json({ error: "Yuklenecek dosya bulunamadi." }, { status: 400 });
+    return NextResponse.json({ error: t("api.fileMissing") }, { status: 400 });
   }
 
   if (!isValidDocx(file)) {
-    return NextResponse.json(
-      { error: "Dosya DOCX olmali ve 10 MB sinirini asmamali." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: t("api.docxInvalid") }, { status: 400 });
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());

@@ -4,11 +4,13 @@ import {
   getRegistrationContext,
   readRegistrationSession,
 } from "@/lib/registration";
+import { getServerT } from "@/lib/i18n/server";
 
 export async function GET() {
+  const { t } = await getServerT();
   const session = await readRegistrationSession();
   if (!session) {
-    return NextResponse.json({ error: "Oturum bulunamadı." }, { status: 401 });
+    return NextResponse.json({ error: t("api.sessionNotFound") }, { status: 401 });
   }
 
   const congress = await prisma.congress.findUnique({
@@ -16,7 +18,7 @@ export async function GET() {
     select: { slug: true },
   });
   if (!congress) {
-    return NextResponse.json({ error: "Kongre bulunamadı." }, { status: 404 });
+    return NextResponse.json({ error: t("api.congressNotFound") }, { status: 404 });
   }
 
   const context = await getRegistrationContext({
@@ -25,7 +27,7 @@ export async function GET() {
   });
 
   if (!context) {
-    return NextResponse.json({ error: "Kayıt bağlamı oluşturulamadı." }, { status: 404 });
+    return NextResponse.json({ error: t("api.contextFailed") }, { status: 404 });
   }
 
   return NextResponse.json({ context });

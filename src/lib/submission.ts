@@ -16,6 +16,7 @@ import type {
   SubmissionSnapshot,
 } from "@/types/submission";
 import { slugToTitle } from "@/lib/utils";
+import type { TFunction } from "@/lib/i18n";
 
 const DRAFT_COOKIE = "draft_access";
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -190,31 +191,31 @@ export async function consumeDraftToken(token: string) {
   return record.submission;
 }
 
-export function validateDetails(input: SubmissionDetailsInput) {
+export function validateDetails(input: SubmissionDetailsInput, t: TFunction) {
   const errors: string[] = [];
   if (!input.submissionLanguage) {
-    errors.push("Bildiri dili zorunludur.");
+    errors.push(t("api.langRequired"));
   }
 
   if (input.submissionLanguage === "TR") {
-    if (!input.titleTr.trim()) errors.push("Türkçe başlık zorunludur.");
-    if (!input.abstractTr.trim()) errors.push("Türkçe özet zorunludur.");
-    if (!input.keywordsTr.trim()) errors.push("Türkçe anahtar kelimeler zorunludur.");
+    if (!input.titleTr.trim()) errors.push(t("api.titleTrRequired"));
+    if (!input.abstractTr.trim()) errors.push(t("api.abstractTrRequired"));
+    if (!input.keywordsTr.trim()) errors.push(t("api.keywordsTrRequired"));
   }
 
   if (input.submissionLanguage === "EN") {
-    if (!input.titleEn.trim()) errors.push("İngilizce başlık zorunludur.");
-    if (!input.abstractEn.trim()) errors.push("İngilizce özet zorunludur.");
-    if (!input.keywordsEn.trim()) errors.push("İngilizce anahtar kelimeler zorunludur.");
+    if (!input.titleEn.trim()) errors.push(t("api.titleEnRequired"));
+    if (!input.abstractEn.trim()) errors.push(t("api.abstractEnRequired"));
+    if (!input.keywordsEn.trim()) errors.push(t("api.keywordsEnRequired"));
   }
 
   return errors;
 }
 
-export function validateAuthors(authors: SubmissionAuthorInput[]) {
+export function validateAuthors(authors: SubmissionAuthorInput[], t: TFunction) {
   const errors: string[] = [];
   if (!authors.length) {
-    errors.push("En az bir yazar eklemelisiniz.");
+    errors.push(t("api.atLeastOneAuthor"));
     return errors;
   }
 
@@ -223,23 +224,23 @@ export function validateAuthors(authors: SubmissionAuthorInput[]) {
 
   for (const author of authors) {
     if (!author.fullName.trim()) {
-      errors.push("Tüm yazarlar için ad soyad zorunludur.");
+      errors.push(t("api.authorNameRequired"));
       break;
     }
 
     if (!author.title.trim()) {
-      errors.push("Tüm yazarlar için unvan zorunludur.");
+      errors.push(t("api.authorTitleRequired"));
       break;
     }
 
     if (!author.email.trim()) {
-      errors.push("Tüm yazarlar için e-posta zorunludur.");
+      errors.push(t("api.authorEmailRequired"));
       break;
     }
 
     const normalized = author.email.trim().toLowerCase();
     if (emailSet.has(normalized)) {
-      errors.push("Aynı bildiri içinde aynı e-posta birden fazla kez kullanılamaz.");
+      errors.push(t("api.duplicateEmail"));
       break;
     }
     emailSet.add(normalized);
@@ -250,7 +251,7 @@ export function validateAuthors(authors: SubmissionAuthorInput[]) {
   }
 
   if (presenterCount !== 1) {
-    errors.push("Tam olarak bir sunan yazar seçmelisiniz.");
+    errors.push(t("api.exactlyOnePresenter"));
   }
 
   return errors;
@@ -260,13 +261,13 @@ export function findPresenter<T extends { isPresenter: boolean }>(authors: T[]) 
   return authors.find((author) => author.isPresenter) ?? authors[0] ?? null;
 }
 
-export function validateParticipation(input: SubmissionParticipationInput) {
+export function validateParticipation(input: SubmissionParticipationInput, t: TFunction) {
   const errors: string[] = [];
   if (!input.presentationMode) {
-    errors.push("Sunum şekli zorunludur.");
+    errors.push(t("api.presentationRequired"));
   }
   if (!input.audience) {
-    errors.push("Akademik statünüzü seçmelisiniz.");
+    errors.push(t("api.audienceRequired"));
   }
   return errors;
 }

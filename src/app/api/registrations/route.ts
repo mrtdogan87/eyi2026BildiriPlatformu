@@ -9,6 +9,7 @@ import {
 import { getCongressWithTiers } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import { isValidReceiptFile } from "@/lib/submission";
+import { getServerT } from "@/lib/i18n/server";
 
 function resolveReceiptMimeType(file: File) {
   if (file.type) return file.type;
@@ -28,15 +29,16 @@ function parseJsonField<T>(value: FormDataEntryValue | null, fallback: T): T {
 }
 
 export async function POST(request: Request) {
+  const { t } = await getServerT();
   const session = await readRegistrationSession();
   if (!session) {
-    return NextResponse.json({ error: "Oturum bulunamadı." }, { status: 401 });
+    return NextResponse.json({ error: t("api.sessionNotFound") }, { status: 401 });
   }
 
   const formData = await request.formData();
   const presenterName = String(formData.get("presenterName") ?? "").trim();
   if (!presenterName) {
-    return NextResponse.json({ error: "Ad soyad zorunludur." }, { status: 400 });
+    return NextResponse.json({ error: t("api.nameRequired") }, { status: 400 });
   }
 
   const paperSubmissionIds = parseJsonField<string[]>(formData.get("paperSubmissionIds"), []);
@@ -51,10 +53,7 @@ export async function POST(request: Request) {
   const tripAttendeeCount = Math.max(0, Number(formData.get("tripAttendeeCount") ?? 0));
 
   if (!paperSubmissionIds.length && !listenerEnabled) {
-    return NextResponse.json(
-      { error: "Bildiri seçmelisiniz veya dinleyici olarak kaydolmalısınız." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: t("api.selectPaperOrListener") }, { status: 400 });
   }
 
   const congress = await getCongressWithTiers((await prisma.congress.findUniqueOrThrow({
@@ -62,7 +61,7 @@ export async function POST(request: Request) {
     select: { slug: true },
   })).slug);
   if (!congress) {
-    return NextResponse.json({ error: "Kongre bulunamadı." }, { status: 404 });
+    return NextResponse.json({ error: t("api.congressNotFound") }, { status: 404 });
   }
 
   // Validate the selected papers belong to this email & ACCEPTED
@@ -82,18 +81,12 @@ export async function POST(request: Request) {
   });
 
   if (selectedSubmissions.length !== paperSubmissionIds.length) {
-    return NextResponse.json(
-      { error: "Seçilen bildirilerden bazıları doğrulanamadı." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: t("api.papersNotVerified") }, { status: 400 });
   }
 
   const alreadyPaid = selectedSubmissions.find((submission) => submission.paperItem);
   if (alreadyPaid) {
-    return NextResponse.json(
-      { error: "Seçilen bildirilerden biri için ödeme zaten kaydedilmiş." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: t("api.paymentAlready") }, { status: 400 });
   }
 
   // Calculate quote
@@ -120,10 +113,11 @@ export async function POST(request: Request) {
       galaAttendeeCount,
       tripAttendance,
       tripAttendeeCount,
+      t,
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Tutar hesaplanamadı." },
+      { error: error instanceof Error ? error.message : t("api.amountFailed") },
       { status: 400 },
     );
   }
@@ -133,13 +127,10 @@ export async function POST(request: Request) {
   const needsReceipt = calculation.quote.totalAmount > 0;
   if (needsReceipt) {
     if (!(receiptFile instanceof File)) {
-      return NextResponse.json({ error: "Dekont yüklemelisiniz." }, { status: 400 });
+      return NextResponse.json({ error: t("api.receiptRequired") }, { status: 400 });
     }
     if (!isValidReceiptFile(receiptFile)) {
-      return NextResponse.json(
-        { error: "Dekont PDF, JPG, JPEG veya PNG olmalı ve 10 MB sınırını aşmamalı." },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: t("api.receiptInvalid") }, { status: 400 });
     }
   }
 
@@ -149,10 +140,7 @@ export async function POST(request: Request) {
   // Öğrenci belgesi isteğe bağlıdır; varsa dekontun yanına yüklenir.
   const studentDocumentFile = formData.get("studentDocument");
   if (studentDocumentFile instanceof File && !isValidReceiptFile(studentDocumentFile)) {
-    return NextResponse.json(
-      { error: "Öğrenci belgesi PDF, JPG, JPEG veya PNG olmalı ve 10 MB sınırını aşmamalı." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: t("api.studentDocInvalid") }, { status: 400 });
   }
   const studentDocumentBuffer =
     studentDocumentFile instanceof File

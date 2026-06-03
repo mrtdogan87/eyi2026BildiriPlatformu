@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrencyAmount } from "@/lib/payment";
 import { ACADEMIC_TITLES, OTHER_TITLE } from "@/lib/titles";
@@ -148,6 +148,18 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       : [createAuthorDraft(emptyAuthor(), true)],
   );
 
+  // Sunan yazarın e-postası, taslağı başlatan e-posta ile aynı olmalı: boşsa otomatik doldur.
+  useEffect(() => {
+    const ownerEmail = snapshot?.draftOwnerEmail;
+    if (!ownerEmail) return;
+    setAuthors((current) => {
+      if (!current.some((author) => author.isPresenter && !author.email.trim())) return current;
+      return current.map((author) =>
+        author.isPresenter && !author.email.trim() ? { ...author, email: ownerEmail } : author,
+      );
+    });
+  }, [snapshot?.draftOwnerEmail]);
+
   const activeStep = snapshot ? step : 0;
   const hasExistingFile = Boolean(snapshot?.file);
   const areDeclarationsComplete = Object.values(declarations).every(Boolean);
@@ -251,6 +263,15 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
   async function saveAuthors(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!snapshot) return;
+
+    const presenter = authors.find((author) => author.isPresenter);
+    if (
+      presenter &&
+      presenter.email.trim().toLowerCase() !== snapshot.draftOwnerEmail.trim().toLowerCase()
+    ) {
+      setError(t("api.presenterEmailMismatch"));
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -574,6 +595,9 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
         {step === 2 ? (
           <form className="submission-form-panel" onSubmit={saveAuthors}>
+            <div className="notice" style={{ marginBottom: 16 }}>
+              {t("submission.presenterEmailHint", { email: snapshot.draftOwnerEmail })}
+            </div>
             <div className="grid" style={{ gap: 16 }}>
               {authors.map((author, index) => (
                 <div className="author-card" key={author.localId}>

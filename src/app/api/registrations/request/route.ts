@@ -2,14 +2,16 @@ import { NextResponse } from "next/server";
 import { isResendConfigured, sendRegistrationAccessEmail } from "@/lib/email";
 import { issueRegistrationLink } from "@/lib/registration";
 import { ensureCongress } from "@/lib/submission";
+import { getServerT } from "@/lib/i18n/server";
 
 export async function POST(request: Request) {
+  const { t } = await getServerT();
   const body = (await request.json()) as { congressSlug?: string; email?: string };
   const email = body.email?.trim().toLowerCase();
   const congressSlug = body.congressSlug?.trim();
 
   if (!email || !congressSlug) {
-    return NextResponse.json({ error: "Kongre ve e-posta zorunludur." }, { status: 400 });
+    return NextResponse.json({ error: t("api.congressEmailRequired") }, { status: 400 });
   }
 
   const congress = await ensureCongress(congressSlug);
@@ -28,22 +30,14 @@ export async function POST(request: Request) {
         magicLink,
       });
     } catch {
-      return NextResponse.json(
-        { error: "Bağlantı oluşturuldu ancak e-posta gönderilemedi." },
-        { status: 500 },
-      );
+      return NextResponse.json({ error: t("api.regLinkEmailFailed") }, { status: 500 });
     }
   } else if (process.env.NODE_ENV === "production") {
-    return NextResponse.json(
-      { error: "Kayıt linki göndermek için Resend API ayarları eksik." },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: t("api.regResendMissing") }, { status: 500 });
   }
 
   return NextResponse.json({
-    message: isDevelopmentPreview
-      ? "Kayıt linki üretildi. Geliştirme ortamında bağlantı aşağıda önizleme olarak gösteriliyor."
-      : "Kayıt linki e-posta adresinize gönderildi.",
+    message: isDevelopmentPreview ? t("api.regLinkSentDev") : t("api.regLinkSent"),
     magicLinkPreview: isDevelopmentPreview ? magicLink : undefined,
   });
 }

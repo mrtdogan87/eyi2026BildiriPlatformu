@@ -64,6 +64,8 @@ export const submission = {
     institutionLabel: "Kurum",
     countryLabel: "Ülke",
     addAuthor: "+ Yazar Ekle",
+    presenterEmailHint:
+      "Sunan yazarın e-postası, taslağı başlattığınız {email} adresi ile aynı olmalıdır.",
     // ---- Adım 3: Sunum bilgileri ----
     presentationModeLabel: "Sunum Şekli",
     inPersonMeta: "Etkinlik salonunda fiziksel sunum",
@@ -163,6 +165,8 @@ export const submission = {
     institutionLabel: "Institution",
     countryLabel: "Country",
     addAuthor: "+ Add Author",
+    presenterEmailHint:
+      "The presenting author's email must match the address you started the draft with ({email}).",
     // ---- Step 3: Presentation details ----
     presentationModeLabel: "Presentation Type",
     inPersonMeta: "Physical presentation in the event hall",

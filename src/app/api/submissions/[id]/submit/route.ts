@@ -10,12 +10,14 @@ import {
   validateDetails,
   validateParticipation,
 } from "@/lib/submission";
+import { getServerT } from "@/lib/i18n/server";
 
 type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
 export async function POST(_request: Request, { params }: RouteProps) {
+  const { t } = await getServerT();
   const body = (await _request.json()) as {
     declarations?: {
       accuracy?: boolean;
@@ -28,7 +30,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
 
   const { id } = await params;
   if (!(await canAccessDraft(id))) {
-    return NextResponse.json({ error: "Bu taslağa erişim izniniz yok." }, { status: 403 });
+    return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
   }
 
   const declarations = body.declarations;
@@ -39,10 +41,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
     !declarations.personalDataConsent ||
     !declarations.registrationPresentationConsent
   ) {
-    return NextResponse.json(
-      { error: "Bildirinizi gönderebilmek için tüm beyanları onaylamalısınız." },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: t("api.declarationsRequired") }, { status: 400 });
   }
 
   const submission = await prisma.submission.findUnique({
@@ -51,18 +50,21 @@ export async function POST(_request: Request, { params }: RouteProps) {
   });
 
   if (!submission) {
-    return NextResponse.json({ error: "Bildiri bulunamadı." }, { status: 404 });
+    return NextResponse.json({ error: t("api.submissionNotFound") }, { status: 404 });
   }
 
-  const detailsErrors = validateDetails({
-    submissionLanguage: (submission.submissionLanguage ?? "TR") as "TR" | "EN",
-    titleTr: submission.titleTr ?? "",
-    titleEn: submission.titleEn ?? "",
-    abstractTr: submission.abstractTr ?? "",
-    abstractEn: submission.abstractEn ?? "",
-    keywordsTr: submission.keywordsTr ?? "",
-    keywordsEn: submission.keywordsEn ?? "",
-  });
+  const detailsErrors = validateDetails(
+    {
+      submissionLanguage: (submission.submissionLanguage ?? "TR") as "TR" | "EN",
+      titleTr: submission.titleTr ?? "",
+      titleEn: submission.titleEn ?? "",
+      abstractTr: submission.abstractTr ?? "",
+      abstractEn: submission.abstractEn ?? "",
+      keywordsTr: submission.keywordsTr ?? "",
+      keywordsEn: submission.keywordsEn ?? "",
+    },
+    t,
+  );
 
   if (detailsErrors.length) {
     return NextResponse.json({ error: detailsErrors[0] }, { status: 400 });
@@ -77,35 +79,45 @@ export async function POST(_request: Request, { params }: RouteProps) {
       country: author.country ?? "",
       isPresenter: author.isPresenter,
     })),
+    t,
   );
 
   if (authorErrors.length) {
     return NextResponse.json({ error: authorErrors[0] }, { status: 400 });
   }
 
-  if (!submission.presentationMode || !submission.audience) {
-    return NextResponse.json(
-      { error: "Sunum bilgilerinizi (yüz yüze/çevrim içi ve akademik statü) seçmelisiniz." },
-      { status: 400 },
-    );
+  // Sunan yazarın e-postası, taslağı başlatan e-posta ile aynı olmalı.
+  const presenterAuthor = findPresenter(submission.authors);
+  if (
+    presenterAuthor &&
+    presenterAuthor.email.trim().toLowerCase() !==
+      submission.draftOwnerEmail.trim().toLowerCase()
+  ) {
+    return NextResponse.json({ error: t("api.presenterEmailMismatch") }, { status: 400 });
   }
 
-  const participationErrors = validateParticipation({
-    presentationMode: submission.presentationMode,
-    audience: submission.audience,
-  });
+  if (!submission.presentationMode || !submission.audience) {
+    return NextResponse.json({ error: t("api.participationRequiredSubmit") }, { status: 400 });
+  }
+
+  const participationErrors = validateParticipation(
+    {
+      presentationMode: submission.presentationMode,
+      audience: submission.audience,
+    },
+    t,
+  );
 
   if (participationErrors.length) {
     return NextResponse.json({ error: participationErrors[0] }, { status: 400 });
   }
 
-  const presenter = findPresenter(submission.authors);
-  if (!presenter?.fullName.trim()) {
-    return NextResponse.json({ error: "Sunan yazar bilgisi bulunamadı." }, { status: 400 });
+  if (!presenterAuthor?.fullName.trim()) {
+    return NextResponse.json({ error: t("api.presenterNotFound") }, { status: 400 });
   }
 
   if (!submission.file) {
-    return NextResponse.json({ error: "DOCX dosyası zorunludur." }, { status: 400 });
+    return NextResponse.json({ error: t("api.docxRequired") }, { status: 400 });
   }
 
   const usage = await countSubmittedEmailUsage(
@@ -116,7 +128,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
   const blockedEmail = submission.authors.find((author) => (usage[author.email] ?? 0) >= 2)?.email;
   if (blockedEmail) {
     return NextResponse.json(
-      { error: `${blockedEmail} adresi daha önce iki kez kullanıldığı için yeni gönderim yapamaz.` },
+      { error: t("api.emailUsedTwice", { email: blockedEmail }) },
       { status: 400 },
     );
   }

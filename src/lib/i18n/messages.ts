@@ -5,6 +5,7 @@ import { registration } from "./messages/registration";
 import { quote } from "./messages/quote";
 import { errors } from "./messages/errors";
 import { email } from "./messages/email";
+import { api } from "./messages/api";
 
 export const messages = {
   tr: {
@@ -15,6 +16,7 @@ export const messages = {
     quote: quote.tr,
     errors: errors.tr,
     email: email.tr,
+    api: api.tr,
   },
   en: {
     common: common.en,
@@ -24,6 +26,7 @@ export const messages = {
     quote: quote.en,
     errors: errors.en,
     email: email.en,
+    api: api.en,
   },
 } as const;
 
