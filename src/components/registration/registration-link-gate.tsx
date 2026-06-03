@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/lib/i18n/provider";
 
 type Props = {
   congressSlug: string;
@@ -12,6 +13,7 @@ type Props = {
 
 export function RegistrationLinkGate({ congressSlug, isValid, token }: Props) {
   const router = useRouter();
+  const t = useT();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -19,11 +21,11 @@ export function RegistrationLinkGate({ congressSlug, isValid, token }: Props) {
     return (
       <div>
         <div className="error">
-          Bağlantı geçersiz ya da süresi dolmuş. Lütfen{" "}
+          {t("registration.gateInvalidPrefix")}{" "}
           <Link href={`/${congressSlug}/kayit`} style={{ color: "var(--primary)", fontWeight: 600 }}>
-            yeni bir bağlantı isteyin
+            {t("registration.gateInvalidLink")}
           </Link>
-          .
+          {t("registration.gateInvalidSuffix")}
         </div>
       </div>
     );
@@ -39,28 +41,25 @@ export function RegistrationLinkGate({ congressSlug, isValid, token }: Props) {
         body: JSON.stringify({ token }),
       });
       const data = (await response.json()) as { error?: string };
-      if (!response.ok) throw new Error(data.error ?? "Bağlantı doğrulanamadı.");
+      if (!response.ok) throw new Error(data.error ?? t("errors.linkVerifyFailed"));
       router.push(`/${congressSlug}/kayit/panel`);
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
+      setError(caughtError instanceof Error ? caughtError.message : t("errors.unexpected"));
       setLoading(false);
     }
   }
 
   return (
     <div>
-      <p className="flow-intro">
-        Bağlantınızı doğrulayıp kayıt panelinizi açacağız. Aynı cihazda 5 dakika içinde işlemlerinizi
-        sürdürebilirsiniz.
-      </p>
+      <p className="flow-intro">{t("registration.gateIntro")}</p>
       {error ? <div className="error">{error}</div> : null}
       <div className="form-actions">
         <Link className="button secondary" href={`/${congressSlug}/kayit`}>
-          Yeni Bağlantı İste
+          {t("registration.requestNewLink")}
         </Link>
         <button className="button primary" disabled={loading} onClick={handleVerify} type="button">
-          {loading ? "Doğrulanıyor..." : "Kayıt Paneline Geç"}
+          {loading ? t("common.verifying") : t("registration.toPanelTitle")}
         </button>
       </div>
     </div>

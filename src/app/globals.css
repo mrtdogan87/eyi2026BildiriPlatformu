@@ -1912,3 +1912,36 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== Dil değiştirme (TR/EN) ===== */
+.lang-toggle-bar {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 50;
+}
+
+.lang-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.lang-toggle-btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.lang-toggle-btn.is-active {
+  background: var(--primary);
+  color: #fff;
+}

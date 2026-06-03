@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, ClipboardCheck, FileText } from "lucide-react";
 import { slugToTitle } from "@/lib/utils";
+import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ type PageProps = {
 
 export default async function CongressHubPage({ params }: PageProps) {
   const { congressSlug } = await params;
+  const { t } = await getServerT();
   const congressTitle = congressSlug === "eyi-2026" ? "EYİ 2026" : slugToTitle(congressSlug);
 
   return (
@@ -17,52 +19,49 @@ export default async function CongressHubPage({ params }: PageProps) {
       <div className="page-box hub-page-box">
         <section className="hub-hero">
           <div>
-            <span className="hub-eyebrow">{congressTitle} Başvuru Merkezi</span>
-            <h1>Bildiri gönderimi ve kongre kaydı</h1>
-            <p>
-              Akademik başvurunuzu başlatın veya kabul sonrası kayıt işleminizi güvenli bağlantı
-              ile tamamlayın.
-            </p>
+            <span className="hub-eyebrow">{t("hub.eyebrow", { title: congressTitle })}</span>
+            <h1>{t("hub.title")}</h1>
+            <p>{t("hub.intro")}</p>
           </div>
           <div className="hub-event-card">
-            <span>23. Uluslararası</span>
-            <strong>Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu</strong>
+            <span>{t("hub.eventOrdinal")}</span>
+            <strong>{t("hub.eventName")}</strong>
           </div>
         </section>
 
         <div className="hub-action-grid">
           <Link className="hub-action-card hub-action-card-submission" href={`/${congressSlug}/bildiri-gonder`}>
             <div className="hub-action-top">
-              <span className="hub-action-label">Akademik Başvuru</span>
+              <span className="hub-action-label">{t("hub.submissionLabel")}</span>
               <span className="hub-action-icon" aria-hidden="true">
                 <FileText size={28} strokeWidth={1.8} />
               </span>
             </div>
-            <h2>Bildiri Gönder</h2>
-            <p>Dosyanızı yükleyin, yazarları ekleyin ve bildiriyi değerlendirme sürecine alın.</p>
+            <h2>{t("hub.submissionTitle")}</h2>
+            <p>{t("hub.submissionDesc")}</p>
             <span className="hub-card-cta">
-              Başla <ArrowRight size={18} strokeWidth={2} />
+              {t("common.start")} <ArrowRight size={18} strokeWidth={2} />
             </span>
           </Link>
 
           <Link className="hub-action-card hub-action-card-registration" href={`/${congressSlug}/kayit`}>
             <div className="hub-action-top">
-              <span className="hub-action-label">Katılım ve Ödeme</span>
+              <span className="hub-action-label">{t("hub.registrationLabel")}</span>
               <span className="hub-action-icon" aria-hidden="true">
                 <ClipboardCheck size={28} strokeWidth={1.8} />
               </span>
             </div>
-            <h2>Kayıt Ol</h2>
-            <p>Kabul edilen bildiriniz için kayıt yapın veya dinleyici katılımınızı oluşturun.</p>
+            <h2>{t("hub.registrationTitle")}</h2>
+            <p>{t("hub.registrationDesc")}</p>
             <span className="hub-card-cta">
-              Devam Et <ArrowRight size={18} strokeWidth={2} />
+              {t("common.continue")} <ArrowRight size={18} strokeWidth={2} />
             </span>
           </Link>
         </div>
 
         <div className="hub-reminder">
-          <span>Bildiri gönderimi kayıt yerine geçmez.</span>
-          <span>Kabul sonrası kayıt işlemi ayrıca tamamlanır.</span>
+          <span>{t("hub.reminder1")}</span>
+          <span>{t("hub.reminder2")}</span>
         </div>
       </div>
     </main>

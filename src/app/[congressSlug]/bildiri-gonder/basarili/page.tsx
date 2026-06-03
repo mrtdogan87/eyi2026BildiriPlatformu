@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { PlatformHero } from "@/components/submission/platform-hero";
+import { getServerT } from "@/lib/i18n/server";
 
 type PageProps = {
   params: Promise<{ congressSlug: string }>;
@@ -8,14 +9,15 @@ type PageProps = {
 
 export default async function SuccessPage({ params }: PageProps) {
   const { congressSlug } = await params;
+  const { t } = await getServerT();
 
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">
         <PlatformHero
           variant="submission"
-          subtitle="Gönderim tamamlandı"
-          caption="Bildiriniz başarıyla alındı."
+          subtitle={t("submission.successSubtitle")}
+          caption={t("submission.successCaption")}
         />
 
         <div className="completion-panel">
@@ -23,18 +25,15 @@ export default async function SuccessPage({ params }: PageProps) {
             <CheckCircle2 size={34} strokeWidth={1.9} />
           </div>
           <div>
-            <h2 className="section-title">Başvurunuz Alındı</h2>
-            <p className="flow-intro">
-              Bildiriniz kongre değerlendirme sürecine aktarıldı. Yeni bir bildiri başlatabilir
-              veya başvuru merkezine dönebilirsiniz.
-            </p>
+            <h2 className="section-title">{t("submission.successTitle")}</h2>
+            <p className="flow-intro">{t("submission.successIntro")}</p>
           </div>
           <div className="completion-actions">
             <Link className="button primary" href={`/${congressSlug}/bildiri-gonder`}>
-              Yeni Bildiri
+              {t("submission.newPaper")}
             </Link>
             <Link className="button ghost" href={`/${congressSlug}`}>
-              Başvuru Merkezi
+              {t("submission.applicationCenter")}
             </Link>
           </div>
         </div>

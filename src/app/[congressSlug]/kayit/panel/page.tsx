@@ -6,6 +6,7 @@ import {
   readRegistrationSession,
 } from "@/lib/registration";
 import { ensureCongress } from "@/lib/submission";
+import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ type PageProps = {
 export default async function RegistrationPanelPage({ params }: PageProps) {
   const { congressSlug } = await params;
   const congress = await ensureCongress(congressSlug);
+  const { t } = await getServerT();
   const session = await readRegistrationSession();
 
   if (!session || session.congressId !== congress.id) {
@@ -37,7 +39,7 @@ export default async function RegistrationPanelPage({ params }: PageProps) {
         <PlatformHero
           variant="registration"
           congressName={congress.name}
-          subtitle="Kayıt paneli"
+          subtitle={t("registration.panelSubtitle")}
         />
         <RegistrationPortal context={context} />
       </div>

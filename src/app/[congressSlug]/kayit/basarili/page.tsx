@@ -2,6 +2,7 @@ import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { ensureCongress } from "@/lib/submission";
+import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ type PageProps = {
 export default async function RegistrationSuccessPage({ params }: PageProps) {
   const { congressSlug } = await params;
   const congress = await ensureCongress(congressSlug);
+  const { t } = await getServerT();
 
   return (
     <main className="page-shell submission-shell">
@@ -19,7 +21,7 @@ export default async function RegistrationSuccessPage({ params }: PageProps) {
         <PlatformHero
           variant="registration"
           congressName={congress.name}
-          caption="Kaydınız ve dekontunuz incelemeye alındı."
+          caption={t("registration.successCaption")}
         />
 
         <div className="completion-panel">
@@ -27,15 +29,12 @@ export default async function RegistrationSuccessPage({ params }: PageProps) {
             <CheckCircle2 size={34} strokeWidth={1.9} />
           </div>
           <div>
-            <h2 className="section-title">Kaydınız Alındı</h2>
-            <p className="flow-intro">
-              Kayıt detaylarınız ve dekontunuz kongre yönetimine iletildi. Onay süreci tamamlandığında
-              size geri dönüş yapılacaktır.
-            </p>
+            <h2 className="section-title">{t("registration.successTitle")}</h2>
+            <p className="flow-intro">{t("registration.successIntro")}</p>
           </div>
           <div className="completion-actions">
             <Link className="button primary" href={`/${congressSlug}`}>
-              Başvuru Merkezine Dön
+              {t("registration.backToCenter")}
             </Link>
           </div>
         </div>

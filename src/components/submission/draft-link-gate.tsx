@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useT } from "@/lib/i18n/provider";
 
 type Props = {
   congressSlug: string;
@@ -20,12 +21,13 @@ async function readResponsePayload(response: Response) {
   try {
     return JSON.parse(text) as Record<string, unknown>;
   } catch {
-    throw new Error("Sunucudan beklenen yanıt alınamadı. Lütfen tekrar deneyin.");
+    throw new Error("server_no_response");
   }
 }
 
 export function DraftLinkGate({ congressSlug, token, isValid, windowMinutes }: Props) {
   const router = useRouter();
+  const t = useT();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -48,24 +50,22 @@ export function DraftLinkGate({ congressSlug, token, isValid, windowMinutes }: P
 
       const data = await readResponsePayload(response);
       if (!response.ok) {
-        throw new Error(
-          (data.error as string | undefined) ??
-            "Taslak bağlantısı doğrulanamadı. Lütfen e-postadaki linki yeniden açın.",
-        );
+        throw new Error((data.error as string | undefined) ?? t("errors.draftVerifyFailed"));
       }
 
       const submissionId = (data.submission as { id?: string } | undefined)?.id;
       if (!submissionId) {
-        throw new Error("Taslak bilgisi alınamadı. Lütfen tekrar deneyin.");
+        throw new Error(t("errors.draftInfoFailed"));
       }
 
       router.push(`/${congressSlug}/bildiri-gonder?draft=${submissionId}`);
       router.refresh();
     } catch (caughtError) {
+      const message = caughtError instanceof Error ? caughtError.message : "";
       setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Taslak bağlantısı doğrulanırken beklenmeyen bir hata oluştu.",
+        message === "server_no_response"
+          ? t("errors.serverNoResponse")
+          : message || t("errors.draftVerifyUnexpected"),
       );
     } finally {
       setLoading(false);
@@ -74,27 +74,19 @@ export function DraftLinkGate({ congressSlug, token, isValid, windowMinutes }: P
 
   return (
     <div className="submission-form-panel">
-      <p className="flow-intro">
-        Taslağınıza geçmeden önce bağlantıyı doğruluyoruz. Devam ettiğinizde bağlantı aynı cihazda{" "}
-        {windowMinutes} dakika boyunca geçerli kalır.
-      </p>
+      <p className="flow-intro">{t("submission.draftGateIntro", { minutes: windowMinutes })}</p>
 
-      {!token ? (
-        <div className="error">Erişim bağlantısında gerekli doğrulama bilgisi bulunamadı.</div>
-      ) : null}
+      {!token ? <div className="error">{t("submission.draftGateNoToken")}</div> : null}
 
       {token && !isValid ? (
-        <div className="error">
-          Bu bağlantı geçersiz, süresi dolmuş veya daha önce kullanım süresi tamamlanmış görünüyor.
-          Yeni bir taslak bağlantısı oluşturup tekrar deneyebilirsiniz.
-        </div>
+        <div className="error">{t("submission.draftGateInvalid")}</div>
       ) : null}
 
       {error ? <div className="error">{error}</div> : null}
 
       <div className="form-actions">
         <Link className="button secondary" href={`/${congressSlug}/bildiri-gonder`}>
-          Başlangıç Ekranına Dön
+          {t("submission.backToStart")}
         </Link>
         <button
           className="button primary"
@@ -102,7 +94,7 @@ export function DraftLinkGate({ congressSlug, token, isValid, windowMinutes }: P
           onClick={handleContinue}
           type="button"
         >
-          {loading ? "Doğrulanıyor..." : "Taslağa Devam Et"}
+          {loading ? t("common.verifying") : t("submission.continueDraftTitle")}
         </button>
       </div>
     </div>

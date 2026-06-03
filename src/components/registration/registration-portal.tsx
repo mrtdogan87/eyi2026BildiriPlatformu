@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrencyAmount, mapPaymentPeriod } from "@/lib/payment";
 import { ACADEMIC_TITLES, OTHER_TITLE } from "@/lib/titles";
+import { useT } from "@/lib/i18n/provider";
 import type {
   AudienceType,
   PaymentTierOption,
@@ -31,18 +32,13 @@ const emptyDeclarations: RegistrationDeclarations = {
   registrationPresentationConsent: false,
 };
 
-const declarationLabels: Record<keyof RegistrationDeclarations, string> = {
-  accuracy:
-    "Başvuru sahibi olarak, bu form kapsamında tarafımdan sunulan tüm bilgi ve belgelerin doğru, eksiksiz ve güncel olduğunu beyan ederim.",
-  submissionLimit:
-    "Kongre kapsamında geçerli olan, bir araştırmacının en fazla iki bildiride yazar olarak yer alabileceği kuralını okuduğumu, anladığımı ve kabul ettiğimi beyan ederim.",
-  coauthorApproval:
-    "Başvurusu yapılan çalışmada adı geçen diğer yazarların çalışmadan, başvuru sürecinden ve bildiri içeriğinden haberdar olduğunu; tüm ortak yazarlardan gerekli izin ve onayın tarafımca alındığını beyan ederim.",
-  personalDataConsent:
-    "Kongre başvuru, değerlendirme, program oluşturma, sertifika düzenleme ve ilgili akademik/idari süreçlerin yürütülmesi amacıyla kişisel verilerimin işlenmesine onay verdiğimi kabul ederim.",
-  registrationPresentationConsent:
-    "Bildiri kabul edilse dahi, kongre kurallarında belirtilen kayıt ve sunum yükümlülüklerinin yerine getirilmemesi durumunda çalışmanın programa alınmayabileceğini veya yayımlanmayabileceğini kabul ederim.",
-};
+const DECLARATION_KEYS: (keyof RegistrationDeclarations)[] = [
+  "accuracy",
+  "submissionLimit",
+  "coauthorApproval",
+  "personalDataConsent",
+  "registrationPresentationConsent",
+];
 
 type ListenerTierKey = "ONLINE" | "IN_PERSON_ACADEMIC" | "IN_PERSON_STUDENT";
 
@@ -50,34 +46,11 @@ const LISTENER_TIER_KEYS: Array<{
   key: ListenerTierKey;
   presentationMode: PresentationMode;
   audience: AudienceType | null;
-  label: string;
-  description: string;
   icon: string;
 }> = [
-  {
-    key: "IN_PERSON_ACADEMIC",
-    presentationMode: "IN_PERSON",
-    audience: "ACADEMIC",
-    label: "Yüz Yüze · Öğretim Üyesi/Diğer Katılımcı",
-    description: "Salon katılımı, öğretim üyesi / diğer katılımcı tarifesi",
-    icon: "🎓",
-  },
-  {
-    key: "IN_PERSON_STUDENT",
-    presentationMode: "IN_PERSON",
-    audience: "STUDENT",
-    label: "Yüz Yüze · Öğrenci",
-    description: "Salon katılımı, öğrenci tarifesi",
-    icon: "📘",
-  },
-  {
-    key: "ONLINE",
-    presentationMode: "ONLINE",
-    audience: null,
-    label: "Çevrim İçi",
-    description: "Uzaktan katılım · ücretsiz",
-    icon: "💻",
-  },
+  { key: "IN_PERSON_ACADEMIC", presentationMode: "IN_PERSON", audience: "ACADEMIC", icon: "🎓" },
+  { key: "IN_PERSON_STUDENT", presentationMode: "IN_PERSON", audience: "STUDENT", icon: "📘" },
+  { key: "ONLINE", presentationMode: "ONLINE", audience: null, icon: "💻" },
 ];
 
 function findListenerTier(
@@ -119,6 +92,7 @@ function findPaperTier(
 
 export function RegistrationPortal({ context }: Props) {
   const router = useRouter();
+  const t = useT();
   const { config } = context;
 
   const [presenterName, setPresenterName] = useState("");
@@ -186,7 +160,7 @@ export function RegistrationPortal({ context }: Props) {
     let paperCurrency = "TRY";
 
     if (selectedPapers.length && !period) {
-      runningError = "Kayıt süresi sona ermiş.";
+      runningError = t("registration.err.periodEnded");
     }
 
     selectedPapers.forEach((paper, index) => {
@@ -196,18 +170,23 @@ export function RegistrationPortal({ context }: Props) {
         : null;
       // İkinci ve sonraki bildiriler ücretsizdir; yalnızca birinci bildiride ücret tanımı zorunlu.
       if (order === 1 && !tier) {
-        runningError = `Bildiri için ücret tanımı bulunamadı: ${paper.title}`;
+        runningError = t("registration.err.tierNotFound", { title: paper.title });
         return;
       }
       const amount = order === 1 ? (tier?.amount ?? 0) : 0;
       paperTotal += amount;
       paperCurrency = tier?.currency ?? paperCurrency;
+      const audienceSuffix =
+        paper.audience === "ACADEMIC"
+          ? ` · ${t("quote.academic")}`
+          : paper.audience === "STUDENT"
+            ? ` · ${t("quote.student")}`
+            : "";
       paperLines.push({
         key: `paper:${paper.submissionId}`,
         label: paper.title,
         detail:
-          (order === 1 ? "Birinci Bildiri" : "İkinci Bildiri (Ücretsiz)") +
-          (paper.audience === "ACADEMIC" ? " · Öğretim Üyesi/Diğer Katılımcı" : paper.audience === "STUDENT" ? " · Öğrenci" : ""),
+          (order === 1 ? t("quote.firstPaper") : t("quote.secondPaperFree")) + audienceSuffix,
         amount,
         currency: tier?.currency ?? paperCurrency,
       });
@@ -216,9 +195,9 @@ export function RegistrationPortal({ context }: Props) {
     let listenerLine: Line | null = null;
     if (listenerEnabled) {
       if (!listenerSelection) {
-        runningError = "Dinleyici tipini seçin.";
+        runningError = t("registration.err.listenerTypeSelect");
       } else if (!listenerDayOne && !listenerDayTwo) {
-        runningError = "Dinleyici katılımı için en az bir gün seçin.";
+        runningError = t("registration.err.listenerDay");
       } else {
         const selection = LISTENER_TIER_KEYS.find((key) => key.key === listenerSelection)!;
         const tier = findListenerTier(
@@ -228,20 +207,14 @@ export function RegistrationPortal({ context }: Props) {
           selection.presentationMode === "IN_PERSON" ? period : null,
         );
         if (!tier) {
-          runningError = "Dinleyici için ücret tanımı bulunamadı.";
+          runningError = t("registration.err.listenerTierNotFound");
         } else {
           // Dinleyici iki gün katılır ancak ücret günlük değil, tek (sabit) ücrettir.
           const listenerAmount = tier.amount;
-          const dayLabel =
-            listenerDayOne && listenerDayTwo
-              ? "1. Gün + 2. Gün"
-              : listenerDayOne
-                ? "1. Gün"
-                : "2. Gün";
           listenerLine = {
             key: "listener",
-            label: `${selection.label} · ${dayLabel}`,
-            detail: tier.amount === 0 ? "Ücretsiz" : undefined,
+            label: `${t(`registration.listenerTier.${selection.key}.label`)} · ${t("quote.twoDays")}`,
+            detail: tier.amount === 0 ? t("common.free") : undefined,
             amount: listenerAmount,
             currency: tier.currency,
           };
@@ -256,11 +229,13 @@ export function RegistrationPortal({ context }: Props) {
       const galaTotal = config.gala.amount * galaAttendeeCount;
       galaLine = {
         key: "gala",
-        label: `Gala Yemeği · ${galaAttendeeCount} kişi`,
+        label: t("quote.galaLine", { count: galaAttendeeCount }),
         detail:
           config.gala.amount === 0
-            ? "Gala Yemeği Ücretsizdir."
-            : `Kişi başı ${formatCurrencyAmount(config.gala.amount, config.gala.currency)}`,
+            ? t("quote.galaFree")
+            : t("quote.galaPerPerson", {
+                amount: formatCurrencyAmount(config.gala.amount, config.gala.currency),
+              }),
         amount: galaTotal,
         currency: config.gala.currency,
       };
@@ -269,8 +244,8 @@ export function RegistrationPortal({ context }: Props) {
     const tripLine: Line | null = tripAttendance
       ? {
           key: "trip",
-          label: `Gezi · ${tripAttendeeCount} kişi`,
-          detail: config.trip.note || "Ücretsiz",
+          label: t("quote.tripLine", { count: tripAttendeeCount }),
+          detail: config.trip.note || t("quote.tripFree"),
           amount: 0,
           currency: paperCurrency,
         }
@@ -317,6 +292,7 @@ export function RegistrationPortal({ context }: Props) {
     tripAttendance,
     tripAttendeeCount,
     presenterName,
+    t,
   ]);
 
   // Gala ücretsiz ve kayıt tutarına dahil değil; dekont yalnızca ödenecek tutar varsa gerekir.
@@ -347,23 +323,23 @@ export function RegistrationPortal({ context }: Props) {
       return;
     }
     if (!presenterName.trim()) {
-      setError("Ad soyad alanını doldurmalısınız.");
+      setError(t("registration.err.nameRequired"));
       return;
     }
     if (!presenterTitle.trim()) {
-      setError("Unvan seçmelisiniz.");
+      setError(t("registration.err.titleRequired"));
       return;
     }
     if (!selectedSubmissionIds.length && !listenerEnabled) {
-      setError("En az bir bildiri seçmeli ya da dinleyici olarak kaydolmalısınız.");
+      setError(t("registration.err.selectPaperOrListener"));
       return;
     }
     if (!areDeclarationsComplete) {
-      setError("Kaydı tamamlamak için tüm beyanları onaylamalısınız.");
+      setError(t("registration.err.declarations"));
       return;
     }
     if (needsReceipt && !receiptFile) {
-      setError("Dekont yüklemelisiniz.");
+      setError(t("registration.err.receiptRequired"));
       return;
     }
 
@@ -403,12 +379,12 @@ export function RegistrationPortal({ context }: Props) {
       });
       const data = (await response.json().catch(() => ({}))) as { error?: string };
       if (!response.ok) {
-        throw new Error(data.error ?? "Kayıt tamamlanamadı.");
+        throw new Error(data.error ?? t("registration.err.registrationFailed"));
       }
       router.push(`/${context.congressSlug}/kayit/basarili`);
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
+      setError(caughtError instanceof Error ? caughtError.message : t("errors.unexpected"));
     } finally {
       setLoading(false);
     }
@@ -417,36 +393,38 @@ export function RegistrationPortal({ context }: Props) {
   return (
     <form className="submission-form-panel registration-portal" onSubmit={handleSubmit}>
       <div className="field-row" style={{ marginBottom: 18 }}>
-        <span className="pill">E-posta: {context.email}</span>
+        <span className="pill">{t("registration.emailPill", { email: context.email })}</span>
         {period ? (
           <span className="pill" style={{ background: "#eef4fb" }}>
-            Aktif Dönem: {mapPaymentPeriod(period)}
+            {t("registration.activePeriod", {
+              period: t(period === "EARLY" ? "quote.periodEarly" : "quote.periodLate"),
+            })}
           </span>
         ) : (
           <span className="pill" style={{ background: "#fff4e5", color: "var(--warning)" }}>
-            Kayıt süresi sona erdi
+            {t("registration.periodClosed")}
           </span>
         )}
       </div>
 
       <div className="grid two">
         <div className="author-card">
-          <h3>Ad Soyad ve Unvan</h3>
+          <h3>{t("registration.nameTitleHeading")}</h3>
           <div className="form-stack">
             <div className="field">
               <label htmlFor="presenter-name">
-                Havale Açıklamasında Görünecek Ad Soyad <span className="required">*</span>
+                {t("registration.nameLabel")} <span className="required">*</span>
               </label>
               <input
                 id="presenter-name"
                 onChange={(event) => setPresenterName(event.target.value)}
-                placeholder="Ad Soyad"
+                placeholder={t("registration.namePlaceholder")}
                 value={presenterName}
               />
             </div>
             <div className="field">
               <label htmlFor="presenter-title">
-                Unvan <span className="required">*</span>
+                {t("registration.titleLabel")} <span className="required">*</span>
               </label>
               <select
                 id="presenter-title"
@@ -462,7 +440,7 @@ export function RegistrationPortal({ context }: Props) {
                   }
                 }}
               >
-                <option value="">Seçiniz</option>
+                <option value="">{t("common.select")}</option>
                 {ACADEMIC_TITLES.map((option) => (
                   <option key={option} value={option}>
                     {option}
@@ -472,7 +450,7 @@ export function RegistrationPortal({ context }: Props) {
               {presenterTitleOther ? (
                 <input
                   style={{ marginTop: 8 }}
-                  placeholder="Unvanınızı yazınız"
+                  placeholder={t("registration.titleOtherPlaceholder")}
                   value={presenterTitle}
                   onChange={(event) => setPresenterTitle(event.target.value)}
                 />
@@ -482,7 +460,7 @@ export function RegistrationPortal({ context }: Props) {
         </div>
 
         <div className="author-card">
-          <h3>Kabul Edilmiş Bildirileriniz</h3>
+          <h3>{t("registration.acceptedPapersHeading")}</h3>
           {hasAcceptedPapers ? (
             <div className="paper-list">
               {context.acceptedPapers.map((paper) => (
@@ -499,10 +477,10 @@ export function RegistrationPortal({ context }: Props) {
                   <div>
                     <strong>{paper.title}</strong>
                     <p>
-                      {paper.audience === "ACADEMIC" ? "Öğretim Üyesi/Diğer Katılımcı" : paper.audience === "STUDENT" ? "Öğrenci" : "—"}
+                      {paper.audience === "ACADEMIC" ? t("quote.academic") : paper.audience === "STUDENT" ? t("quote.student") : "—"}
                       {" · "}
-                      {paper.presentationMode === "IN_PERSON" ? "Yüz Yüze" : paper.presentationMode === "ONLINE" ? "Çevrim İçi" : "—"}
-                      {paper.alreadyPaid ? " · ✅ Ödendi" : ""}
+                      {paper.presentationMode === "IN_PERSON" ? t("quote.inPerson") : paper.presentationMode === "ONLINE" ? t("quote.online") : "—"}
+                      {paper.alreadyPaid ? ` · ✅ ${t("registration.paid")}` : ""}
                     </p>
                   </div>
                 </label>
@@ -510,7 +488,7 @@ export function RegistrationPortal({ context }: Props) {
             </div>
           ) : (
             <p style={{ margin: 0, color: "var(--text-muted)" }}>
-              Bu e-postaya bağlı kabul edilmiş bildiri bulunmuyor. Dinleyici olarak kaydolabilirsiniz.
+              {t("registration.noAcceptedPapers")}
             </p>
           )}
         </div>
@@ -518,7 +496,7 @@ export function RegistrationPortal({ context }: Props) {
 
       {!hasAcceptedPapers ? (
       <div className="author-card" style={{ marginTop: 18 }}>
-        <h3>Dinleyici Katılımı</h3>
+        <h3>{t("registration.listenerHeading")}</h3>
         <div className="form-stack">
           <label className="radio-line" style={{ alignSelf: "flex-start" }}>
             <input
@@ -529,7 +507,7 @@ export function RegistrationPortal({ context }: Props) {
               }}
               type="checkbox"
             />
-            Dinleyici olarak katılmak istiyorum
+            {t("registration.listenerCheckbox")}
           </label>
 
           {listenerEnabled ? (
@@ -547,8 +525,12 @@ export function RegistrationPortal({ context }: Props) {
                       type="radio"
                     />
                     <span className="option-card-icon" aria-hidden>{entry.icon}</span>
-                    <span className="option-card-title">{entry.label}</span>
-                    <span className="option-card-meta">{entry.description}</span>
+                    <span className="option-card-title">
+                      {t(`registration.listenerTier.${entry.key}.label`)}
+                    </span>
+                    <span className="option-card-meta">
+                      {t(`registration.listenerTier.${entry.key}.description`)}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -560,10 +542,10 @@ export function RegistrationPortal({ context }: Props) {
 
       <div className="grid two" style={{ marginTop: 18 }}>
         <div className="author-card">
-          <h3>Gala Yemeği</h3>
+          <h3>{t("registration.galaHeading")}</h3>
           <div className="form-stack">
             <div className="field">
-              <label htmlFor="gala">Katılım</label>
+              <label htmlFor="gala">{t("registration.attendanceLabel")}</label>
               <select
                 id="gala"
                 onChange={(event) => {
@@ -573,15 +555,15 @@ export function RegistrationPortal({ context }: Props) {
                 }}
                 value={galaAttendance ? "yes" : "no"}
               >
-                <option value="no">Hayır, katılmayacağım</option>
-                <option value="yes">Evet, katılacağım</option>
+                <option value="no">{t("registration.attendanceNo")}</option>
+                <option value="yes">{t("registration.attendanceYes")}</option>
               </select>
               {config.gala.note ? (
                 <span className="field-hint">{config.gala.note}</span>
               ) : null}
             </div>
             <div className="field">
-              <label htmlFor="gala-count">Kaç kişi?</label>
+              <label htmlFor="gala-count">{t("registration.howManyPeople")}</label>
               <input
                 disabled={!galaAttendance}
                 id="gala-count"
@@ -595,10 +577,10 @@ export function RegistrationPortal({ context }: Props) {
         </div>
 
         <div className="author-card">
-          <h3>Gezi</h3>
+          <h3>{t("registration.tripHeading")}</h3>
           <div className="form-stack">
             <div className="field">
-              <label htmlFor="trip">Katılım</label>
+              <label htmlFor="trip">{t("registration.attendanceLabel")}</label>
               <select
                 id="trip"
                 onChange={(event) => {
@@ -608,13 +590,13 @@ export function RegistrationPortal({ context }: Props) {
                 }}
                 value={tripAttendance ? "yes" : "no"}
               >
-                <option value="no">Hayır, katılmayacağım</option>
-                <option value="yes">Evet, katılacağım</option>
+                <option value="no">{t("registration.attendanceNo")}</option>
+                <option value="yes">{t("registration.attendanceYes")}</option>
               </select>
-              <span className="field-hint">{config.trip.note || "Gezi ücretsizdir."}</span>
+              <span className="field-hint">{config.trip.note || t("quote.tripFree")}</span>
             </div>
             <div className="field">
-              <label htmlFor="trip-count">Kaç kişi?</label>
+              <label htmlFor="trip-count">{t("registration.howManyPeople")}</label>
               <input
                 disabled={!tripAttendance}
                 id="trip-count"
@@ -629,7 +611,7 @@ export function RegistrationPortal({ context }: Props) {
       </div>
 
       <div className="author-card" style={{ marginTop: 18 }}>
-        <h3>Hesap Özeti</h3>
+        <h3>{t("registration.summaryHeading")}</h3>
         <div className="quote-list">
           {computed.grandLines.map((line) => (
             <div className="quote-row" key={line.key}>
@@ -639,53 +621,51 @@ export function RegistrationPortal({ context }: Props) {
               </div>
               <span>
                 {line.amount === 0
-                  ? "Ücretsiz"
+                  ? t("common.free")
                   : formatCurrencyAmount(line.amount, line.currency)}
               </span>
             </div>
           ))}
         </div>
         <div className="quote-total">
-          <span>Dekont Tutarı (Bildiri / Dinleyici)</span>
+          <span>{t("registration.receiptAmountRow")}</span>
           <strong>{formatCurrencyAmount(computed.paperTotal, computed.paperCurrency)}</strong>
         </div>
         <p className="field-hint" style={{ marginTop: 12 }}>
-          Belirtilen tutar, kongre kaydı için tahsil edilecek net tutardır. Havale/EFT sırasında
-          doğabilecek tüm bankacılık işlem masrafları gönderen katılımcıya aittir; lütfen tutarın
-          eksiksiz olarak hesabımıza ulaştığından emin olun.
+          {t("registration.summaryHint")}
         </p>
       </div>
 
       <div className="grid two" style={{ marginTop: 18 }}>
         <div className="author-card">
-          <h3>Banka Hesap Bilgileri</h3>
+          <h3>{t("registration.bankHeading")}</h3>
           <div className="form-stack">
             <div className="field">
-              <label>Banka</label>
-              <input readOnly value={config.bank.bankName || "Belirtilmedi"} />
+              <label>{t("registration.bankName")}</label>
+              <input readOnly value={config.bank.bankName || t("registration.notSpecified")} />
             </div>
             {config.bank.bankBranch ? (
               <div className="field">
-                <label>Şube</label>
+                <label>{t("registration.bankBranch")}</label>
                 <input readOnly value={config.bank.bankBranch} />
               </div>
             ) : null}
             <div className="field">
-              <label>Hesap Sahibi</label>
-              <input readOnly value={config.bank.bankAccountHolder || "Belirtilmedi"} />
+              <label>{t("registration.bankHolder")}</label>
+              <input readOnly value={config.bank.bankAccountHolder || t("registration.notSpecified")} />
             </div>
             <div className="field">
-              <label>IBAN</label>
-              <input readOnly value={config.bank.bankIban || "Belirtilmedi"} />
+              <label>{t("registration.bankIban")}</label>
+              <input readOnly value={config.bank.bankIban || t("registration.notSpecified")} />
             </div>
           </div>
         </div>
 
         <div className="author-card">
-          <h3>Havale Açıklaması</h3>
+          <h3>{t("registration.transferHeading")}</h3>
           <div className="form-stack">
             <div className="field">
-              <label>Bu metni havale açıklamasına yazın</label>
+              <label>{t("registration.transferLabel")}</label>
               <textarea
                 readOnly
                 rows={3}
@@ -697,19 +677,19 @@ export function RegistrationPortal({ context }: Props) {
               onClick={copyDescription}
               type="button"
             >
-              {copiedDescription ? "Kopyalandı ✓" : "Açıklamayı Kopyala"}
+              {copiedDescription ? t("common.copied") : t("registration.copyDescription")}
             </button>
           </div>
         </div>
       </div>
 
       <div className="author-card" style={{ marginTop: 18 }}>
-        <h3>Dekont ve Öğrenci Belgesi</h3>
+        <h3>{t("registration.receiptHeading")}</h3>
         <div className="form-stack">
           {needsReceipt ? (
             <div className="field">
               <label htmlFor="receipt">
-                Dekont Yükle <span className="required">*</span>
+                {t("registration.receiptUpload")} <span className="required">*</span>
               </label>
               <input
                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
@@ -717,38 +697,30 @@ export function RegistrationPortal({ context }: Props) {
                 onChange={(event) => setReceiptFile(event.target.files?.[0] ?? null)}
                 type="file"
               />
-              <span className="field-hint">
-                PDF, JPG, JPEG veya PNG, maksimum 10 MB. Yukarıdaki dekont tutarı için yapılan
-                havalenin dekontunu yükleyin.
-              </span>
+              <span className="field-hint">{t("registration.receiptHint")}</span>
             </div>
           ) : (
             <div className="notice" style={{ marginTop: 0 }}>
-              Seçtiğiniz kategoriler için ücret alınmadığından dekont gerekmez.
+              {t("registration.noReceiptNeeded")}
             </div>
           )}
           <div className="field">
-            <label htmlFor="student-document">Öğrenci Belgesi (İsteğe Bağlı)</label>
+            <label htmlFor="student-document">{t("registration.studentDocLabel")}</label>
             <input
               accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
               id="student-document"
               onChange={(event) => setStudentDocumentFile(event.target.files?.[0] ?? null)}
               type="file"
             />
-            <span className="field-hint">
-              Öğrenci ücretinden yararlanıyorsanız öğrenci belgenizi de yükleyin. PDF, JPG, JPEG
-              veya PNG, maksimum 10 MB.
-            </span>
+            <span className="field-hint">{t("registration.studentDocHint")}</span>
           </div>
         </div>
       </div>
 
       <div className="author-card" style={{ marginTop: 18 }}>
-        <h3>Etik ve Beyanlar</h3>
+        <h3>{t("registration.ethicsHeading")}</h3>
         <div className="checklist">
-          {(Object.entries(declarationLabels) as Array<
-            [keyof RegistrationDeclarations, string]
-          >).map(([key, label]) => (
+          {DECLARATION_KEYS.map((key) => (
             <label className="check-item" key={key}>
               <input
                 checked={declarations[key]}
@@ -757,7 +729,7 @@ export function RegistrationPortal({ context }: Props) {
                 }
                 type="checkbox"
               />
-              <span>{label}</span>
+              <span>{t(`registration.decl.${key}`)}</span>
             </label>
           ))}
         </div>
@@ -776,7 +748,7 @@ export function RegistrationPortal({ context }: Props) {
           disabled={loading || !areDeclarationsComplete}
           type="submit"
         >
-          {loading ? "Kaydediliyor..." : "Kaydı Tamamla"}
+          {loading ? t("common.saving") : t("registration.submit")}
         </button>
       </div>
     </form>

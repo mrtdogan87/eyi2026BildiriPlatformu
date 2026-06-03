@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatCurrencyAmount, mapAudience } from "@/lib/payment";
+import { formatCurrencyAmount } from "@/lib/payment";
 import { ACADEMIC_TITLES, OTHER_TITLE } from "@/lib/titles";
+import { useT } from "@/lib/i18n/provider";
 import type {
   AudienceType,
   PaymentTierOption,
@@ -66,18 +67,13 @@ const emptyDeclarations: SubmissionDeclarations = {
   registrationPresentationConsent: false,
 };
 
-const declarationLabels: Record<keyof SubmissionDeclarations, string> = {
-  accuracy:
-    "Başvuru sahibi olarak, bu form kapsamında tarafımdan sunulan tüm bilgi ve belgelerin doğru, eksiksiz ve güncel olduğunu beyan ederim.",
-  submissionLimit:
-    "Kongre kapsamında geçerli olan, bir araştırmacının en fazla iki bildiride yazar olarak yer alabileceği kuralını okuduğumu, anladığımı ve kabul ettiğimi beyan ederim.",
-  coauthorApproval:
-    "Başvurusu yapılan çalışmada adı geçen diğer yazarların çalışmadan, başvuru sürecinden ve bildiri içeriğinden haberdar olduğunu; tüm ortak yazarlardan gerekli izin ve onayın tarafımca alındığını beyan ederim.",
-  personalDataConsent:
-    "Kongre başvuru, değerlendirme, program oluşturma, sertifika düzenleme ve ilgili akademik/idari süreçlerin yürütülmesi amacıyla kişisel verilerimin işlenmesine onay verdiğimi kabul ederim.",
-  registrationPresentationConsent:
-    "Bildiri kabul edilse dahi, kongre kurallarında belirtilen kayıt ve sunum yükümlülüklerinin yerine getirilmemesi durumunda çalışmanın programa alınmayabileceğini veya yayımlanmayabileceğini kabul ederim.",
-};
+const DECLARATION_KEYS: (keyof SubmissionDeclarations)[] = [
+  "accuracy",
+  "submissionLimit",
+  "coauthorApproval",
+  "personalDataConsent",
+  "registrationPresentationConsent",
+];
 
 function createAuthorDraft(author?: Partial<SubmissionAuthorInput>, isPresenter = false): AuthorDraft {
   const title = author?.title ?? "";
@@ -109,6 +105,7 @@ function findPresenterPaperTiers(
 
 export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Props) {
   const router = useRouter();
+  const t = useT();
   const [snapshot, setSnapshot] = useState<SubmissionSnapshot | null>(initialSnapshot);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState(initialSnapshot?.draftOwnerEmail ?? "");
@@ -155,8 +152,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
   const hasExistingFile = Boolean(snapshot?.file);
   const areDeclarationsComplete = Object.values(declarations).every(Boolean);
   const selectedLanguageLabel = useMemo(
-    () => (details.submissionLanguage === "TR" ? "Türkçe" : "İngilizce"),
-    [details.submissionLanguage],
+    () => (details.submissionLanguage === "TR" ? t("submission.turkce") : t("submission.ingilizce")),
+    [details.submissionLanguage, t],
   );
 
   const presenterPaperTiers = useMemo(
@@ -173,7 +170,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
     try {
       return JSON.parse(text) as Record<string, unknown>;
     } catch {
-      throw new Error("Sunucudan beklenen yanıt alınamadı. Lütfen sayfayı yenileyip tekrar deneyin.");
+      throw new Error(t("errors.serverNoResponse"));
     }
   }
 
@@ -193,14 +190,14 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
       const data = await readResponsePayload(response);
       if (!response.ok) {
-        throw new Error((data.error as string | undefined) ?? "Taslak oluşturulamadı.");
+        throw new Error((data.error as string | undefined) ?? t("submission.err.draftCreateFailed"));
       }
 
       setDraftMessage((data.message as string | undefined) ?? "");
       setDetails((current) => ({ ...current, submissionLanguage: draftLanguage }));
       if (data.magicLinkPreview) setMagicLinkPreview(data.magicLinkPreview as string);
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
+      setError(caughtError instanceof Error ? caughtError.message : t("errors.unexpected"));
     } finally {
       setLoading(false);
     }
@@ -221,7 +218,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       });
       const data = await readResponsePayload(response);
       if (!response.ok) {
-        throw new Error((data.error as string | undefined) ?? "Bildiri bilgileri kaydedilemedi.");
+        throw new Error((data.error as string | undefined) ?? t("submission.err.detailsSaveFailed"));
       }
 
       let nextSubmission = (data.submission as SubmissionSnapshot | undefined) ?? null;
@@ -236,7 +233,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
         });
         const fileData = await readResponsePayload(fileResponse);
         if (!fileResponse.ok) {
-          throw new Error((fileData.error as string | undefined) ?? "Dosya yüklenemedi.");
+          throw new Error((fileData.error as string | undefined) ?? t("submission.err.fileUploadFailed"));
         }
         nextSubmission = (fileData.submission as SubmissionSnapshot | undefined) ?? nextSubmission;
       }
@@ -245,7 +242,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       setStep(2);
       setFile(null);
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
+      setError(caughtError instanceof Error ? caughtError.message : t("errors.unexpected"));
     } finally {
       setLoading(false);
     }
@@ -275,12 +272,12 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       });
       const data = await readResponsePayload(response);
       if (!response.ok) {
-        throw new Error((data.error as string | undefined) ?? "Yazar bilgileri kaydedilemedi.");
+        throw new Error((data.error as string | undefined) ?? t("submission.err.authorsSaveFailed"));
       }
       setSnapshot((data.submission as SubmissionSnapshot | undefined) ?? null);
       setStep(3);
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
+      setError(caughtError instanceof Error ? caughtError.message : t("errors.unexpected"));
     } finally {
       setLoading(false);
     }
@@ -290,7 +287,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
     event.preventDefault();
     if (!snapshot) return;
     if (!participation.presentationMode || !participation.audience) {
-      setError("Sunum şekli ve akademik statü seçmelisiniz.");
+      setError(t("submission.err.participationRequired"));
       return;
     }
 
@@ -308,12 +305,12 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       });
       const data = await readResponsePayload(response);
       if (!response.ok) {
-        throw new Error((data.error as string | undefined) ?? "Sunum bilgileri kaydedilemedi.");
+        throw new Error((data.error as string | undefined) ?? t("submission.err.participationSaveFailed"));
       }
       setSnapshot((data.submission as SubmissionSnapshot | undefined) ?? null);
       setStep(4);
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
+      setError(caughtError instanceof Error ? caughtError.message : t("errors.unexpected"));
     } finally {
       setLoading(false);
     }
@@ -322,7 +319,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
   async function submitFinal() {
     if (!snapshot) return;
     if (!areDeclarationsComplete) {
-      setError("Bildirinizi gönderebilmek için tüm beyanları onaylamalısınız.");
+      setError(t("submission.err.declarations"));
       return;
     }
 
@@ -337,12 +334,12 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       });
       const data = await readResponsePayload(response);
       if (!response.ok) {
-        throw new Error((data.error as string | undefined) ?? "Bildiri gönderilemedi.");
+        throw new Error((data.error as string | undefined) ?? t("submission.err.submitFailed"));
       }
       router.push(`/${congressSlug}/bildiri-gonder/basarili?id=${snapshot.id}`);
       router.refresh();
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
+      setError(caughtError instanceof Error ? caughtError.message : t("errors.unexpected"));
     } finally {
       setLoading(false);
     }
@@ -377,33 +374,29 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
   if (!snapshot) {
     return (
       <div className="card start-card">
-        <h2 className="section-title">Taslak Başlat</h2>
-        <p className="flow-intro">
-          E-postanıza gelen güvenli bağlantıyla aynı taslağa dönebilir, bildiriyi adım adım
-          tamamlayabilirsiniz.
-        </p>
+        <h2 className="section-title">{t("submission.startDraftTitle")}</h2>
+        <p className="flow-intro">{t("submission.startDraftIntro")}</p>
         <div className="notice" style={{ marginBottom: 18 }}>
-          İkinci bildiriniz için de aynı e-posta adresini kullanmalısınız; sistem yazarları
-          e-posta üzerinden eşleştirir.
+          {t("submission.secondPaperNotice")}
         </div>
         <form className="submission-form-panel" onSubmit={startDraft}>
           <div className="grid two">
             <div className="field">
               <label htmlFor="draft-email">
-                E-posta <span className="required">*</span>
+                {t("common.email")} <span className="required">*</span>
               </label>
               <input
                 id="draft-email"
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="ornek@universite.edu.tr"
+                placeholder={t("submission.emailPlaceholder")}
                 required
               />
             </div>
             <div className="field">
               <label htmlFor="draft-language">
-                Bildirinizin Dili <span className="required">*</span>
+                {t("submission.paperLanguageLabel")} <span className="required">*</span>
               </label>
               <select
                 id="draft-language"
@@ -414,8 +407,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                   setDetails((current) => ({ ...current, submissionLanguage: nextLanguage }));
                 }}
               >
-                <option value="TR">Türkçe</option>
-                <option value="EN">İngilizce</option>
+                <option value="TR">{t("submission.turkce")}</option>
+                <option value="EN">{t("submission.ingilizce")}</option>
               </select>
             </div>
           </div>
@@ -424,20 +417,19 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
               {draftMessage ? <div className="notice">{draftMessage}</div> : null}
               {magicLinkPreview ? (
                 <div className="magic-preview">
-                  <strong>Test için oluşturulan erişim linki</strong>
+                  <strong>{t("submission.previewTitle")}</strong>
                   <p style={{ margin: "10px 0 14px", color: "#284777" }}>
-                    Gerçek e-posta servisi bağlı olmadığı için bu link ekranda gösteriliyor.
-                    Tıklayarak taslağı açabilirsiniz.
+                    {t("submission.previewDesc")}
                   </p>
                   <a className="button primary" href={magicLinkPreview} style={{ display: "inline-flex" }}>
-                    Taslağı Aç
+                    {t("submission.openDraft")}
                   </a>
                 </div>
               ) : null}
               {error ? <div className="error">{error}</div> : null}
             </div>
             <button className="button primary" disabled={loading} type="submit">
-              {loading ? "Hazırlanıyor..." : "Taslağı Başlat"}
+              {loading ? t("submission.preparing") : t("submission.startDraftButton")}
             </button>
           </div>
         </form>
@@ -451,43 +443,27 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
         {[1, 2, 3, 4].map((item) => (
           <div className={`step ${activeStep === item ? "active" : activeStep > item ? "done" : ""}`} key={item}>
             <span className="step-badge">{item}</span>
-            <span>
-              {item === 1
-                ? "Bildiri Bilgileri"
-                : item === 2
-                  ? "Yazarlar"
-                  : item === 3
-                    ? "Sunum Bilgileri"
-                    : "Onay ve Gönder"}
-            </span>
+            <span>{t(`submission.step${item}`)}</span>
             {item < 4 ? <span className="step-separator">→</span> : null}
           </div>
         ))}
       </div>
 
       <div className="card wizard-card">
-        <h2 className="section-title">
-          {step === 1
-            ? "Bildiri Bilgileri"
-            : step === 2
-              ? "Yazarlar"
-              : step === 3
-                ? "Sunum Bilgileri"
-                : "Onay ve Gönder"}
-        </h2>
+        <h2 className="section-title">{t(`submission.step${step}`)}</h2>
 
         {step === 1 ? (
           <form className="submission-form-panel" onSubmit={saveDetails}>
             <div className="field-row" style={{ marginBottom: 18 }}>
-              <span className="pill">Bildiri Dili: {selectedLanguageLabel}</span>
+              <span className="pill">{t("submission.paperLangPill", { lang: selectedLanguageLabel })}</span>
               <span className="pill" style={{ background: "#eef4fb" }}>
-                Taslak Sahibi: {snapshot.draftOwnerEmail}
+                {t("submission.draftOwnerPill", { email: snapshot.draftOwnerEmail })}
               </span>
             </div>
 
             <div className="field" style={{ marginBottom: 20 }}>
               <label htmlFor="file">
-                Ana Dosya {!hasExistingFile ? <span className="required">*</span> : null}
+                {t("submission.mainFile")} {!hasExistingFile ? <span className="required">*</span> : null}
               </label>
               <input
                 id="file"
@@ -496,8 +472,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                 onChange={(event) => setFile(event.target.files?.[0] ?? null)}
               />
               <span className="field-hint">
-                Sadece DOCX, maksimum 10 MB.
-                {snapshot.file ? ` Mevcut dosya: ${snapshot.file.originalName}` : ""}
+                {t("submission.fileHint")}
+                {snapshot.file ? t("submission.existingFile", { name: snapshot.file.originalName }) : ""}
               </span>
             </div>
 
@@ -506,7 +482,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                 <>
                   <div className="field">
                     <label htmlFor="title-tr">
-                      Başlık (Türkçe) <span className="required">*</span>
+                      {t("submission.titleTrLabel")} <span className="required">*</span>
                     </label>
                     <input
                       id="title-tr"
@@ -518,7 +494,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                   </div>
                   <div className="field">
                     <label htmlFor="abstract-tr">
-                      Özet (Türkçe) <span className="required">*</span>
+                      {t("submission.abstractTrLabel")} <span className="required">*</span>
                     </label>
                     <textarea
                       id="abstract-tr"
@@ -530,7 +506,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                   </div>
                   <div className="field">
                     <label htmlFor="keywords-tr">
-                      Anahtar Kelimeler (Türkçe) <span className="required">*</span>
+                      {t("submission.keywordsTrLabel")} <span className="required">*</span>
                     </label>
                     <input
                       id="keywords-tr"
@@ -538,7 +514,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       onChange={(event) =>
                         setDetails((current) => ({ ...current, keywordsTr: event.target.value }))
                       }
-                      placeholder="Virgülle ayırın"
+                      placeholder={t("submission.keywordsPlaceholder")}
                     />
                   </div>
                 </>
@@ -546,7 +522,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                 <>
                   <div className="field">
                     <label htmlFor="title-en">
-                      Title (English) <span className="required">*</span>
+                      {t("submission.titleEnLabel")} <span className="required">*</span>
                     </label>
                     <input
                       id="title-en"
@@ -558,7 +534,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                   </div>
                   <div className="field">
                     <label htmlFor="abstract-en">
-                      Abstract (English) <span className="required">*</span>
+                      {t("submission.abstractEnLabel")} <span className="required">*</span>
                     </label>
                     <textarea
                       id="abstract-en"
@@ -570,7 +546,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                   </div>
                   <div className="field">
                     <label htmlFor="keywords-en">
-                      Keywords (English) <span className="required">*</span>
+                      {t("submission.keywordsEnLabel")} <span className="required">*</span>
                     </label>
                     <input
                       id="keywords-en"
@@ -578,7 +554,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       onChange={(event) =>
                         setDetails((current) => ({ ...current, keywordsEn: event.target.value }))
                       }
-                      placeholder="Separate with commas"
+                      placeholder={t("submission.keywordsPlaceholder")}
                     />
                   </div>
                 </>
@@ -590,7 +566,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
             <div className="form-actions">
               <span />
               <button className="button primary" disabled={loading} type="submit">
-                {loading ? "Kaydediliyor..." : "İleri"}
+                {loading ? t("common.saving") : t("submission.next")}
               </button>
             </div>
           </form>
@@ -602,7 +578,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
               {authors.map((author, index) => (
                 <div className="author-card" key={author.localId}>
                   <div className="author-head">
-                    <strong>{index + 1}. Yazar</strong>
+                    <strong>{t("submission.authorN", { n: index + 1 })}</strong>
                     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                       <label className="radio-line">
                         <input
@@ -611,7 +587,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                           onChange={() => updateAuthor(index, { isPresenter: true })}
                           type="radio"
                         />
-                        Sunan yazar
+                        {t("submission.presenterRadio")}
                       </label>
                       {authors.length > 1 ? (
                         <button
@@ -619,7 +595,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                           onClick={() => removeAuthor(index)}
                           type="button"
                         >
-                          Sil
+                          {t("submission.delete")}
                         </button>
                       ) : null}
                     </div>
@@ -627,7 +603,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                   <div className="grid two">
                     <div className="field">
                       <label>
-                        Ad Soyad <span className="required">*</span>
+                        {t("submission.fullNameLabel")} <span className="required">*</span>
                       </label>
                       <input
                         value={author.fullName}
@@ -636,7 +612,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     </div>
                     <div className="field">
                       <label>
-                        Unvan <span className="required">*</span>
+                        {t("registration.titleLabel")} <span className="required">*</span>
                       </label>
                       <select
                         value={author.titleOther ? OTHER_TITLE : author.title}
@@ -649,7 +625,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                           }
                         }}
                       >
-                        <option value="">Seçiniz</option>
+                        <option value="">{t("common.select")}</option>
                         {ACADEMIC_TITLES.map((option) => (
                           <option key={option} value={option}>
                             {option}
@@ -659,7 +635,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       {author.titleOther ? (
                         <input
                           style={{ marginTop: 8 }}
-                          placeholder="Unvanınızı yazınız"
+                          placeholder={t("registration.titleOtherPlaceholder")}
                           value={author.title}
                           onChange={(event) => updateAuthor(index, { title: event.target.value })}
                         />
@@ -667,7 +643,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     </div>
                     <div className="field">
                       <label>
-                        E-posta <span className="required">*</span>
+                        {t("common.email")} <span className="required">*</span>
                       </label>
                       <input
                         type="email"
@@ -676,14 +652,14 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       />
                     </div>
                     <div className="field">
-                      <label>Kurum</label>
+                      <label>{t("submission.institutionLabel")}</label>
                       <input
                         value={author.institution}
                         onChange={(event) => updateAuthor(index, { institution: event.target.value })}
                       />
                     </div>
                     <div className="field">
-                      <label>Ülke</label>
+                      <label>{t("submission.countryLabel")}</label>
                       <input
                         value={author.country}
                         onChange={(event) => updateAuthor(index, { country: event.target.value })}
@@ -696,7 +672,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
             <div style={{ marginTop: 20 }}>
               <button className="button secondary" onClick={addAuthor} type="button">
-                + Yazar Ekle
+                {t("submission.addAuthor")}
               </button>
             </div>
 
@@ -704,10 +680,10 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
             <div className="form-actions">
               <button className="button secondary" onClick={() => setStep(1)} type="button">
-                Geri
+                {t("common.back")}
               </button>
               <button className="button primary" disabled={loading} type="submit">
-                {loading ? "Kaydediliyor..." : "İleri"}
+                {loading ? t("common.saving") : t("submission.next")}
               </button>
             </div>
           </form>
@@ -717,7 +693,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
           <form className="submission-form-panel" onSubmit={saveParticipation}>
             <div className="field" style={{ marginBottom: 22 }}>
               <label>
-                Sunum Şekli <span className="required">*</span>
+                {t("submission.presentationModeLabel")} <span className="required">*</span>
               </label>
               <div className="option-cards">
                 <label
@@ -729,8 +705,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     onChange={() => setParticipation((current) => ({ ...current, presentationMode: "IN_PERSON" }))}
                     type="radio"
                   />
-                  <span className="option-card-title">Yüz Yüze</span>
-                  <span className="option-card-meta">Etkinlik salonunda fiziksel sunum</span>
+                  <span className="option-card-title">{t("quote.inPerson")}</span>
+                  <span className="option-card-meta">{t("submission.inPersonMeta")}</span>
                 </label>
                 <label
                   className={`option-card${participation.presentationMode === "ONLINE" ? " is-selected" : ""}`}
@@ -741,18 +717,16 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     onChange={() => setParticipation((current) => ({ ...current, presentationMode: "ONLINE" }))}
                     type="radio"
                   />
-                  <span className="option-card-title">Çevrim İçi</span>
-                  <span className="option-card-meta">Uzaktan sunum</span>
+                  <span className="option-card-title">{t("quote.online")}</span>
+                  <span className="option-card-meta">{t("submission.onlineMeta")}</span>
                 </label>
               </div>
-              <span className="field-hint">
-                Yüz yüze ve çevrim içi sunumlarda aynı ücretlendirme uygulanır.
-              </span>
+              <span className="field-hint">{t("submission.sameFeeHint")}</span>
             </div>
 
             <div className="field" style={{ marginBottom: 22 }}>
               <label>
-                Akademik Statü <span className="required">*</span>
+                {t("submission.academicStatusLabel")} <span className="required">*</span>
               </label>
               <div className="option-cards">
                 <label
@@ -764,8 +738,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     onChange={() => setParticipation((current) => ({ ...current, audience: "ACADEMIC" }))}
                     type="radio"
                   />
-                  <span className="option-card-title">Öğretim Üyesi/Diğer Katılımcı</span>
-                  <span className="option-card-meta">Öğretim üyesi / araştırmacı</span>
+                  <span className="option-card-title">{t("quote.academic")}</span>
+                  <span className="option-card-meta">{t("submission.academicMeta")}</span>
                 </label>
                 <label
                   className={`option-card${participation.audience === "STUDENT" ? " is-selected" : ""}`}
@@ -776,8 +750,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                     onChange={() => setParticipation((current) => ({ ...current, audience: "STUDENT" }))}
                     type="radio"
                   />
-                  <span className="option-card-title">Öğrenci</span>
-                  <span className="option-card-meta">Lisans / yüksek lisans / doktora</span>
+                  <span className="option-card-title">{t("quote.student")}</span>
+                  <span className="option-card-meta">{t("submission.studentMeta")}</span>
                 </label>
               </div>
             </div>
@@ -786,10 +760,10 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
             <div className="form-actions">
               <button className="button secondary" onClick={() => setStep(2)} type="button">
-                Geri
+                {t("common.back")}
               </button>
               <button className="button primary" disabled={loading} type="submit">
-                {loading ? "Kaydediliyor..." : "İleri"}
+                {loading ? t("common.saving") : t("submission.next")}
               </button>
             </div>
           </form>
@@ -799,64 +773,57 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
           <div className="submission-form-panel">
             <div className="grid two" style={{ marginBottom: 22 }}>
               <div className="author-card">
-                <h3>Bildiri Ücreti</h3>
+                <h3>{t("submission.paperFeeHeading")}</h3>
                 {participation.audience ? (
                   <div className="form-stack">
                     <div className="field">
-                      <label>Kategori</label>
-                      <div className="field-display">{mapAudience(participation.audience)}</div>
+                      <label>{t("submission.category")}</label>
+                      <div className="field-display">
+                        {participation.audience === "ACADEMIC" ? t("quote.academic") : t("quote.student")}
+                      </div>
                     </div>
                     <div className="field">
-                      <label>Erken Kayıt</label>
+                      <label>{t("quote.periodEarly")}</label>
                       <div className="amount-display">
                         {earlyTier
                           ? formatCurrencyAmount(earlyTier.amount, earlyTier.currency)
-                          : "Tanımlı değil"}
-                        <span className="amount-display-meta">Birinci bildiri için</span>
+                          : t("submission.notDefined")}
+                        <span className="amount-display-meta">{t("submission.forFirstPaper")}</span>
                       </div>
                     </div>
                     <div className="field">
-                      <label>Geç Kayıt</label>
+                      <label>{t("quote.periodLate")}</label>
                       <div className="amount-display">
                         {lateTier
                           ? formatCurrencyAmount(lateTier.amount, lateTier.currency)
-                          : "Tanımlı değil"}
-                        <span className="amount-display-meta">Birinci bildiri için</span>
+                          : t("submission.notDefined")}
+                        <span className="amount-display-meta">{t("submission.forFirstPaper")}</span>
                       </div>
                     </div>
-                    <span className="field-hint">
-                      Ödeme tarihinizdeki dönem (erken veya geç) uygulanır. İkinci bildiriniz
-                      ücretsizdir.
-                    </span>
+                    <span className="field-hint">{t("submission.feeHint")}</span>
                   </div>
                 ) : (
-                  <p style={{ margin: 0, color: "#617089" }}>
-                    Akademik statünüz seçili değil. Önceki adımda seçim yaparsanız tutar burada hesaplanır.
-                  </p>
+                  <p style={{ margin: 0, color: "#617089" }}>{t("submission.noAudience")}</p>
                 )}
               </div>
 
               <div className="author-card">
-                <h3>Ödeme Bilgisi</h3>
+                <h3>{t("submission.paymentInfoHeading")}</h3>
                 <div className="form-stack">
                   <p style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.55 }}>
-                    Katılımcılar, bildirilerinin hakem değerlendirme süreci sonucunda kabul
-                    edilmesinin ardından kayıt ücretini yatırmalıdır.
+                    {t("submission.paymentInfo1")}
                   </p>
                   <p style={{ margin: 0, color: "var(--text-muted)", lineHeight: 1.55 }}>
-                    Birden fazla bildiriniz kabul edilirse hepsini tek seferde, tek dekontla
-                    ödeyebilirsiniz.
+                    {t("submission.paymentInfo2")}
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="author-card" style={{ marginBottom: 22 }}>
-              <h3>Etik ve Beyanlar</h3>
+              <h3>{t("registration.ethicsHeading")}</h3>
               <div className="checklist">
-                {(Object.entries(declarationLabels) as Array<
-                  [keyof SubmissionDeclarations, string]
-                >).map(([key, label]) => (
+                {DECLARATION_KEYS.map((key) => (
                   <label className="check-item" key={key}>
                     <input
                       checked={declarations[key]}
@@ -865,7 +832,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       }
                       type="checkbox"
                     />
-                    <span>{label}</span>
+                    <span>{t(`registration.decl.${key}`)}</span>
                   </label>
                 ))}
               </div>
@@ -875,7 +842,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
             <div className="form-actions">
               <button className="button secondary" onClick={() => setStep(3)} type="button">
-                Geri
+                {t("common.back")}
               </button>
               <button
                 className="button primary"
@@ -883,7 +850,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                 onClick={submitFinal}
                 type="button"
               >
-                {loading ? "Gönderiliyor..." : "Bildiriyi Gönder"}
+                {loading ? t("common.sending") : t("submission.submitPaper")}
               </button>
             </div>
           </div>

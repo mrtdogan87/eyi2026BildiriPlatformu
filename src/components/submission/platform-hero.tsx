@@ -1,3 +1,5 @@
+import { getServerT } from "@/lib/i18n/server";
+
 type Props = {
   caption?: string;
   variant?: "default" | "submission" | "registration" | "hub";
@@ -5,27 +7,33 @@ type Props = {
   subtitle?: string;
 };
 
-export function PlatformHero({ caption, variant = "default", congressName, subtitle }: Props) {
+export async function PlatformHero({
+  caption,
+  variant = "default",
+  congressName,
+  subtitle,
+}: Props) {
+  const { t } = await getServerT();
+
   const eyebrow =
     variant === "submission"
-      ? "Akademik Başvuru"
+      ? t("submission.heroEyebrow")
       : variant === "registration"
-        ? "Katılım ve Ödeme"
+        ? t("registration.heroEyebrow")
         : variant === "hub"
-          ? "EYİ 2026 Başvuru Merkezi"
+          ? t("hub.eyebrow", { title: "EYİ 2026" })
           : "EYİ 2026";
 
   const title =
     variant === "submission"
-      ? "Bildiri Gönderimi"
+      ? t("submission.heroTitle")
       : variant === "registration"
-        ? "Kongre Kaydı"
+        ? t("registration.heroTitle")
         : variant === "hub"
-          ? congressName ?? "Bildiri Yönetim Platformu"
-          : "Bildiri Yönetim Platformu";
+          ? congressName ?? t("common.platformName")
+          : t("common.platformName");
 
-  const heroSubtitle =
-    subtitle ?? congressName ?? "23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu";
+  const heroSubtitle = subtitle ?? congressName ?? t("submission.heroDefaultSubtitle");
 
   return (
     <section className={`hero platform-hero platform-hero-${variant}`}>

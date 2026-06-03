@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { useT } from "@/lib/i18n/provider";
 
 type Props = {
   congressSlug: string;
 };
 
 export function RegistrationEmailForm({ congressSlug }: Props) {
+  const t = useT();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -33,12 +35,12 @@ export function RegistrationEmailForm({ congressSlug }: Props) {
         error?: string;
       };
       if (!response.ok) {
-        throw new Error(data.error ?? "Kayıt linki gönderilemedi.");
+        throw new Error(data.error ?? t("errors.linkSendFailed"));
       }
       setMessage(data.message ?? "");
       if (data.magicLinkPreview) setMagicLinkPreview(data.magicLinkPreview);
     } catch (caughtError) {
-      setError(caughtError instanceof Error ? caughtError.message : "Beklenmeyen bir hata oluştu.");
+      setError(caughtError instanceof Error ? caughtError.message : t("errors.unexpected"));
     } finally {
       setLoading(false);
     }
@@ -49,20 +51,17 @@ export function RegistrationEmailForm({ congressSlug }: Props) {
       <div className="grid two">
         <div className="field">
           <label htmlFor="registration-email">
-            E-posta <span className="required">*</span>
+            {t("common.email")} <span className="required">*</span>
           </label>
           <input
             id="registration-email"
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            placeholder="ornek@universite.edu.tr"
+            placeholder={t("registration.emailPlaceholder")}
             required
           />
-          <span className="field-hint">
-            Bildiri gönderdiyseniz yazar e-postanızı; dinleyici olarak kaydolacaksanız iletişim
-            e-postanızı girin.
-          </span>
+          <span className="field-hint">{t("registration.emailHint")}</span>
         </div>
       </div>
 
@@ -71,20 +70,17 @@ export function RegistrationEmailForm({ congressSlug }: Props) {
           {message ? <div className="notice">{message}</div> : null}
           {magicLinkPreview ? (
             <div className="magic-preview">
-              <strong>Test için oluşturulan erişim linki</strong>
-              <p>
-                Gerçek e-posta servisi bağlı olmadığı için bu link ekranda gösteriliyor.
-                Tıklayarak kayıt panelini açabilirsiniz.
-              </p>
+              <strong>{t("registration.previewTitle")}</strong>
+              <p>{t("registration.previewDesc")}</p>
               <a className="button primary" href={magicLinkPreview}>
-                Kayıt Panelini Aç
+                {t("registration.openPanel")}
               </a>
             </div>
           ) : null}
           {error ? <div className="error">{error}</div> : null}
         </div>
         <button className="button primary" disabled={loading} type="submit">
-          {loading ? "Gönderiliyor..." : "Bağlantı Gönder"}
+          {loading ? t("common.sending") : t("registration.sendLink")}
         </button>
       </div>
     </form>

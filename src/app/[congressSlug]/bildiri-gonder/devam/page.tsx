@@ -1,6 +1,7 @@
 import { DraftLinkGate } from "@/components/submission/draft-link-gate";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { getDraftTokenWindowMinutes, inspectDraftToken } from "@/lib/submission";
+import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -17,17 +18,18 @@ export default async function ContinueDraftPage({
   const { token } = await searchParams;
   const trimmedToken = token?.trim() ?? "";
   const submission = trimmedToken ? await inspectDraftToken(trimmedToken) : null;
+  const { t } = await getServerT();
 
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">
         <PlatformHero
           variant="submission"
-          subtitle="Güvenli bağlantı doğrulaması"
+          subtitle={t("submission.secureLinkSubtitle")}
         />
 
         <div className="card start-card">
-          <h2 className="section-title">Taslağa Devam Et</h2>
+          <h2 className="section-title">{t("submission.continueDraftTitle")}</h2>
           <DraftLinkGate
             congressSlug={congressSlug}
             isValid={Boolean(trimmedToken && submission)}

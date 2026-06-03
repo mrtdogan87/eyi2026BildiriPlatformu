@@ -2,6 +2,7 @@ import { PlatformHero } from "@/components/submission/platform-hero";
 import { RegistrationLinkGate } from "@/components/registration/registration-link-gate";
 import { ensureCongress } from "@/lib/submission";
 import { inspectRegistrationToken } from "@/lib/registration";
+import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +16,7 @@ export default async function RegistrationContinuePage({ params, searchParams }:
   const { token } = await searchParams;
   const trimmedToken = token?.trim() ?? "";
   const congress = await ensureCongress(congressSlug);
+  const { t } = await getServerT();
 
   const record = trimmedToken ? await inspectRegistrationToken(trimmedToken) : null;
   const isValid = Boolean(record && record.congressId === congress.id);
@@ -25,11 +27,11 @@ export default async function RegistrationContinuePage({ params, searchParams }:
         <PlatformHero
           variant="registration"
           congressName={congress.name}
-          subtitle="Güvenli bağlantı doğrulaması"
+          subtitle={t("registration.secureLinkSubtitle")}
         />
 
         <div className="card start-card">
-          <h2 className="section-title">Kayıt Paneline Geç</h2>
+          <h2 className="section-title">{t("registration.toPanelTitle")}</h2>
           <RegistrationLinkGate
             congressSlug={congressSlug}
             isValid={isValid}
