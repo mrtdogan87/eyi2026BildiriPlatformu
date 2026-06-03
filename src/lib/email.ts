@@ -29,7 +29,7 @@ type ResendSendResponse = {
 function getResendConfig() {
   const apiKey = process.env.RESEND_API_KEY;
   const senderEmail = process.env.RESEND_SENDER_EMAIL;
-  const senderName = process.env.RESEND_SENDER_NAME ?? "EYI 2026 Bildiri Platformu";
+  const senderName = process.env.RESEND_SENDER_NAME ?? "EYİ2026 / ISEOS2026 Platformu";
 
   return {
     apiKey,
@@ -113,7 +113,7 @@ async function sendEmail(input: { subject: string; to: string; text: string; htm
 
 export async function sendDraftAccessEmail({ to, congressName, magicLink }: DraftEmailInput) {
   const html = emailLayout(
-    `${congressName} - Taslak Erişim Bağlantısı / Draft Access Link`,
+    `${congressName} - Draft Access Link / Taslak Erişim Bağlantısı`,
     `
     <p class="lang-tag">Türkçe</p>
     <h1>Bildiri taslağınıza erişim bağlantınız hazır</h1>
@@ -148,7 +148,7 @@ export async function sendDraftAccessEmail({ to, congressName, magicLink }: Draf
 
   return sendEmail({
     to,
-    subject: `${congressName} - Bildiri taslağınıza erişim bağlantısı / Paper draft access link`,
+    subject: `${congressName} - Draft access link / Taslak erişim bağlantısı`,
     text: [
       `${congressName} bildiri gönderim platformunda başlattığınız taslağa erişim bağlantısı:`,
       "",
@@ -174,7 +174,7 @@ export async function sendRegistrationAccessEmail({
   magicLink,
 }: RegistrationEmailInput) {
   const html = emailLayout(
-    `${congressName} - Kayıt Erişim Bağlantısı / Registration Access Link`,
+    `${congressName} - Registration Access Link / Kayıt Erişim Bağlantısı`,
     `
     <p class="lang-tag">Türkçe</p>
     <h1>Kayıt sayfanıza giriş bağlantınız hazır</h1>
@@ -213,7 +213,7 @@ export async function sendRegistrationAccessEmail({
 
   return sendEmail({
     to,
-    subject: `${congressName} - Kayıt sayfanıza erişim bağlantısı / Registration page access link`,
+    subject: `${congressName} - Registration access link / Kayıt erişim bağlantısı`,
     text: [
       `${congressName} kayıt sayfasına erişim bağlantısı:`,
       "",
@@ -318,7 +318,7 @@ export async function sendSubmissionStatusEmail({
       : "";
 
   const html = emailLayout(
-    `${congressName} - Bildiri durum güncellemesi / Paper status update`,
+    `${congressName} - Paper Status Update / Bildiri Durum Güncellemesi`,
     `
     <p class="lang-tag">Türkçe</p>
     <h1>Bildirinizin durumu güncellendi</h1>
@@ -373,7 +373,7 @@ export async function sendSubmissionStatusEmail({
 
   return sendEmail({
     to,
-    subject: `${congressName} - Bildiri durum güncellemesi / Paper status update`,
+    subject: `${congressName} - Paper status update / Bildiri durum güncellemesi`,
     text: textLines.join("\n"),
     html,
   });

@@ -15,9 +15,41 @@ import type {
 } from "@/types/submission";
 
 export type CongressWithTiers = Congress & { paymentTiers: PaymentTier[] };
+type PaymentLabelLocale = "tr" | "en";
 
 const PAYMENT_CLOSED_MESSAGE =
   "Kayıt süresi sona erdiği için yeni ödeme alınmıyor.";
+
+const paymentLabels = {
+  tr: {
+    academic: "Öğretim Üyesi/Diğer Katılımcı",
+    student: "Öğrenci",
+    firstPaper: "Birinci Bildiri",
+    secondPaperFree: "İkinci Bildiri (Ücretsiz)",
+    early: "Erken Kayıt",
+    late: "Geç Kayıt",
+    inPersonListener: "Yüz Yüze Dinleyici",
+    onlineListener: "Çevrim İçi Dinleyici",
+    presenter: "Sunumlu",
+    listener: "Dinleyici",
+  },
+  en: {
+    academic: "Faculty/Other Participant",
+    student: "Student",
+    firstPaper: "First Paper",
+    secondPaperFree: "Second Paper (Free)",
+    early: "Early Registration",
+    late: "Late Registration",
+    inPersonListener: "In-Person Listener",
+    onlineListener: "Online Listener",
+    presenter: "Presenter",
+    listener: "Listener",
+  },
+} as const;
+
+function labelsFor(locale: PaymentLabelLocale = "tr") {
+  return paymentLabels[locale];
+}
 
 export function getPaymentClosedMessage() {
   return PAYMENT_CLOSED_MESSAGE;
@@ -45,9 +77,13 @@ export function getCurrentPaymentPeriod(
   return "LATE";
 }
 
-export function formatCurrencyAmount(amount: number, currency: string): string {
+export function formatCurrencyAmount(
+  amount: number,
+  currency: string,
+  locale: PaymentLabelLocale = "tr",
+): string {
   try {
-    return new Intl.NumberFormat("tr-TR", {
+    return new Intl.NumberFormat(locale === "en" ? "en-US" : "tr-TR", {
       style: "currency",
       currency,
       maximumFractionDigits: 0,
@@ -62,32 +98,37 @@ export function tierLabel(
     PaymentTier,
     "presentationMode" | "role" | "audience" | "paperOrder" | "period"
   >,
+  locale: PaymentLabelLocale = "tr",
 ): string {
   const parts: string[] = [];
+  const label = labelsFor(locale);
 
   if (tier.role === "PRESENTER") {
-    if (tier.audience === "ACADEMIC") parts.push("Öğretim Üyesi/Diğer Katılımcı");
-    if (tier.audience === "STUDENT") parts.push("Öğrenci");
-    if (tier.paperOrder === 1) parts.push("Birinci Bildiri");
-    if (tier.paperOrder === 2) parts.push("İkinci Bildiri (Ücretsiz)");
-    if (tier.period === "EARLY") parts.push("Erken Kayıt");
-    if (tier.period === "LATE") parts.push("Geç Kayıt");
+    if (tier.audience === "ACADEMIC") parts.push(label.academic);
+    if (tier.audience === "STUDENT") parts.push(label.student);
+    if (tier.paperOrder === 1) parts.push(label.firstPaper);
+    if (tier.paperOrder === 2) parts.push(label.secondPaperFree);
+    if (tier.period === "EARLY") parts.push(label.early);
+    if (tier.period === "LATE") parts.push(label.late);
     return parts.join(" · ");
   }
 
   if (tier.presentationMode === "IN_PERSON") {
-    parts.push("Yüz Yüze Dinleyici");
-    if (tier.audience === "ACADEMIC") parts.push("Öğretim Üyesi/Diğer Katılımcı");
-    if (tier.audience === "STUDENT") parts.push("Öğrenci");
-    if (tier.period === "EARLY") parts.push("Erken Kayıt");
-    if (tier.period === "LATE") parts.push("Geç Kayıt");
+    parts.push(label.inPersonListener);
+    if (tier.audience === "ACADEMIC") parts.push(label.academic);
+    if (tier.audience === "STUDENT") parts.push(label.student);
+    if (tier.period === "EARLY") parts.push(label.early);
+    if (tier.period === "LATE") parts.push(label.late);
   } else {
-    parts.push("Çevrim İçi Dinleyici");
+    parts.push(label.onlineListener);
   }
   return parts.join(" · ");
 }
 
-export function tierToOption(tier: PaymentTier): PaymentTierOption {
+export function tierToOption(
+  tier: PaymentTier,
+  locale: PaymentLabelLocale = "tr",
+): PaymentTierOption {
   return {
     id: tier.id,
     presentationMode: tier.presentationMode,
@@ -100,7 +141,7 @@ export function tierToOption(tier: PaymentTier): PaymentTierOption {
     period: tier.period,
     amount: tier.amount,
     currency: tier.currency,
-    label: tierLabel(tier),
+    label: tierLabel(tier, locale),
   };
 }
 
@@ -179,42 +220,58 @@ export async function getCongressWithTiers(
   });
 }
 
-export function mapPaymentPeriod(period: PaymentPeriod | null) {
+export function mapPaymentPeriod(
+  period: PaymentPeriod | null,
+  locale: PaymentLabelLocale = "tr",
+) {
+  const label = labelsFor(locale);
   switch (period) {
     case "EARLY":
-      return "Erken Kayıt";
+      return label.early;
     case "LATE":
-      return "Geç Kayıt";
+      return label.late;
     default:
       return "-";
   }
 }
 
-export function mapAudience(audience: AudienceType | null) {
+export function mapAudience(
+  audience: AudienceType | null,
+  locale: PaymentLabelLocale = "tr",
+) {
+  const label = labelsFor(locale);
   switch (audience) {
     case "ACADEMIC":
-      return "Öğretim Üyesi/Diğer Katılımcı";
+      return label.academic;
     case "STUDENT":
-      return "Öğrenci";
+      return label.student;
     default:
       return "-";
   }
 }
 
-export function mapAttendeeRole(role: AttendeeRole | null) {
+export function mapAttendeeRole(
+  role: AttendeeRole | null,
+  locale: PaymentLabelLocale = "tr",
+) {
+  const label = labelsFor(locale);
   switch (role) {
     case "PRESENTER":
-      return "Sunumlu";
+      return label.presenter;
     case "LISTENER":
-      return "Dinleyici";
+      return label.listener;
     default:
       return "-";
   }
 }
 
-export function mapPaperOrder(order: number | null) {
-  if (order === 1) return "Birinci Bildiri";
-  if (order === 2) return "İkinci Bildiri (Ücretsiz)";
+export function mapPaperOrder(
+  order: number | null,
+  locale: PaymentLabelLocale = "tr",
+) {
+  const label = labelsFor(locale);
+  if (order === 1) return label.firstPaper;
+  if (order === 2) return label.secondPaperFree;
   return "-";
 }
 

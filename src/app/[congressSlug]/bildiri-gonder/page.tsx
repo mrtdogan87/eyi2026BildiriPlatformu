@@ -7,6 +7,7 @@ import {
   getSubmissionConfig,
   getSubmissionSnapshot,
 } from "@/lib/submission";
+import { getLocale } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -18,9 +19,10 @@ type PageProps = {
 export default async function SubmissionPage({ params, searchParams }: PageProps) {
   const { congressSlug } = await params;
   const { draft } = await searchParams;
+  const locale = await getLocale();
 
   await ensureCongress(congressSlug);
-  const config = await getSubmissionConfig(congressSlug);
+  const config = await getSubmissionConfig(congressSlug, locale);
   if (!config) {
     notFound();
   }

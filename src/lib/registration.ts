@@ -12,7 +12,7 @@ import {
 } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import { getBaseUrl } from "@/lib/submission";
-import type { TFunction } from "@/lib/i18n";
+import type { Locale, TFunction } from "@/lib/i18n";
 import type {
   AudienceType,
   PresentationMode,
@@ -163,6 +163,7 @@ export type CongressWithTiers = Congress & { paymentTiers: PaymentTier[] };
 
 function toRegistrationConfig(
   congress: CongressWithTiers,
+  locale: Locale = "tr",
 ): RegistrationConfig {
   return {
     congressName: congress.name,
@@ -173,7 +174,9 @@ function toRegistrationConfig(
     bank: getCongressBankInfo(congress),
     gala: getCongressGalaInfo(congress),
     trip: getCongressTripInfo(congress),
-    tiers: congress.paymentTiers.filter((tier) => tier.active).map(tierToOption),
+    tiers: congress.paymentTiers
+      .filter((tier) => tier.active)
+      .map((tier) => tierToOption(tier, locale)),
   };
 }
 
@@ -187,6 +190,7 @@ type AcceptedPaperRow = Pick<
 export async function getRegistrationContext(input: {
   email: string;
   congressSlug: string;
+  locale?: Locale;
 }): Promise<RegistrationContext | null> {
   const congress = await getCongressWithTiers(input.congressSlug);
   if (!congress) return null;
@@ -236,7 +240,7 @@ export async function getRegistrationContext(input: {
     email: input.email,
     congressSlug: input.congressSlug,
     acceptedPapers,
-    config: toRegistrationConfig(congress),
+    config: toRegistrationConfig(congress, input.locale ?? "tr"),
   };
 }
 
@@ -329,7 +333,7 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
       label: paper.title,
       amount,
       currency,
-      detail: order === 1 ? "Birinci Bildiri" : "İkinci Bildiri (Ücretsiz)",
+      detail: order === 1 ? input.t("quote.firstPaper") : input.t("quote.secondPaperFree"),
     });
     total += amount;
   }
@@ -361,10 +365,10 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
     const listenerAmount = tier.amount;
     const dayLabel =
       input.listenerDayOne && input.listenerDayTwo
-        ? "1. Gün + 2. Gün"
+        ? input.t("quote.twoDays")
         : input.listenerDayOne
-          ? "1. Gün"
-          : "2. Gün";
+          ? input.t("quote.dayOne")
+          : input.t("quote.dayTwo");
 
     listenerLine = {
       amount: listenerAmount,
@@ -375,11 +379,11 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
       key: "listener",
       label:
         input.listenerPresentationMode === "IN_PERSON"
-          ? `Yüz Yüze Dinleyici · ${dayLabel}`
-          : `Çevrim İçi Dinleyici · ${dayLabel}`,
+          ? `${input.t("quote.inPersonListener")} · ${dayLabel}`
+          : `${input.t("quote.onlineListener")} · ${dayLabel}`,
       amount: listenerAmount,
       currency: tier.currency,
-      detail: tier.amount === 0 ? "Ücretsiz" : undefined,
+      detail: tier.amount === 0 ? input.t("common.free") : undefined,
     });
     total += listenerAmount;
     if (!currency || listenerAmount > 0) currency = tier.currency;
@@ -394,10 +398,10 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
     };
     lines.push({
       key: "gala",
-      label: `Gala Yemeği · ${input.galaAttendeeCount} kişi`,
+      label: input.t("quote.galaLineCount", { count: input.galaAttendeeCount }),
       amount: galaAmount,
       currency: input.congress.galaFeeCurrency,
-      detail: "Ayrıca toplanacaktır",
+      detail: input.t("quote.collectedSeparately"),
     });
     // Gala kayıt ücretiyle birlikte toplanmaz; ekran ve özette bilgi olarak görünür.
   }
@@ -405,23 +409,26 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
   if (input.tripAttendance) {
     lines.push({
       key: "trip",
-      label: `Gezi · ${input.tripAttendeeCount} kişi`,
+      label: input.t("quote.tripLineCount", { count: input.tripAttendeeCount }),
       amount: 0,
       currency: "TRY",
-      detail: input.congress.tripNote || "Ücretsiz",
+      detail: input.congress.tripNote || input.t("common.free"),
     });
   }
 
-  const descriptionParts: string[] = [input.presenterName];
+  const descriptionParts: string[] = [
+    input.t("registration.transferCode"),
+    input.presenterName,
+  ].filter(Boolean);
   if (paperAssignments.length === 1) {
-    descriptionParts.push("1 Bildiri");
+    descriptionParts.push(input.t("registration.transferOnePaper"));
   } else if (paperAssignments.length > 1) {
-    descriptionParts.push(`${paperAssignments.length} Bildiri`);
+    descriptionParts.push(input.t("registration.transferPaperCount", { count: paperAssignments.length }));
   }
-  if (listenerLine) {
-    descriptionParts.push("Dinleyici");
+  if (listenerLine && listenerLine.amount > 0) {
+    descriptionParts.push(input.t("registration.transferListener"));
   }
-  descriptionParts.push(period === "EARLY" ? "Erken Kayıt" : "Geç Kayıt");
+  descriptionParts.push(period === "EARLY" ? input.t("quote.periodEarly") : input.t("quote.periodLate"));
 
   return {
     quote: {

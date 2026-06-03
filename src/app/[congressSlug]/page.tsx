@@ -11,8 +11,13 @@ type PageProps = {
 
 export default async function CongressHubPage({ params }: PageProps) {
   const { congressSlug } = await params;
-  const { t } = await getServerT();
-  const congressTitle = congressSlug === "eyi-2026" ? "EYİ 2026" : slugToTitle(congressSlug);
+  const { locale, t } = await getServerT();
+  const congressTitle =
+    congressSlug === "eyi-2026"
+      ? locale === "en"
+        ? "ISEOS 2026"
+        : "EYİ 2026"
+      : slugToTitle(congressSlug);
 
   return (
     <main className="page-shell hub-shell">

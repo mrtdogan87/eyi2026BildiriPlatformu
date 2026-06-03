@@ -16,7 +16,7 @@ import type {
   SubmissionSnapshot,
 } from "@/types/submission";
 import { slugToTitle } from "@/lib/utils";
-import type { TFunction } from "@/lib/i18n";
+import type { Locale, TFunction } from "@/lib/i18n";
 
 const DRAFT_COOKIE = "draft_access";
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -274,6 +274,7 @@ export function validateParticipation(input: SubmissionParticipationInput, t: TF
 
 export async function getSubmissionConfig(
   congressSlug: string,
+  locale: Locale = "tr",
 ): Promise<SubmissionConfig | null> {
   const congress = await getCongressWithTiers(congressSlug);
   if (!congress) {
@@ -286,7 +287,9 @@ export async function getSubmissionConfig(
     earlyDeadline: congress.earlyDeadline?.toISOString() ?? null,
     lateDeadline: congress.lateDeadline?.toISOString() ?? null,
     currentPeriod: getCurrentPaymentPeriod(congress),
-    tiers: congress.paymentTiers.filter((tier) => tier.active).map(tierToOption),
+    tiers: congress.paymentTiers
+      .filter((tier) => tier.active)
+      .map((tier) => tierToOption(tier, locale)),
   };
 }
 

@@ -17,7 +17,7 @@ type PageProps = {
 export default async function RegistrationPanelPage({ params }: PageProps) {
   const { congressSlug } = await params;
   const congress = await ensureCongress(congressSlug);
-  const { t } = await getServerT();
+  const { locale, t } = await getServerT();
   const session = await readRegistrationSession();
 
   if (!session || session.congressId !== congress.id) {
@@ -27,6 +27,7 @@ export default async function RegistrationPanelPage({ params }: PageProps) {
   const context = await getRegistrationContext({
     email: session.email,
     congressSlug,
+    locale,
   });
 
   if (!context) {

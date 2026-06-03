@@ -13,7 +13,15 @@ export async function PlatformHero({
   congressName,
   subtitle,
 }: Props) {
-  const { t } = await getServerT();
+  const { locale, t } = await getServerT();
+  const eventShortName = locale === "en" ? "ISEOS 2026" : "EYİ 2026";
+  const normalizedCongressName = congressName?.toLocaleLowerCase("tr-TR") ?? "";
+  const isEyiCongress =
+    normalizedCongressName.includes("eyi") || normalizedCongressName.includes("ekonometri");
+  const congressDisplayName =
+    locale === "en" && isEyiCongress
+      ? t("submission.heroDefaultSubtitle")
+      : congressName;
 
   const eyebrow =
     variant === "submission"
@@ -21,8 +29,8 @@ export async function PlatformHero({
       : variant === "registration"
         ? t("registration.heroEyebrow")
         : variant === "hub"
-          ? t("hub.eyebrow", { title: "EYİ 2026" })
-          : "EYİ 2026";
+          ? t("hub.eyebrow", { title: eventShortName })
+          : eventShortName;
 
   const title =
     variant === "submission"
@@ -33,7 +41,7 @@ export async function PlatformHero({
           ? congressName ?? t("common.platformName")
           : t("common.platformName");
 
-  const heroSubtitle = subtitle ?? congressName ?? t("submission.heroDefaultSubtitle");
+  const heroSubtitle = subtitle ?? congressDisplayName ?? t("submission.heroDefaultSubtitle");
 
   return (
     <section className={`hero platform-hero platform-hero-${variant}`}>

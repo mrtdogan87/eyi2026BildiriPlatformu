@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrencyAmount } from "@/lib/payment";
-import { ACADEMIC_TITLES, OTHER_TITLE } from "@/lib/titles";
-import { useT } from "@/lib/i18n/provider";
+import { ACADEMIC_TITLES, OTHER_TITLE, academicTitleLabel } from "@/lib/titles";
+import { useLocale, useT } from "@/lib/i18n/provider";
 import type {
   AudienceType,
   PaymentTierOption,
@@ -106,6 +106,7 @@ function findPresenterPaperTiers(
 export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Props) {
   const router = useRouter();
   const t = useT();
+  const locale = useLocale();
   const [snapshot, setSnapshot] = useState<SubmissionSnapshot | null>(initialSnapshot);
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState(initialSnapshot?.draftOwnerEmail ?? "");
@@ -652,7 +653,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                         <option value="">{t("common.select")}</option>
                         {ACADEMIC_TITLES.map((option) => (
                           <option key={option} value={option}>
-                            {option}
+                            {academicTitleLabel(option, locale)}
                           </option>
                         ))}
                       </select>
@@ -810,7 +811,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       <label>{t("quote.periodEarly")}</label>
                       <div className="amount-display">
                         {earlyTier
-                          ? formatCurrencyAmount(earlyTier.amount, earlyTier.currency)
+                          ? formatCurrencyAmount(earlyTier.amount, earlyTier.currency, locale)
                           : t("submission.notDefined")}
                         <span className="amount-display-meta">{t("submission.forFirstPaper")}</span>
                       </div>
@@ -819,7 +820,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       <label>{t("quote.periodLate")}</label>
                       <div className="amount-display">
                         {lateTier
-                          ? formatCurrencyAmount(lateTier.amount, lateTier.currency)
+                          ? formatCurrencyAmount(lateTier.amount, lateTier.currency, locale)
                           : t("submission.notDefined")}
                         <span className="amount-display-meta">{t("submission.forFirstPaper")}</span>
                       </div>

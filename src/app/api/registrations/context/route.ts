@@ -7,7 +7,7 @@ import {
 import { getServerT } from "@/lib/i18n/server";
 
 export async function GET() {
-  const { t } = await getServerT();
+  const { locale, t } = await getServerT();
   const session = await readRegistrationSession();
   if (!session) {
     return NextResponse.json({ error: t("api.sessionNotFound") }, { status: 401 });
@@ -24,6 +24,7 @@ export async function GET() {
   const context = await getRegistrationContext({
     email: session.email,
     congressSlug: congress.slug,
+    locale,
   });
 
   if (!context) {

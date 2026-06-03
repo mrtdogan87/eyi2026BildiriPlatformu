@@ -2,9 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatCurrencyAmount, mapPaymentPeriod } from "@/lib/payment";
-import { ACADEMIC_TITLES, OTHER_TITLE } from "@/lib/titles";
-import { useT } from "@/lib/i18n/provider";
+import { formatCurrencyAmount } from "@/lib/payment";
+import { ACADEMIC_TITLES, OTHER_TITLE, academicTitleLabel } from "@/lib/titles";
+import { useLocale, useT } from "@/lib/i18n/provider";
 import type {
   AudienceType,
   PaymentTierOption,
@@ -93,6 +93,7 @@ function findPaperTier(
 export function RegistrationPortal({ context }: Props) {
   const router = useRouter();
   const t = useT();
+  const locale = useLocale();
   const { config } = context;
 
   const [presenterName, setPresenterName] = useState("");
@@ -233,7 +234,7 @@ export function RegistrationPortal({ context }: Props) {
           config.gala.amount === 0
             ? t("quote.galaFree")
             : t("quote.galaPerPerson", {
-                amount: formatCurrencyAmount(config.gala.amount, config.gala.currency),
+                amount: formatCurrencyAmount(config.gala.amount, config.gala.currency, locale),
               }),
         amount: galaTotal,
         currency: config.gala.currency,
@@ -255,15 +256,19 @@ export function RegistrationPortal({ context }: Props) {
     if (galaLine) lines.push(galaLine);
     if (tripLine) lines.push(tripLine);
 
-    const trimmedName = ["EYİ2026", presenterName.trim()]
+    const trimmedName = [t("registration.transferCode"), presenterName.trim()]
       .filter(Boolean)
       .join(" ");
     const descriptionParts: string[] = [];
     if (trimmedName) descriptionParts.push(trimmedName);
-    if (paperLines.length === 1) descriptionParts.push("1 Bildiri");
-    if (paperLines.length > 1) descriptionParts.push(`${paperLines.length} Bildiri`);
-    if (listenerLine && listenerLine.amount > 0) descriptionParts.push("Dinleyici");
-    if (period) descriptionParts.push(mapPaymentPeriod(period));
+    if (paperLines.length === 1) descriptionParts.push(t("registration.transferOnePaper"));
+    if (paperLines.length > 1) {
+      descriptionParts.push(t("registration.transferPaperCount", { count: paperLines.length }));
+    }
+    if (listenerLine && listenerLine.amount > 0) {
+      descriptionParts.push(t("registration.transferListener"));
+    }
+    if (period) descriptionParts.push(t(period === "EARLY" ? "quote.periodEarly" : "quote.periodLate"));
 
     return {
       paperLines,
@@ -273,7 +278,7 @@ export function RegistrationPortal({ context }: Props) {
       paperTotal,
       grandLines: lines,
       paperCurrency,
-      description: descriptionParts.join(" · ") || "Henüz seçim yapılmadı",
+      description: descriptionParts.join(" · ") || t("registration.noSelectionYet"),
       error: runningError,
     };
   }, [
@@ -289,6 +294,7 @@ export function RegistrationPortal({ context }: Props) {
     galaAttendance,
     tripAttendance,
     presenterName,
+    locale,
     t,
   ]);
 
@@ -440,7 +446,7 @@ export function RegistrationPortal({ context }: Props) {
                 <option value="">{t("common.select")}</option>
                 {ACADEMIC_TITLES.map((option) => (
                   <option key={option} value={option}>
-                    {option}
+                    {academicTitleLabel(option, locale)}
                   </option>
                 ))}
               </select>
@@ -589,14 +595,14 @@ export function RegistrationPortal({ context }: Props) {
               <span>
                 {line.amount === 0
                   ? t("common.free")
-                  : formatCurrencyAmount(line.amount, line.currency)}
+                  : formatCurrencyAmount(line.amount, line.currency, locale)}
               </span>
             </div>
           ))}
         </div>
         <div className="quote-total">
           <span>{t("registration.receiptAmountRow")}</span>
-          <strong>{formatCurrencyAmount(computed.paperTotal, computed.paperCurrency)}</strong>
+          <strong>{formatCurrencyAmount(computed.paperTotal, computed.paperCurrency, locale)}</strong>
         </div>
       </div>
 

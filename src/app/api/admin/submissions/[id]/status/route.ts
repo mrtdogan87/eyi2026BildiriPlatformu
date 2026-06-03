@@ -49,7 +49,7 @@ export async function POST(request: Request, { params }: RouteProps) {
     try {
       await sendSubmissionStatusEmail({
         to: submission.submission.draftOwnerEmail,
-        congressName: "EYİ 2026",
+        congressName: "EYİ 2026 / ISEOS 2026",
         congressSlug: ADMIN_DEFAULT_CONGRESS_SLUG,
         paperTitle,
         statusLabel: mapSubmissionStatus(body.status),

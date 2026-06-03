@@ -1,18 +1,21 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { getLocale } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
-  title: "EYİ 2026 Bildiri Platformu",
-  description: "EYİ 2026 bildiri gönderim ve yönetim sistemi",
+  title: "EYİ2026 / ISEOS2026 Platformu",
+  description: "EYİ2026 / ISEOS2026 bildiri gönderim ve kayıt sistemi",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
-    <html lang="tr">
+    <html lang={locale}>
       <body>{children}</body>
     </html>
   );
