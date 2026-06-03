@@ -26,6 +26,25 @@ type ResendSendResponse = {
   name?: string;
 };
 
+function getCongressEmailNames(congressName: string) {
+  const normalized = congressName.toLocaleLowerCase("tr-TR");
+  const isEyiCongress =
+    normalized.includes("eyi") ||
+    normalized.includes("iseos") ||
+    normalized.includes("ekonometri") ||
+    normalized.includes("econometrics");
+
+  if (!isEyiCongress) {
+    return { tr: congressName, en: congressName, brand: congressName };
+  }
+
+  return {
+    tr: "EYİ2026",
+    en: "ISEOS2026",
+    brand: "EYİ2026 / ISEOS2026",
+  };
+}
+
 function getResendConfig() {
   const apiKey = process.env.RESEND_API_KEY;
   const senderEmail = process.env.RESEND_SENDER_EMAIL;
@@ -112,13 +131,14 @@ async function sendEmail(input: { subject: string; to: string; text: string; htm
 }
 
 export async function sendDraftAccessEmail({ to, congressName, magicLink }: DraftEmailInput) {
+  const congress = getCongressEmailNames(congressName);
   const html = emailLayout(
-    `${congressName} - Draft Access Link / Taslak Erişim Bağlantısı`,
+    `${congress.en} - Draft Access Link / ${congress.tr} - Taslak Erişim Bağlantısı`,
     `
     <p class="lang-tag">Türkçe</p>
     <h1>Bildiri taslağınıza erişim bağlantınız hazır</h1>
     <p>
-      <strong>${congressName}</strong> bildiri gönderim platformunda başlattığınız taslağa,
+      <strong>${congress.tr}</strong> bildiri gönderim platformunda başlattığınız taslağa,
       güvenli erişim bağlantısı aşağıdadır. Bağlantıyı açtıktan sonra ekrandaki doğrulama adımıyla
       taslağınıza geçebilirsiniz.
     </p>
@@ -133,7 +153,7 @@ export async function sendDraftAccessEmail({ to, congressName, magicLink }: Draf
     <h1>Your draft access link is ready</h1>
     <p>
       Below is the secure access link to the draft you started on the
-      <strong>${congressName}</strong> paper submission platform. After opening the link, you can
+      <strong>${congress.en}</strong> paper submission platform. After opening the link, you can
       reach your draft via the on-screen verification step.
     </p>
     <p><a class="cta" href="${magicLink}">Open Draft</a></p>
@@ -143,14 +163,14 @@ export async function sendDraftAccessEmail({ to, congressName, magicLink }: Draf
       If you did not request this link, you can ignore this email.
     </p>
     `,
-    congressName,
+    congress.brand,
   );
 
   return sendEmail({
     to,
-    subject: `${congressName} - Draft access link / Taslak erişim bağlantısı`,
+    subject: `${congress.en} - Draft access link / ${congress.tr} - Taslak erişim bağlantısı`,
     text: [
-      `${congressName} bildiri gönderim platformunda başlattığınız taslağa erişim bağlantısı:`,
+      `${congress.tr} bildiri gönderim platformunda başlattığınız taslağa erişim bağlantısı:`,
       "",
       magicLink,
       "",
@@ -158,7 +178,7 @@ export async function sendDraftAccessEmail({ to, congressName, magicLink }: Draf
       "",
       "----",
       "",
-      `Access link to the draft you started on the ${congressName} paper submission platform:`,
+      `Access link to the draft you started on the ${congress.en} paper submission platform:`,
       "",
       magicLink,
       "",
@@ -173,13 +193,14 @@ export async function sendRegistrationAccessEmail({
   congressName,
   magicLink,
 }: RegistrationEmailInput) {
+  const congress = getCongressEmailNames(congressName);
   const html = emailLayout(
-    `${congressName} - Registration Access Link / Kayıt Erişim Bağlantısı`,
+    `${congress.en} - Registration Access Link / ${congress.tr} - Kayıt Erişim Bağlantısı`,
     `
     <p class="lang-tag">Türkçe</p>
     <h1>Kayıt sayfanıza giriş bağlantınız hazır</h1>
     <p>
-      <strong>${congressName}</strong> kayıt sayfasına girmek için aşağıdaki güvenli bağlantıyı
+      <strong>${congress.tr}</strong> kayıt sayfasına girmek için aşağıdaki güvenli bağlantıyı
       kullanabilirsiniz.
     </p>
     <p><a class="cta" href="${magicLink}">Kayıt Sayfasını Aç</a></p>
@@ -195,7 +216,7 @@ export async function sendRegistrationAccessEmail({
     <p class="lang-tag">English</p>
     <h1>Your registration login link is ready</h1>
     <p>
-      You can use the secure link below to access the <strong>${congressName}</strong> registration
+      You can use the secure link below to access the <strong>${congress.en}</strong> registration
       page.
     </p>
     <p><a class="cta" href="${magicLink}">Open Registration Page</a></p>
@@ -208,14 +229,14 @@ export async function sendRegistrationAccessEmail({
       5 minutes. If you did not request this link, you can ignore this email.
     </p>
     `,
-    congressName,
+    congress.brand,
   );
 
   return sendEmail({
     to,
-    subject: `${congressName} - Registration access link / Kayıt erişim bağlantısı`,
+    subject: `${congress.en} - Registration access link / ${congress.tr} - Kayıt erişim bağlantısı`,
     text: [
-      `${congressName} kayıt sayfasına erişim bağlantısı:`,
+      `${congress.tr} kayıt sayfasına erişim bağlantısı:`,
       "",
       magicLink,
       "",
@@ -223,7 +244,7 @@ export async function sendRegistrationAccessEmail({
       "",
       "----",
       "",
-      `Access link to the ${congressName} registration page:`,
+      `Access link to the ${congress.en} registration page:`,
       "",
       magicLink,
       "",
@@ -241,6 +262,7 @@ export async function sendSubmissionStatusEmail({
   status,
   registrationUrl,
 }: SubmissionStatusEmailInput) {
+  const congress = getCongressEmailNames(congressName);
   const statusLabelEn =
     status === "ACCEPTED"
       ? "Accepted"
@@ -318,7 +340,7 @@ export async function sendSubmissionStatusEmail({
       : "";
 
   const html = emailLayout(
-    `${congressName} - Paper Status Update / Bildiri Durum Güncellemesi`,
+    `${congress.en} - Paper Status Update / ${congress.tr} - Bildiri Durum Güncellemesi`,
     `
     <p class="lang-tag">Türkçe</p>
     <h1>Bildirinizin durumu güncellendi</h1>
@@ -348,11 +370,11 @@ export async function sendSubmissionStatusEmail({
       secretariat.
     </p>
     `,
-    congressName,
+    congress.brand,
   );
 
   const textLines = [
-    `${congressName} kapsamında gönderdiğiniz bildirinin durumu güncellendi.`,
+    `${congress.tr} kapsamında gönderdiğiniz bildirinin durumu güncellendi.`,
     "",
     `Başlık: ${paperTitle}`,
     `Yeni durum: ${statusLabel}`,
@@ -362,7 +384,7 @@ export async function sendSubmissionStatusEmail({
   }
   textLines.push("", "----", "");
   textLines.push(
-    `The status of the paper you submitted for ${congressName} has been updated.`,
+    `The status of the paper you submitted for ${congress.en} has been updated.`,
     "",
     `Title: ${paperTitle}`,
     `New status: ${statusLabelEn}`,
@@ -373,7 +395,7 @@ export async function sendSubmissionStatusEmail({
 
   return sendEmail({
     to,
-    subject: `${congressName} - Paper status update / Bildiri durum güncellemesi`,
+    subject: `${congress.en} - Paper status update / ${congress.tr} - Bildiri durum güncellemesi`,
     text: textLines.join("\n"),
     html,
   });
