@@ -92,6 +92,10 @@ export type RegistrationAcceptedPaper = {
   submittedAt: string | null;
   alreadyPaid: boolean;
   paidAt: string | null;
+  // Giriş yapan kişi bu bildirinin SUNAN yazarı mı?
+  isPresenter: boolean;
+  // Bildirideki sunan yazarın adı (kimlik karşılaştırması ve gösterim için).
+  presenterName: string | null;
 };
 
 export type RegistrationConfig = {
@@ -111,6 +115,8 @@ export type RegistrationContext = {
   congressSlug: string;
   acceptedPapers: RegistrationAcceptedPaper[];
   config: RegistrationConfig;
+  // Giriş e-postasıyla eşleşen yazar kaydındaki ad (ad alanını ön-doldurmak için).
+  registrantName: string | null;
 };
 
 export type RegistrationPaperSelectionInput = {

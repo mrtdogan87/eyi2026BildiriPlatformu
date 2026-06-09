@@ -86,15 +86,7 @@ export async function POST(_request: Request, { params }: RouteProps) {
     return NextResponse.json({ error: authorErrors[0] }, { status: 400 });
   }
 
-  // Sunan yazarın e-postası, taslağı başlatan e-posta ile aynı olmalı.
   const presenterAuthor = findPresenter(submission.authors);
-  if (
-    presenterAuthor &&
-    presenterAuthor.email.trim().toLowerCase() !==
-      submission.draftOwnerEmail.trim().toLowerCase()
-  ) {
-    return NextResponse.json({ error: t("api.presenterEmailMismatch") }, { status: 400 });
-  }
 
   if (!submission.presentationMode || !submission.audience) {
     return NextResponse.json({ error: t("api.participationRequiredSubmit") }, { status: 400 });

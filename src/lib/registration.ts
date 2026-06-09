@@ -12,6 +12,7 @@ import {
 } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
 import { getBaseUrl } from "@/lib/submission";
+import { normalizeName } from "@/lib/utils";
 import type { Locale, TFunction } from "@/lib/i18n";
 import type {
   AudienceType,
@@ -184,6 +185,7 @@ type AcceptedPaperRow = Pick<
   Submission,
   "id" | "titleTr" | "titleEn" | "submissionLanguage" | "presentationMode" | "audience" | "submittedAt"
 > & {
+  authors: Array<{ email: string; fullName: string; isPresenter: boolean }>;
   paperItem: { paidAt: Date | null; registration: { paidAt: Date | null } } | null;
 };
 
@@ -196,14 +198,12 @@ export async function getRegistrationContext(input: {
   if (!congress) return null;
 
   const normalizedEmail = input.email.toLowerCase();
+  // Eşleştirme yalnızca yazar e-postası üzerinden yapılır (taslağı başlatan e-posta dikkate alınmaz).
   const submissions = await prisma.submission.findMany({
     where: {
       congressId: congress.id,
       status: "ACCEPTED",
-      OR: [
-        { draftOwnerEmail: normalizedEmail },
-        { authors: { some: { email: normalizedEmail } } },
-      ],
+      authors: { some: { email: normalizedEmail } },
     },
     orderBy: [{ submittedAt: "asc" }, { createdAt: "asc" }],
     select: {
@@ -214,14 +214,18 @@ export async function getRegistrationContext(input: {
       presentationMode: true,
       audience: true,
       submittedAt: true,
+      authors: { select: { email: true, fullName: true, isPresenter: true } },
       paperItem: {
         include: { registration: true },
       },
     },
   });
 
-  const acceptedPapers = (submissions as unknown as AcceptedPaperRow[]).map((submission) => {
+  const rows = submissions as unknown as AcceptedPaperRow[];
+
+  const acceptedPapers = rows.map((submission) => {
     const language = submission.submissionLanguage ?? "TR";
+    const presenter = submission.authors.find((author) => author.isPresenter) ?? null;
     return {
       submissionId: submission.id,
       title:
@@ -233,14 +237,31 @@ export async function getRegistrationContext(input: {
       submittedAt: submission.submittedAt?.toISOString() ?? null,
       alreadyPaid: Boolean(submission.paperItem?.registration?.paidAt),
       paidAt: submission.paperItem?.registration?.paidAt?.toISOString() ?? null,
+      isPresenter: presenter?.email.toLowerCase() === normalizedEmail,
+      presenterName: presenter?.fullName ?? null,
     };
   });
+
+  // Ad alanını ön-doldurmak için: giriş e-postasıyla eşleşen yazar kaydındaki ad (önce sunan kaydı).
+  let registrantName: string | null = null;
+  for (const submission of rows) {
+    const mine = submission.authors.find(
+      (author) => author.email.toLowerCase() === normalizedEmail,
+    );
+    if (!mine) continue;
+    if (mine.isPresenter) {
+      registrantName = mine.fullName;
+      break;
+    }
+    if (!registrantName) registrantName = mine.fullName;
+  }
 
   return {
     email: input.email,
     congressSlug: input.congressSlug,
     acceptedPapers,
     config: toRegistrationConfig(congress, input.locale ?? "tr"),
+    registrantName,
   };
 }
 
@@ -252,6 +273,8 @@ export type RegistrationCalculationInput = {
     submissionId: string;
     title: string;
     audience: AudienceType | null;
+    // Bildirideki sunan yazarın adı — 2. bildiri ücretsizliği için kimlik grubu anahtarı.
+    presenterName: string | null;
   }>;
   listenerEnabled: boolean;
   listenerPresentationMode: PresentationMode | null;
@@ -303,11 +326,20 @@ export function calculateRegistration(input: RegistrationCalculationInput): Calc
   let total = 0;
   let currency = "TRY";
 
-  for (const [index, paper] of input.selectedPapers.entries()) {
+  // 2. bildiri ücretsizliği KİMLİK grubuna göre: aynı sunan yazar (ad-soyad) ilk bildiri tam,
+  // sonraki bildirileri ücretsiz. Farklı ad = farklı kimlik = ayrı tam ücret.
+  const identityCounts = new Map<string, number>();
+
+  for (const paper of input.selectedPapers) {
     if (!paper.audience) {
       throw new Error(input.t("api.audienceMissingForPapers"));
     }
-    const order = index === 0 ? 1 : 2;
+    const identityKey = paper.presenterName
+      ? normalizeName(paper.presenterName)
+      : `__${paper.submissionId}`;
+    const seen = identityCounts.get(identityKey) ?? 0;
+    identityCounts.set(identityKey, seen + 1);
+    const order = seen === 0 ? 1 : 2;
     const tier = findApplicableTier(tiers, {
       presentationMode: "IN_PERSON",
       attendeeRole: "PRESENTER",

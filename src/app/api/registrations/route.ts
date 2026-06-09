@@ -64,19 +64,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: t("api.congressNotFound") }, { status: 404 });
   }
 
-  // Validate the selected papers belong to this email & ACCEPTED
+  // Kullanıcı yalnızca SUNDUĞU bildirilerin ücretini ödeyebilir (e-posta == sunan yazar).
   const normalizedEmail = session.email.toLowerCase();
   const selectedSubmissions = await prisma.submission.findMany({
     where: {
       id: { in: paperSubmissionIds },
       congressId: congress.id,
       status: "ACCEPTED",
-      OR: [
-        { draftOwnerEmail: normalizedEmail },
-        { authors: { some: { email: normalizedEmail } } },
-      ],
+      authors: { some: { email: normalizedEmail, isPresenter: true } },
     },
-    include: { paperItem: true },
+    include: { paperItem: true, authors: { select: { fullName: true, isPresenter: true } } },
     orderBy: [{ submittedAt: "asc" }, { createdAt: "asc" }],
   });
 
@@ -103,6 +100,8 @@ export async function POST(request: Request) {
             ? submission.titleEn || submission.titleTr || "Bildiri"
             : submission.titleTr || submission.titleEn || "Bildiri",
         audience: submission.audience,
+        presenterName:
+          submission.authors.find((author) => author.isPresenter)?.fullName ?? null,
       })),
       listenerEnabled,
       listenerPresentationMode,

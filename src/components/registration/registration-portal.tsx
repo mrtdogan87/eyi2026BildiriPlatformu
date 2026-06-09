@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatCurrencyAmount } from "@/lib/payment";
+import { normalizeName } from "@/lib/utils";
 import { ACADEMIC_TITLES, OTHER_TITLE, academicTitleLabel } from "@/lib/titles";
 import { useLocale, useT } from "@/lib/i18n/provider";
 import type {
@@ -96,7 +97,7 @@ export function RegistrationPortal({ context }: Props) {
   const locale = useLocale();
   const { config } = context;
 
-  const [presenterName, setPresenterName] = useState("");
+  const [presenterName, setPresenterName] = useState(context.registrantName ?? "");
   const [presenterTitle, setPresenterTitle] = useState("");
   const [presenterTitleOther, setPresenterTitleOther] = useState(false);
   const [selectedSubmissionIds, setSelectedSubmissionIds] = useState<string[]>([]);
@@ -117,23 +118,45 @@ export function RegistrationPortal({ context }: Props) {
 
   const areDeclarationsComplete = Object.values(declarations).every(Boolean);
 
-  const hasAcceptedPapers = context.acceptedPapers.length > 0;
+  // Sunduğunuz bildiriler = ödenebilir; ortak yazar olunan bildiriler = yalnızca bilgi.
+  const presenterPapers = useMemo(
+    () => context.acceptedPapers.filter((paper) => paper.isPresenter),
+    [context.acceptedPapers],
+  );
+  const coauthorPapers = useMemo(
+    () => context.acceptedPapers.filter((paper) => !paper.isPresenter),
+    [context.acceptedPapers],
+  );
+  const hasPresenterPapers = presenterPapers.length > 0;
   const period = config.currentPeriod ?? null;
 
+  // Bildiri sunmayan kişi (ortak yazar veya bildirisiz) katılımcı/dinleyici olarak kaydolur.
   useEffect(() => {
-    if (!hasAcceptedPapers) {
+    if (!hasPresenterPapers) {
       setListenerEnabled(true);
       if (!listenerSelection) setListenerSelection("ONLINE");
     }
-  }, [hasAcceptedPapers, listenerSelection]);
+  }, [hasPresenterPapers, listenerSelection]);
 
   const selectedPapers = useMemo(
     () =>
-      context.acceptedPapers.filter((paper) =>
+      presenterPapers.filter((paper) =>
         selectedSubmissionIds.includes(paper.submissionId),
       ),
-    [context.acceptedPapers, selectedSubmissionIds],
+    [presenterPapers, selectedSubmissionIds],
   );
+
+  // Bloklamayan kimlik uyarısı: girilen ad, seçilen sunan bildirilerin kayıtlı adıyla
+  // eşleşmiyorsa ya da seçilen bildirilerde sunan adı tutarsızsa uyar.
+  const identityWarning = useMemo(() => {
+    if (!selectedPapers.length) return false;
+    const enteredName = normalizeName(presenterName);
+    const paperNames = selectedPapers.map((paper) => normalizeName(paper.presenterName));
+    const distinctNames = new Set(paperNames.filter(Boolean));
+    if (distinctNames.size > 1) return true;
+    if (enteredName && distinctNames.size === 1 && !distinctNames.has(enteredName)) return true;
+    return false;
+  }, [selectedPapers, presenterName]);
 
   type Line = {
     key: string;
@@ -163,8 +186,15 @@ export function RegistrationPortal({ context }: Props) {
       runningError = t("registration.err.periodEnded");
     }
 
-    selectedPapers.forEach((paper, index) => {
-      const order: 1 | 2 = index === 0 ? 1 : 2;
+    // 2. bildiri ücretsizliği kimlik grubuna (sunan ad-soyad) göre.
+    const identityCounts = new Map<string, number>();
+    selectedPapers.forEach((paper) => {
+      const identityKey = paper.presenterName
+        ? normalizeName(paper.presenterName)
+        : `__${paper.submissionId}`;
+      const seen = identityCounts.get(identityKey) ?? 0;
+      identityCounts.set(identityKey, seen + 1);
+      const order: 1 | 2 = seen === 0 ? 1 : 2;
       const tier = period
         ? findPaperTier(config.tiers, paper.audience, order, period)
         : null;
@@ -463,10 +493,10 @@ export function RegistrationPortal({ context }: Props) {
         </div>
 
         <div className="author-card">
-          <h3>{t("registration.acceptedPapersHeading")}</h3>
-          {hasAcceptedPapers ? (
+          <h3>{t("registration.presenterPapersHeading")}</h3>
+          {hasPresenterPapers ? (
             <div className="paper-list">
-              {context.acceptedPapers.map((paper) => (
+              {presenterPapers.map((paper) => (
                 <label
                   key={paper.submissionId}
                   className={`paper-item${paper.alreadyPaid ? " is-paid" : ""}`}
@@ -491,13 +521,41 @@ export function RegistrationPortal({ context }: Props) {
             </div>
           ) : (
             <p style={{ margin: 0, color: "var(--text-muted)" }}>
-              {t("registration.noAcceptedPapers")}
+              {t("registration.noPresenterPapers")}
             </p>
           )}
+
+          {coauthorPapers.length > 0 ? (
+            <div style={{ marginTop: 18 }}>
+              <h3 style={{ marginBottom: 6 }}>{t("registration.coauthorPapersHeading")}</h3>
+              <p className="field-hint" style={{ marginBottom: 12 }}>
+                {t("registration.coauthorPapersNote")}
+              </p>
+              <div className="paper-list">
+                {coauthorPapers.map((paper) => (
+                  <div
+                    key={paper.submissionId}
+                    className="paper-item"
+                    style={{ gridTemplateColumns: "1fr", cursor: "default" }}
+                  >
+                    <div>
+                      <strong>{paper.title}</strong>
+                      <p>
+                        {paper.audience === "ACADEMIC" ? t("quote.academic") : paper.audience === "STUDENT" ? t("quote.student") : "—"}
+                        {" · "}
+                        {paper.presentationMode === "IN_PERSON" ? t("quote.inPerson") : paper.presentationMode === "ONLINE" ? t("quote.online") : "—"}
+                        {paper.presenterName ? ` · ${t("registration.presenterLabel", { name: paper.presenterName })}` : ""}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </div>
       </div>
 
-      {!hasAcceptedPapers ? (
+      {!hasPresenterPapers ? (
       <div className="author-card" style={{ marginTop: 18 }}>
         <h3>{t("registration.listenerHeading")}</h3>
         <div className="form-stack">
@@ -704,6 +762,12 @@ export function RegistrationPortal({ context }: Props) {
           ))}
         </div>
       </div>
+
+      {identityWarning ? (
+        <div className="notice" style={{ marginTop: 18, background: "var(--warning-bg)", color: "var(--warning)" }}>
+          {t("registration.identityWarning")}
+        </div>
+      ) : null}
 
       {error || computed.error ? (
         <div className="error" style={{ marginTop: 18 }}>

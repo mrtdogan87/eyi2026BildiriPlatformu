@@ -46,6 +46,15 @@ export const registration = {
     noAcceptedPapers:
       "Bu e-postaya bağlı kabul edilmiş bildiri bulunmuyor. Dinleyici olarak kaydolabilirsiniz.",
     paid: "Ödendi",
+    presenterPapersHeading: "Sunduğunuz Bildiriler",
+    noPresenterPapers:
+      "Bu e-postayla sunan yazar olduğunuz kabul edilmiş bildiri yok. Kongreye katılımcı/dinleyici olarak kaydolabilirsiniz.",
+    coauthorPapersHeading: "Yazar Olduğunuz Diğer Bildiriler",
+    coauthorPapersNote:
+      "Bu bildirilerde sunan yazar değilsiniz; ücreti sunan yazar öder. Kongreye katılmak için aşağıdan katılımcı/dinleyici olarak kaydolabilirsiniz.",
+    presenterLabel: "Sunan: {name}",
+    identityWarning:
+      "Bu siz misiniz? Girdiğiniz ad-soyad, bildirideki sunan yazarla tam eşleşmiyor. Bilgilerinizi kontrol edin; yine de devam edebilirsiniz.",
     listenerHeading: "Dinleyici Katılımı",
     listenerCheckbox: "Dinleyici olarak katılmak istiyorum",
     listenerTier: {
@@ -164,6 +173,15 @@ export const registration = {
     noAcceptedPapers:
       "There are no accepted papers linked to this email. You can register as a listener.",
     paid: "Paid",
+    presenterPapersHeading: "Papers You Present",
+    noPresenterPapers:
+      "There are no accepted papers where you are the presenting author for this email. You can register as a participant/listener.",
+    coauthorPapersHeading: "Other Papers You Co-author",
+    coauthorPapersNote:
+      "You are not the presenting author on these; the presenting author pays the fee. To attend the congress, you can register as a participant/listener below.",
+    presenterLabel: "Presenter: {name}",
+    identityWarning:
+      "Is this you? The name you entered does not exactly match the presenting author on the paper. Please check your details; you can still continue.",
     listenerHeading: "Listener Attendance",
     listenerCheckbox: "I want to attend as a listener",
     listenerTier: {

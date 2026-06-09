@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { canAccessDraft, findPresenter, getSubmissionSnapshot, validateAuthors } from "@/lib/submission";
+import { canAccessDraft, getSubmissionSnapshot, validateAuthors } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 import type { SubmissionAuthorInput } from "@/types/submission";
 
@@ -20,20 +20,6 @@ export async function PATCH(request: Request, { params }: RouteProps) {
   const errors = validateAuthors(authors, t);
   if (errors.length) {
     return NextResponse.json({ error: errors[0] }, { status: 400 });
-  }
-
-  // Sunan yazarın e-postası, taslağı başlatan e-posta ile aynı olmalı.
-  const submission = await prisma.submission.findUnique({
-    where: { id },
-    select: { draftOwnerEmail: true },
-  });
-  const presenter = findPresenter(authors);
-  if (
-    submission &&
-    presenter &&
-    presenter.email.trim().toLowerCase() !== submission.draftOwnerEmail.trim().toLowerCase()
-  ) {
-    return NextResponse.json({ error: t("api.presenterEmailMismatch") }, { status: 400 });
   }
 
   await prisma.$transaction([
