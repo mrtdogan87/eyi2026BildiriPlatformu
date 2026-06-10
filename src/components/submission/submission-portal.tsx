@@ -377,9 +377,6 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       <div className="card start-card">
         <h2 className="section-title">{t("submission.startDraftTitle")}</h2>
         <p className="flow-intro">{t("submission.startDraftIntro")}</p>
-        <div className="notice" style={{ marginBottom: 18 }}>
-          {t("submission.secondPaperNotice")}
-        </div>
         <form className="submission-form-panel" onSubmit={startDraft}>
           <div className="grid two">
             <div className="field">

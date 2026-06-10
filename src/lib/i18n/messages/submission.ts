@@ -25,8 +25,6 @@ export const submission = {
     startDraftTitle: "Taslak Başlat",
     startDraftIntro:
       "E-postanıza gelen güvenli bağlantıyla aynı taslağa dönebilir, bildiriyi adım adım tamamlayabilirsiniz.",
-    secondPaperNotice:
-      "İkinci bildiriniz için de aynı e-posta adresini kullanmalısınız; sistem yazarları e-posta üzerinden eşleştirir.",
     emailPlaceholder: "ornek@universite.edu.tr",
     paperLanguageLabel: "Bildirinizin Dili",
     turkce: "Türkçe",
@@ -126,8 +124,6 @@ export const submission = {
     startDraftTitle: "Start Draft",
     startDraftIntro:
       "Using the secure link sent to your email, you can return to the same draft and complete your paper step by step.",
-    secondPaperNotice:
-      "You must use the same email address for your second paper as well; the system matches authors via email.",
     emailPlaceholder: "example@university.edu",
     paperLanguageLabel: "Language of Your Paper",
     turkce: "Turkish",
