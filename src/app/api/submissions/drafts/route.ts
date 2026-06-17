@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { isResendConfigured, sendDraftAccessEmail } from "@/lib/email";
+import { isEmailConfigured, sendDraftAccessEmail } from "@/lib/email";
 import {
   ensureCongress,
   getSubmissionSnapshot,
@@ -57,8 +57,8 @@ export async function POST(request: Request) {
   const magicLink = await issueDraftLink(submission.id, email, congress.slug);
   await setDraftAccessCookie(submission.id);
 
-  const isDevelopmentPreview = process.env.NODE_ENV !== "production" && !isResendConfigured();
-  if (isResendConfigured()) {
+  const isDevelopmentPreview = process.env.NODE_ENV !== "production" && !isEmailConfigured();
+  if (isEmailConfigured()) {
     try {
       await sendDraftAccessEmail({
         to: email,

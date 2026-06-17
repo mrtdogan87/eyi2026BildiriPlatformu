@@ -1,3 +1,5 @@
+import nodemailer, { type Transporter } from "nodemailer";
+
 type DraftEmailInput = {
   to: string;
   congressName: string;
@@ -101,7 +103,54 @@ function emailLayout(title: string, body: string, congressName: string): string 
 </html>`;
 }
 
-async function sendEmail(input: { subject: string; to: string; text: string; html: string }) {
+function getSmtpConfig() {
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  const port = Number(process.env.SMTP_PORT ?? 465);
+  const secure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === "true" : port === 465;
+  const from = process.env.SMTP_FROM ?? user ?? "";
+  const fromName = process.env.SMTP_FROM_NAME ?? "EYİ 2026";
+  return { host, user, pass, port, secure, from, fromName, isConfigured: Boolean(host && user && pass) };
+}
+
+export function isSmtpConfigured() {
+  return getSmtpConfig().isConfigured;
+}
+
+export function isEmailConfigured() {
+  return isSmtpConfigured() || isResendConfigured();
+}
+
+let smtpTransport: Transporter | null = null;
+function getSmtpTransport() {
+  if (!smtpTransport) {
+    const cfg = getSmtpConfig();
+    smtpTransport = nodemailer.createTransport({
+      host: cfg.host,
+      port: cfg.port,
+      secure: cfg.secure,
+      auth: { user: cfg.user, pass: cfg.pass },
+    });
+  }
+  return smtpTransport;
+}
+
+type SendInput = { subject: string; to: string; text: string; html: string };
+
+async function sendViaSmtp(input: SendInput) {
+  const cfg = getSmtpConfig();
+  const info = await getSmtpTransport().sendMail({
+    from: `"${cfg.fromName}" <${cfg.from}>`,
+    to: input.to,
+    subject: input.subject,
+    text: input.text,
+    html: input.html,
+  });
+  return { id: info.messageId };
+}
+
+async function sendViaResend(input: SendInput) {
   const resend = getResendConfig();
   if (!resend.isConfigured || !resend.apiKey || !resend.senderEmail) {
     throw new Error("Resend API ayarları eksik.");
@@ -128,6 +177,33 @@ async function sendEmail(input: { subject: string; to: string; text: string; htm
   }
 
   return (await response.json().catch(() => null)) as ResendSendResponse | null;
+}
+
+// EMAIL_PRIMARY=smtp|resend (varsayılan resend). Birincil başarısız/yapılandırılmamışsa diğerine düşer.
+function getProviderOrder(): Array<"smtp" | "resend"> {
+  const primary = (process.env.EMAIL_PRIMARY ?? "resend").toLowerCase() === "smtp" ? "smtp" : "resend";
+  return primary === "smtp" ? ["smtp", "resend"] : ["resend", "smtp"];
+}
+
+async function sendEmail(input: SendInput) {
+  const errors: string[] = [];
+  for (const provider of getProviderOrder()) {
+    try {
+      if (provider === "smtp") {
+        if (!isSmtpConfigured()) continue;
+        return await sendViaSmtp(input);
+      }
+      if (!isResendConfigured()) continue;
+      return await sendViaResend(input);
+    } catch (error) {
+      errors.push(`${provider}: ${error instanceof Error ? error.message : "hata"}`);
+    }
+  }
+  throw new Error(
+    errors.length
+      ? `E-posta gönderilemedi (${errors.join(" | ")})`
+      : "E-posta sağlayıcısı yapılandırılmadı.",
+  );
 }
 
 export async function sendDraftAccessEmail({ to, congressName, magicLink }: DraftEmailInput) {

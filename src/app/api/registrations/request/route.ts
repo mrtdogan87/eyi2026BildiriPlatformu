@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isResendConfigured, sendRegistrationAccessEmail } from "@/lib/email";
+import { isEmailConfigured, sendRegistrationAccessEmail } from "@/lib/email";
 import { issueRegistrationLink } from "@/lib/registration";
 import { ensureCongress } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
@@ -21,8 +21,8 @@ export async function POST(request: Request) {
     email,
   });
 
-  const isDevelopmentPreview = process.env.NODE_ENV !== "production" && !isResendConfigured();
-  if (isResendConfigured()) {
+  const isDevelopmentPreview = process.env.NODE_ENV !== "production" && !isEmailConfigured();
+  if (isEmailConfigured()) {
     try {
       await sendRegistrationAccessEmail({
         to: email,

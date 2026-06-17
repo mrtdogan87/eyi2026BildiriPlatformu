@@ -6,7 +6,7 @@ import {
   mapSubmissionStatus,
   updateAdminSubmissionStatus,
 } from "@/lib/admin";
-import { isResendConfigured, sendSubmissionStatusEmail } from "@/lib/email";
+import { isEmailConfigured, sendSubmissionStatusEmail } from "@/lib/email";
 import { getBaseUrl } from "@/lib/submission";
 
 type RouteProps = {
@@ -39,7 +39,7 @@ export async function POST(request: Request, { params }: RouteProps) {
   if (
     submission.changed &&
     (body.status === "ACCEPTED" || body.status === "REJECTED") &&
-    isResendConfigured()
+    isEmailConfigured()
   ) {
     const paperTitle =
       submission.submission.submissionLanguage === "EN"
