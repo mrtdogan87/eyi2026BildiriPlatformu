@@ -11,6 +11,7 @@ import {
   validateParticipation,
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
+import { isEmailConfigured, sendSubmissionReceivedEmail } from "@/lib/email";
 
 type RouteProps = {
   params: Promise<{ id: string }>;
@@ -129,6 +130,34 @@ export async function POST(_request: Request, { params }: RouteProps) {
     where: { id },
     data: { status: "SUBMITTED", submittedAt: new Date() },
   });
+
+  // Tüm yazarlara "bildiriniz alındı" bildirimi (bildirinin dilinde). Hata gönderimi engellemez.
+  if (isEmailConfigured()) {
+    const emailLocale: "tr" | "en" = submission.submissionLanguage === "EN" ? "en" : "tr";
+    const paperTitle =
+      submission.submissionLanguage === "EN"
+        ? submission.titleEn || submission.titleTr || "Bildiri"
+        : submission.titleTr || submission.titleEn || "Bildiri";
+    const recipients = [
+      ...new Set(
+        submission.authors.map((author) => author.email.trim().toLowerCase()).filter(Boolean),
+      ),
+    ];
+    try {
+      await Promise.allSettled(
+        recipients.map((recipient) =>
+          sendSubmissionReceivedEmail({
+            to: recipient,
+            congressName: "EYİ 2026 / ISEOS 2026",
+            paperTitle,
+            locale: emailLocale,
+          }),
+        ),
+      );
+    } catch {
+      // bildirim hatası bildirinin gönderimini etkilemez
+    }
+  }
 
   await clearDraftAccessCookie();
 

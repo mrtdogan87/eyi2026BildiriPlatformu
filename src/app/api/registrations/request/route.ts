@@ -5,7 +5,7 @@ import { ensureCongress } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 
 export async function POST(request: Request) {
-  const { t } = await getServerT();
+  const { t, locale } = await getServerT();
   const body = (await request.json()) as { congressSlug?: string; email?: string };
   const email = body.email?.trim().toLowerCase();
   const congressSlug = body.congressSlug?.trim();
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
         to: email,
         congressName: congress.name,
         magicLink,
+        locale,
       });
     } catch {
       return NextResponse.json({ error: t("api.regLinkEmailFailed") }, { status: 500 });

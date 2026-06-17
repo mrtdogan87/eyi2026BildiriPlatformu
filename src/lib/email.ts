@@ -1,15 +1,18 @@
 import nodemailer, { type Transporter } from "nodemailer";
+import type { Locale } from "@/lib/i18n";
 
 type DraftEmailInput = {
   to: string;
   congressName: string;
   magicLink: string;
+  locale: Locale;
 };
 
 type RegistrationEmailInput = {
   to: string;
   congressName: string;
   magicLink: string;
+  locale: Locale;
 };
 
 type SubmissionStatusEmailInput = {
@@ -20,6 +23,14 @@ type SubmissionStatusEmailInput = {
   statusLabel: string;
   status: "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
   registrationUrl?: string;
+  locale: Locale;
+};
+
+type SubmissionReceivedEmailInput = {
+  to: string;
+  congressName: string;
+  paperTitle: string;
+  locale: Locale;
 };
 
 type ResendSendResponse = {
@@ -82,9 +93,13 @@ const EMAIL_BASE_STYLES = `
   .footer { max-width:560px; margin:18px auto 0; text-align:center; font-size:12px; color:#66758d; padding:0 16px; }
 `;
 
-function emailLayout(title: string, body: string, congressName: string): string {
+function emailLayout(title: string, body: string, congressName: string, locale: Locale): string {
+  const footer =
+    locale === "en"
+      ? "This email was sent automatically, please do not reply."
+      : "Bu e-posta otomatik gönderilmiştir, lütfen yanıtlamayınız.";
   return `<!doctype html>
-<html lang="tr">
+<html lang="${locale}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -97,7 +112,7 @@ function emailLayout(title: string, body: string, congressName: string): string 
         <p class="brand">${congressName}</p>
         ${body}
       </div>
-      <p class="footer">Bu e-posta otomatik gönderilmiştir, lütfen yanıtlamayınız. · This email was sent automatically, please do not reply.</p>
+      <p class="footer">${footer}</p>
     </div>
   </body>
 </html>`;
@@ -206,17 +221,52 @@ async function sendEmail(input: SendInput) {
   );
 }
 
-export async function sendDraftAccessEmail({ to, congressName, magicLink }: DraftEmailInput) {
+export async function sendDraftAccessEmail({ to, congressName, magicLink, locale }: DraftEmailInput) {
   const congress = getCongressEmailNames(congressName);
+  const name = locale === "en" ? congress.en : congress.tr;
+
+  if (locale === "en") {
+    const html = emailLayout(
+      `${name} - Draft Access Link`,
+      `
+      <h1>Your draft access link is ready</h1>
+      <p>
+        Below is the secure access link to the draft you started on the <strong>${name}</strong>
+        paper submission platform. After opening the link, you can reach your draft via the
+        on-screen verification step.
+      </p>
+      <p><a class="cta" href="${magicLink}">Open Draft</a></p>
+      <p class="small">
+        The link is valid for 24 hours. After verification you can continue on the same browser for
+        5 minutes; once it expires you can generate a new link.<br />
+        If you did not request this link, you can ignore this email.
+      </p>
+      `,
+      name,
+      locale,
+    );
+    return sendEmail({
+      to,
+      subject: `${name} - Draft access link`,
+      text: [
+        `Access link to the draft you started on the ${name} paper submission platform:`,
+        "",
+        magicLink,
+        "",
+        "The link is valid for 24 hours; after verification you can continue on the same browser for 5 minutes.",
+      ].join("\n"),
+      html,
+    });
+  }
+
   const html = emailLayout(
-    `${congress.en} - Draft Access Link / ${congress.tr} - Taslak Erişim Bağlantısı`,
+    `${name} - Taslak Erişim Bağlantısı`,
     `
-    <p class="lang-tag">Türkçe</p>
     <h1>Bildiri taslağınıza erişim bağlantınız hazır</h1>
     <p>
-      <strong>${congress.tr}</strong> bildiri gönderim platformunda başlattığınız taslağa,
-      güvenli erişim bağlantısı aşağıdadır. Bağlantıyı açtıktan sonra ekrandaki doğrulama adımıyla
-      taslağınıza geçebilirsiniz.
+      <strong>${name}</strong> bildiri gönderim platformunda başlattığınız taslağa, güvenli erişim
+      bağlantısı aşağıdadır. Bağlantıyı açtıktan sonra ekrandaki doğrulama adımıyla taslağınıza
+      geçebilirsiniz.
     </p>
     <p><a class="cta" href="${magicLink}">Taslağı Aç</a></p>
     <p class="small">
@@ -224,41 +274,19 @@ export async function sendDraftAccessEmail({ to, congressName, magicLink }: Draf
       edebilirsiniz; süre dolduğunda yeni bir bağlantı oluşturabilirsiniz.<br />
       Bu bağlantıyı talep etmediyseniz e-postayı yok sayabilirsiniz.
     </p>
-    <hr class="divider" />
-    <p class="lang-tag">English</p>
-    <h1>Your draft access link is ready</h1>
-    <p>
-      Below is the secure access link to the draft you started on the
-      <strong>${congress.en}</strong> paper submission platform. After opening the link, you can
-      reach your draft via the on-screen verification step.
-    </p>
-    <p><a class="cta" href="${magicLink}">Open Draft</a></p>
-    <p class="small">
-      The link is valid for 24 hours. After verification you can continue on the same browser for
-      5 minutes; once it expires you can generate a new link.<br />
-      If you did not request this link, you can ignore this email.
-    </p>
     `,
-    congress.brand,
+    name,
+    locale,
   );
-
   return sendEmail({
     to,
-    subject: `${congress.en} - Draft access link / ${congress.tr} - Taslak erişim bağlantısı`,
+    subject: `${name} - Taslak erişim bağlantısı`,
     text: [
-      `${congress.tr} bildiri gönderim platformunda başlattığınız taslağa erişim bağlantısı:`,
+      `${name} bildiri gönderim platformunda başlattığınız taslağa erişim bağlantısı:`,
       "",
       magicLink,
       "",
       "Bağlantı 24 saat geçerlidir; doğrulama sonrası aynı tarayıcıda 5 dakika boyunca devam edebilirsiniz.",
-      "",
-      "----",
-      "",
-      `Access link to the draft you started on the ${congress.en} paper submission platform:`,
-      "",
-      magicLink,
-      "",
-      "The link is valid for 24 hours; after verification you can continue on the same browser for 5 minutes.",
     ].join("\n"),
     html,
   });
@@ -268,15 +296,52 @@ export async function sendRegistrationAccessEmail({
   to,
   congressName,
   magicLink,
+  locale,
 }: RegistrationEmailInput) {
   const congress = getCongressEmailNames(congressName);
+  const name = locale === "en" ? congress.en : congress.tr;
+
+  if (locale === "en") {
+    const html = emailLayout(
+      `${name} - Registration Access Link`,
+      `
+      <h1>Your registration login link is ready</h1>
+      <p>
+        You can use the secure link below to access the <strong>${name}</strong> registration page.
+      </p>
+      <p><a class="cta" href="${magicLink}">Open Registration Page</a></p>
+      <p>
+        Your accepted papers will appear in the panel automatically; you can pay for multiple papers
+        at once. You may also register as a listener if you wish.
+      </p>
+      <p class="small">
+        The link is valid for 24 hours; after verification you can continue on the same browser for
+        5 minutes. If you did not request this link, you can ignore this email.
+      </p>
+      `,
+      name,
+      locale,
+    );
+    return sendEmail({
+      to,
+      subject: `${name} - Registration access link`,
+      text: [
+        `Access link to the ${name} registration page:`,
+        "",
+        magicLink,
+        "",
+        "Your accepted papers will appear in the panel automatically; you can pay at once.",
+      ].join("\n"),
+      html,
+    });
+  }
+
   const html = emailLayout(
-    `${congress.en} - Registration Access Link / ${congress.tr} - Kayıt Erişim Bağlantısı`,
+    `${name} - Kayıt Erişim Bağlantısı`,
     `
-    <p class="lang-tag">Türkçe</p>
     <h1>Kayıt sayfanıza giriş bağlantınız hazır</h1>
     <p>
-      <strong>${congress.tr}</strong> kayıt sayfasına girmek için aşağıdaki güvenli bağlantıyı
+      <strong>${name}</strong> kayıt sayfasına girmek için aşağıdaki güvenli bağlantıyı
       kullanabilirsiniz.
     </p>
     <p><a class="cta" href="${magicLink}">Kayıt Sayfasını Aç</a></p>
@@ -288,43 +353,19 @@ export async function sendRegistrationAccessEmail({
       Bağlantı 24 saat geçerlidir; doğrulama sonrası aynı tarayıcıda 5 dakika boyunca devam
       edebilirsiniz. Bu bağlantıyı talep etmediyseniz e-postayı yok sayabilirsiniz.
     </p>
-    <hr class="divider" />
-    <p class="lang-tag">English</p>
-    <h1>Your registration login link is ready</h1>
-    <p>
-      You can use the secure link below to access the <strong>${congress.en}</strong> registration
-      page.
-    </p>
-    <p><a class="cta" href="${magicLink}">Open Registration Page</a></p>
-    <p>
-      Your accepted papers will appear in the panel automatically; you can pay for multiple papers
-      at once. You may also register as a listener if you wish.
-    </p>
-    <p class="small">
-      The link is valid for 24 hours; after verification you can continue on the same browser for
-      5 minutes. If you did not request this link, you can ignore this email.
-    </p>
     `,
-    congress.brand,
+    name,
+    locale,
   );
-
   return sendEmail({
     to,
-    subject: `${congress.en} - Registration access link / ${congress.tr} - Kayıt erişim bağlantısı`,
+    subject: `${name} - Kayıt erişim bağlantısı`,
     text: [
-      `${congress.tr} kayıt sayfasına erişim bağlantısı:`,
+      `${name} kayıt sayfasına erişim bağlantısı:`,
       "",
       magicLink,
       "",
       "Kabul edilmiş bildirileriniz panele otomatik gelecek; tek seferde ödeme yapabilirsiniz.",
-      "",
-      "----",
-      "",
-      `Access link to the ${congress.en} registration page:`,
-      "",
-      magicLink,
-      "",
-      "Your accepted papers will appear in the panel automatically; you can pay at once.",
     ].join("\n"),
     html,
   });
@@ -337,142 +378,134 @@ export async function sendSubmissionStatusEmail({
   statusLabel,
   status,
   registrationUrl,
+  locale,
 }: SubmissionStatusEmailInput) {
   const congress = getCongressEmailNames(congressName);
-  const statusLabelEn =
-    status === "ACCEPTED"
+  const name = locale === "en" ? congress.en : congress.tr;
+  const en = locale === "en";
+
+  const statusLabelLocalized = en
+    ? status === "ACCEPTED"
       ? "Accepted"
       : status === "REJECTED"
         ? "Rejected"
         : status === "UNDER_REVIEW"
           ? "Under Review"
-          : "Submitted";
+          : "Submitted"
+    : statusLabel;
 
-  // ---- Türkçe bloklar ----
-  const acceptedBlockTr =
-    status === "ACCEPTED"
-      ? `
-        <p>
-          Bildiriniz kongre programına kabul edilmiştir. Kayıt ücretinizi yatırmak ve programa
-          dahil olmak için aşağıdaki bağlantıyı kullanabilirsiniz. Birden fazla kabul edilmiş
-          bildiriniz varsa hepsini tek seferde ödeyebilirsiniz.
-        </p>
-        ${registrationUrl ? `<p><a class="cta" href="${registrationUrl}">Kayıt Sayfasına Git</a></p>` : ""}
-      `
-      : "";
-
-  const rejectedBlockTr =
-    status === "REJECTED"
-      ? `
-        <p>
-          Bildiriniz hakem değerlendirmesi sonucunda bu yıl programa alınamamıştır. Emeğiniz için
-          teşekkür ederiz; ilerideki kongrelerimizde sizi tekrar aramızda görmekten memnuniyet
-          duyarız.
-        </p>
-      `
-      : "";
-
-  const reviewBlockTr =
-    status === "UNDER_REVIEW"
-      ? `
-        <p>
-          Bildiriniz hakem değerlendirmesine alınmıştır. Süreç tamamlandığında sonuç yine bu
-          e-posta adresine iletilecektir.
-        </p>
-      `
-      : "";
-
-  // ---- English blocks ----
-  const acceptedBlockEn =
-    status === "ACCEPTED"
-      ? `
-        <p>
-          Your paper has been accepted into the congress program. You can use the link below to pay
-          your registration fee and join the program. If more than one of your papers is accepted,
-          you can pay for all of them at once.
-        </p>
-        ${registrationUrl ? `<p><a class="cta" href="${registrationUrl}">Go to Registration Page</a></p>` : ""}
-      `
-      : "";
-
-  const rejectedBlockEn =
-    status === "REJECTED"
-      ? `
-        <p>
-          As a result of the peer review, your paper could not be included in this year's program.
-          Thank you for your effort; we would be glad to see you again at our future congresses.
-        </p>
-      `
-      : "";
-
-  const reviewBlockEn =
-    status === "UNDER_REVIEW"
-      ? `
-        <p>
-          Your paper has been taken into peer review. Once the process is complete, the result will
-          be sent again to this email address.
-        </p>
-      `
-      : "";
+  let block = "";
+  if (status === "ACCEPTED") {
+    block = en
+      ? `<p>Your paper has been accepted into the congress program. You can use the link below to pay your registration fee and join the program. If more than one of your papers is accepted, you can pay for all of them at once.</p>${registrationUrl ? `<p><a class="cta" href="${registrationUrl}">Go to Registration Page</a></p>` : ""}`
+      : `<p>Bildiriniz kongre programına kabul edilmiştir. Kayıt ücretinizi yatırmak ve programa dahil olmak için aşağıdaki bağlantıyı kullanabilirsiniz. Birden fazla kabul edilmiş bildiriniz varsa hepsini tek seferde ödeyebilirsiniz.</p>${registrationUrl ? `<p><a class="cta" href="${registrationUrl}">Kayıt Sayfasına Git</a></p>` : ""}`;
+  } else if (status === "REJECTED") {
+    block = en
+      ? `<p>As a result of the peer review, your paper could not be included in this year's program. Thank you for your effort; we would be glad to see you again at our future congresses.</p>`
+      : `<p>Bildiriniz hakem değerlendirmesi sonucunda bu yıl programa alınamamıştır. Emeğiniz için teşekkür ederiz; ilerideki kongrelerimizde sizi tekrar aramızda görmekten memnuniyet duyarız.</p>`;
+  } else if (status === "UNDER_REVIEW") {
+    block = en
+      ? `<p>Your paper has been taken into peer review. Once the process is complete, the result will be sent again to this email address.</p>`
+      : `<p>Bildiriniz hakem değerlendirmesine alınmıştır. Süreç tamamlandığında sonuç yine bu e-posta adresine iletilecektir.</p>`;
+  }
 
   const html = emailLayout(
-    `${congress.en} - Paper Status Update / ${congress.tr} - Bildiri Durum Güncellemesi`,
-    `
-    <p class="lang-tag">Türkçe</p>
-    <h1>Bildirinizin durumu güncellendi</h1>
-    <div class="meta">
-      <p class="meta-row"><strong>Başlık:</strong> ${paperTitle}</p>
-      <p class="meta-row"><strong>Yeni durum:</strong> ${statusLabel}</p>
-    </div>
-    ${reviewBlockTr}
-    ${acceptedBlockTr}
-    ${rejectedBlockTr}
-    <p class="small">
-      Bu güncelleme ile ilgili soru veya itirazlarınız için kongre sekretaryasına
-      ulaşabilirsiniz.
-    </p>
-    <hr class="divider" />
-    <p class="lang-tag">English</p>
-    <h1>The status of your paper has been updated</h1>
-    <div class="meta">
-      <p class="meta-row"><strong>Title:</strong> ${paperTitle}</p>
-      <p class="meta-row"><strong>New status:</strong> ${statusLabelEn}</p>
-    </div>
-    ${reviewBlockEn}
-    ${acceptedBlockEn}
-    ${rejectedBlockEn}
-    <p class="small">
-      For any questions or objections regarding this update, you can contact the congress
-      secretariat.
-    </p>
-    `,
-    congress.brand,
+    en ? `${name} - Paper Status Update` : `${name} - Bildiri Durum Güncellemesi`,
+    en
+      ? `
+      <h1>The status of your paper has been updated</h1>
+      <div class="meta">
+        <p class="meta-row"><strong>Title:</strong> ${paperTitle}</p>
+        <p class="meta-row"><strong>New status:</strong> ${statusLabelLocalized}</p>
+      </div>
+      ${block}
+      <p class="small">For any questions or objections regarding this update, you can contact the congress secretariat.</p>
+      `
+      : `
+      <h1>Bildirinizin durumu güncellendi</h1>
+      <div class="meta">
+        <p class="meta-row"><strong>Başlık:</strong> ${paperTitle}</p>
+        <p class="meta-row"><strong>Yeni durum:</strong> ${statusLabelLocalized}</p>
+      </div>
+      ${block}
+      <p class="small">Bu güncelleme ile ilgili soru veya itirazlarınız için kongre sekretaryasına ulaşabilirsiniz.</p>
+      `,
+    name,
+    locale,
   );
 
-  const textLines = [
-    `${congress.tr} kapsamında gönderdiğiniz bildirinin durumu güncellendi.`,
-    "",
-    `Başlık: ${paperTitle}`,
-    `Yeni durum: ${statusLabel}`,
-  ];
+  const textLines = en
+    ? [
+        `The status of the paper you submitted for ${name} has been updated.`,
+        "",
+        `Title: ${paperTitle}`,
+        `New status: ${statusLabelLocalized}`,
+      ]
+    : [
+        `${name} kapsamında gönderdiğiniz bildirinin durumu güncellendi.`,
+        "",
+        `Başlık: ${paperTitle}`,
+        `Yeni durum: ${statusLabelLocalized}`,
+      ];
   if (status === "ACCEPTED" && registrationUrl) {
-    textLines.push("", `Kayıt ücretini yatırmak için: ${registrationUrl}`);
-  }
-  textLines.push("", "----", "");
-  textLines.push(
-    `The status of the paper you submitted for ${congress.en} has been updated.`,
-    "",
-    `Title: ${paperTitle}`,
-    `New status: ${statusLabelEn}`,
-  );
-  if (status === "ACCEPTED" && registrationUrl) {
-    textLines.push("", `To pay the registration fee: ${registrationUrl}`);
+    textLines.push("", en ? `To pay the registration fee: ${registrationUrl}` : `Kayıt ücretini yatırmak için: ${registrationUrl}`);
   }
 
   return sendEmail({
     to,
-    subject: `${congress.en} - Paper status update / ${congress.tr} - Bildiri durum güncellemesi`,
+    subject: en ? `${name} - Paper status update` : `${name} - Bildiri durum güncellemesi`,
     text: textLines.join("\n"),
+    html,
+  });
+}
+
+export async function sendSubmissionReceivedEmail({
+  to,
+  congressName,
+  paperTitle,
+  locale,
+}: SubmissionReceivedEmailInput) {
+  const congress = getCongressEmailNames(congressName);
+  const name = locale === "en" ? congress.en : congress.tr;
+  const en = locale === "en";
+
+  const html = emailLayout(
+    en ? `${name} - Paper Received` : `${name} - Bildiriniz Alındı`,
+    en
+      ? `
+      <h1>Your paper has been received</h1>
+      <div class="meta">
+        <p class="meta-row"><strong>Title:</strong> ${paperTitle}</p>
+      </div>
+      <p>
+        Your paper has been successfully uploaded to the <strong>${name}</strong> system and listed
+        among its authors. The result will be sent to this email address after the peer review
+        process is complete.
+      </p>
+      <p class="small">You are receiving this email because you are listed as an author of this paper.</p>
+      `
+      : `
+      <h1>Bildiriniz alındı</h1>
+      <div class="meta">
+        <p class="meta-row"><strong>Başlık:</strong> ${paperTitle}</p>
+      </div>
+      <p>
+        Bildiriniz <strong>${name}</strong> sistemine başarıyla yüklenmiş ve yazarları arasında yer
+        almaktadır. Hakem değerlendirme süreci tamamlandığında sonuç bu e-posta adresine
+        iletilecektir.
+      </p>
+      <p class="small">Bu e-postayı, bu bildiride yazar olarak kayıtlı olduğunuz için alıyorsunuz.</p>
+      `,
+    name,
+    locale,
+  );
+
+  return sendEmail({
+    to,
+    subject: en ? `${name} - Your paper has been received` : `${name} - Bildiriniz alındı`,
+    text: en
+      ? [`Your paper has been received by ${name}.`, "", `Title: ${paperTitle}`, "", "The result will be emailed after the review process."].join("\n")
+      : [`Bildiriniz ${name} sistemine alındı.`, "", `Başlık: ${paperTitle}`, "", "Sonuç, değerlendirme süreci sonrası e-posta ile iletilecektir."].join("\n"),
     html,
   });
 }

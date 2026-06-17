@@ -41,26 +41,45 @@ export async function POST(request: Request, { params }: RouteProps) {
     (body.status === "ACCEPTED" || body.status === "REJECTED") &&
     isEmailConfigured()
   ) {
+    const notifyStatus: "ACCEPTED" | "REJECTED" = body.status;
+    const emailLocale: "tr" | "en" =
+      submission.submission.submissionLanguage === "EN" ? "en" : "tr";
     const paperTitle =
       submission.submission.submissionLanguage === "EN"
         ? submission.submission.titleEn || submission.submission.titleTr || "Bildiri"
         : submission.submission.titleTr || submission.submission.titleEn || "Bildiri";
+    // Tüm yazarlara bildir (taslak sahibi + tüm yazar e-postaları, tekilleştirilmiş).
+    const recipients = [
+      ...new Set(
+        [
+          submission.submission.draftOwnerEmail,
+          ...submission.submission.authors.map((author) => author.email),
+        ]
+          .map((email) => email.trim().toLowerCase())
+          .filter(Boolean),
+      ),
+    ];
+    const registrationUrl =
+      notifyStatus === "ACCEPTED"
+        ? `${getBaseUrl()}/${ADMIN_DEFAULT_CONGRESS_SLUG}/kayit`
+        : undefined;
 
-    try {
-      await sendSubmissionStatusEmail({
-        to: submission.submission.draftOwnerEmail,
-        congressName: "EYİ 2026 / ISEOS 2026",
-        congressSlug: ADMIN_DEFAULT_CONGRESS_SLUG,
-        paperTitle,
-        statusLabel: mapSubmissionStatus(body.status),
-        status: body.status,
-        registrationUrl:
-          body.status === "ACCEPTED"
-            ? `${getBaseUrl()}/${ADMIN_DEFAULT_CONGRESS_SLUG}/kayit`
-            : undefined,
-      });
-    } catch {
-      warning = "Durum güncellendi ancak bildirim e-postası gönderilemedi.";
+    const results = await Promise.allSettled(
+      recipients.map((recipient) =>
+        sendSubmissionStatusEmail({
+          to: recipient,
+          congressName: "EYİ 2026 / ISEOS 2026",
+          congressSlug: ADMIN_DEFAULT_CONGRESS_SLUG,
+          paperTitle,
+          statusLabel: mapSubmissionStatus(notifyStatus),
+          status: notifyStatus,
+          registrationUrl,
+          locale: emailLocale,
+        }),
+      ),
+    );
+    if (results.some((result) => result.status === "rejected")) {
+      warning = "Durum güncellendi ancak bazı bildirim e-postaları gönderilemedi.";
     }
   }
 
