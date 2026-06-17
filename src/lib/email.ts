@@ -146,6 +146,10 @@ function getSmtpTransport() {
       port: cfg.port,
       secure: cfg.secure,
       auth: { user: cfg.user, pass: cfg.pass },
+      // SMTP erişilemezse uzun süre asılı kalmasın; hızlıca Resend yedeğine düşsün.
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 20000,
     });
   }
   return smtpTransport;
