@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { consumeDraftToken, getSubmissionSnapshot, setDraftAccessCookie } from "@/lib/submission";
+import {
+  consumeDraftToken,
+  getSubmissionSnapshot,
+  isSubmissionClosedForDraft,
+  setDraftAccessCookie,
+} from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 
 export async function POST(request: Request) {
@@ -12,6 +17,10 @@ export async function POST(request: Request) {
   const submission = await consumeDraftToken(body.token);
   if (!submission) {
     return NextResponse.json({ error: t("api.invalidOrExpiredLink") }, { status: 400 });
+  }
+
+  if (await isSubmissionClosedForDraft(submission.id)) {
+    return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
   await setDraftAccessCookie(submission.id);

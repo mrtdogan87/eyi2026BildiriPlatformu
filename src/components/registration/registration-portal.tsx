@@ -114,6 +114,8 @@ export function RegistrationPortal({ context }: Props) {
   const [declarations, setDeclarations] = useState<RegistrationDeclarations>(emptyDeclarations);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // Eksik alan uyarıları gönderim denenene kadar yumuşak bilgi notu, sonrasında hata olarak gösterilir.
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [copiedDescription, setCopiedDescription] = useState(false);
 
   const areDeclarationsComplete = Object.values(declarations).every(Boolean);
@@ -129,14 +131,20 @@ export function RegistrationPortal({ context }: Props) {
   );
   const hasPresenterPapers = presenterPapers.length > 0;
   const period = config.currentPeriod ?? null;
+  // Ortak yazarı olduğu bildiri yüz yüze ise, katılım türünü seçerken buna dikkat çekilir.
+  const hasInPersonCoauthorPaper = useMemo(
+    () => coauthorPapers.some((paper) => paper.presentationMode === "IN_PERSON"),
+    [coauthorPapers],
+  );
 
   // Bildiri sunmayan kişi (ortak yazar veya bildirisiz) katılımcı/dinleyici olarak kaydolur.
+  // Katılım türü BİLEREK ön-seçilmez: seçenekler arasında ücretsiz olan da bulunduğu için
+  // varsayılan bir seçim, kişinin farkında olmadan yanlış tarifeye kaydolmasına yol açıyordu.
   useEffect(() => {
     if (!hasPresenterPapers) {
       setListenerEnabled(true);
-      if (!listenerSelection) setListenerSelection("ONLINE");
     }
-  }, [hasPresenterPapers, listenerSelection]);
+  }, [hasPresenterPapers]);
 
   const selectedPapers = useMemo(
     () =>
@@ -351,6 +359,7 @@ export function RegistrationPortal({ context }: Props) {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setAttemptedSubmit(true);
     if (computed.error) {
       setError(computed.error);
       return;
@@ -564,7 +573,7 @@ export function RegistrationPortal({ context }: Props) {
               checked={listenerEnabled}
               onChange={(event) => {
                 setListenerEnabled(event.target.checked);
-                if (event.target.checked && !listenerSelection) setListenerSelection("ONLINE");
+                if (!event.target.checked) setListenerSelection(null);
               }}
               type="checkbox"
             />
@@ -573,27 +582,48 @@ export function RegistrationPortal({ context }: Props) {
 
           {listenerEnabled ? (
             <>
+              {hasInPersonCoauthorPaper ? (
+                <div className="notice">{t("registration.listenerInPersonNotice")}</div>
+              ) : null}
               <div className="option-cards option-cards-rich">
-                {LISTENER_TIER_KEYS.map((entry) => (
-                  <label
-                    key={entry.key}
-                    className={`option-card option-card-rich${listenerSelection === entry.key ? " is-selected" : ""}`}
-                  >
-                    <input
-                      checked={listenerSelection === entry.key}
-                      name="listener-tier"
-                      onChange={() => setListenerSelection(entry.key)}
-                      type="radio"
-                    />
-                    <span className="option-card-icon" aria-hidden>{entry.icon}</span>
-                    <span className="option-card-title">
-                      {t(`registration.listenerTier.${entry.key}.label`)}
-                    </span>
-                    <span className="option-card-meta">
-                      {t(`registration.listenerTier.${entry.key}.description`)}
-                    </span>
-                  </label>
-                ))}
+                {LISTENER_TIER_KEYS.map((entry) => {
+                  // Her seçeneğin ücreti kartın üzerinde gösterilir; yalnızca ücretsiz seçeneğin
+                  // fiyatının görünmesi kullanıcıyı yanlış tarafa yönlendiriyordu.
+                  const entryTier = findListenerTier(
+                    config.tiers,
+                    entry.presentationMode,
+                    entry.audience,
+                    entry.presentationMode === "IN_PERSON" ? period : null,
+                  );
+                  const priceLabel = entryTier
+                    ? entryTier.amount > 0
+                      ? formatCurrencyAmount(entryTier.amount, entryTier.currency, locale)
+                      : t("common.free")
+                    : null;
+                  return (
+                    <label
+                      key={entry.key}
+                      className={`option-card option-card-rich${listenerSelection === entry.key ? " is-selected" : ""}`}
+                    >
+                      <input
+                        checked={listenerSelection === entry.key}
+                        name="listener-tier"
+                        onChange={() => setListenerSelection(entry.key)}
+                        type="radio"
+                      />
+                      <span className="option-card-icon" aria-hidden>{entry.icon}</span>
+                      <span className="option-card-title">
+                        {t(`registration.listenerTier.${entry.key}.label`)}
+                      </span>
+                      <span className="option-card-meta">
+                        {t(`registration.listenerTier.${entry.key}.description`)}
+                      </span>
+                      {priceLabel ? (
+                        <span className="option-card-price">{priceLabel}</span>
+                      ) : null}
+                    </label>
+                  );
+                })}
               </div>
             </>
           ) : null}
@@ -769,10 +799,13 @@ export function RegistrationPortal({ context }: Props) {
         </div>
       ) : null}
 
-      {error || computed.error ? (
+      {error || (attemptedSubmit && computed.error) ? (
         <div className="error" style={{ marginTop: 18 }}>
           {error || computed.error}
         </div>
+      ) : computed.error ? (
+        // Kullanıcı henüz gönderim denemediyse eksik alanı kırmızı hata yerine nötr not olarak bildir.
+        <div className="notice">{computed.error}</div>
       ) : null}
 
       <div className="form-actions">

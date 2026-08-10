@@ -21,6 +21,7 @@ export async function PATCH(request: Request) {
     bankIban?: string;
     bankBranch?: string;
     tripNote?: string;
+    submissionsClosed?: boolean;
   };
 
   await updateAdminCongressSettings(body);

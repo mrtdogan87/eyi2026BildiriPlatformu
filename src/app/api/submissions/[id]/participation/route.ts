@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import {
   canAccessDraft,
   getSubmissionSnapshot,
+  isSubmissionClosedForDraft,
   validateParticipation,
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
@@ -17,6 +18,9 @@ export async function PATCH(request: Request, { params }: RouteProps) {
   const { id } = await params;
   if (!(await canAccessDraft(id))) {
     return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
+  }
+  if (await isSubmissionClosedForDraft(id)) {
+    return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
   const body = (await request.json()) as SubmissionParticipationInput;

@@ -60,6 +60,8 @@ model Congress {
   bankIban                 String?
   bankBranch               String?
   tripNote                 String?
+  // Admin panelinden çevrilen anahtar: açıkken yeni bildiri gönderimi tamamen durur.
+  submissionsClosed        Boolean                   @default(false)
   createdAt                DateTime                  @default(now())
   updatedAt                DateTime                  @updatedAt
   submissions              Submission[]

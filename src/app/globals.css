@@ -498,6 +498,13 @@ textarea {
   line-height: 1.4;
 }
 
+.option-card-price {
+  margin-top: 4px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--primary);
+}
+
 .option-card.is-selected {
   border-color: var(--primary);
   background: var(--info-bg);
@@ -822,6 +829,51 @@ textarea {
   background:
     linear-gradient(150deg, rgba(232, 240, 252, 0.72), rgba(255, 255, 255, 0.94) 44%),
     var(--surface);
+}
+
+/* Bildiri gönderimi kapatıldığında kart tıklanamaz ve sönük görünür. */
+.hub-action-card.is-disabled {
+  background: var(--surface-muted);
+  border-style: dashed;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.hub-action-card.is-disabled:hover {
+  transform: none;
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.hub-action-card.is-disabled h2,
+.hub-action-card.is-disabled p,
+.hub-action-card.is-disabled .hub-action-label {
+  color: var(--text-muted);
+}
+
+.submission-closed {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.submission-closed-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--info-bg);
+  color: var(--primary);
+}
+
+.submission-closed p {
+  margin: 0;
+  max-width: 640px;
+  color: var(--text-muted);
+  line-height: 1.65;
 }
 
 .hub-action-card-registration {

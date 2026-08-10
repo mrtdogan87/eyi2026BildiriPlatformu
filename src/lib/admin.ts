@@ -506,6 +506,7 @@ export async function getAdminPricingPayload(): Promise<AdminPricingPayload | nu
     bankIban: congress.bankIban ?? "",
     bankBranch: congress.bankBranch ?? "",
     tripNote: congress.tripNote ?? "",
+    submissionsClosed: congress.submissionsClosed,
   };
 
   return {
@@ -557,6 +558,7 @@ export async function updateAdminCongressSettings(input: {
   bankIban?: string;
   bankBranch?: string;
   tripNote?: string;
+  submissionsClosed?: boolean;
 }) {
   const data: Record<string, unknown> = {};
   const earlyDeadline = parseDeadline(input.earlyDeadline);
@@ -575,6 +577,9 @@ export async function updateAdminCongressSettings(input: {
   if (typeof input.bankIban === "string") data.bankIban = input.bankIban.trim() || null;
   if (typeof input.bankBranch === "string") data.bankBranch = input.bankBranch.trim() || null;
   if (typeof input.tripNote === "string") data.tripNote = input.tripNote.trim() || null;
+  if (typeof input.submissionsClosed === "boolean") {
+    data.submissionsClosed = input.submissionsClosed;
+  }
 
   return prisma.congress.update({
     where: { slug: EYI_CONGRESS_SLUG },

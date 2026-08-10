@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { PlatformHero } from "@/components/submission/platform-hero";
+import { SubmissionClosedNotice } from "@/components/submission/submission-closed";
 import { SubmissionPortal } from "@/components/submission/submission-portal";
 import {
   canAccessDraft,
@@ -35,11 +36,15 @@ export default async function SubmissionPage({ params, searchParams }: PageProps
       <div className="page-box submission-page-box">
         <PlatformHero variant="submission" congressName={config.congressName} />
 
-        <SubmissionPortal
-          congressSlug={congressSlug}
-          initialSnapshot={initialSnapshot}
-          config={config}
-        />
+        {config.submissionsClosed ? (
+          <SubmissionClosedNotice congressSlug={congressSlug} />
+        ) : (
+          <SubmissionPortal
+            congressSlug={congressSlug}
+            initialSnapshot={initialSnapshot}
+            config={config}
+          />
+        )}
       </div>
     </main>
   );

@@ -1,6 +1,11 @@
 import { DraftLinkGate } from "@/components/submission/draft-link-gate";
 import { PlatformHero } from "@/components/submission/platform-hero";
-import { getDraftTokenWindowMinutes, inspectDraftToken } from "@/lib/submission";
+import { SubmissionClosedNotice } from "@/components/submission/submission-closed";
+import {
+  getDraftTokenWindowMinutes,
+  inspectDraftToken,
+  isSubmissionClosed,
+} from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +24,7 @@ export default async function ContinueDraftPage({
   const trimmedToken = token?.trim() ?? "";
   const submission = trimmedToken ? await inspectDraftToken(trimmedToken) : null;
   const { t } = await getServerT();
+  const submissionsClosed = await isSubmissionClosed(congressSlug);
 
   return (
     <main className="page-shell submission-shell">
@@ -28,15 +34,19 @@ export default async function ContinueDraftPage({
           subtitle={t("submission.secureLinkSubtitle")}
         />
 
-        <div className="card start-card">
-          <h2 className="section-title">{t("submission.continueDraftTitle")}</h2>
-          <DraftLinkGate
-            congressSlug={congressSlug}
-            isValid={Boolean(trimmedToken && submission)}
-            token={trimmedToken}
-            windowMinutes={getDraftTokenWindowMinutes()}
-          />
-        </div>
+        {submissionsClosed ? (
+          <SubmissionClosedNotice congressSlug={congressSlug} />
+        ) : (
+          <div className="card start-card">
+            <h2 className="section-title">{t("submission.continueDraftTitle")}</h2>
+            <DraftLinkGate
+              congressSlug={congressSlug}
+              isValid={Boolean(trimmedToken && submission)}
+              token={trimmedToken}
+              windowMinutes={getDraftTokenWindowMinutes()}
+            />
+          </div>
+        )}
       </div>
     </main>
   );

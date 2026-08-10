@@ -66,8 +66,10 @@ export const registration = {
         label: "Yüz Yüze · Öğrenci",
         description: "Salon katılımı, öğrenci tarifesi",
       },
-      ONLINE: { label: "Çevrim İçi", description: "Uzaktan katılım · ücretsiz" },
+      ONLINE: { label: "Çevrim İçi", description: "Uzaktan katılım" },
     },
+    listenerInPersonNotice:
+      "Ortak yazarı olduğunuz bildiri yüz yüze sunum olarak kayıtlıdır. Sempozyuma salonda katılacaksanız yüz yüze katılım seçeneklerinden birini işaretlemeniz gerekir.",
     galaHeading: "Gala Yemeği",
     attendanceLabel: "Katılım",
     attendanceNo: "Hayır, katılmayacağım",
@@ -193,8 +195,10 @@ export const registration = {
         label: "In Person · Student",
         description: "On-site attendance, student rate",
       },
-      ONLINE: { label: "Online", description: "Remote attendance · free" },
+      ONLINE: { label: "Online", description: "Remote attendance" },
     },
+    listenerInPersonNotice:
+      "The paper you co-authored is registered as an in-person presentation. If you will attend the symposium on site, you need to select one of the in-person attendance options.",
     galaHeading: "Gala Dinner",
     attendanceLabel: "Attendance",
     attendanceNo: "No, I will not attend",

@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, ClipboardCheck, FileText } from "lucide-react";
+import { ArrowRight, ClipboardCheck, FileText, Lock } from "lucide-react";
 import { slugToTitle } from "@/lib/utils";
+import { isSubmissionClosed } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ type PageProps = {
 export default async function CongressHubPage({ params }: PageProps) {
   const { congressSlug } = await params;
   const { locale, t } = await getServerT();
+  const submissionsClosed = await isSubmissionClosed(congressSlug);
   const congressTitle =
     congressSlug === "eyi-2026"
       ? locale === "en"
@@ -35,19 +37,32 @@ export default async function CongressHubPage({ params }: PageProps) {
         </section>
 
         <div className="hub-action-grid">
-          <Link className="hub-action-card hub-action-card-submission" href={`/${congressSlug}/bildiri-gonder`}>
-            <div className="hub-action-top">
-              <span className="hub-action-label">{t("hub.submissionLabel")}</span>
-              <span className="hub-action-icon" aria-hidden="true">
-                <FileText size={28} strokeWidth={1.8} />
-              </span>
+          {submissionsClosed ? (
+            <div className="hub-action-card hub-action-card-submission is-disabled" aria-disabled="true">
+              <div className="hub-action-top">
+                <span className="hub-action-label">{t("hub.submissionClosedLabel")}</span>
+                <span className="hub-action-icon" aria-hidden="true">
+                  <Lock size={28} strokeWidth={1.8} />
+                </span>
+              </div>
+              <h2>{t("hub.submissionClosedTitle")}</h2>
+              <p>{t("hub.submissionClosedDesc")}</p>
             </div>
-            <h2>{t("hub.submissionTitle")}</h2>
-            <p>{t("hub.submissionDesc")}</p>
-            <span className="hub-card-cta">
-              {t("common.start")} <ArrowRight size={18} strokeWidth={2} />
-            </span>
-          </Link>
+          ) : (
+            <Link className="hub-action-card hub-action-card-submission" href={`/${congressSlug}/bildiri-gonder`}>
+              <div className="hub-action-top">
+                <span className="hub-action-label">{t("hub.submissionLabel")}</span>
+                <span className="hub-action-icon" aria-hidden="true">
+                  <FileText size={28} strokeWidth={1.8} />
+                </span>
+              </div>
+              <h2>{t("hub.submissionTitle")}</h2>
+              <p>{t("hub.submissionDesc")}</p>
+              <span className="hub-card-cta">
+                {t("common.start")} <ArrowRight size={18} strokeWidth={2} />
+              </span>
+            </Link>
+          )}
 
           <Link className="hub-action-card hub-action-card-registration" href={`/${congressSlug}/kayit`}>
             <div className="hub-action-top">

@@ -290,7 +290,30 @@ export async function getSubmissionConfig(
     tiers: congress.paymentTiers
       .filter((tier) => tier.active)
       .map((tier) => tierToOption(tier, locale)),
+    submissionsClosed: congress.submissionsClosed,
   };
+}
+
+/**
+ * Bildiri gönderiminin kapalı olup olmadığı. Admin panelindeki anahtar ile yönetilir.
+ * Sunucu tarafındaki her gönderim yolu bunu kontrol etmek zorundadır; arayüzde butonu
+ * gizlemek yeterli değildir çünkü taslak bağlantıları ve API uçları doğrudan çağrılabilir.
+ */
+export async function isSubmissionClosed(congressSlug: string): Promise<boolean> {
+  const congress = await prisma.congress.findUnique({
+    where: { slug: congressSlug },
+    select: { submissionsClosed: true },
+  });
+  return congress?.submissionsClosed ?? false;
+}
+
+/** Aynı kontrolün taslak kimliği üzerinden yapılan hâli (kongre slug'ı istekte yer almayan uçlar için). */
+export async function isSubmissionClosedForDraft(submissionId: string): Promise<boolean> {
+  const submission = await prisma.submission.findUnique({
+    where: { id: submissionId },
+    select: { congress: { select: { submissionsClosed: true } } },
+  });
+  return submission?.congress.submissionsClosed ?? false;
 }
 
 export async function getSubmissionSnapshot(

@@ -22,6 +22,7 @@ type SettingsDraft = {
   bankIban: string;
   bankBranch: string;
   tripNote: string;
+  submissionsClosed: boolean;
 };
 
 type TierDraft = {
@@ -73,6 +74,7 @@ function settingsToDraft(settings: AdminCongressSettings): SettingsDraft {
     bankIban: settings.bankIban ?? "",
     bankBranch: settings.bankBranch ?? "",
     tripNote: settings.tripNote ?? "",
+    submissionsClosed: settings.submissionsClosed ?? false,
   };
 }
 
@@ -268,6 +270,7 @@ export function PricingManager({ initialPayload }: Props) {
           bankIban: settingsDraft.bankIban,
           bankBranch: settingsDraft.bankBranch,
           tripNote: settingsDraft.tripNote,
+          submissionsClosed: settingsDraft.submissionsClosed,
         }),
       });
 
@@ -340,6 +343,40 @@ export function PricingManager({ initialPayload }: Props) {
               />
               <span className="field-hint">
                 Bu tarihten sonra başvuru ve ödeme alınmaz. Boş bırakılırsa kayıt süresiz açık kalır.
+              </span>
+            </div>
+          </div>
+
+          <div className="pricing-card">
+            <h3>Bildiri Gönderimi</h3>
+            {payload.congress.submissionsClosed ? (
+              <span className="pricing-pill pricing-pill-warn">
+                Şu an KAPALI — yeni bildiri alınmıyor.
+              </span>
+            ) : (
+              <span className="pricing-pill pricing-pill-info">
+                Şu an AÇIK — bildiri gönderimi devam ediyor.
+              </span>
+            )}
+            <div className="field">
+              <label htmlFor="submissionsClosed">Gönderim Durumu</label>
+              <select
+                id="submissionsClosed"
+                value={settingsDraft.submissionsClosed ? "closed" : "open"}
+                onChange={(event) =>
+                  setSettingsDraft((current) => ({
+                    ...current,
+                    submissionsClosed: event.target.value === "closed",
+                  }))
+                }
+              >
+                <option value="open">Açık — bildiri gönderilebilir</option>
+                <option value="closed">Kapalı — bildiri gönderimi durdu</option>
+              </select>
+              <span className="field-hint">
+                Kapalı seçildiğinde yeni taslak açılamaz, mevcut taslaklara devam edilemez ve
+                bekleyen taslaklar gönderilemez. Kayıt ve ödeme işlemleri bundan etkilenmez.
+                Değişikliğin geçerli olması için aşağıdan kaydetmeniz gerekir.
               </span>
             </div>
           </div>

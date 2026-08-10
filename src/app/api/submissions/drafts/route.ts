@@ -4,6 +4,7 @@ import { isEmailConfigured, sendDraftAccessEmail } from "@/lib/email";
 import {
   ensureCongress,
   getSubmissionSnapshot,
+  isSubmissionClosed,
   issueDraftLink,
   setDraftAccessCookie,
 } from "@/lib/submission";
@@ -23,6 +24,10 @@ export async function POST(request: Request) {
 
   if (!email || !congressSlug) {
     return NextResponse.json({ error: t("api.congressEmailRequired") }, { status: 400 });
+  }
+
+  if (await isSubmissionClosed(congressSlug)) {
+    return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
   const congress = await ensureCongress(congressSlug);

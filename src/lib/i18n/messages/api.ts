@@ -68,6 +68,8 @@ export const api = {
     listenerAudienceRequired: "Yüz yüze dinleyici için akademik statü seçmelisiniz.",
     listenerDayRequired: "Dinleyici katılımı için en az bir gün seçmelisiniz.",
     listenerTierNotFound: "Dinleyici katılımı için ücret tanımı bulunamadı.",
+    submissionsClosed:
+      "Bildiri gönderimi sona ermiştir. Kabul edilen bildiriler için kayıt işlemleri devam etmektedir.",
   },
   en: {
     // Success messages
@@ -140,5 +142,7 @@ export const api = {
     listenerAudienceRequired: "You must select an academic status for in-person listeners.",
     listenerDayRequired: "You must select at least one day for listener attendance.",
     listenerTierNotFound: "No fee definition found for listener attendance.",
+    submissionsClosed:
+      "Paper submission has closed. Registration for accepted papers is still open.",
   },
 } as const;

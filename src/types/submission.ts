@@ -67,6 +67,7 @@ export type SubmissionConfig = {
   lateDeadline: string | null;
   currentPeriod: PaymentPeriod | null;
   tiers: PaymentTierOption[];
+  submissionsClosed: boolean;
 };
 
 export type SubmissionSnapshot = SubmissionDetailsInput & {

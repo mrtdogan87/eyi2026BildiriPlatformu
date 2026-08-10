@@ -96,6 +96,7 @@ export type AdminCongressSettings = {
   bankIban: string;
   bankBranch: string;
   tripNote: string;
+  submissionsClosed: boolean;
 };
 
 export type AdminPricingPayload = {

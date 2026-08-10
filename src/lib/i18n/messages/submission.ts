@@ -7,6 +7,10 @@ export const submission = {
       "23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu",
     secureLinkSubtitle: "Güvenli bağlantı doğrulaması",
     continueDraftTitle: "Taslağa Devam Et",
+    closedTitle: "Bildiri Gönderimi Sona Erdi",
+    closedBody:
+      "Bildiri gönderimi sona ermiştir. Kabul edilen bildiriler için kayıt işlemleri devam etmektedir.",
+    closedRegistrationCta: "Kayıt Sayfasına Git",
     successSubtitle: "Gönderim tamamlandı",
     successCaption: "Bildiriniz başarıyla alındı.",
     successTitle: "Başvurunuz Alındı",
@@ -106,6 +110,10 @@ export const submission = {
       "23rd International Symposium on Econometrics, Operations Research and Statistics",
     secureLinkSubtitle: "Secure link verification",
     continueDraftTitle: "Continue Your Draft",
+    closedTitle: "Paper Submission Has Closed",
+    closedBody:
+      "Paper submission has closed. Registration for accepted papers is still open.",
+    closedRegistrationCta: "Go to Registration",
     successSubtitle: "Submission complete",
     successCaption: "Your paper has been received successfully.",
     successTitle: "Your Application Was Received",

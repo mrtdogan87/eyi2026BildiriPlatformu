@@ -14,6 +14,10 @@ export const hub = {
     registrationDesc: "Kabul edilen bildiriniz için kayıt yapın veya dinleyici katılımınızı oluşturun.",
     reminder1: "Bildiri gönderimi kayıt yerine geçmez.",
     reminder2: "Kabul sonrası kayıt işlemi ayrıca tamamlanır.",
+    submissionClosedLabel: "Gönderim Kapalı",
+    submissionClosedTitle: "Bildiri Gönderimi Sona Erdi",
+    submissionClosedDesc:
+      "Bildiri gönderimi sona ermiştir. Kabul edilen bildiriler için kayıt işlemleri devam etmektedir.",
   },
   en: {
     eyebrow: "{title} Application Center",
@@ -30,5 +34,9 @@ export const hub = {
     registrationDesc: "Register for your accepted paper or set up your listener attendance.",
     reminder1: "Submitting a paper does not count as registration.",
     reminder2: "Registration is completed separately after acceptance.",
+    submissionClosedLabel: "Submission Closed",
+    submissionClosedTitle: "Paper Submission Has Closed",
+    submissionClosedDesc:
+      "Paper submission has closed. Registration for accepted papers is still open.",
   },
 } as const;
