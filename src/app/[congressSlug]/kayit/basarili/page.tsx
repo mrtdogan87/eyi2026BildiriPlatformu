@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { PlatformHero } from "@/components/submission/platform-hero";
-import { ensureCongress } from "@/lib/submission";
+import { publicCongress } from "@/integrations/congress/public-context";
 import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ type PageProps = {
 
 export default async function RegistrationSuccessPage({ params }: PageProps) {
   const { congressSlug } = await params;
-  const congress = await ensureCongress(congressSlug);
+  const congress = await publicCongress(congressSlug);
   const { t } = await getServerT();
 
   return (

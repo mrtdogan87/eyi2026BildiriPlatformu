@@ -16,7 +16,8 @@ import type {
   SubmissionParticipationInput,
   SubmissionSnapshot,
 } from "@/types/submission";
-import { slugToTitle } from "@/lib/utils";
+import { AccessError } from "@/platform/http";
+import { moduleEnabled } from "@/platform/context";
 import type { Locale, TFunction } from "@/lib/i18n";
 
 const DRAFT_COOKIE = sessionCookieName("draft_access");
@@ -102,14 +103,9 @@ export async function canAccessDraft(submissionId: string) {
 }
 
 export async function ensureCongress(slug: string) {
-  return prisma.congress.upsert({
-    where: { slug },
-    update: {},
-    create: {
-      slug,
-      name: slugToTitle(slug) || "Congress",
-    },
-  });
+  const congress = await prisma.congress.findUnique({ where: { slug } });
+  if (!congress) throw new AccessError(404, 'Kongre bulunamadı.');
+  return congress;
 }
 
 export function buildMagicLink(congressSlug: string, token: string) {
@@ -300,18 +296,18 @@ export async function getSubmissionConfig(
 export async function isSubmissionClosed(congressSlug: string): Promise<boolean> {
   const congress = await prisma.congress.findUnique({
     where: { slug: congressSlug },
-    select: { submissionsClosed: true },
+    select: { id: true, submissionsClosed: true },
   });
-  return congress?.submissionsClosed ?? false;
+  return !congress || congress.submissionsClosed || !(await moduleEnabled(congress.id, "SUBMISSIONS"));
 }
 
 /** Aynı kontrolün taslak kimliği üzerinden yapılan hâli (kongre slug'ı istekte yer almayan uçlar için). */
 export async function isSubmissionClosedForDraft(submissionId: string): Promise<boolean> {
   const submission = await prisma.submission.findUnique({
     where: { id: submissionId },
-    select: { congress: { select: { submissionsClosed: true } } },
+    select: { congress: { select: { id: true, submissionsClosed: true } } },
   });
-  return submission?.congress.submissionsClosed ?? false;
+  return !submission || submission.congress.submissionsClosed || !(await moduleEnabled(submission.congress.id, "SUBMISSIONS"));
 }
 
 export async function getSubmissionSnapshot(

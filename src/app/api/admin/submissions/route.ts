@@ -1,8 +1,9 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { assertAdminApiAccess, getAdminSubmissionList } from "@/lib/admin";
 
-export async function GET() {
-  if (!(await assertAdminApiAccess())) {
+async function handleGET() {
+  if (!(await assertAdminApiAccess("submissions.read", "SUBMISSIONS"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -10,3 +11,5 @@ export async function GET() {
     submissions: await getAdminSubmissionList(),
   });
 }
+
+export const GET = apiRoute(handleGET);

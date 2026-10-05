@@ -1,3 +1,4 @@
+import { allows } from "@/platform/policy";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminDeleteSubmission } from "@/components/admin/admin-delete-submission";
@@ -24,7 +25,7 @@ function formatFileSize(fileSize: number) {
 }
 
 export default async function AdminSubmissionDetailPage({ params }: PageProps) {
-  await requireAdminPage();
+  const context = await requireAdminPage("submissions.read", "SUBMISSIONS");
   const { id } = await params;
   const submission = await getAdminSubmissionDetail(id);
 
@@ -90,7 +91,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
         <div className="admin-detail-block">
           <h2>Durum Yönetimi</h2>
-          <AdminStatusForm submissionId={submission.id} currentStatus={submission.status} />
+          {allows(context.role, "submissions.status") ? <AdminStatusForm submissionId={submission.id} currentStatus={submission.status} /> : null}
         </div>
 
         <div className="admin-detail-block">
@@ -189,10 +190,10 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
         <div className="admin-detail-block admin-detail-block-danger">
           <h2>Tehlikeli İşlem · Bildiriyi Sil</h2>
-          <AdminDeleteSubmission
+          {allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
             submissionId={submission.id}
             submissionTitle={isTurkish ? submission.titleTr : submission.titleEn}
-          />
+          /> : null}
         </div>
 
         <div className="admin-detail-block">

@@ -1,20 +1,20 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import {
-  ADMIN_DEFAULT_CONGRESS_SLUG,
   assertAdminApiAccess,
   isManageableSubmissionStatus,
   mapSubmissionStatus,
   updateAdminSubmissionStatus,
 } from "@/lib/admin";
-import { isEmailConfigured, sendSubmissionStatusEmail } from "@/lib/email";
+import { isEmailConfigured, sendSubmissionStatusEmail } from "@/platform/notifications";
 import { getBaseUrl } from "@/lib/submission";
 
 type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function POST(request: Request, { params }: RouteProps) {
-  if (!(await assertAdminApiAccess())) {
+async function handlePOST(request: Request, { params }: RouteProps) {
+  if (!(await assertAdminApiAccess("submissions.status", "SUBMISSIONS"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -61,15 +61,15 @@ export async function POST(request: Request, { params }: RouteProps) {
     ];
     const registrationUrl =
       notifyStatus === "ACCEPTED"
-        ? `${getBaseUrl()}/${ADMIN_DEFAULT_CONGRESS_SLUG}/kayit`
+        ? `${getBaseUrl()}/${submission.congress.slug}/kayit`
         : undefined;
 
     const results = await Promise.allSettled(
       recipients.map((recipient) =>
         sendSubmissionStatusEmail({
           to: recipient,
-          congressName: "EYİ 2026 / ISEOS 2026",
-          congressSlug: ADMIN_DEFAULT_CONGRESS_SLUG,
+          congressName: submission.congress.name,
+          congressSlug: submission.congress.slug,
           paperTitle,
           statusLabel: mapSubmissionStatus(notifyStatus),
           status: notifyStatus,
@@ -88,3 +88,5 @@ export async function POST(request: Request, { params }: RouteProps) {
     warning,
   });
 }
+
+export const POST = apiRoute(handlePOST);

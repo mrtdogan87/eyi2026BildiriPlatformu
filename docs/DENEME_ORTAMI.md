@@ -38,3 +38,10 @@ volume'a kaydedilir; SMTP/Resend yasaktır. Dosyalar sadece test DB'sindedir.
 Bu makinede Docker yok; imaj/Compose uzak ortamda çalıştırılmadı.
 Yerel Next derlemesi ve preview erişim kodu prova edilir; Docker/TLS/domain
 kabulü yayından önce ayrıca yapılmalıdır.
+
+P03: preview ön erişim kapısı ile kişisel uygulama hesabı ayrı katmanlardır.
+Ortak admin parolası kaldırıldı. Preview kanıtı artık Basic erişim + eski
+parola girişinin reddidir; DB'siz prova kişisel oturum açmaz. Uzak test
+kurulumunda kişisel test kullanıcıları ayrı güvenli bootstrap ile hazırlanıp
+roller/üyelikler ve Secure oturum ayrıca sınanmalıdır. Yerel seed preview'da
+çalışmaz. Genel canlı veri/kullanıcı geçişi bu paket kapsamında değildir.

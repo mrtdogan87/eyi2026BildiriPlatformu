@@ -1,3 +1,4 @@
+import { moduleEnabled } from "@/platform/context";
 import { notFound, redirect } from "next/navigation";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { RegistrationPortal } from "@/components/registration/registration-portal";
@@ -5,7 +6,7 @@ import {
   getRegistrationContext,
   readRegistrationSession,
 } from "@/lib/registration";
-import { ensureCongress } from "@/lib/submission";
+import { publicCongress } from "@/integrations/congress/public-context";
 import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,8 @@ type PageProps = {
 
 export default async function RegistrationPanelPage({ params }: PageProps) {
   const { congressSlug } = await params;
-  const congress = await ensureCongress(congressSlug);
+  const congress = await publicCongress(congressSlug);
+  if (!(await moduleEnabled(congress.id, "REGISTRATION"))) return null;
   const { locale, t } = await getServerT();
   const session = await readRegistrationSession();
 

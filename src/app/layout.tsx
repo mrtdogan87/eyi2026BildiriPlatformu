@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { getLocale } from "@/lib/i18n/server";
 
 export const metadata: Metadata = {
-  title: "EYİ2026 / ISEOS2026 Platformu",
-  description: "EYİ2026 / ISEOS2026 bildiri gönderim ve kayıt sistemi",
+  title: "Kongre Yönetim Platformu",
+  description: "Kurum ve kongreler için bildiri, kayıt ve ekip yönetimi",
 };
 
 export default async function RootLayout({

@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import {
   assertAdminApiAccess,
@@ -5,8 +6,8 @@ import {
   updateAdminCongressSettings,
 } from "@/lib/admin";
 
-export async function PATCH(request: Request) {
-  if (!(await assertAdminApiAccess())) {
+async function handlePATCH(request: Request) {
+  if (!(await assertAdminApiAccess("settings", "REGISTRATION"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -28,3 +29,5 @@ export async function PATCH(request: Request) {
 
   return NextResponse.json({ pricing: await getAdminPricingPayload() });
 }
+
+export const PATCH = apiRoute(handlePATCH);

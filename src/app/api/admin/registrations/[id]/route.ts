@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import {
   assertAdminApiAccess,
@@ -11,8 +12,8 @@ type RouteProps = {
 
 const DELETE_CONFIRMATION_PHRASE = "Bu kaydı silmeyi onaylıyorum";
 
-export async function GET(_: Request, { params }: RouteProps) {
-  if (!(await assertAdminApiAccess())) {
+async function handleGET(_: Request, { params }: RouteProps) {
+  if (!(await assertAdminApiAccess("registrations.read", "REGISTRATION"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
   const { id } = await params;
@@ -23,8 +24,8 @@ export async function GET(_: Request, { params }: RouteProps) {
   return NextResponse.json({ registration });
 }
 
-export async function DELETE(request: Request, { params }: RouteProps) {
-  if (!(await assertAdminApiAccess())) {
+async function handleDELETE(request: Request, { params }: RouteProps) {
+  if (!(await assertAdminApiAccess("registrations.delete", "REGISTRATION"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -43,3 +44,7 @@ export async function DELETE(request: Request, { params }: RouteProps) {
   }
   return NextResponse.json({ ok: true });
 }
+
+export const GET = apiRoute(handleGET);
+
+export const DELETE = apiRoute(handleDELETE);

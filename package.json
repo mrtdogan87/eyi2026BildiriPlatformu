@@ -18,7 +18,8 @@
     "test:safety": "node --test scripts/environment.test.mjs",
     "test:smoke": "node scripts/run.mjs smoke",
     "test:preview": "node scripts/preview-check.mjs",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "test:platform": "node scripts/platform-check.mjs"
   },
   "keywords": [],
   "author": "",

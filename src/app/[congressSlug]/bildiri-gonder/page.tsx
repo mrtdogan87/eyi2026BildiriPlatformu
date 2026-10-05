@@ -1,10 +1,11 @@
+import { publicCongress } from "@/integrations/congress/public-context";
+import { moduleEnabled } from "@/platform/context";
 import { notFound } from "next/navigation";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { SubmissionClosedNotice } from "@/components/submission/submission-closed";
 import { SubmissionPortal } from "@/components/submission/submission-portal";
 import {
   canAccessDraft,
-  ensureCongress,
   getSubmissionConfig,
   getSubmissionSnapshot,
 } from "@/lib/submission";
@@ -22,15 +23,17 @@ export default async function SubmissionPage({ params, searchParams }: PageProps
   const { draft } = await searchParams;
   const locale = await getLocale();
 
-  await ensureCongress(congressSlug);
+  const congress = await publicCongress(congressSlug);
+  if (!(await moduleEnabled(congress.id, "SUBMISSIONS"))) return null;
   const config = await getSubmissionConfig(congressSlug, locale);
   if (!config) {
     notFound();
   }
 
-  const initialSnapshot =
+  const snapshot =
     draft && (await canAccessDraft(draft)) ? await getSubmissionSnapshot(draft) : null;
 
+  const initialSnapshot = snapshot?.congressSlug === congressSlug ? snapshot : null;
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">

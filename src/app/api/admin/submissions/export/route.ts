@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import {
   assertAdminApiAccess,
@@ -6,8 +7,8 @@ import {
   normalizeAdminSubmissionFilters,
 } from "@/lib/admin";
 
-export async function GET(request: Request) {
-  if (!(await assertAdminApiAccess())) {
+async function handleGET(request: Request) {
+  if (!(await assertAdminApiAccess("submissions.read", "SUBMISSIONS"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -23,3 +24,5 @@ export async function GET(request: Request) {
     },
   });
 }
+
+export const GET = apiRoute(handleGET);

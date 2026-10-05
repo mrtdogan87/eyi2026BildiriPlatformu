@@ -42,9 +42,8 @@ try {
   if (asset.status !== 200) throw new Error('Authorized preview asset failed');
   checks.push('Anonymous CSS: 401; authorized admin and CSS: 200');
   const login = await fetch(`${base}/api/admin/login`, { method: 'POST', headers: { authorization, 'content-type': 'application/json' }, body: JSON.stringify({ password: env.ADMIN_PASSWORD }) });
-  const cookie = login.headers.getSetCookie().find(x => x.startsWith('aibildiri_v2_preview_admin_session='));
-  if (login.status !== 200 || !cookie || !/; Secure/i.test(cookie) || !/; HttpOnly/i.test(cookie)) throw new Error('Preview session cookie is not isolated and secure');
-  checks.push('Preview admin cookie uses its own namespace and Secure/HttpOnly');
+  if (login.status !== 400 || login.headers.getSetCookie().length) throw new Error('Legacy shared-password login unexpectedly accepted');
+  checks.push('Shared-password-only login rejected before a database connection');
   writeFileSync('.local/preview-check-result.json', JSON.stringify({ executedAt: new Date().toISOString(), databaseConnected: false, checks }, null, 2) + '\n', { mode: 0o600 });
   console.log('Preview gate passed: pages, APIs, files and CSS protected; valid credentials accepted. No DB connection used.');
 } finally { child.kill('SIGTERM'); }

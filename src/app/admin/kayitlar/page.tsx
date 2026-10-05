@@ -1,3 +1,4 @@
+import { allows } from "@/platform/policy";
 import Link from "next/link";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import {
@@ -26,7 +27,7 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminRegistrationsPage({ searchParams }: PageProps) {
-  await requireAdminPage();
+  const context = await requireAdminPage("registrations.read", "REGISTRATION");
   const params = new URLSearchParams(
     Object.entries(await searchParams).flatMap(([key, value]) =>
       typeof value === "string" ? [[key, value]] : [],
@@ -36,7 +37,7 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
   const registrations = await getAdminRegistrationList(filters);
 
   return (
-    <main className="page-shell admin-page-shell">
+    <main data-congress={context.congress.id} className="page-shell admin-page-shell">
       <section className="hero admin-hero">
         <div>
           <h1>Kayıtlar</h1>
@@ -46,9 +47,9 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
           <Link className="button ghost" href="/admin/bildiriler">
             Bildiriler
           </Link>
-          <Link className="button ghost" href="/admin/ucretler">
+          {allows(context.role, "settings") ? <Link className="button ghost" href="/admin/ucretler">
             Ücret ve Ayarlar
-          </Link>
+          </Link> : null}
           <AdminLogoutButton />
         </div>
       </section>

@@ -1997,3 +1997,24 @@ textarea {
   background: var(--primary);
   color: #fff;
 }
+
+/* P03: personal accounts and congress context */
+.platform-bar { max-width: 1200px; margin: 20px auto 0; padding: 20px 28px; border-radius: 16px; background: #fff; border: 1px solid #dce3ee; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.platform-bar p { margin: 8px 0 0; color: #536079; font-size: .9rem; }
+.platform-bar .field { min-width: 280px; max-width: 600px; flex: 1; margin: 0; }
+.platform-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+.platform-tile { display: block; color: inherit; text-decoration: none; padding: 24px; }
+.platform-tile:hover { border-color: #2463a9; }
+.platform-tile h2 { font-size: 1.15rem; margin: 0 0 20px; }
+.platform-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: end; }
+.platform-form button { justify-self: start; }
+.platform-members { display: grid; gap: 14px; }
+.platform-member { border-top: 1px solid #dce3ee; padding: 18px 0; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.platform-member > div { flex: 1; min-width: 240px; }
+.platform-member p { margin: 6px 0; overflow-wrap: anywhere; }
+.platform-member select { padding: 10px; border: 1px solid #bdcadd; border-radius: 8px; }
+.audit-detail { white-space: pre-wrap; overflow-wrap: anywhere; font-size: .85rem; }
+@media (max-width: 760px) { .platform-bar { margin: 12px; padding: 18px; flex-direction: column; align-items: stretch; } .platform-bar .field { min-width: 0; } .platform-form { grid-template-columns: 1fr; } }
+
+.platform-card { padding: 28px; }
+@media (max-width: 760px) { .platform-card { padding: 20px; } }

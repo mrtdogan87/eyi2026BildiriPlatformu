@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -13,7 +14,7 @@ type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function PATCH(request: Request, { params }: RouteProps) {
+async function handlePATCH(request: Request, { params }: RouteProps) {
   const { t } = await getServerT();
   const { id } = await params;
   if (!(await canAccessDraft(id))) {
@@ -42,3 +43,5 @@ export async function PATCH(request: Request, { params }: RouteProps) {
     submission: await getSubmissionSnapshot(id),
   });
 }
+
+export const PATCH = apiRoute(handlePATCH);

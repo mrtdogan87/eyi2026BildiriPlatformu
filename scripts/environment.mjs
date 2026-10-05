@@ -5,11 +5,9 @@ export function assertEnvironment(env = process.env) {
   if (!['local', 'preview', 'production'].includes(mode)) fail('APP_ENV');
   const namespace = `aibildiri_v2_${mode}`;
   if (env.SESSION_COOKIE_NAMESPACE !== namespace) fail('SESSION_COOKIE_NAMESPACE');
-  for (const key of ['DRAFT_SESSION_SECRET', 'ADMIN_SESSION_SECRET']) {
+  for (const key of ['DRAFT_SESSION_SECRET']) {
     if (!env[key] || env[key].length < 32 || /change-me|replace-with/.test(env[key])) fail(key);
   }
-  if (env.DRAFT_SESSION_SECRET === env.ADMIN_SESSION_SECRET) fail('session secrets must differ');
-  if (!env.ADMIN_PASSWORD || env.ADMIN_PASSWORD.length < 16 || env.ADMIN_PASSWORD.includes('replace-with')) fail('ADMIN_PASSWORD');
   if (env.FILE_STORAGE !== 'database') fail('FILE_STORAGE');
   let base;
   try { base = new URL(env.APP_BASE_URL); } catch { fail('APP_BASE_URL'); }

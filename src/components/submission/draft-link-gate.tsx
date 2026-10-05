@@ -45,7 +45,7 @@ export function DraftLinkGate({ congressSlug, token, isValid, windowMinutes }: P
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, congressSlug }),
       });
 
       const data = await readResponsePayload(response);

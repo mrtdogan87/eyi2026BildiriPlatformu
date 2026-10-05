@@ -41,7 +41,7 @@ export default async function ContinueDraftPage({
             <h2 className="section-title">{t("submission.continueDraftTitle")}</h2>
             <DraftLinkGate
               congressSlug={congressSlug}
-              isValid={Boolean(trimmedToken && submission)}
+              isValid={Boolean(trimmedToken && submission && submission.congress.slug === congressSlug)}
               token={trimmedToken}
               windowMinutes={getDraftTokenWindowMinutes()}
             />

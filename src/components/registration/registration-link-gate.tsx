@@ -38,7 +38,7 @@ export function RegistrationLinkGate({ congressSlug, isValid, token }: Props) {
       const response = await fetch("/api/registrations/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, congressSlug }),
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error ?? t("errors.linkVerifyFailed"));

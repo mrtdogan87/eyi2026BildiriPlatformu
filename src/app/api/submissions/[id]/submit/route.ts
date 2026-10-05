@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -18,7 +19,7 @@ type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function POST(_request: Request, { params }: RouteProps) {
+async function handlePOST(_request: Request, { params }: RouteProps) {
   const { t } = await getServerT();
   const body = (await _request.json()) as {
     declarations?: {
@@ -169,3 +170,5 @@ export async function POST(_request: Request, { params }: RouteProps) {
     submission: await getSubmissionSnapshot(id),
   });
 }
+
+export const POST = apiRoute(handlePOST);

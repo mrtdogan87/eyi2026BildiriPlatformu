@@ -532,3 +532,11 @@ export async function sendSubmissionReceivedEmail({
     html,
   });
 }
+
+export async function sendAccountActivationEmail(to: string, link: string, congressName: string) {
+  return sendEmail({ to, subject: 'Kişisel hesabınızı etkinleştirin',
+    text: `${congressName} ekibine davet edildiniz. Kişisel parolanızı 24 saat içinde oluşturun: ${link}`,
+    html: `<p>${escapeHtml(congressName)} ekibine davet edildiniz.</p><p><a href="${escapeHtml(link)}">Kişisel hesabınızı etkinleştirin</a> (24 saat)</p>` });
+}
+
+function escapeHtml(value: string) { return value.replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[ch]!)); }

@@ -1,3 +1,4 @@
+import { allows } from "@/platform/policy";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminDeleteRegistration } from "@/components/admin/admin-delete-registration";
@@ -23,7 +24,7 @@ function formatFileSize(fileSize: number) {
 }
 
 export default async function AdminRegistrationDetailPage({ params }: PageProps) {
-  await requireAdminPage();
+  const context = await requireAdminPage("registrations.read", "REGISTRATION");
   const { id } = await params;
   const registration = await getAdminRegistrationDetail(id);
 
@@ -139,10 +140,10 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
 
         <div className="admin-detail-block admin-detail-block-danger">
           <h2>Tehlikeli İşlem · Kaydı Sil</h2>
-          <AdminDeleteRegistration
+          {allows(context.role, "registrations.delete") ? <AdminDeleteRegistration
             registrationId={registration.id}
             registrationEmail={registration.email}
-          />
+          /> : null}
         </div>
 
         <div className="admin-detail-block">

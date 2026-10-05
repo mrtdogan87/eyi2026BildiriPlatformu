@@ -1,3 +1,4 @@
+import { requireModule } from "@/platform/context";
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import {
@@ -151,9 +152,10 @@ export async function readRegistrationSession(): Promise<{
 
   const [email, congressId, signature] = parts;
   const expected = signSession(`${email}|${congressId}`);
-  if (!signature || expected.length !== signature.length) return null;
+  if (!signature || Buffer.byteLength(expected) !== Buffer.byteLength(signature)) return null;
 
   if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  await requireModule(congressId, "REGISTRATION");
   return { email, congressId };
 }
 

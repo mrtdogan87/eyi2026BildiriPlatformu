@@ -1,8 +1,8 @@
 # Bildiri Yönetim Sistemi — v2 Geliştirme Planı
 
-> Durum: **P01 ve P02 yerel kapsamı tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 05.10.2026
-> İlk gerçek kullanım: EYİ 2026 kongresi (`eyi-2026`) — sistem uçtan uca başarıyla çalıştı.
-> Bu kopya uygulama takibidir. Ana planın modülerlik/sertifika/seçmeli kullanım güncellemeleri alındı. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`; modül kararı `docs/adr/0001-modul-sinirlari.md`. Ana plan bu uygulama çalışmasında değiştirilmedi.
+> Durum: **P01, P02 yerel kapsamı ve P03 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 05.10.2026
+> İlk gerçek kullanım: EYİ 2026 (`eyi-2026`); canlı sistem korunuyor.
+> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
 
 ## 1. Hedef
 
@@ -218,7 +218,8 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01 tamamlandı; P02 yerel kapsam/deneme yapılandırması tamamlandı; P03–P22 planlandı. Uzak deneme yayını seçilecek adresi ve ayrı projenin kurulmasını bekliyor. Modülerliğin tahmin etkisi ADR-0001 içinde değerlendirilmiştir; aşağıdaki kapsam/süre tablosu kaynak planla korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı ve P03 tamamlandı. P04–P22 planlandı. Ayrı test adresi/projesi seçilmediği için uzak deneme yayını bekliyor. Sonraki paket P04 kongre oluşturma, profiller, alan/aşama ayarları ve güvenli yıl çoğaltmadır. Kaynak planın kapsam/süre tablosu korunmuştur.
+
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
 

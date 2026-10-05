@@ -27,7 +27,7 @@ if (action === 'setup') {
       `DIRECT_URL=postgresql://aibildiri_v2:${dbPassword}@127.0.0.1:55432/aibildiri_v2`,
       'APP_BASE_URL=http://127.0.0.1:3100',
       'SESSION_COOKIE_NAMESPACE=aibildiri_v2_local',
-      `DRAFT_SESSION_SECRET=${secret()}`, `ADMIN_SESSION_SECRET=${secret()}`, `ADMIN_PASSWORD=${secret()}`,
+      `DRAFT_SESSION_SECRET=${secret()}`,
       'FILE_STORAGE=database', 'MAIL_MODE=capture', 'MAIL_CAPTURE_DIR=.local/mail',
       'SMTP_HOST=', 'SMTP_USER=', 'SMTP_PASS=', 'SMTP_FROM=', 'RESEND_API_KEY=', 'RESEND_SENDER_EMAIL=',
     ].join('\n') + '\n';

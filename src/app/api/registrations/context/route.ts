@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -6,7 +7,7 @@ import {
 } from "@/lib/registration";
 import { getServerT } from "@/lib/i18n/server";
 
-export async function GET() {
+async function handleGET() {
   const { locale, t } = await getServerT();
   const session = await readRegistrationSession();
   if (!session) {
@@ -33,3 +34,5 @@ export async function GET() {
 
   return NextResponse.json({ context });
 }
+
+export const GET = apiRoute(handleGET);

@@ -1,10 +1,12 @@
+import { apiRoute } from "@/platform/http";
+import { requireModule } from "@/platform/context";
 import { NextResponse } from "next/server";
 import { isEmailConfigured, sendRegistrationAccessEmail } from "@/lib/email";
 import { issueRegistrationLink } from "@/lib/registration";
 import { ensureCongress } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   const { t, locale } = await getServerT();
   const body = (await request.json()) as { congressSlug?: string; email?: string };
   const email = body.email?.trim().toLowerCase();
@@ -15,6 +17,7 @@ export async function POST(request: Request) {
   }
 
   const congress = await ensureCongress(congressSlug);
+  await requireModule(congress.id, "REGISTRATION");
   const magicLink = await issueRegistrationLink({
     congressId: congress.id,
     congressSlug: congress.slug,
@@ -42,3 +45,5 @@ export async function POST(request: Request) {
     magicLinkPreview: isDevelopmentPreview ? magicLink : undefined,
   });
 }
+
+export const POST = apiRoute(handlePOST);

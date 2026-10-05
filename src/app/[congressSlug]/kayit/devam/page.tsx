@@ -1,6 +1,6 @@
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { RegistrationLinkGate } from "@/components/registration/registration-link-gate";
-import { ensureCongress } from "@/lib/submission";
+import { publicCongress } from "@/integrations/congress/public-context";
 import { inspectRegistrationToken } from "@/lib/registration";
 import { getServerT } from "@/lib/i18n/server";
 
@@ -15,7 +15,7 @@ export default async function RegistrationContinuePage({ params, searchParams }:
   const { congressSlug } = await params;
   const { token } = await searchParams;
   const trimmedToken = token?.trim() ?? "";
-  const congress = await ensureCongress(congressSlug);
+  const congress = await publicCongress(congressSlug);
   const { t } = await getServerT();
 
   const record = trimmedToken ? await inspectRegistrationToken(trimmedToken) : null;

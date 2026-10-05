@@ -74,10 +74,11 @@ try {
   ok(submit.submission.status === 'SUBMITTED', 'Draft, details, authors, participation, DOCX and final submission complete');
   ok(Boolean(captured(email, 'Alındı')) && Boolean(captured(coauthorEmail, 'Alındı')), 'Submission notifications captured for both synthetic authors');
   await request('/api/admin/submissions', { status: 401 });
-  const legacySignature = createHmac('sha256', process.env.ADMIN_SESSION_SECRET).update('eyi-2026').digest('hex');
+  const legacySignature = createHmac('sha256', 'retired-legacy-test-signing-secret').update('eyi-2026').digest('hex');
   await request('/api/admin/submissions', { cookies: new Map([['admin_session', `eyi-2026.${legacySignature}`]]), status: 401 });
-  await request('/api/admin/login', { method: 'POST', cookies: admin, body: { password: process.env.ADMIN_PASSWORD } });
-  ok(admin.has('aibildiri_v2_local_admin_session'), 'Admin rejects legacy cookie and accepts independent session');
+  await request('/api/admin/login', { method: 'POST', cookies: admin, body: JSON.parse(readFileSync('.local/p03-accounts.json', 'utf8')).organizer });
+  await request('/api/platform/context', { method: 'POST', cookies: admin, body: { congressId: 'local-eyi-2026' } });
+  ok(admin.has('aibildiri_v2_local_platform_session'), 'Admin rejects legacy cookie and accepts personal platform session');
   await request(`/api/admin/submissions/${id}/file`, { status: 401 });
   const downloaded = Buffer.from(await (await request(`/api/admin/submissions/${id}/file`, { cookies: admin })).arrayBuffer());
   ok(digest(downloaded) === digest(docx), 'Admin DOCX download matches uploaded bytes');

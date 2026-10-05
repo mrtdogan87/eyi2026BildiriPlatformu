@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import {
   assertAdminApiAccess,
@@ -9,8 +10,8 @@ type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function PATCH(request: Request, { params }: RouteProps) {
-  if (!(await assertAdminApiAccess())) {
+async function handlePATCH(request: Request, { params }: RouteProps) {
+  if (!(await assertAdminApiAccess("settings", "REGISTRATION"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -40,3 +41,5 @@ export async function PATCH(request: Request, { params }: RouteProps) {
 
   return NextResponse.json({ pricing: await getAdminPricingPayload() });
 }
+
+export const PATCH = apiRoute(handlePATCH);

@@ -1,3 +1,5 @@
+import { privateFile } from "@/platform/files";
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { assertAdminApiAccess, getAdminDownloadPayload } from "@/lib/admin";
 
@@ -5,8 +7,8 @@ type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function GET(_: Request, { params }: RouteProps) {
-  if (!(await assertAdminApiAccess())) {
+async function handleGET(_: Request, { params }: RouteProps) {
+  if (!(await assertAdminApiAccess("submissions.read", "SUBMISSIONS"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -17,11 +19,7 @@ export async function GET(_: Request, { params }: RouteProps) {
     return NextResponse.json({ error: "Dosya bulunamadı." }, { status: 404 });
   }
 
-  return new Response(Buffer.from(file.content), {
-    headers: {
-      "Content-Type": file.mimeType,
-      "Content-Disposition": `attachment; filename*=UTF-8''${encodeURIComponent(file.originalName)}`,
-      "Cache-Control": "no-store",
-    },
-  });
+  return privateFile(file.content, file.mimeType, file.originalName);
 }
+
+export const GET = apiRoute(handleGET);

@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -13,7 +14,7 @@ type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function PUT(request: Request, { params }: RouteProps) {
+async function handlePUT(request: Request, { params }: RouteProps) {
   const { t } = await getServerT();
   const { id } = await params;
   if (!(await canAccessDraft(id))) {
@@ -62,3 +63,5 @@ export async function PUT(request: Request, { params }: RouteProps) {
     submission: await getSubmissionSnapshot(id),
   });
 }
+
+export const PUT = apiRoute(handlePUT);

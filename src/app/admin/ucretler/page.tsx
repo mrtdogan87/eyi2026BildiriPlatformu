@@ -7,7 +7,7 @@ import { getAdminPricingPayload, requireAdminPage } from "@/lib/admin";
 export const dynamic = "force-dynamic";
 
 export default async function AdminPricingPage() {
-  await requireAdminPage();
+  const context = await requireAdminPage("settings", "REGISTRATION");
   const pricing = await getAdminPricingPayload();
 
   if (!pricing) {
@@ -15,7 +15,7 @@ export default async function AdminPricingPage() {
   }
 
   return (
-    <main className="page-shell admin-page-shell">
+    <main data-congress={context.congress.id} className="page-shell admin-page-shell">
       <section className="hero admin-hero">
         <div>
           <Link href="/admin/bildiriler" className="admin-back-link">

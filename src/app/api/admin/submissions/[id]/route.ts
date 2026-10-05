@@ -1,6 +1,8 @@
+import { requireContext } from "@/platform/context";
+import { auditSink } from "@/platform/audit";
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import {
-  ADMIN_DEFAULT_CONGRESS_SLUG,
   assertAdminApiAccess,
   getAdminSubmissionDetail,
 } from "@/lib/admin";
@@ -10,8 +12,8 @@ type RouteProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function GET(_: Request, { params }: RouteProps) {
-  if (!(await assertAdminApiAccess())) {
+async function handleGET(_: Request, { params }: RouteProps) {
+  if (!(await assertAdminApiAccess("submissions.read", "SUBMISSIONS"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -27,8 +29,8 @@ export async function GET(_: Request, { params }: RouteProps) {
 
 const DELETE_CONFIRMATION_PHRASE = "Bu bildiriyi silmeyi onaylıyorum";
 
-export async function DELETE(request: Request, { params }: RouteProps) {
-  if (!(await assertAdminApiAccess())) {
+async function handleDELETE(request: Request, { params }: RouteProps) {
+  if (!(await assertAdminApiAccess("submissions.delete", "SUBMISSIONS"))) {
     return NextResponse.json({ error: "Bu alana erişim yetkiniz yok." }, { status: 401 });
   }
 
@@ -46,10 +48,11 @@ export async function DELETE(request: Request, { params }: RouteProps) {
     );
   }
 
+  const context = await requireContext("submissions.delete", "SUBMISSIONS");
   const submission = await prisma.submission.findFirst({
     where: {
       id,
-      congress: { slug: ADMIN_DEFAULT_CONGRESS_SLUG },
+      congressId: context.congress.id,
     },
     select: { id: true },
   });
@@ -58,7 +61,14 @@ export async function DELETE(request: Request, { params }: RouteProps) {
     return NextResponse.json({ error: "Bildiri bulunamadı." }, { status: 404 });
   }
 
-  await prisma.submission.delete({ where: { id: submission.id } });
+  await prisma.$transaction([
+    prisma.submission.delete({ where: { id: submission.id } }),
+    auditSink(prisma)(context, "submission.delete", submission.id),
+  ]);
 
   return NextResponse.json({ ok: true });
 }
+
+export const GET = apiRoute(handleGET);
+
+export const DELETE = apiRoute(handleDELETE);

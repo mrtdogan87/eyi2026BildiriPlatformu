@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isEmailConfigured, sendDraftAccessEmail } from "@/lib/email";
@@ -10,7 +11,7 @@ import {
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   const { t, locale } = await getServerT();
   const body = (await request.json()) as {
     congressSlug?: string;
@@ -85,3 +86,5 @@ export async function POST(request: Request) {
     magicLinkPreview: isDevelopmentPreview ? magicLink : undefined,
   });
 }
+
+export const POST = apiRoute(handlePOST);

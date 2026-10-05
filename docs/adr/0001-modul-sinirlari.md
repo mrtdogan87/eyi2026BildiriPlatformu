@@ -84,3 +84,18 @@ Her iş modülünün kapanışı başka küçük örnek uygulamaya bağlama, yal
 gerekli ortak hizmetlerle çalışma ve kapalı API/kuyruk davranışı kanıtı
 içerecek. Klasör ayrımı taşınabilirlik kabulü değildir. Ayrı ticari ürün
 paketleme ve çok sunuculu servis işletimi mevcut uygulama kapsamına eklenmedi.
+
+## P03 uygulama kaydı (05.10.2026)
+
+Kişisel hesap çekirdeği `src/modules/identity`, platform bağlam/izin ve
+modül kapıları `src/platform`, eski kongre yönetimi
+`src/integrations/congress/management` olarak uygulandı. Dosya/notification/
+audit ve kimlik-bağlam sözleşmeleri `src/platform/ports.ts` ile görünürdür.
+İş modülü audit yazısını platform transaction sink'i üzerinden yapar.
+
+İki mevcut iş modülü kapalıyken çekirdek hesap/ekip/kongre paneli çalışır;
+kapatma veri silmez, mevcut katılımcı oturumunu da API'de durdurur.
+Katalogda henüz hazır olmayan modül açılmaz. Eski başvuru/kayıt iş kodunun
+tam taşınması kendi paketinde; bağımsız CMS/sertifika uygulama örneği kendi
+kapanışında doğrulanacak. P03 yalnız klasörlerle taşınabilirlik kanıtı ileri
+sürmez. P02'nin 2–4 gün risk payı kaynak plan değiştirilmeden korunuyor.

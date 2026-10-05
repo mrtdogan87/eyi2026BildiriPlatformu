@@ -1,3 +1,4 @@
+import { apiRoute } from "@/platform/http";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import type { AudienceType, PresentationMode } from "@prisma/client";
@@ -28,7 +29,7 @@ function parseJsonField<T>(value: FormDataEntryValue | null, fallback: T): T {
   }
 }
 
-export async function POST(request: Request) {
+async function handlePOST(request: Request) {
   const { t } = await getServerT();
   const session = await readRegistrationSession();
   if (!session) {
@@ -212,3 +213,5 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ registrationId: registration.id });
 }
+
+export const POST = apiRoute(handlePOST);

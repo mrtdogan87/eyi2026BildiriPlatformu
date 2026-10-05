@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { RegistrationEmailForm } from "@/components/registration/registration-email-form";
-import { ensureCongress } from "@/lib/submission";
+import { publicCongress } from "@/integrations/congress/public-context";
 import { getServerT } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ type PageProps = {
 
 export default async function RegistrationStartPage({ params }: PageProps) {
   const { congressSlug } = await params;
-  const congress = await ensureCongress(congressSlug);
+  const congress = await publicCongress(congressSlug);
   const { t } = await getServerT();
 
   return (

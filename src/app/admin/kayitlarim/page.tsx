@@ -1,0 +1,4 @@
+import { requirePage } from '@/platform/context';
+import { ownRecords } from '@/integrations/congress/own-records';
+export const dynamic = 'force-dynamic';
+export default async function OwnPage() { await requirePage('own'); const records = await ownRecords(); return <main className="page-shell"><section className="hero"><h1>Kendi kayıtlarım</h1><p>Seçili kongrede hesabınızın e-postasıyla ilişkili kayıtlar.</p></section><section className="card platform-card"><h2>Bildiriler</h2>{records.submissions.length ? records.submissions.map(paper => <p key={paper.id}>{paper.titleTr ?? paper.titleEn ?? 'Taslak'} · {paper.status}</p>) : <p>Görüntülenecek bildiri yok.</p>}<h2>Kayıtlar</h2>{records.registrations.length ? records.registrations.map(registration => <p key={registration.id}>{registration.totalAmount} {registration.currency} · {registration.paidAt ? 'Ödeme tamamlandı' : 'Ödeme incelemede'}</p>) : <p>Görüntülenecek kayıt yok.</p>}</section></main>; }

@@ -47,6 +47,12 @@ enum RegistrationKind {
 }
 
 model Congress {
+  organizationId           String
+  organization             Organization              @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  memberships              CongressMembership[]
+  modules                  CongressModule[]
+  sessions                 PlatformSession[]
+  audits                   AuditLog[]
   id                       String                    @id @default(cuid())
   slug                     String                    @unique
   name                     String
@@ -68,6 +74,8 @@ model Congress {
   paymentTiers             PaymentTier[]
   registrations            Registration[]
   registrationAccessTokens RegistrationAccessToken[]
+
+  @@index([organizationId])
 }
 
 model PaymentTier {
@@ -178,28 +186,28 @@ model SubmissionStatusHistory {
 }
 
 model Registration {
-  id                       String                  @id @default(cuid())
+  id                       String                       @id @default(cuid())
   congressId               String
   email                    String
   kind                     RegistrationKind
   audience                 AudienceType?
   listenerPresentationMode PresentationMode?
-  listenerDayOne           Boolean                 @default(true)
-  listenerDayTwo           Boolean                 @default(false)
-  galaAttendance           Boolean                 @default(false)
-  galaAttendeeCount        Int                     @default(0)
+  listenerDayOne           Boolean                      @default(true)
+  listenerDayTwo           Boolean                      @default(false)
+  galaAttendance           Boolean                      @default(false)
+  galaAttendeeCount        Int                          @default(0)
   galaFeeAmount            Int?
   galaFeeCurrency          String?
-  tripAttendance           Boolean                 @default(false)
-  tripAttendeeCount        Int                     @default(0)
+  tripAttendance           Boolean                      @default(false)
+  tripAttendeeCount        Int                          @default(0)
   paymentPeriod            PaymentPeriod
   totalAmount              Int
-  currency                 String                  @default("TRY")
+  currency                 String                       @default("TRY")
   paymentDescription       String
   paidAt                   DateTime?
-  createdAt                DateTime                @default(now())
-  updatedAt                DateTime                @updatedAt
-  congress                 Congress                @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  createdAt                DateTime                     @default(now())
+  updatedAt                DateTime                     @updatedAt
+  congress                 Congress                     @relation(fields: [congressId], references: [id], onDelete: Cascade)
   receipt                  RegistrationReceipt?
   studentDocument          RegistrationStudentDocument?
   paperItems               RegistrationPaperItem[]
@@ -260,4 +268,126 @@ model RegistrationAccessToken {
   @@index([email])
   @@index([tokenHash])
   @@index([expiresAt])
+}
+
+enum CongressRole {
+  ORGANIZER
+  SECRETARY
+  CONTENT_EDITOR
+  REVIEWER
+  SESSION_CHAIR
+  PARTICIPANT
+}
+
+enum ModuleKey {
+  SUBMISSIONS
+  REGISTRATION
+  CMS
+  REVIEWS
+  PROGRAM
+  CERTIFICATES
+}
+
+model Organization {
+  id          String                   @id @default(cuid())
+  name        String
+  createdAt   DateTime                 @default(now())
+  congresses  Congress[]
+  memberships OrganizationMembership[]
+  audits      AuditLog[]
+}
+
+model PlatformUser {
+  id               String                   @id @default(cuid())
+  email            String                   @unique
+  name             String
+  passwordHash     String?
+  platformAdmin    Boolean                  @default(false)
+  active           Boolean                  @default(true)
+  failedLogins     Int                      @default(0)
+  lockedUntil      DateTime?
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
+  organizations    OrganizationMembership[]
+  congresses       CongressMembership[]
+  sessions         PlatformSession[]
+  activationTokens ActivationToken[]
+  audits           AuditLog[]
+}
+
+model OrganizationMembership {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  organizer      Boolean      @default(false)
+  active         Boolean      @default(true)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+model CongressMembership {
+  id         String       @id @default(cuid())
+  congressId String
+  userId     String
+  role       CongressRole
+  active     Boolean      @default(true)
+  congress   Congress     @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  user       PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([congressId, userId])
+  @@index([userId])
+}
+
+model CongressModule {
+  id         String    @id @default(cuid())
+  congressId String
+  key        ModuleKey
+  enabled    Boolean   @default(false)
+  congress   Congress  @relation(fields: [congressId], references: [id], onDelete: Cascade)
+
+  @@unique([congressId, key])
+}
+
+model PlatformSession {
+  id         String       @id @default(cuid())
+  tokenHash  String       @unique
+  userId     String
+  congressId String?
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime     @default(now())
+  user       PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+  congress   Congress?    @relation(fields: [congressId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+model ActivationToken {
+  id        String       @id @default(cuid())
+  tokenHash String       @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id             String        @id @default(cuid())
+  actorId        String?
+  organizationId String?
+  congressId     String?
+  action         String
+  targetId       String?
+  detail         Json?
+  createdAt      DateTime      @default(now())
+  actor          PlatformUser? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  congress       Congress?     @relation(fields: [congressId], references: [id], onDelete: Restrict)
+
+  @@index([congressId, createdAt])
 }

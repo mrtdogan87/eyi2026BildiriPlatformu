@@ -1,3 +1,5 @@
+import { publicCongress } from "@/integrations/congress/public-context";
+import { moduleEnabled } from "@/platform/context";
 import Link from "next/link";
 import { ArrowRight, ClipboardCheck, FileText, Lock } from "lucide-react";
 import { slugToTitle } from "@/lib/utils";
@@ -13,6 +15,8 @@ type PageProps = {
 export default async function CongressHubPage({ params }: PageProps) {
   const { congressSlug } = await params;
   const { locale, t } = await getServerT();
+  const congress = await publicCongress(congressSlug);
+  const registrationEnabled = await moduleEnabled(congress.id, "REGISTRATION");
   const submissionsClosed = await isSubmissionClosed(congressSlug);
   const congressTitle =
     congressSlug === "eyi-2026"
@@ -64,7 +68,7 @@ export default async function CongressHubPage({ params }: PageProps) {
             </Link>
           )}
 
-          <Link className="hub-action-card hub-action-card-registration" href={`/${congressSlug}/kayit`}>
+          {registrationEnabled ? <Link className="hub-action-card hub-action-card-registration" href={`/${congressSlug}/kayit`}>
             <div className="hub-action-top">
               <span className="hub-action-label">{t("hub.registrationLabel")}</span>
               <span className="hub-action-icon" aria-hidden="true">
@@ -76,7 +80,7 @@ export default async function CongressHubPage({ params }: PageProps) {
             <span className="hub-card-cta">
               {t("common.continue")} <ArrowRight size={18} strokeWidth={2} />
             </span>
-          </Link>
+          </Link> : <div className="hub-action-card is-disabled"><h2>Kayıt modülü kapalı</h2><p>Bu kongrede kayıt hizmeti şu anda açık değil.</p></div>}
         </div>
 
         <div className="hub-reminder">

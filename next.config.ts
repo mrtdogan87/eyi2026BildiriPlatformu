@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typedRoutes: false,
+  // Access links carry secrets in their query; never log incoming request URLs in dev.
+  logging: { incomingRequests: false },
   output: "standalone",
   outputFileTracingRoot: process.cwd(),
   turbopack: { root: process.cwd() },

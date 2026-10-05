@@ -33,12 +33,12 @@ DB kendi parolası/kümesiyle `127.0.0.1:55432/aibildiri_v2`, dosyaları `.local
 - Yakalanan e-postalar `.local/mail/*.json` içinde `0600` izinle saklanır.
   `npm run mail:latest` yolu gösterir; yerel editörde bağlantıyı açabilirsiniz.
   Tokenlar sunucu loguna yazılmaz.
-- Çerez ön eki `aibildiri_v2_local_`, imza sırları bağımsızdır. HTTP sadece
+- Çerez ön eki `aibildiri_v2_local_`; yönetim oturumu rastgele DB oturumudur. HTTP sadece
   yerel loopback; denemede HTTPS/secure çerez gerekir.
 - Dosyalar ayrı DB byte alanlarına gider; eski yükleme alanı kullanılmaz.
 - `.env*`, `.local`, `.preview`, `.recovery` ve build çıktıları Git dışındadır.
 
-Seed iki sentetik kongre (açık/kapalı), 13 tarife ve iki test bildirisi içerir;
+Seed iki sentetik kurum, üç kongre (A açık/kapalı, B açık), 13 tarife ve temel rol hesapları içerir;
 yazar adresleri `.invalid`. Banka/ücret bilgisi gerçek ödeme talimatı değildir.
 Seed idempotenttir, mevcut test kayıtlarını silmez. İlk seed'de tarihler
 30/60 gün ileridedir; gelecekte tarihler yerel admin'den yenilenebilir.
@@ -53,6 +53,7 @@ npm run build
 npm run start
 # Uygulama çalışırken başka terminalde:
 npm run test:smoke
+npm run test:platform
 ```
 
 Smoke gerçek HTTP üzerinden sentetik başvuru/dosya/kabul/kayıt/dekont ve
@@ -60,3 +61,21 @@ e-posta/yetki kontrolünü yapar, yeni test kayıtları bırakır. Kanıt
 `.local/smoke-result.json`; gerçek veri/e-posta kullanılmaz.
 Uygulama Ctrl+C, DB `npm run db:stop` ile durdurulur. P01 restore kümesi
 uygulamaya bağlı değildir; kabul provasından sonra kapatılır.
+
+## P03 kişisel hesaplar
+
+`npm run db:seed` sentetik kişisel hesapları hazırlar. Hesap bilgileri yalnız
+Git dışı `.local/p03-accounts.json` dosyasındadır; konsola yazdırmayın veya
+paylaşmayın. Yerel panel `/admin`, kongre seçimi `/admin/panel`; ekip, modül
+ve işlem geçmişi buradan açılır. `ADMIN_PASSWORD` ve `ADMIN_SESSION_SECRET`
+artık giriş için kullanılmaz ve yeni env örneğinde yoktur. P02'nin ortak
+parola/çerezi P03'te kabul edilmez. Seed yerel testle sınırlıdır.
+
+Ekip davetinden sonra `.local/mail` içindeki kişisel etkinleştirme bağlantısı
+24 saat içinde kullanılır. Kullanıcı parolasını kendi oluşturur; süre dolarsa
+ekrandan daveti yeniden gönderebilirsiniz. Var olan hesabı kongreye eklemek
+parolasını sıfırlamaz. Hakem/editör/başkan ekranları ilgili paketlerde açılır.
+
+`test:platform` yerel sentetik davet/kayıtlar bırakır; modül ve rol ayarlarını
+prova sonrası geri getirir. Derlenmiş sürümü test etmek için dev'i kapatıp
+build/start çalıştırın. Kabul kanıtı `.local/platform-check-result.json`.

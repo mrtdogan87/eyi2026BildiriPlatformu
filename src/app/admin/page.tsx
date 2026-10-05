@@ -6,16 +6,15 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminLoginPage() {
   if (await isAdminAuthenticated()) {
-    redirect("/admin/bildiriler");
+    redirect("/admin/panel");
   }
 
   return (
     <main className="page-shell admin-page-shell">
       <section className="hero">
-        <h1>EYİ 2026 Yönetim Paneli</h1>
+        <h1>Kongre Yönetim Platformu</h1>
         <p>
-          Bu alan yalnızca yönetim kullanımı içindir. Gönderilmiş bildirileri görüntülemek ve
-          dosyaları indirmek için giriş yapın.
+          Kişisel hesabınızla giriş yapın. Yetkili olduğunuz kurum ve kongreleri hesabınızdan seçebilirsiniz.
         </p>
       </section>
 

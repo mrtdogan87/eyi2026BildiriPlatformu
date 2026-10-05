@@ -6,6 +6,7 @@ import type { FormEvent } from "react";
 
 export function AdminLoginForm() {
   const router = useRouter();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +22,7 @@ export function AdminLoginForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = (await response.json()) as { error?: string };
@@ -29,7 +30,7 @@ export function AdminLoginForm() {
         throw new Error(data.error ?? "Giriş başarısız.");
       }
 
-      router.push("/admin/bildiriler");
+      router.push("/admin/panel");
       router.refresh();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Giriş başarısız.");
@@ -40,9 +41,10 @@ export function AdminLoginForm() {
 
   return (
     <form className="card admin-login-card" onSubmit={handleSubmit}>
-      <h2 className="section-title">Yönetim Girişi</h2>
+      <h2 className="section-title">Kişisel Hesap Girişi</h2>
+      <div className="field"><label htmlFor="admin-email">E-posta</label><input id="admin-email" type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required /></div>
       <div className="field">
-        <label htmlFor="admin-password">Admin Şifresi</label>
+        <label htmlFor="admin-password">Parola</label>
         <input
           id="admin-password"
           type="password"
