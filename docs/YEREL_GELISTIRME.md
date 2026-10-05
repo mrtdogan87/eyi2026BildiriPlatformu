@@ -1,6 +1,6 @@
 # v2 yerel geliştirme
 
-Dizin `/Users/mrt/Documents/Codex/AIBildiriYonetim/v2`, dal `codex/v2-p01-p02`.
+Dizin `/Users/mrt/Documents/Codex/AIBildiriYonetim/v2`, güncel paket dalı `codex/v2-p06`.
 Üst checkout korunmuştur. Node.js 22.13+ ve PostgreSQL 16 CLI araçları gerekir.
 Bu makinede Node 25.8.2/PostgreSQL 16.13 ile doğrulandı. Docker gerekmez.
 
@@ -74,7 +74,7 @@ parola/çerezi P03'te kabul edilmez. Seed yerel testle sınırlıdır.
 Ekip davetinden sonra `.local/mail` içindeki kişisel etkinleştirme bağlantısı
 24 saat içinde kullanılır. Kullanıcı parolasını kendi oluşturur; süre dolarsa
 ekrandan daveti yeniden gönderebilirsiniz. Var olan hesabı kongreye eklemek
-parolasını sıfırlamaz. Hakem/editör/başkan ekranları ilgili paketlerde açılır.
+parolasını sıfırlamaz. CMS editör ekranları P06'da açıldı; hakem/başkan ekranları ilgili paketlerde açılır.
 
 `test:platform` yerel sentetik davet/kayıtlar bırakır; modül ve rol ayarlarını
 prova sonrası geri getirir. Derlenmiş sürümü test etmek için dev'i kapatıp
@@ -115,3 +115,27 @@ içindeki `fixtures.demo.slug` alanındadır. Diğer DB senaryolarıyla sıralı
 Paket commit'i temizken `node scripts/checkpoint.mjs P05-20261005-final`
 kaynak/DB/özel dosyaları yeni kurtarma klasörüne alır ve tüm tabloları ayrı
 geçici yerel DB'ye geri yükleyerek satır sayıları ile SHA-256 değerlerini karşılaştırır.
+
+## P06 CMS
+
+Organizatör seçili kongrede Modüller ekranından **Sayfalar ve medya (CMS)**
+açabilir. CMS sayfaları `/admin/cms`, kitaplık `/admin/cms/medya` adresindedir.
+İçerik editörü yalnız kendi kongresinin CMS'sini kullanır; ayar/modül/ekip
+yönetimine erişmez. Bildiri ve kayıt kapalıyken CMS tek başına çalışır.
+
+Taslak sayfa oluşturun, TR/EN başlık ve blokları doldurun. Kitaplığa görsel
+veya PDF yükleyip uygun bloktan seçin. Taslağı kaydet, özel önizlemede kontrol
+et, ardından Yayımla. Sonraki taslak kayıtları yayını değiştirmez. Geçmiş
+sürümü taslağa almak yeni sürüm oluşturur; tekrar Yayımla gerekir. Dosyayı
+gizlemek erişimi kapatır, yeniden açmak geri getirir; özgün veri silinmez.
+CMS dosyaları herkese açık sitede kullanılacak içerikler içindir.
+
+`npm run test:cms` 9 saf test + 34 sentetik HTTP/DB senaryosu çalıştırır.
+DB testlerini `test:site`, `test:congress`, `test:smoke`, `test:platform`
+ile sıralı çalıştırın. `test:safety` ve `test:preview` ile toplam 175 kontrol
+ve ayrı preview kapısı doğrulanır. Son CMS örneği `.local/cms-check-result.json`
+içinde; tarayıcı kanıtı `.local/p06-browser-check-result.json` içindedir.
+
+Temiz paket commit'inden sonra `node scripts/checkpoint.mjs P06-20261005-final`
+27 tabloyu geçici yerel DB'ye tam geri yükleyip karşılaştırır. Önceki paket
+checkpoint'lerine yazılmaz. Kapsam ve bağımlılık bulguları [P06 kapanışında](P06_KAPANIS.md).

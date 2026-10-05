@@ -4,10 +4,10 @@ import Image from 'next/image';
 import { useRef, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { LanguageToggle } from '@/lib/i18n/language-toggle';
-type Props = { slug:string; name:string; organization:string; locale:'tr'|'en'; languages:readonly ('TR'|'EN')[]; modules:{SUBMISSIONS:boolean;REGISTRATION:boolean}; contact:boolean; logo?:{url:string;width:number;height:number}; logoAlt:string };
-export function SiteHeader({slug,name,organization,locale,languages,modules,contact,logo,logoAlt}:Props) {
+type Props = { slug:string; name:string; organization:string; locale:'tr'|'en'; languages:readonly ('TR'|'EN')[]; modules:{SUBMISSIONS:boolean;REGISTRATION:boolean}; contact:boolean; logo?:{url:string;width:number;height:number}; logoAlt:string; pages?:{href:string;label:string}[] };
+export function SiteHeader({slug,name,organization,locale,languages,modules,contact,logo,logoAlt,pages=[]}:Props) {
   const [open,setOpen]=useState(false);const trigger=useRef<HTMLButtonElement>(null);const root=`/${slug}`;const en=locale==='en';
-  const links=[{href:root,label:en?'Home':'Ana sayfa'},{href:root+'#kongre-hakkinda',label:en?'About':'Kongre hakkında'},{href:root+'#onemli-tarihler',label:en?'Important dates':'Önemli tarihler'},...(modules.SUBMISSIONS?[{href:root+'/bildiri-gonder',label:en?'Paper submission':'Bildiri gönderimi'}]:[]),...(modules.REGISTRATION?[{href:root+'/kayit',label:en?'Registration':'Kayıt'}]:[]),...(contact?[{href:root+'#iletisim',label:en?'Contact':'İletişim'}]:[])];
+  const links=[{href:root,label:en?'Home':'Ana sayfa'},{href:root+'#kongre-hakkinda',label:en?'About':'Kongre hakkında'},{href:root+'#onemli-tarihler',label:en?'Important dates':'Önemli tarihler'},...(modules.SUBMISSIONS?[{href:root+'/bildiri-gonder',label:en?'Paper submission':'Bildiri gönderimi'}]:[]),...(modules.REGISTRATION?[{href:root+'/kayit',label:en?'Registration':'Kayıt'}]:[]),...pages,...(contact?[{href:root+'#iletisim',label:en?'Contact':'İletişim'}]:[])];
   return <header className="site-header" onKeyDown={event=>{if(event.key==='Escape'&&open){setOpen(false);trigger.current?.focus();}}}>
     <a className="site-skip" href="#congress-content">{en?'Skip to content':'İçeriğe geç'}</a>
     <div className="site-institution"><div className="site-width"><span>{organization}</span><span>{en?'Congress platform':'Kongre platformu'}</span></div></div>

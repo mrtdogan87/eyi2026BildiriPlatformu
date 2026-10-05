@@ -26,7 +26,7 @@ try {
   }
   if (!ready) throw new Error('Preview probe server did not start');
   const checks = [];
-  for (const path of ['/admin', '/eyi-2026', '/api/admin/submissions', '/api/registrations/request', '/api/admin/submissions/test/file', '/api/platform/site', '/api/public/congresses/eyi-2026/assets/logo']) {
+  for (const path of ['/admin', '/eyi-2026', '/api/admin/submissions', '/api/registrations/request', '/api/admin/submissions/test/file', '/api/platform/site', '/api/public/congresses/eyi-2026/assets/logo', '/admin/cms', '/admin/cms/test/onizleme', '/api/platform/cms/pages', '/api/platform/cms/media/test/file', '/eyi-2026/sayfalar/rehber', '/api/public/congresses/eyi-2026/media/test']) {
     const r = await fetch(base + path);
     if (r.status !== 401 || !r.headers.get('www-authenticate') || r.headers.get('x-robots-tag') !== 'noindex, nofollow') throw new Error('Preview anonymous request was not blocked');
     checks.push(`Anonymous ${path}: 401`);
@@ -41,6 +41,11 @@ try {
   const asset = await fetch(base + css, { headers: { authorization } });
   if (asset.status !== 200) throw new Error('Authorized preview asset failed');
   checks.push('Anonymous CSS: 401; authorized admin and CSS: 200');
+  for (const headers of [{rsc:'1', 'next-router-prefetch':'1'}, {'x-middleware-subrequest':'proxy:proxy:proxy:proxy:proxy'}]) {
+    const probe = await fetch(`${base}/admin/cms/test/onizleme`, {headers});
+    if (probe.status !== 401) throw new Error('Preview protection failed for a special request');
+  }
+  checks.push('CMS preview prefetch and subrequest probes: 401');
   const login = await fetch(`${base}/api/admin/login`, { method: 'POST', headers: { authorization, 'content-type': 'application/json' }, body: JSON.stringify({ password: env.ADMIN_PASSWORD }) });
   if (login.status !== 400 || login.headers.getSetCookie().length) throw new Error('Legacy shared-password login unexpectedly accepted');
   checks.push('Shared-password-only login rejected before a database connection');

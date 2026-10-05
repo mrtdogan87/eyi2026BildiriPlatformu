@@ -17,7 +17,7 @@ export async function setModule(key: ModuleKey, enabled: boolean) {
     const before = await tx.congressModule.findUnique({ where: { congressId_key: { congressId: context.congress.id, key } } });
     await tx.congressModule.upsert({ where: { congressId_key: { congressId: context.congress.id, key } }, create: { congressId: context.congress.id, key, enabled }, update: { enabled } });
     const congress = await tx.congress.findUniqueOrThrow({ where: { id: context.congress.id } });
-    if (congress.configuration) {
+    if (congress.configuration && (key === 'SUBMISSIONS' || key === 'REGISTRATION')) {
       const config = effectiveConfiguration(congress.configuration); config.modules[key as 'SUBMISSIONS' | 'REGISTRATION'] = enabled;
       if (!configurationSchema.safeParse(config).success) throw new AccessError(400, 'Önce Kongre yapılandırması ekranında bu modülün aşamalarını düzenleyin.');
       const updated = await tx.congress.updateMany({ where: { id: congress.id, configVersion: congress.configVersion }, data: { configuration: config, configVersion: { increment: 1 } } });

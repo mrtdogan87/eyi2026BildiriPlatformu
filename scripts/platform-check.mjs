@@ -93,7 +93,7 @@ try {
   assert.equal(audit.actorId, 'local-user-secretary'); assert.equal(audit.congressId, 'local-eyi-2026'); assert.equal(audit.detail.after, targetStatus);
   await req('/api/admin/submissions/local-paper-submitted/status', { method: 'POST', body: { status: statusRecord.status }, jar: secretary });
   passed('Status mutation and history have actor/congress audit evidence');
-  await req('/api/platform/modules', { method: 'PATCH', body: { key: 'CMS', enabled: true }, jar: organizer, status: 400 });
+  await req('/api/platform/modules', { method: 'PATCH', body: { key: 'REVIEWS', enabled: true }, jar: organizer, status: 400 });
   const publicEmail = `p03-owner-${Date.now()}@example.invalid`; const draftJar = {}; const regJar = {};
   function latestMail(to) { return readdirSync('.local/mail').filter(x => x.endsWith('.json')).sort().reverse().map(x => JSON.parse(readFileSync(`.local/mail/${x}`, 'utf8'))).find(m => m.to === to); }
   await req('/api/submissions/drafts', { method: 'POST', body: { congressSlug: 'eyi-2026', email: publicEmail } });

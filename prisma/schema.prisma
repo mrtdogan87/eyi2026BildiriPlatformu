@@ -47,6 +47,8 @@ enum RegistrationKind {
 }
 
 model Congress {
+  cmsPages                 CmsPage[]
+  cmsMedia                 CmsMedia[]
   siteConfiguration        Json?
   siteVersion              Int                       @default(0)
   siteAssets               SiteAsset[]
@@ -308,6 +310,8 @@ model Organization {
 }
 
 model PlatformUser {
+  cmsRevisions       CmsRevision[]
+  cmsMedia           CmsMedia[]
   id                 String                   @id @default(cuid())
   email              String                   @unique
   name               String
@@ -446,4 +450,80 @@ model SiteAsset {
   congress     Congress      @relation(fields: [congressId], references: [id], onDelete: Cascade)
 
   @@unique([congressId, kind])
+}
+
+enum CmsRevisionKind {
+  SAVE
+  PUBLISH
+  RESTORE
+  WITHDRAW
+}
+
+enum CmsMediaKind {
+  IMAGE
+  PDF
+}
+
+model CmsPage {
+  id                  String        @id @default(cuid())
+  congressId          String
+  slug                String
+  internalName        String
+  draft               Json
+  version             Int           @default(1)
+  publishedRevisionId String?       @unique
+  publishedRevision   CmsRevision?  @relation("CmsPublication", fields: [publishedRevisionId], references: [id], onDelete: SetNull)
+  revisions           CmsRevision[] @relation("CmsHistory")
+  congress            Congress      @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@unique([congressId, slug])
+}
+
+model CmsRevision {
+  id          String             @id @default(cuid())
+  pageId      String
+  number      Int
+  kind        CmsRevisionKind
+  content     Json
+  createdById String?
+  createdBy   PlatformUser?      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime           @default(now())
+  page        CmsPage            @relation("CmsHistory", fields: [pageId], references: [id], onDelete: Cascade)
+  publishedBy CmsPage?           @relation("CmsPublication")
+  mediaRefs   CmsRevisionMedia[]
+
+  @@unique([pageId, number])
+}
+
+model CmsMedia {
+  id           String             @id @default(cuid())
+  congressId   String
+  internalName String
+  originalName String
+  kind         CmsMediaKind
+  mimeType     String
+  content      Bytes
+  width        Int?
+  height       Int?
+  byteSize     Int
+  active       Boolean            @default(true)
+  version      Int                @default(1)
+  uploadedById String?
+  uploadedBy   PlatformUser?      @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  congress     Congress           @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  createdAt    DateTime           @default(now())
+  references   CmsRevisionMedia[]
+
+  @@index([congressId, createdAt])
+}
+
+model CmsRevisionMedia {
+  revisionId String
+  mediaId    String
+  revision   CmsRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  media      CmsMedia    @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@id([revisionId, mediaId])
 }
