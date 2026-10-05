@@ -1,30 +1,15 @@
-import type { CSSProperties } from "react";
-import { effectiveConfiguration } from "@/modules/congress/configuration";
-import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
-import { LanguageToggle } from "@/lib/i18n/language-toggle";
-import { LanguageProvider } from "@/lib/i18n/provider";
-import { getLocale } from "@/lib/i18n/server";
-
-export default async function CongressLayout({
-  children, params,
-}: {
-  children: React.ReactNode; params: Promise<{ congressSlug: string }>;
-}) {
-  const { congressSlug } = await params;
-  const congress = await prisma.congress.findUnique({ where: { slug: congressSlug } });
-  if (!congress) notFound();
-  const config = effectiveConfiguration(congress.configuration);
-  const preferred = await getLocale();
-  const locale = config.languages.includes(preferred === "en" ? "EN" : "TR") ? preferred : config.languages[0] === "EN" ? "en" : "tr";
-  return (
-    <LanguageProvider initialLocale={locale}>
-      <div data-congress-theme={config.theme} style={congress.configuration ? ({ "--primary":config.accent,"--primary-soft":config.accent,"--primary-strong":config.accent,"--accent":config.accent } as CSSProperties) : undefined}>
-      <div className="lang-toggle-bar">
-        {config.languages.length > 1 && <LanguageToggle />}
-      </div>
-      {children}
-      </div>
-    </LanguageProvider>
-  );
+import type { CSSProperties } from 'react';
+import Link from 'next/link';
+import { publicSite } from '@/integrations/congress/site-data';
+import { localized, readableAccent } from '@/modules/site/configuration';
+import { LanguageProvider } from '@/lib/i18n/provider';
+import { getLocale } from '@/lib/i18n/server';
+import { SiteHeader } from '@/components/site/site-header';
+export default async function CongressLayout({children,params}:{children:React.ReactNode;params:Promise<{congressSlug:string}>}) {
+  const {congressSlug}=await params;const {congress,workflow,modules,site,assets}=await publicSite(congressSlug);const locale=await getLocale(workflow.languages);const name=localized(site.shortName,locale,congress.name);const primary=readableAccent(workflow.accent);
+  return <LanguageProvider key={locale} initialLocale={locale}><div className="congress-site" lang={locale} data-congress-theme={workflow.theme} style={{'--primary':primary,'--primary-soft':primary,'--primary-strong':primary,'--accent':workflow.accent} as CSSProperties}>
+    <SiteHeader slug={congressSlug} name={name} organization={congress.organization.name} locale={locale} languages={workflow.languages} modules={modules} contact={!!site.contactEmail} logo={assets.LOGO} logoAlt={localized(site.logoAlt,locale)}/>
+    {children}
+    <footer className="site-footer"><div className="site-width"><div><Link href={`/${congressSlug}`}><strong>{name}</strong></Link><p>{congress.organization.name}</p></div><div>{site.contactEmail&&<a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>}<p>{locale==='en'?'Submission & participation services':'Başvuru ve katılım hizmetleri'}</p></div></div></footer>
+  </div></LanguageProvider>;
 }

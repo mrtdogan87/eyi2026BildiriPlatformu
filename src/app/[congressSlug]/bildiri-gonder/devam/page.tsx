@@ -28,7 +28,7 @@ export default async function ContinueDraftPage({
   const submissionsClosed = submission?.congress.slug === congressSlug ? !(await canResumeDraft(submission.id)) : await isSubmissionClosed(congressSlug);
 
   return (
-    <main className="page-shell submission-shell">
+    <main id="congress-content" tabIndex={-1} className="page-shell submission-shell">
       <div className="page-box submission-page-box">
         <PlatformHero
           variant="submission"

@@ -98,3 +98,20 @@ kopyalar ve ayrı rastgele adlı geçici yerel DB'de tam geri yükleme yaparak
 tüm tablo parmak izlerini karşılaştırır. Klasör zaten varsa üzerine yazmaz.
 PostgreSQL araçları için varsayılan yol `/opt/homebrew/opt/postgresql@16/bin`;
 farklı kurulumda `PG_BIN` kullanılır. Hiçbir aşamada uzak DB seçilemez.
+
+## P05 site görünümü
+
+Panelde **Site görünümü** seçili kongrenin ana sayfasını, EYİ/sade temasını,
+vurgu rengini ve butonlarını düzenler. TR/EN metinleri kaydedin, ardından
+logo veya ana görsel yükleyin. **Yayınlanan sayfayı aç** sonucu gösterir.
+Gizli görsel yeniden açılabilir; yeni yükleme mevcut görselin yerini alır.
+Ayarlar bu yerel ortamda hemen uygulanır. Ayrıntılar [P05 kapanışında](P05_KAPANIS.md).
+
+`npm run test:site` 7 saf yapılandırma ve 26 sentetik HTTP/DB senaryosudur.
+Yeni örnek kongreler bırakır; son örnek adresi `.local/site-check-result.json`
+içindeki `fixtures.demo.slug` alanındadır. Diğer DB senaryolarıyla sıralı
+çalıştırın. Yalnız yerel ortam kabul edilir; gerçek e-posta gönderilmez.
+
+Paket commit'i temizken `node scripts/checkpoint.mjs P05-20261005-final`
+kaynak/DB/özel dosyaları yeni kurtarma klasörüne alır ve tüm tabloları ayrı
+geçici yerel DB'ye geri yükleyerek satır sayıları ile SHA-256 değerlerini karşılaştırır.

@@ -26,7 +26,7 @@ try {
   }
   if (!ready) throw new Error('Preview probe server did not start');
   const checks = [];
-  for (const path of ['/admin', '/eyi-2026', '/api/admin/submissions', '/api/registrations/request', '/api/admin/submissions/test/file']) {
+  for (const path of ['/admin', '/eyi-2026', '/api/admin/submissions', '/api/registrations/request', '/api/admin/submissions/test/file', '/api/platform/site', '/api/public/congresses/eyi-2026/assets/logo']) {
     const r = await fetch(base + path);
     if (r.status !== 401 || !r.headers.get('www-authenticate') || r.headers.get('x-robots-tag') !== 'noindex, nofollow') throw new Error('Preview anonymous request was not blocked');
     checks.push(`Anonymous ${path}: 401`);

@@ -42,7 +42,7 @@ export default async function SubmissionPage({ params, searchParams }: PageProps
     config.submissionsClosed = !config.deliveryAccess.metadata && !config.deliveryAccess.fullText;
   }
   return (
-    <main className="page-shell submission-shell">
+    <main id="congress-content" tabIndex={-1} className="page-shell submission-shell">
       <div className="page-box submission-page-box">
         <PlatformHero variant="submission" congressName={config.congressName} languages={config.workflow?.languages} />
 

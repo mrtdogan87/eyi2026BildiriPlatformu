@@ -2026,3 +2026,112 @@ textarea {
 .setup-review { padding: 24px; }
 [data-congress-theme="simple"] .platform-hero, [data-congress-theme="simple"] .hub-hero { background: var(--primary); color: white; border-radius: 12px; }
 [data-congress-theme="simple"] .hero p, [data-congress-theme="simple"] .hero span, [data-congress-theme="simple"] .hub-hero p, [data-congress-theme="simple"] .hub-hero span { color: white; }
+
+/* P05: congress public theme; shared forms inherit the accessible accent. */
+.congress-site { background:#fff; min-height:100vh; color:#142d46; }
+.congress-site :is(h1,h2,h3,p,a,span,dt,dd) { overflow-wrap:anywhere; }
+.congress-site :is(a,button,input,select,textarea):focus-visible, .site-editor :is(a,button,input,select,textarea):focus-visible { outline:3px solid #142d46; outline-offset:4px; box-shadow:0 0 0 6px #fff; }
+.congress-site [id] { scroll-margin-top:24px; }
+.site-width { width:min(1200px,calc(100% - 80px)); margin-inline:auto; }
+.site-institution { background:#142d46; color:#fff; font-size:.76rem; letter-spacing:.04em; }
+.site-institution .site-width { display:flex; justify-content:space-between; gap:24px; padding-block:12px; }
+.site-navigation { display:grid; grid-template-columns:1fr auto; align-items:center; column-gap:32px; }
+.site-brand { display:flex; align-items:center; gap:14px; min-width:0; padding-block:24px; }
+.site-brand strong { font-size:1.2rem; line-height:1.3; max-width:760px; }
+.site-brand-mark { width:44px; height:44px; color:var(--primary); flex-shrink:0; }
+.site-brand img { width:auto; max-width:150px; height:54px; object-fit:contain; }
+.site-nav-tools { display:flex; align-items:center; gap:12px; }
+.site-menu { grid-column:1/-1; display:flex; flex-wrap:wrap; gap:8px 32px; padding-block:14px; border-top:1px solid #e2e7eb; }
+.site-menu a { font-size:.9rem; font-weight:600; padding-block:8px; border-bottom:2px solid transparent; }
+.site-menu a:hover { color:var(--primary); border-color:var(--primary); }
+.site-header { border-bottom:3px solid var(--accent); }
+.site-menu-toggle { display:none; }
+.site-skip { position:absolute; top:8px; left:8px; transform:translateY(-200%); background:#fff; color:#142d46; padding:12px 20px; z-index:100; border:2px solid #142d46; }
+.site-skip:focus { transform:translateY(0); }
+.site-home { outline:none; }
+.site-home h1 { font-family:Georgia,'Times New Roman',serif; font-size:clamp(2.5rem,4.1vw,4rem); font-weight:500; letter-spacing:-.035em; line-height:1.13; margin:24px 0; }
+.site-home h2 { font-family:Georgia,'Times New Roman',serif; font-size:clamp(1.9rem,2.9vw,2.7rem); font-weight:500; line-height:1.2; margin:18px 0; letter-spacing:-.025em; }
+.site-hero { display:grid; grid-template-columns:1.1fr 1fr; gap:64px; padding-block:64px 72px; align-items:center; }
+.site-eyebrow { text-transform:uppercase; letter-spacing:.15em; font-size:.7rem; font-weight:700; color:var(--primary); line-height:1.8; margin:0; }
+.site-eyebrow > span { display:inline-block; width:8px; height:8px; margin-right:8px; border-radius:50%; background:var(--accent); }
+.site-introduction { color:#536375; font-size:1.06rem; line-height:1.8; margin:0; white-space:pre-line; }
+.site-event-meta { margin:24px 0; color:#46596c; font-size:.85rem; }
+.site-event-meta p { display:flex; gap:10px; align-items:center; line-height:1.7; margin:6px 0; }
+.site-event-meta svg { flex-shrink:0; }
+.site-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:30px; }
+.site-action { display:inline-flex; align-items:center; justify-content:space-between; gap:20px; background:var(--primary); color:#fff; padding:16px 20px; border:1px solid var(--primary); font-size:.88rem; font-weight:600; border-radius:3px; }
+.site-action svg { flex-shrink:0; }
+.site-action.secondary { background:#fff; color:var(--primary); }
+.site-action:hover { text-decoration:underline; text-underline-offset:4px; }
+.site-hero-visual { background:#142d46; min-height:480px; position:relative; border-radius:3px; overflow:hidden; }
+.site-gathering-art { display:block; width:100%; height:480px; object-fit:cover; }
+.site-hero-visual.has-image > img { width:100%; height:480px; object-fit:cover; display:block; }
+.site-visual-caption { position:relative; display:flex; align-items:center; justify-content:space-between; gap:24px; color:#fff; background:#142d46; border-top:1px solid #4e6478; padding:20px 28px; }
+.site-visual-caption > span { font-family:Georgia,serif; font-size:2.3rem; }
+.site-visual-caption p { margin:0; font-size:.8rem; line-height:1.7; }
+.site-section { display:grid; grid-template-columns:.85fr 1.15fr; gap:100px; padding-block:64px; border-top:1px solid #dde5e9; }
+.site-prose { line-height:1.9; margin:0; color:#536375; white-space:pre-line; }
+.site-organizer { font-size:.8rem; line-height:1.9; color:#536375; margin-top:26px; }
+.site-organizer strong { color:#142d46; font-size:.95rem; }
+.site-participation { background:#f0f5f5; padding-block:64px; border-block:1px solid #dde5e9; }
+.site-service-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin-top:32px; }
+.site-service { display:block; background:#fff; border:1px solid #d4dfe0; padding:32px; border-radius:3px; }
+.site-service > svg { color:var(--primary); }
+.site-service h3 { font-size:1.18rem; margin:22px 0 12px; }
+.site-service p { color:#536375; line-height:1.8; font-size:.95rem; }
+.site-service > span { display:flex; gap:14px; align-items:center; color:var(--primary); font-size:.85rem; font-weight:700; margin-top:24px; }
+.site-service:hover { border-color:var(--primary); }
+.site-dates > div > p:last-child { font-size:.86rem; color:#536375; line-height:1.8; }
+.site-dates dl { margin:0; }
+.site-dates dl > div { display:flex; justify-content:space-between; align-items:start; gap:24px; padding:20px 0; border-bottom:1px solid #dde5e9; }
+.site-dates dt { font-weight:600; font-size:.9rem; }
+.site-dates dd { margin:0; font-size:.86rem; text-align:right; color:#46596c; line-height:1.7; }
+.site-dates small { display:block; color:#9c2d25; }
+.site-contact { background:var(--primary); color:#fff; padding-block:48px; }
+.site-contact .site-width { display:flex; justify-content:space-between; align-items:center; gap:32px; }
+.site-contact .site-eyebrow { color:#fff; }
+.site-contact h2 { margin-bottom:0; }
+.site-contact a { display:flex; gap:18px; align-items:center; font-size:1.1rem; border-bottom:1px solid #fff; padding-block:8px; }
+.site-contact a svg { flex-shrink:0; }
+.site-footer { background:#142d46; color:#fff; padding-block:40px; }
+.site-footer > div { display:flex; justify-content:space-between; gap:40px; }
+.site-footer p { color:#d1dbe4; font-size:.8rem; line-height:1.7; }
+.site-footer a:hover { text-decoration:underline; }
+.congress-site .page-shell { padding-top:36px; }
+.congress-site[data-congress-theme="simple"] .site-hero { grid-template-columns:1.3fr .7fr; }
+.congress-site[data-congress-theme="simple"] .site-gathering-art { height:330px; }
+.congress-site[data-congress-theme="simple"] .site-hero-visual { min-height:0; background:var(--primary); }
+.congress-site[data-congress-theme="simple"] .site-hero-visual.has-image > img { height:330px; }
+.site-editor { display:grid; gap:24px; }
+.site-editor-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+.site-editor .field { display:grid; gap:8px; }
+.site-editor textarea { min-height:100px; resize:vertical; }
+.site-editor input,.site-editor select,.site-editor textarea { width:100%; padding:12px; border:1px solid #b5c3d4; border-radius:8px; }
+.site-editor input[type="checkbox"] { width:auto; }
+.site-editor input[type="color"] { height:48px; padding:4px; }
+.site-editor p { line-height:1.7; }
+.site-editor .site-preview { border:1px solid #ccd7df; padding:24px; border-radius:8px; }
+.site-preview > strong { display:block; font-family:Georgia,serif; font-size:1.6rem; }
+.site-preview span { display:inline-flex; margin-top:10px; padding:12px 18px; color:#fff; border-radius:3px; }
+.site-asset-preview { width:100%; max-height:200px; object-fit:contain; background:#eef2f4; border:1px solid #dae3e8; }
+.site-editor .site-editor-actions { display:flex; gap:12px; flex-wrap:wrap; }
+@media (max-width:900px) { .site-width { width:calc(100% - 48px); } .site-hero { gap:32px; padding-block:40px; } .site-hero-visual,.site-gathering-art,.site-hero-visual.has-image > img { min-height:0; height:390px; } .site-hero-visual { height:auto; } .site-section { gap:40px; } .site-brand strong { font-size:1rem; } }
+@media (max-width:700px) {
+  .site-width { width:calc(100% - 40px); } .site-institution .site-width { gap:16px; font-size:.65rem; } .site-institution span:last-child { flex-shrink:0; }
+  .site-navigation { column-gap:12px; } .site-brand { gap:10px; padding-block:18px; } .site-brand strong { font-size:.87rem; } .site-brand-mark { width:34px; height:34px; } .site-brand img { max-width:65px; height:42px; }
+  .site-nav-tools { flex-direction:column; gap:8px; align-items:end; } .site-nav-tools .lang-toggle-btn { padding:5px 10px; font-size:.7rem; }
+  .site-menu-toggle { display:flex; align-items:center; gap:6px; background:white; border:1px solid #b5c4d0; color:#142d46; padding:8px 10px; border-radius:3px; font-size:.75rem; }
+  .site-menu { display:none; } .site-menu.is-open { display:flex; flex-direction:column; gap:4px; padding-bottom:18px; } .site-menu a { padding:12px 0; }
+  .site-hero,.congress-site[data-congress-theme="simple"] .site-hero { grid-template-columns:1fr; padding-block:36px 40px; gap:32px; }
+  .site-home h1 { font-size:2.65rem; margin-block:18px; } .site-introduction { font-size:1rem; }
+  .site-hero-visual,.site-gathering-art,.site-hero-visual.has-image > img { min-height:0; height:300px; } .site-hero-visual { height:auto; } .site-visual-caption { padding:18px 22px; }
+  .site-section { grid-template-columns:1fr; padding-block:40px; gap:18px; } .site-home h2 { font-size:2rem; }
+  .site-participation { padding-block:40px; } .site-service-grid { grid-template-columns:1fr; gap:16px; } .site-service { padding:24px; }
+  .site-contact .site-width,.site-footer > div { flex-direction:column; align-items:start; gap:24px; } .site-contact a { font-size:1rem; max-width:100%; }
+  .site-dates dl > div { gap:16px; } .site-dates dd { max-width:60%; }
+  .site-editor-grid { grid-template-columns:1fr; } .site-editor fieldset { padding:16px; }
+  .congress-site .submission-page-box { padding:20px 14px; } .congress-site .submission-page-box .submission-form-panel { padding:20px 14px; }
+}
+@media (prefers-reduced-motion:reduce) { .congress-site * { transition:none!important; animation:none!important; scroll-behavior:auto!important; } }
+
+.site-home h1, .site-preview > strong { white-space:pre-line; }

@@ -1,96 +1,30 @@
-import { effectiveConfiguration } from "@/modules/congress/configuration";
-import { publicCongress } from "@/integrations/congress/public-context";
-import { moduleEnabled } from "@/platform/context";
-import Link from "next/link";
-import { ArrowRight, ClipboardCheck, FileText, Lock } from "lucide-react";
-import { slugToTitle } from "@/lib/utils";
-import { isSubmissionClosed } from "@/lib/submission";
-import { getServerT } from "@/lib/i18n/server";
-
-export const dynamic = "force-dynamic";
-
-type PageProps = {
-  params: Promise<{ congressSlug: string }>;
-};
-
-export default async function CongressHubPage({ params }: PageProps) {
-  const { congressSlug } = await params;
-  const congress = await publicCongress(congressSlug);
-  const { locale, t } = await getServerT(effectiveConfiguration(congress.configuration).languages);
-  const submissionsEnabled = await moduleEnabled(congress.id, "SUBMISSIONS");
-  const registrationEnabled = await moduleEnabled(congress.id, "REGISTRATION");
-  const submissionsClosed = await isSubmissionClosed(congressSlug);
-  const congressTitle =
-    congress.configuration ? congress.name : congressSlug === "eyi-2026"
-      ? locale === "en"
-        ? "ISEOS 2026"
-        : "EYİ 2026"
-      : slugToTitle(congressSlug);
-
-  return (
-    <main className="page-shell hub-shell">
-      <div className="page-box hub-page-box">
-        <section className="hub-hero">
-          <div>
-            <span className="hub-eyebrow">{t("hub.eyebrow", { title: congressTitle })}</span>
-            <h1>{t("hub.title")}</h1>
-            <p>{t("hub.intro")}</p>
-          </div>
-          <div className="hub-event-card">
-            <span>{congress.configuration ? congress.year : t("hub.eventOrdinal")}</span>
-            <strong>{congress.configuration ? congress.name : t("hub.eventName")}</strong>
-          </div>
-        </section>
-
-        <div className="hub-action-grid">
-          {!submissionsEnabled ? <div className="hub-action-card is-disabled"><h2>Bildiri modülü kapalı</h2></div> : submissionsClosed ? (
-            <div className="hub-action-card hub-action-card-submission is-disabled" aria-disabled="true">
-              <div className="hub-action-top">
-                <span className="hub-action-label">{t("hub.submissionClosedLabel")}</span>
-                <span className="hub-action-icon" aria-hidden="true">
-                  <Lock size={28} strokeWidth={1.8} />
-                </span>
-              </div>
-              <h2>{t("hub.submissionClosedTitle")}</h2>
-              <p>{t("hub.submissionClosedDesc")}</p><Link href={`/${congressSlug}/bildiri-gonder`}>Süreli izin / taslak erişimi →</Link>
-            </div>
-          ) : (
-            <Link className="hub-action-card hub-action-card-submission" href={`/${congressSlug}/bildiri-gonder`}>
-              <div className="hub-action-top">
-                <span className="hub-action-label">{t("hub.submissionLabel")}</span>
-                <span className="hub-action-icon" aria-hidden="true">
-                  <FileText size={28} strokeWidth={1.8} />
-                </span>
-              </div>
-              <h2>{t("hub.submissionTitle")}</h2>
-              <p>{t("hub.submissionDesc")}</p>
-              <span className="hub-card-cta">
-                {t("common.start")} <ArrowRight size={18} strokeWidth={2} />
-              </span>
-            </Link>
-          )}
-
-          {registrationEnabled ? <Link className="hub-action-card hub-action-card-registration" href={`/${congressSlug}/kayit`}>
-            <div className="hub-action-top">
-              <span className="hub-action-label">{t("hub.registrationLabel")}</span>
-              <span className="hub-action-icon" aria-hidden="true">
-                <ClipboardCheck size={28} strokeWidth={1.8} />
-              </span>
-            </div>
-            <h2>{t("hub.registrationTitle")}</h2>
-            <p>{t("hub.registrationDesc")}</p>
-            <span className="hub-card-cta">
-              {t("common.continue")} <ArrowRight size={18} strokeWidth={2} />
-            </span>
-          </Link> : <div className="hub-action-card is-disabled"><h2>Kayıt modülü kapalı</h2><p>Bu kongrede kayıt hizmeti şu anda açık değil.</p></div>}
-        </div>
-
-        <div className="hub-reminder">
-          {congress.eventStartsAt && <span>{congress.eventStartsAt.toLocaleDateString(locale, { timeZone:"Europe/Istanbul" })} — {congress.eventEndsAt?.toLocaleDateString(locale, { timeZone:"Europe/Istanbul" })}</span>}
-          <span>{t("hub.reminder1")}</span>
-          <span>{t("hub.reminder2")}</span>
-        </div>
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ArrowUpRight, ArrowRight, CalendarDays, FileText, Users } from 'lucide-react';
+import { publicSite } from '@/integrations/congress/site-data';
+import { actionHref, localized } from '@/modules/site/configuration';
+import { getLocale } from '@/lib/i18n/server';
+export const dynamic='force-dynamic';
+type Props={params:Promise<{congressSlug:string}>};
+export async function generateMetadata({params}:Props):Promise<Metadata> {const {congressSlug}=await params;const {congress,site,workflow}=await publicSite(congressSlug);const locale=await getLocale(workflow.languages);return {title:localized(site.headline,locale,congress.name),description:localized(site.introduction,locale)};}
+function GatheringArt() { return <svg className="site-gathering-art" viewBox="0 0 560 510" aria-hidden="true"><defs><pattern id="site-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="white" strokeOpacity=".13"/></pattern></defs><rect width="560" height="510" fill="url(#site-grid)"/><g fill="none" stroke="white"><circle cx="280" cy="255" r="170" strokeOpacity=".25"/><circle cx="280" cy="255" r="115" strokeOpacity=".45"/><circle cx="280" cy="255" r="58" strokeOpacity=".6"/><path d="M90 335 170 190 280 255 390 130 475 295M90 335l190-80 195 40M170 190l220-60M280 255v160" strokeWidth="2" strokeOpacity=".8"/></g><g fill="var(--accent)">{[[90,335],[170,190],[280,255],[390,130],[475,295],[280,415]].map(([cx,cy])=><circle key={cx+':'+cy} cx={cx} cy={cy} r="9" stroke="#fff" strokeWidth="2"/>)}</g><path d="M90 420c100-60 230-180 385-330" fill="none" stroke="var(--accent)" strokeWidth="4"/><text x="32" y="52" fill="white" fontSize="13" fontFamily="monospace" letterSpacing="3">IDEAS · CONNECTIONS · DISCOVERY</text><text x="32" y="478" fill="white" fontSize="13" fontFamily="monospace" letterSpacing="3">01 — TOGETHER</text></svg>; }
+export default async function CongressHome({params}:Props) {
+  const {congressSlug}=await params;const {congress,workflow,modules,site,assets}=await publicSite(congressSlug);const locale=await getLocale(workflow.languages);const en=locale==='en';const copy=(tr:string,enText:string)=>en?enText:tr;
+  const date=(value:Date|string)=>new Date(value).toLocaleDateString(en?'en-GB':'tr-TR',{day:'numeric',month:'long',year:'numeric',timeZone:'Europe/Istanbul'});
+  const stages=([['ABSTRACT',copy('Özet teslimi','Abstract submission')],['FULL_TEXT',copy('Tam metin teslimi','Full-text submission')],['PAYMENT',copy('Ödeme süresi','Payment deadline')]] as const).filter(([key])=>workflow.stages[key].enabled&&(key==='PAYMENT'?modules.REGISTRATION:modules.SUBMISSIONS));
+  const actions=site.actions.flatMap(action=>{const href=actionHref(action,congressSlug,modules,!!site.contactEmail);if(!href)return[];const firstStage=workflow.stages.ABSTRACT.enabled?workflow.stages.ABSTRACT:workflow.stages.FULL_TEXT;const closed=action.target==='SUBMISSIONS'&&(congress.submissionsClosed || !!firstStage.deadline&&new Date(firstStage.deadline)<=new Date());return [{...action,href,label:closed?copy('Taslak ve süreli izin erişimi','Draft & extension access'):localized(action.label,locale)}];});
+  return <main id="congress-content" tabIndex={-1} className="site-home">
+    <section className="site-hero site-width">
+      <div className="site-hero-copy"><p className="site-eyebrow"><span/> {localized(site.eyebrow,locale)}</p><h1>{localized(site.headline,locale,congress.name)}</h1><p className="site-introduction">{localized(site.introduction,locale)}</p>
+        <div className="site-event-meta">{congress.eventStartsAt&&<p><CalendarDays size={18} aria-hidden="true"/>{date(congress.eventStartsAt)}{congress.eventEndsAt&&congress.eventEndsAt.getTime()!==congress.eventStartsAt.getTime()&&<> — {date(congress.eventEndsAt)}</>}</p>}{localized(site.venue,locale)&&<p>{localized(site.venue,locale)}</p>}</div>
+        <div className="site-actions">{actions.map((action,index)=><Link key={index} className={`site-action${index?' secondary':''}`} href={action.href} {...(action.target==='EXTERNAL'?{target:'_blank',rel:'noopener noreferrer'}:{})}>{action.label}{action.target==='EXTERNAL'?<ArrowUpRight size={18} aria-hidden="true"/>:<ArrowRight size={18} aria-hidden="true"/>}</Link>)}</div>
       </div>
-    </main>
-  );
+      <div className={`site-hero-visual${assets.HERO?' has-image':''}`}>{assets.HERO ? <Image unoptimized src={assets.HERO.url} width={assets.HERO.width} height={assets.HERO.height} alt={localized(site.heroAlt,locale,congress.name)}/> : <GatheringArt/>}<div className="site-visual-caption"><span>{congress.year}</span><p>{copy('Bilgiyle buluş.','Meet through knowledge.')}<br/>{copy('Birlikte düşün.','Think together.')}</p></div></div>
+    </section>
+    <section id="kongre-hakkinda" className="site-section site-width site-about"><div><p className="site-eyebrow">{copy('Kongre hakkında','About the congress')}</p><h2>{copy('Yeni fikirler için ortak bir zemin.','Common ground for new ideas.')}</h2></div><div><p className="site-prose">{localized(site.about,locale)}</p><p className="site-organizer">{copy('Düzenleyen kurum','Organizing institution')}<br/><strong>{congress.organization.name}</strong></p></div></section>
+    {(modules.SUBMISSIONS||modules.REGISTRATION)&&<section className="site-participation"><div className="site-width"><p className="site-eyebrow">{copy('Başvuru ve katılım','Submission & participation')}</p><h2>{copy('Kongre yolculuğunuz burada başlıyor.','Your congress journey starts here.')}</h2><div className="site-service-grid">{modules.SUBMISSIONS&&<Link href={`/${congressSlug}/bildiri-gonder`} className="site-service"><FileText size={28} aria-hidden="true"/><h3>{copy('Bildiri işlemleri','Paper submissions')}</h3><p>{copy('Açık teslim aşamalarını kontrol edin. Taslağınıza e-postanıza gönderilen bağlantıyla güvenle devam edin.','Check the available delivery stages. Continue your draft securely using the link sent to your email.')}</p><span>{copy('Bildiri alanına git','Open submission portal')} <ArrowUpRight size={18} aria-hidden="true"/></span></Link>}{modules.REGISTRATION&&<Link href={`/${congressSlug}/kayit`} className="site-service"><Users size={28} aria-hidden="true"/><h3>{copy('Katılımcı kaydı','Participant registration')}</h3><p>{copy('Katılım seçeneklerini ve varsa ücretleri inceleyin. Kayıt işlemlerinizi e-posta bağlantınızla takip edin.','Review participation options and any applicable fees. Follow your registration through your email link.')}</p><span>{copy('Kayıt alanına git','Open registration portal')} <ArrowUpRight size={18} aria-hidden="true"/></span></Link>}</div></div></section>}
+    <section id="onemli-tarihler" className="site-section site-width site-dates"><div><p className="site-eyebrow">{copy('Takviminize ekleyin','Mark your calendar')}</p><h2>{copy('Önemli tarihler','Important dates')}</h2><p>{copy('Tüm tarihler Türkiye saatine göre gösterilir.','All dates are shown in Türkiye time.')}</p></div><dl>{congress.eventStartsAt&&<div><dt>{copy('Kongre başlangıcı','Congress opens')}</dt><dd>{date(congress.eventStartsAt)}</dd></div>}{congress.eventEndsAt&&<div><dt>{copy('Kongre bitişi','Congress closes')}</dt><dd>{date(congress.eventEndsAt)}</dd></div>}{stages.map(([key,label])=><div key={key}><dt>{label}</dt><dd>{workflow.stages[key].deadline?date(workflow.stages[key].deadline!):copy('Son tarih henüz belirtilmedi','Deadline to be announced')}{workflow.stages[key].deadline&&new Date(workflow.stages[key].deadline!)<new Date()&&<small>{copy('Genel süre sona erdi','General deadline has passed')}</small>}</dd></div>)}{!congress.eventStartsAt&&!stages.length&&<div><dt>{copy('Kongre takvimi','Congress calendar')}</dt><dd>{copy('Tarihler duyurulduğunda burada yer alacak.','Dates will appear here when announced.')}</dd></div>}</dl></section>
+    {site.contactEmail&&<section id="iletisim" className="site-contact"><div className="site-width"><div><p className="site-eyebrow">{copy('İletişim','Contact')}</p><h2>{copy('Birlikte konuşalım.','Let’s start a conversation.')}</h2></div><a href={`mailto:${site.contactEmail}`}>{site.contactEmail}<ArrowUpRight size={24} aria-hidden="true"/></a></div></section>}
+  </main>;
 }

@@ -22,7 +22,7 @@ export default async function RegistrationContinuePage({ params, searchParams }:
   const isValid = Boolean(record && record.congressId === congress.id);
 
   return (
-    <main className="page-shell submission-shell">
+    <main id="congress-content" tabIndex={-1} className="page-shell submission-shell">
       <div className="page-box submission-page-box">
         <PlatformHero
           variant="registration"

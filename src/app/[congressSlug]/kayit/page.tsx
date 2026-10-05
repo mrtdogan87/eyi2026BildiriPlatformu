@@ -18,7 +18,7 @@ export default async function RegistrationStartPage({ params }: PageProps) {
   const { t } = await getServerT(languages);
 
   return (
-    <main className="page-shell submission-shell">
+    <main id="congress-content" tabIndex={-1} className="page-shell submission-shell">
       <div className="page-box submission-page-box">
         <PlatformHero variant="registration" congressName={congress.name} languages={languages} />
 

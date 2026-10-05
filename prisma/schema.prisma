@@ -47,6 +47,9 @@ enum RegistrationKind {
 }
 
 model Congress {
+  siteConfiguration        Json?
+  siteVersion              Int                       @default(0)
+  siteAssets               SiteAsset[]
   year                     Int?
   eventStartsAt            DateTime?
   eventEndsAt              DateTime?
@@ -422,4 +425,25 @@ model DeliveryException {
   createdBy    PlatformUser? @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
   @@index([congressId, email, stage, expiresAt])
+}
+
+enum SiteAssetKind {
+  LOGO
+  HERO
+}
+
+model SiteAsset {
+  id           String        @id @default(cuid())
+  congressId   String
+  kind         SiteAssetKind
+  originalName String
+  mimeType     String
+  content      Bytes
+  width        Int
+  height       Int
+  active       Boolean       @default(true)
+  updatedAt    DateTime      @updatedAt
+  congress     Congress      @relation(fields: [congressId], references: [id], onDelete: Cascade)
+
+  @@unique([congressId, kind])
 }
