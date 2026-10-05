@@ -1,8 +1,8 @@
 # Bildiri Yönetim Sistemi — v2 Geliştirme Planı
 
-> Durum: **P01 tamamlandı; P02 yerel doğrulamada** · Başlangıç / son güncelleme: 05.10.2026
+> Durum: **P01 ve P02 yerel kapsamı tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 05.10.2026
 > İlk gerçek kullanım: EYİ 2026 kongresi (`eyi-2026`) — sistem uçtan uca başarıyla çalıştı.
-> Bu kopya uygulama takibidir. P01 sonuçları `docs/P01_KAPANIS.md` içinde. v2 ayrı `v2/` checkout'ta geliştirilir; mevcut canlı ve üniversite sitesi korunur. Ana checkout'taki planlama metni değiştirilmedi.
+> Bu kopya uygulama takibidir. Ana planın modülerlik/sertifika/seçmeli kullanım güncellemeleri alındı. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`; modül kararı `docs/adr/0001-modul-sinirlari.md`. Ana plan bu uygulama çalışmasında değiştirilmedi.
 
 ## 1. Hedef
 
@@ -12,6 +12,8 @@ Sistemi tek kongrelik bir araçtan, her yıl tekrar kullanılabilen bir **kongre
 - Son kongrede eksik kalan özelliklerin eklenmesi.
 - Mevcut canlı uygulama ve EYİ 2026 web sitesi korunurken, v2'nin ayrı yerel ortamda geliştirilmesi ve yeni bir alt alan adında kullanılması.
 - Yeni kongre ekiplerinin kendi sitelerini ve süreçlerini yönetebilmesi; EYİ 2026 sitesinin bütün kongre sayfalarının başlangıç şablonunda bulunması.
+- CMS, sertifika ve diğer iş modüllerinin başka projelerde de kullanılabilecek sınırlarla tasarlanması; PDF arka planıyla çalışan sertifika modülünün ayrıca sunulması (Bölüm 14–15).
+- **Seçmeli kullanım:** organizatör her kongre için kullanacağı iş modüllerini, aşamaları, sayfaları, form alanlarını ve belge koşullarını seçer. Geliştirme planındaki bir özelliğin var olması, her kongrede kullanımını zorunlu kılmaz (Bölüm 14.3).
 
 ---
 
@@ -55,7 +57,7 @@ Sistemi tek kongrelik bir araçtan, her yıl tekrar kullanılabilen bir **kongre
 | 3 | **Ödeme doğrulama** | Ödeme kaydı, statü (bekliyor / onaylandı / davetli / muaf), banka hareketi eşleştirme |
 | 4 | **Kongre ayarları** | Tarihler, konu başlıkları, aşamalar (özet → tam metin → revizyon) veritabanından yönetilsin |
 | 5 | **Program** | Oturum, salon, oturum başkanı, bildirinin hangi oturumda olduğu |
-| 6 | **Belgeler** | Katılım / sunum belgesi, doğrulama kodu |
+| 6 | **Sertifika modülü** | PDF arka planı, yerleşim alanları, katılım/konuşmacı/görev belgeleri, toplu üretim, şablon ve belge sürümleri, doğrulama kodu |
 | 7 | **CMS içerikleri (TR/EN)** | Sayfalar, duyurular, kurullar, davetli konuşmacılar, önemli tarihler, sponsorlar |
 | 8 | **KVKK** | Aydınlatma metni onayı / açık rıza kaydı (tarih, versiyon) |
 | 9 | **Gönderim sonrası düzenleme** | Değişiklik kaydı + dosya versiyonlama (bkz. Bölüm 4) |
@@ -144,8 +146,10 @@ Site incelemesinde alt kısımdaki `/Iletisim` ve etkinlik arşivi `/Arsiv/3/101
 - Değerlendirme, kayıt, ödeme, sunum/katılım, programa yerleşme ve yayın durumu ayrı izlenecek.
 - Özet ve tam metin için ayrı teslim/revizyon takvimleri, yayın tercihi, sürüme bağlı yazar prova onayı ve editör yayın kararı.
 - Oturum başkanı yoklaması; katılımcı, sunucu, oturum başkanı ve diğer görevler için ayrı belge koşulları.
+- Ayrı sertifika modülü: yüklenen PDF tasarımı üzerine alıcı ve katılım/görev bilgileri; kongre kaydından veya bağımsız Excel/CSV listesinden üretim (Bölüm 15).
 - Geri çekme/iptal, neden ve işlem geçmişi; geri alınabilir arşivleme. İptal kaydı banka iadesinin yapıldığı anlamına gelmez.
 - E-posta incelemesinin dayanağı, 2026 EYİ yazışmalarından seçili örneklerdir: kayıt/ödeme teyidi, iade olmuş havale, tam metin alındı teyidi, özet düzeltmesi, yayın onayı, oturum başkanlığı belgesi ve yayın takvimi. Bu liste bütün posta kutusunun nicel analizi değildir.
+- Ek araştırma kaynağı: `noreply@stativera.store` Google Workspace hesabına 05.10.2026'da Chrome üzerinden erişim doğrulandı. Altı seçili yazışma zinciri incelendi: sertifika teslim hatası, oturum başkanlığı reddi, özet biçimi düzeltmesi, tam metin yayın tercihi, geç başvuru talebi ve iki bildiriye ilişkin hakem formu dönüşü. Bulgular Bölüm 16'da; tüm posta kutusunun veya bütün eklerin incelendiği anlamına gelmez.
 
 ---
 
@@ -214,7 +218,9 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-P01 **Tamamlandı**, P02 **Kontrol ediliyor**, P03–P22 **Planlandı**. Uzak v2 deneme yayını seçilecek adresi bekliyor. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir.
+**Uygulama durumu:** P01 tamamlandı; P02 yerel kapsam/deneme yapılandırması tamamlandı; P03–P22 planlandı. Uzak deneme yayını seçilecek adresi ve ayrı projenin kurulmasını bekliyor. Modülerliğin tahmin etkisi ADR-0001 içinde değerlendirilmiştir; aşağıdaki kapsam/süre tablosu kaynak planla korunmuştur.
+
+Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
 
 | Paket | Kapsam / çıktı | Ön koşul | İş günü |
 |-------|----------------|----------|---------|
@@ -233,7 +239,7 @@ P01 **Tamamlandı**, P02 **Kontrol ediliyor**, P03–P22 **Planlandı**. Uzak v2
 | P13 | Hakem atama, değerlendirme turları, revizyon ve karar | P09, P11 | 2–3 |
 | P14 | Oturum/program, salon, çakışma kontrolü ve çevrim içi bağlantılar | P08, P10, P13 | 2–3 |
 | P15 | Workshop ve sosyal etkinlik katılımı, kontenjan ve bekleme listesi | P10, P14 | 1–2 |
-| P16 | Oturum yoklaması ve göreve göre doğrulanabilir belgeler | P12, P14 | 1–2 |
+| P16 | P16A bağımsız PDF sertifika modülü; P16B oturum yoklaması ve kongreye bağlama | A: P03, P09; B: P12, P14, P16A | 3–5 |
 | P17 | Ödül başvurusu, komisyon, ölçütler ve puanlama | P11, P13, P14, P16 | 1–2 |
 | P18 | Düzenlenebilir davet ve şablonlu afiş/tanıtım çıktıları | P08 | 1–2 |
 | P19 | Tam metin teslimi, yayın tercihi, prova ve yazar onayı | P11, P13 | 2–3 |
@@ -253,16 +259,20 @@ P01 **Tamamlandı**, P02 **Kontrol ediliyor**, P03–P22 **Planlandı**. Uzak v2
 - Uygulama canlı bağlantısı olmadan yerelde açılıyor; deneme verisiyle başvuru/kayıt denenebiliyor.
 - Canlı e-posta/DB/dosya alanlarına yazamadığı doğrulanmış; yerel başlatma ve ortam ayarları belgelenmiş.
 - Deneme alt alan adı için yapılandırma hazır. Ad ve erişim bilgisi hazırsa sınırlı test yayını yapılabilir; değilse yerel çalışma devam eder, uzak yayın tamamlandı sayılmaz.
+- Bölüm 14'teki modül sınırları ve ortak altyapı bağlantıları için kısa mimari karar kaydı hazırlanmış; modülerliğin altyapı ve paket sırasına etkisi tahmine yansıtılmış.
 
 **P03 — Hesaplar ve kongre ayrımı**
 
 - İki örnek kongre ve farklı rollerle ekran/API/dosya erişimi sınanmış; başka kongrenin kaydına erişim reddediliyor.
 - Platform yöneticisi, organizatör, sekreterya, içerik editörü, hakem, oturum başkanı ve katılımcı için temel yetkiler tanımlı; hassas değişikliklerin işlem kaydı var.
+- Kimlik/yetki, kurum-etkinlik bağlamı, dosya ve bildirim bağlantıları modüllere açık arayüzlerle sunuluyor; modüller başka modülün tablolarına doğrudan yazmıyor. Modül açma/kapama hem ekran hem API tarafında uygulanıyor.
 
 **P04 — Yeni kongre oluşturma**
 
 - Kod değiştirmeden ad, tarih, dil, tema, ücret ve süreç ayarları girilebiliyor.
+- Kurulumda kullanım profili seçilip modüller ve süreç aşamaları ayrı ayrı açılıp kapatılabiliyor; seçim özeti ilgili menü, form ve panel davranışını gösteriyor. Form alanları gizli/isteğe bağlı/zorunlu olarak yapılandırılabiliyor; seçilen işlemi yürütmek için gereken asgari bilgiler açıkça belirtiliyor.
 - Önceki yılın şablonu kopyalanıyor; eski işlemler ve tarih/banka/kişi bilgileri kontrolsüz aktarılmıyor. Kişi kopyalama ayrıca seçilip gözden geçiriliyor.
+- Yetkili organizatör belirli kişi/başvuru ve aşama için gerekçeli, süreli teslim istisnası tanımlayabiliyor. Genel son tarih bütün katılımcılar için kendiliğinden açılmıyor; istisna başvuruyu kabul edilmiş saymıyor.
 
 **P05 — Ön yüz**
 
@@ -274,6 +284,7 @@ P01 **Tamamlandı**, P02 **Kontrol ediliyor**, P03–P22 **Planlandı**. Uzak v2
 - Bloklarla sayfa oluşturma, TR/EN eşleştirme, önizleme, yayınlama ve eski sürüme dönme tamamlanabiliyor.
 - Medya yükleme ve kongreye göre erişim çalışıyor; iç düzenleme adları halka görünen başlığa sızmıyor.
 - Süre, kendi uygulamamızda çalışan hazır editör bileşenleri ve başlangıç sayfalarını karşılayan belirli bir blok seti varsayar; sıfırdan genel amaçlı görsel editör geliştirme içermez.
+- Başvuru, hakemlik veya ödeme modülü kurulmadan örnek bir etkinlik/kurum sitesi yönetilebiliyor; ortak altyapı bağımlılıkları belgelenmiş.
 
 **P07 — Tüm sayfalar ve aktarım**
 
@@ -291,12 +302,16 @@ P01 **Tamamlandı**, P02 **Kontrol ediliyor**, P03–P22 **Planlandı**. Uzak v2
 
 - Gönderim durumu ve hatası kalıcı; kesinti sonrası deneme aynı bildirimi gereksiz yere çoğaltmıyor.
 - TR/EN şablon önizlemesi ve test alıcısıyla örnek tamamlanmış; gerçek gönderim ayrı ortam ayarına bağlı.
+- Geçici gönderim hatası ile kalıcı alıcı/adres hatası ayrılıyor. Kalıcı hata sekreteryaya iş oluşturuyor; adres düzeltilmeden aynı alıcıya sürekli yeniden deneme yapılmıyor. Sağlayıcı kabulü, teslim teyidi ve okunma farklı kavramlar olarak gösteriliyor.
+- Yanıt beklenen iletilerde organizatörün takip edilen yanıt adresi (`Reply-To`) ve ilgili panel/talep bağlantısı tanımlanıyor. İlk kapsam bütün posta kutusunu otomatik içe aktarmayı gerektirmiyor.
 
 **P10 — Katılımcı ve sekreterya**
 
 - Başvuru/kayıt akışları kongre bazlı çalışıyor; katılımcı kendi bildiri/ödeme/program/görev durumunu görüyor.
 - Başvuru kuralları ve metin sürümlü beyanlar kaydediliyor; geri çekme/iptal talebi ve eksik işlem listesi var.
 - Henüz geliştirilmemiş modül tamamlanmış gibi gösterilmiyor; panel sonraki paketlere genişletilebilir.
+- Yapılandırılmış özet gereken kongrede amaç/yöntem/bulgular/sonuç alanları, zorunluluk ve kelime sınırları gönderimde gösterilip kontrol ediliyor; kurallar TR/EN ve aşamaya göre ayarlanabiliyor.
+- E-posta veya panelden gelen talep ilgili başvuru/görev/belgeyle ilişkilendirilebiliyor; sorumlu, durum ve sonuç kaydı var. Tam otomatik posta kutusu eşleme sonraki bağlantı kararıdır.
 
 **P11 — Düzeltmeler**
 
@@ -314,26 +329,36 @@ P01 **Tamamlandı**, P02 **Kontrol ediliyor**, P03–P22 **Planlandı**. Uzak v2
 - Atama daveti → kabul/ret → değerlendirme → revizyon → yeni tur → editör kararı çalışıyor.
 - Körlük seçeneği, son tarih, yetkili dosya erişimi, çıkar çatışması beyanı ve yazara/hakeme farklı görünürlük kontrol edilmiş.
 - Kör değerlendirmede hakeme verilecek ayrı dosya/sürüm kontrol ediliyor; içerik, dosya adı ve belge özellikleri kimlik barındırabilir. Ekrandaki yazar adını gizlemek dosyanın anonim olduğunu garanti etmez; yazar/editör kontrolü akışta bulunur.
+- Bir hakemin birden fazla bildiri değerlendirmesi ayrı bildiri kimliği, tur ve dosya sürümüne bağlı tutuluyor. Dışarıdan gelen değerlendirme eki elle eşlenirse hedef kayıt ve gerekçe doğrulanıyor; benzer dosya adları tek başına eşleştirme ölçütü değil.
 
 **P14 — Program**
 
 - Bildiri, sunucu, salon, oturum başkanı ve teknik destek bağlanabiliyor; çakışma/yerleşmemiş bildiri uyarıları var.
 - Program yayın sürümü ve çevrim içi bağlantıların açılma/kapanma zamanı ayrı; genel program erişimi bağlantı kapatılınca kaybolmuyor.
+- Oturum başkanlığı/görev daveti için bekliyor/kabul/reddetti/değiştirildi durumları var. Ret halinde boş görev ve yerine atama ihtiyacı sekreteryada görünür; aynı kişinin kendi bildiri sunumu ayrıca izlenir.
 
 **P15 — Workshop ve sosyal katılım**
 
 - Kontenjan doluluğu, bekleme listesi, iptal ve katılımcı listesi örneği çalışıyor.
 - Gezi/gala tercihleri ve program ilişkisi panelde görülebiliyor; mevcut ücret kuralları korunuyor.
 
-**P16 — Katılım ve belgeler**
+**P16A — Bağımsız sertifika modülü (2–3 iş günü)**
 
-- Oturum başkanı yoklama verebiliyor; sunucu, ortak yazar, dinleyici ve görevli belge koşulları kongre ayarına göre uygulanıyor.
-- İlk belge şablonları, doğrulama kodu/QR, yeniden üretim ve iptal/sürüm geçmişi örnek üzerinden kontrol edilmiş.
+- Bölüm 15'teki PDF arka planı, alıcı ve alt katılım/görev alanları için konum, yazı tipi/boyutu, hizalama ve uzun metin davranışı ayarlanabiliyor; önizleme ile tekli/toplu PDF üretimi çalışıyor.
+- Kongre kaydından veya bağımsız Excel/CSV listesinden katılımcı, konuşmacı ve diğer görev türleri için belge üretilebiliyor. Liste eşleştirme/hata özeti görülüyor; hatalı kayıtlar sessizce atlanmıyor.
+- Türkçe karakterler, uzun isim/kurum ve farklı PDF sayfa ölçüleri örneklerle kontrol edilmiş; kullanılan şablon/veri sürümü ve doğrulama kodu kayıtlı.
+- Katılımcı indirme ve isteğe bağlı toplu e-posta akışı P09 arayüzüyle bağlanabiliyor; başka örnek uygulamada kongreye özel modüller olmadan kullanımı gösterilmiş.
+- Belgenin üretilmesi ve alıcıya teslim süreci ayrı izleniyor. Geri dönen e-posta doğru belge/alıcıya bağlanıyor; doğrulanmış adres düzeltmesi sonrası belgeyi gereksiz yere yeniden numaralandırmadan tekrar gönderme örneği çalışıyor.
+
+**P16B — Yoklama ve kongre bağlantısı (1–2 iş günü)**
+
+- Oturum başkanı yoklama verebiliyor; sunucu, ortak yazar, dinleyici, konuşmacı ve görevli belge koşulları kongre ayarına göre uygulanıyor.
+- Sertifika modülüne uygunluk sonucu ve gerekli alanlar aktarılıyor. Yeniden üretim, düzeltme, iptal ve eski belge/sürüm geçmişi örnek üzerinden kontrol edilmiş.
 
 **P17 — Ödüller**
 
 - Kategori, jüri, ölçüt ve bilimsel/sunum ağırlıkları ayarlanabiliyor; örnek sıralama hesaplaması doğrulanmış.
-- Eksik değerlendirme veya çatışmalı jüri uyarısı var; nihai ödül kararı yetkili kurulca veriliyor. Sunum koşulu P16'daki yoklamayla kontrol ediliyor.
+- Eksik değerlendirme veya çatışmalı jüri uyarısı var; nihai ödül kararı yetkili kurulca veriliyor. Sunum koşulu P16B'deki yoklamayla kontrol ediliyor.
 
 **P18 — Davet ve afiş**
 
@@ -344,6 +369,7 @@ P01 **Tamamlandı**, P02 **Kontrol ediliyor**, P03–P22 **Planlandı**. Uzak v2
 
 - Tam metin için bağımsız teslim/revizyon süresi; yayın tercihi ve dosya sürümü mevcut bildiriye bağlı.
 - Prova → belirli sürüme yazar onayı → editörün yayına hazır kararı çalışıyor. Dergiye yönlendirme kaydı dergi kabulü anlamına gelmiyor.
+- Ödül için tam metin teslimi, tam metin kitapta yayın izni sayılmıyor. Yalnız özet yayını, tam metin kitap tercihi ve dergiye yönlendirme isteği ayrı alanlarda tutuluyor; tercih/onay geçmişi hangi dosya sürümünü kapsadığını gösteriyor.
 
 **P20 — Kitap ve PDF**
 
@@ -361,6 +387,7 @@ P01 **Tamamlandı**, P02 **Kontrol ediliyor**, P03–P22 **Planlandı**. Uzak v2
 - İki kongreli örnekte başvuru → değerlendirme → kayıt/ödeme → program → katılım → belge → yayın tamamlanmış; yetki/dosya kontrolleri ve hedef yüke uygun deneme yapılmış.
 - Yeni alt alan adı, TLS, yedek, hata takibi, e-posta ve dağıtım/şema geçişi doğrulanmış; işletim belgesi gerçek ortamla uyumlu.
 - Eski canlı korunmuş; yeni kayıtlar için veri kaybettirmeyen geri dönüş yöntemi prova edilmiş. Gerçek yayına açma ayrı bir dağıtım adımı olarak sonuçlarıyla gösterilir.
+- Modüllerin bağımsız örnek kullanımları, belgelenmiş ortak altyapı gereksinimleri ve kapalı modüllerin erişim davranışı doğrulanmış.
 
 ---
 
@@ -376,7 +403,7 @@ CMS için kendi ortamımızda çalıştırılan hazır editör bileşenleri ve b
 | Kontrollü kullanılabilir pilot | P01–P12; mevcut başvuru/kayıt, panel, düzeltmeler, ödeme kontrolü ve iletişim; ilgili uçtan uca kontroller | 20–35 |
 | Planlanan tam v2 | P01–P22; hakemlik, program, workshop/ödül, belgeler, tanıtım, yayın/kitap ve arşiv | 40–65 |
 
-- Paket tablolarının temel toplamı **33,5–55 iş günü**; tam v2 için entegrasyon, düzeltme ve belirsizlik payıyla **40–65 iş günü** ayrılır.
+- Sertifika modülünün ayrıntılandırılmasıyla paket tablolarının temel toplamı **35,5–58 iş günü** oldu. Tam v2 için mevcut **40–65 iş günü** aralığı geçici tahmindir; modüllerin farklı projelerde kullanımını doğrulama maliyeti P02/P03'te belirlenip toplam ve ara teslim tahminleri yeniden değerlendirilecek.
 - Haftada beş gün çalışmayla tam v2 yaklaşık **8–13 hafta**; ara teslimler beklenmeden gösterilir. Süreler kümülatiftir, birbirine eklenmez.
 - Pilot bütün hakemlik/kitap özelliklerini içermez; tamamlanan kapsam ve eksikler kullanıcıya açık gösterilir. Uzak pilotta P22'nin ilgili ortam/erişim/geri dönüş kontrolleri erkenden uygulanır, tüm v2 hazır sayılmaz.
 - İlk iki paketten sonra mevcut kodun gerçek yeniden kullanım oranı, barındırma ve veri geçişi durumuna göre tahmin güncellenir.
@@ -392,3 +419,98 @@ CMS için kendi ortamımızda çalıştırılan hazır editör bileşenleri ve b
 - [PKP OJS](https://pkp.sfu.ca/software/ojs/) ve [resmî üretim akışı](https://github.com/pkp/pkp-docs/blob/main/learning-ojs/editorial-workflow/en/production.md): aşamalı değerlendirme/yayına hazırlık örneği. OJS'nin standart kurulumu her Word dosyasını otomatik dizgiyle PDF'ye dönüştürüyor varsayımı yapılmıyor.
 - Dental projesinin “Altyapı kurulumu” ve “Hedefini Netleştir” sohbetlerinde görülen sınırlı kapsam, sürüm koruma, kabul sonucu ve paket kapanışı yaklaşımı.
 - Yerel kaynak incelemesi: `prisma/schema.prisma`, `src/lib/admin.ts`, `src/lib/email.ts`, gönderim/kayıt API'leri, `package.json`, `DEPLOYMENT.md`.
+
+---
+
+## 14. Başka Projelerde Kullanılabilen Modüller
+
+05.10.2026 kullanıcı kararı: sistem iş modülleri halinde tasarlanacak; her modül başka bir projede de kullanılabilecek. İlk kurulumda tek uygulama ve ortak yönetim kabuğu içinde, sınırları açık modüller önerilir. Başka projede kullanım; ilgili modülün ve belgelenmiş temel altyapısının eklenmesiyle mümkün olmalı. Her modül için ayrı sunucu kurmak ilk gereksinim değildir.
+
+### 14.1 Ortak altyapı ve modül sınırları
+
+- Ortak temel: kimlik/yetki, kurum ve etkinlik bağlamı, dil, dosya saklama, işlem kaydı ve iş kuyruğu. Modül bu hizmetleri tanımlanmış arayüzlerden alır; kullanılan uygulamanın e-posta veya dosya sağlayıcısı değiştirilebilir.
+- Modül kendi iş kurallarını, verisini, servis/API arayüzünü, ekranlarını ve şema değişikliklerini sahiplenir. Başka modülün veri tablosuna doğrudan erişim/yazma yerine ilgili servis kullanılır.
+- Gerekli ve isteğe bağlı bağımlılıklar ayrı tanımlanır. Bir modül kapatıldığında yeni işlem menüsü ve ilgili API işlemleri kapanır; bağımlı özellikler anlaşılır biçimde gösterilir. Mevcut kayıtlar korunur; yayımlanmış arşiv ve verilmiş belgelerin doğrulama erişimi ayrı yaşam döngüsü ayarlarıyla yönetilir.
+- Tek bir kongre kodu, belirli proje dosya yolu, tema veya e-posta sağlayıcısı modülün içine sabitlenmez. Etkinlik/kişi verileri ihtiyaca göre dış uygulamadan, API'den veya liste içe aktarımından sağlanabilir.
+- Modüller arasında veri aktarımı sürümlü arayüzler ve açık olaylarla yapılır: örneğin `katılım onaylandı` bilgisi sertifika uygunluğunu tetikler; otomatik toplu gönderim organizatörün yayın/gönderim ayarına bağlıdır.
+- Başka projeye taşıma; kurulum belgesi, örnek bağlama uygulaması ve uyumluluk kontrolüyle gösterilir. “Ayrı klasörde” olması tek başına yeniden kullanılabilirlik kabulü değildir.
+- Bu yapı P02/P03'te kararlaştırılıp sonraki paketlere uygulanacak; bu plan güncellemesi kodun modüllere ayrılmış olduğunu göstermez.
+
+### 14.2 İş modülleri
+
+| Modül | Başka projede örnek kullanım | Kongre platformuna bağlantısı / paket |
+|-------|-----------------------------|--------------------------------------|
+| CMS ve web sitesi | Kurum, etkinlik veya eğitim sitesi | Ortak temel ve isteğe bağlı dinamik etkinlik verisi; P05–P08 |
+| Başvuru/kayıt ve revizyon | Etkinlik, eğitim veya içerik başvurusu | Kongreye özel form/ücret kuralları yapılandırma ve bağlantı katmanında; P10–P11 |
+| Değerlendirme | Bildiri veya proje başvurusu değerlendirmesi | Dışarıdan değerlendirilecek kayıt/dosya alır, karar sonucu sunar; P13 |
+| Ödeme kontrolü | Etkinlik/eğitim ücretlerinin doğrulanması | Katılımcı ve ücret verisini alır; banka biçimi ayrı içe aktarma bağlantısı; P12 |
+| Program ve oturum | Eğitim, seminer veya etkinlik takvimi | Bildiri kaydı isteğe bağlı; kişi, oturum ve salon temel verileriyle çalışır; P14 |
+| Etkinlik katılımı | Kontenjanlı workshop, gezi veya kurs | Kayıt/kişi bağlantısı ve isteğe bağlı ücret/program; P15 |
+| Yoklama | Eğitim/seminer katılım takibi | Oturum/kişi verisini alır, katılım sonucunu verir; P16B |
+| Sertifika | Katılım, konuşmacı, eğitim veya görev belgesi | Kongre bağlantısı veya Excel/CSV; PDF şablonu ve alıcı verileri yeterli; P16A |
+| Ödül | Proje, yarışma veya bilimsel etkinlik ödülleri | Aday/jüri/değerlendirme verisi alır; sunum zorunluysa yoklama sonucu; P17 |
+| İletişim | İşlem ve durum bildirimleri | Sağlayıcı bağlantısı, şablon, kuyruk, geçmiş; P09 |
+| Tanıtım çıktıları | Davet ve etkinlik afişi | Etkinlik bilgileri ve şablon; P18 |
+| Yayın ve arşiv | Özet koleksiyonu veya onaylı içerik yayını | Dosya, prova/onay ve metadata; kongreye özgü alanlar bağlantı katmanında; P19–P21 |
+
+Her iş modülünün kapanışında küçük bir bağımsız kullanım örneği ve gereken temel hizmetler belgelenir. Ürün içindeki bütün modüllerin aynı anda kullanılması zorunlu değildir. Modüllerin kodla taşınabilirliği ilk hedeftir; ayrı ayrı ticari ürün paketleme ve geniş kapsamlı bağımsız kurulum ekranları ayrıca değerlendirilecek.
+
+### 14.3 Seçmeli özellikler ve kongreye göre yapılandırma
+
+05.10.2026 kullanıcı kararı: özellikler seçmeli olacak. Kongre ekibi kendi ihtiyacına göre modül, süreç, sayfa ve kuralları belirleyecek; öneriler zorunlu bir iş akışına dönüşmeyecek.
+
+- **Modüller:** CMS, kayıt, bildiri, hakemlik, ücret/ödeme, program, workshop, yoklama, sertifika, ödül ve yayın gibi işlevler kongre bazında seçilir. Sadece sertifika veya sadece web sitesi kullanımı mümkündür.
+- **Süreçler:** hakemli/hakemsiz değerlendirme, yalnız özet/tam metin, ücretli/ücretsiz katılım, fiziksel/çevrim içi/karma etkinlik ve belge üretimi ayrı tercihlerdir. Kapalı aşama kullanıcıdan işlem beklemez; ilerleme durumu seçili aşamalara göre hesaplanır.
+- **Alanlar ve koşullar:** organizatör form alanlarının görünürlüğünü ve zorunluluğunu, özet başlıklarını/kelime sınırlarını, tarihleri ve belge koşullarını ayarlar. Bir özelliğin gerçekten gerektirdiği veri eksikse yalnız o özellik için anlaşılır uyarı gösterilir; örneğin e-posta gönderimi alıcı adresi isterken yalnız PDF indirmek e-posta adresi gerektirmez.
+- **Sayfalar:** EYİ referansındaki bütün sayfa şablonları başlangıçta yönetim panelinde bulunur. Organizatör yayımlayacağı sayfaları seçer; kapalı veya doldurulmamış bir özellik halka açık menüde boş sayfa oluşturmaz.
+- **Hazır başlangıç seçimleri:** yalnız web sitesi, web sitesi + ücretsiz kayıt, bildiri süreçli kongre ve yalnız sertifika gibi seçimler kolaylık sağlar; her biri sonradan özelleştirilebilir. Hangi modüllerin açılacağı yayın öncesi özetlenir.
+- **Bağımlılıklar:** ihtiyaç duyulan ek modül veya alternatif veri girişi açıkça gösterilir; seçim kullanıcıya açıklanmadan genişletilmez. Paket tablosundaki geliştirme sırası, ürün kullanımında bütün önceki modüllerin açılmasını gerektirmez.
+- **Devam eden etkinlikte değişiklik:** ayar değişikliğinin mevcut kayıtlar, görevler, bildirimler ve belgeler üzerindeki etkisi gösterilir. Modül kapatmak veri silmez veya geçmiş onayları değiştirmez; işlem geçmişi korunur. Yeni işlemler ve geçmiş kayıtların erişimi ayrı yönetilir.
+- **Doğrulama:** P04/P22'de yalnız site, ücretsiz kayıt, hakemsiz bildiri ve bağımsız sertifika örnekleriyle seçimlerin ekran/API/iş kuyruğuna yansıdığı kontrol edilir. Kapalı modüller hatırlatma veya otomatik e-posta üretmez.
+
+---
+
+## 15. Sertifika Modülü — PDF Arka Planlı İlk Sürüm
+
+05.10.2026 kullanıcı kararı: mevcut yöntem korunacak. Sertifika tasarımı PDF olarak yüklenir; üst alanda alıcının ayrıntıları, alt alanda katılım/görev bilgileri bulunur. İlk sürüm bu yerleşimi ön tanımlı sunar; şablonun ölçüsüne göre alan konumları ayarlanabilir.
+
+### 15.1 Şablon ve alanlar
+
+- Katılımcı, konuşmacı, bildiri sunucusu, oturum başkanı, kurul/görevli ve workshop katılımcısı için belge türleri; organizatör ek tür tanımlayabilir.
+- Üst alan: ad-soyad, isteğe bağlı unvan, kurum ve belge için seçilen diğer bilgiler. E-posta, iç kayıt numarası ve kimlik bilgileri varsayılan olarak sertifikaya basılmaz.
+- Alt alan: etkinlik adı, tarih/yer, katılım veya görev açıklaması, varsa konuşma/bildiri/oturum başlığı. Aynı kişi farklı görevler için birden fazla belge alabilir.
+- İlk PDF arka planı ve alıcı/katılım alanları; yazı tipi ve boyutu, renk, hizalama, satır kırılması ve konum ayarları. İmza/logo hazırlanmış PDF tasarımında bulunabilir.
+- Şablon önizlemesi: kısa/uzun isim, uzun kurum ve Türkçe karakter örnekleri; taşan alan uyarısı. İlk kapsam sertifika sayfası için PDF arka planıdır; çok sayfalı belge tasarımı daha sonra kapsamlandırılır.
+
+### 15.2 Üretim ve dağıtım
+
+- Tek belge önizleme/indirme; seçilmiş kişilere toplu PDF üretimi ve arşiv indirme. Modül bağımsız çalışırken Excel/CSV sütunları alanlarla eşleştirilir.
+- Kongre içinden üretimde kayıt, katılım veya görev şartları yapılandırılır. Her belge türü için ödeme/yoklama zorunluluğu ayrıca seçilir; davetli konuşmacı gibi roller katılımcı ücretine otomatik bağlanmaz.
+- İçe aktarılan satırlar ve aynı kişinin farklı belgeleri ayrıştırılır; tekrar üretim yeni bir kişiye/mükerrer belgelendirmeye dönüşmez. Şablon değişikliği geçmiş PDF'yi sessizce değiştirmez.
+- Belge kimliği ve isteğe bağlı QR/doğrulama bağlantısı; şablon/veri sürümü, üretim tarihi ve üreten kullanıcı kaydı. Düzeltme, yeniden üretim ve iptal geçmişi tutulur; doğrulamada yalnız gerekli belge bilgileri gösterilir.
+- Katılımcı panelinden indirme ve organizatörün seçimiyle e-posta gönderimi; gönderim kuyruğu/geçmişi İletişim modülü üzerinden. Basılı imza görseli hukuki elektronik imza olarak adlandırılmaz.
+- Üretim ve teslim durumları ayrı: PDF hazır, gönderim bekliyor, sağlayıcı kabul etti, teslim hatası ve varsa doğrulanmış teslim bilgisi. Kalıcı adres hatasında organizatöre düzeltme işi açılır; toplu üretimin başarılı olması bütün alıcılara ulaşıldığını göstermez.
+
+### 15.3 Pakete yansıması ve bağımsız kullanım kanıtı
+
+- **P16A:** sertifika çekirdeği, PDF alan yerleşimi, şablon/üretim geçmişi, doğrulama ve Excel/CSV örneği.
+- **P16B:** yoklama ve kongreye bağlantı; göreve/katılıma göre uygunluk ve panelden erişim.
+- Kabul örneği: aynı PDF tasarımından bir katılımcı ve bir konuşmacı belgesi; uzun ad/kurum ve Türkçe karakterler; aynı kişiye iki farklı rol; hatalı içe aktarım satırı; düzeltme/iptal; kongre modülleri olmadan örnek kullanım.
+- Referans sertifika PDF'si ve örnek alanlar uygulama paketi öncesinde kullanıcıdan alınacak; tasarımın kesin koordinatları şu aşamada varsayılmayacak.
+
+---
+
+## 16. Workspace Yazışmalarından Planı Netleştiren Örnekler
+
+05.10.2026'da kullanıcının açık Chrome oturumunda `noreply@stativera.store` hesabı doğrulandı. Temmuz–Eylül 2026 döneminden altı yazışma zincirinin görünen mesajları incelendi. Tablo kişisel içeriklerin dökümünü değil, gözlenen iş akışı ile önerilen davranışın bağlantısını kaydeder. Eklerin tamamı okunmadı; hakem puanları, bütün sertifika tasarımları veya başvuruların son sonuçları hakkında çıkarım yapılmadı.
+
+| Yazışma / tarih | Gözlenen durum | Plana yansıyan davranış |
+|----------------|----------------|------------------------|
+| Workshop III Katılım Belgesi, 25.09.2026 | PDF sertifika e-postasına adres bulunamadı (`550 5.1.1`) teslim hatası dönmüş. | P09/P16A: belge üretimi ve teslimi ayrı; kalıcı hata listesi, adres düzeltme ve kontrollü yeniden gönderim. |
+| EYİ 2026 Oturum Başkanlığı Hk., 07.09.2026 | Davet edilen kişi kendi sunumunu çevrim içi yapmayı planlıyor; bağlantı koşulları nedeniyle başkanlık görevini üstlenemeyeceğini bildiriyor. | P14/P16B: görev kabul/ret durumu, yerine atama ve görev belgesi uygunluğu; sunucu rolü ile başkanlık ayrı. |
+| EYİ 2026 Özet Bildiri Kitabı Hakkında — Özet Düzenleme Talebi, 22–24.09.2026 | Güncel metin geldikten sonra amaç/yöntem/bulgular/sonuç alt başlıkları ayrıca istenmiş ve yeni dosya gönderilmiş. | P04/P10/P11/P20: kongreye göre yapılandırılmış özet alanları, erken biçim kontrolü ve kitapta kullanılacak onaylı sürüm. |
+| EYİ 2026 — Tam Metin Bildiri Kitabı Yayın Onayı Hakkında, 22–23.09.2026 | Ödül değerlendirmesi için teslim edilen çalışmanın yazarı tam metnin kitapta yayımlanmasını istemiyor; yalnız özet ve dergi seçeneğini soruyor. | P17/P19/P20: ödül teslimi ile yayın onayı ayrı; açık yayın tercihine göre kitap seçimi. |
+| EYİ 2026 Kongre Kayıt İşlemlerinin Tamamlanması Hakkında, 03.09.2026 | Kayıt yaptırmış kişi son tarih geçtikten sonra bildiri özeti sunmak için uygunluk soruyor. Yazışmada nihai kabul sonucu doğrulanmadı. | P04/P10/P11: kayıt ve bildiri süreçleri ayrı; organizatörün gerekçeli, belirli kişi/aşama için süreli istisnası. |
+| EYİ 2026 Bildiri Değerlendirme Talebi, 27–30.07.2026 | Bir hakem iki bildiri için iki ayrı değerlendirme formunu aynı e-postayla göndermiş. Yanlış eşleştirme yaşandığına dair bulgu yok. | P13: her formu bildiri/hakem/tur/sürümle açık eşleştirme; birden çok değerlendirmeyi tek yazışmadan izleme. |
+
+Bu örnekler mevcut paketlerin kabul ölçütlerini netleştirir. Yanıtlar `noreply` adlı hesaba da geldiği için yanıt bekleyen iletilerde takip edilen yanıt adresi ve panelden talep bağlantısı tasarlanmalı. Tam otomatik gelen kutusu bağlama, kapsamı ve erişimi ayrıca kararlaştırılacak bir entegrasyondur.

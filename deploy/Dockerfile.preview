@@ -1,0 +1,30 @@
+FROM node:22-alpine AS builder
+RUN apk add --no-cache openssl
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY prisma ./prisma
+RUN npm ci
+COPY . .
+# Build uses placeholder test settings; no credentials or migrations in this image.
+ENV APP_ENV=preview APP_BASE_URL=https://v2-preview.example.invalid V2_DB_HOST=db-v2-preview \
+    DATABASE_URL=postgresql://aibildiri_v2_preview:build-only@db-v2-preview:5432/aibildiri_v2_preview \
+    DIRECT_URL=postgresql://aibildiri_v2_preview:build-only@db-v2-preview:5432/aibildiri_v2_preview \
+    SESSION_COOKIE_NAMESPACE=aibildiri_v2_preview \
+    DRAFT_SESSION_SECRET=build-only-draft-secret-not-used-at-runtime-123 \
+    ADMIN_SESSION_SECRET=build-only-admin-secret-not-used-at-runtime-456 \
+    ADMIN_PASSWORD=build-only-password-789 \
+    PREVIEW_ACCESS_USER=build-only PREVIEW_ACCESS_PASSWORD=build-only-preview-password-123 \
+    FILE_STORAGE=database MAIL_MODE=capture MAIL_CAPTURE_DIR=/app/.preview/mail
+RUN npm run build
+
+FROM node:22-alpine AS runner
+RUN apk add --no-cache openssl
+WORKDIR /app
+ENV NODE_ENV=production HOSTNAME=0.0.0.0 PORT=3000
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+RUN mkdir -p /app/.preview/mail && chown -R node:node /app/.preview
+USER node
+EXPOSE 3000
+CMD ["node", "server.js"]

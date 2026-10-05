@@ -1,4 +1,8 @@
 import nodemailer, { type Transporter } from "nodemailer";
+import { mkdir, writeFile } from "node:fs/promises";
+import { randomUUID } from "node:crypto";
+import { resolve } from "node:path";
+import { getEnvironment } from "@/lib/environment";
 import type { Locale } from "@/lib/i18n";
 
 type DraftEmailInput = {
@@ -134,6 +138,7 @@ export function isSmtpConfigured() {
 }
 
 export function isEmailConfigured() {
+  if (getEnvironment().mode !== "production") return true;
   return isSmtpConfigured() || isResendConfigured();
 }
 
@@ -205,6 +210,20 @@ function getProviderOrder(): Array<"smtp" | "resend"> {
 }
 
 async function sendEmail(input: SendInput) {
+  const environment = getEnvironment();
+  if (environment.mode !== "production") {
+    const directory = environment.mode === "local"
+      ? resolve(process.env.V2_LOCAL_ROOT ?? process.cwd(), environment.captureDir!)
+      : resolve(environment.captureDir!);
+    await mkdir(directory, { recursive: true, mode: 0o700 });
+    const id = randomUUID();
+    await writeFile(
+      resolve(directory, `${new Date().toISOString().replaceAll(":", "-")}-${id}.json`),
+      JSON.stringify({ id, capturedAt: new Date().toISOString(), ...input }, null, 2),
+      { mode: 0o600, flag: "wx" },
+    );
+    return { id };
+  }
   const errors: string[] = [];
   for (const provider of getProviderOrder()) {
     try {

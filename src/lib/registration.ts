@@ -11,6 +11,7 @@ import {
   tierToOption,
 } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
+import { sessionCookieName, secureSessionCookie } from "@/lib/environment";
 import { getBaseUrl } from "@/lib/submission";
 import { normalizeName } from "@/lib/utils";
 import type { Locale, TFunction } from "@/lib/i18n";
@@ -24,7 +25,7 @@ import type {
 } from "@/types/submission";
 import type { Congress, PaymentTier, Submission } from "@prisma/client";
 
-const REGISTRATION_COOKIE = "registration_access";
+const REGISTRATION_COOKIE = sessionCookieName("registration_access");
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24;
 const TOKEN_GRACE_WINDOW_MS = 5 * 60 * 1000;
 
@@ -78,10 +79,6 @@ export async function issueRegistrationLink(input: {
 
   const magicLink = buildRegistrationMagicLink(input.congressSlug, token);
 
-  if (process.env.NODE_ENV !== "production") {
-    console.log(`[registration-link:${input.email}] ${magicLink}`);
-  }
-
   return magicLink;
 }
 
@@ -130,7 +127,7 @@ export async function setRegistrationCookie(email: string, congressId: string) {
   cookieStore.set(REGISTRATION_COOKIE, cookieValue(email, congressId), {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: secureSessionCookie(),
     path: "/",
     maxAge: 60 * 60 * 8,
   });

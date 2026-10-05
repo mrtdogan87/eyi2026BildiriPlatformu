@@ -1,0 +1,12 @@
+.git
+.env
+.env.*
+.local
+.preview
+.recovery
+.vercel
+node_modules
+.next
+prisma/*.db
+public/uploads/*
+!public/uploads/.gitkeep

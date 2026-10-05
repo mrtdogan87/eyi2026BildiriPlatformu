@@ -1,6 +1,7 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
+import { sessionCookieName, secureSessionCookie } from "@/lib/environment";
 import {
   getCongressWithTiers,
   getCurrentPaymentPeriod,
@@ -18,7 +19,7 @@ import type {
 import { slugToTitle } from "@/lib/utils";
 import type { Locale, TFunction } from "@/lib/i18n";
 
-const DRAFT_COOKIE = "draft_access";
+const DRAFT_COOKIE = sessionCookieName("draft_access");
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const DRAFT_TOKEN_GRACE_WINDOW_MS = 5 * 60 * 1000;
@@ -72,7 +73,7 @@ export async function setDraftAccessCookie(submissionId: string) {
   cookieStore.set(DRAFT_COOKIE, `${submissionId}.${signature}`, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: secureSessionCookie(),
     path: "/",
     maxAge: 60 * 60 * 8,
   });
@@ -96,6 +97,7 @@ export async function canAccessDraft(submissionId: string) {
   }
 
   const expected = signDraftSession(submissionId);
+  if (Buffer.byteLength(signature) !== Buffer.byteLength(expected)) return false;
   return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }
 
@@ -138,10 +140,6 @@ export async function issueDraftLink(submissionId: string, email: string, congre
   });
 
   const magicLink = buildMagicLink(congressSlug, token);
-
-  if (process.env.NODE_ENV !== "production") {
-    console.log(`[draft-link:${email}] ${magicLink}`);
-  }
 
   return magicLink;
 }

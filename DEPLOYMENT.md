@@ -1,51 +1,24 @@
-# GitHub, Neon ve Vercel Kurulumu
+# Ortam ve dağıtım — v2
 
-## 1. Yerel Hazırlık
+05.10.2026 tarihinde gerçek ortam SSH, HTTP/DNS, konteyner ve GitHub kayıtlarıyla doğrulandı.
 
-- `.env` dosyasındaki `DATABASE_URL` ve `DIRECT_URL` değerlerini Neon bağlantı dizgisi ile doldurun.
-- Resend API ayarlarını ücretsiz sağlayıcınızın bilgileri ile doldurun.
-- `APP_BASE_URL` yerelde `http://localhost:3000`, production'da Vercel domain'i olmalı.
-- Yönetim paneli için `ADMIN_PASSWORD` ve `ADMIN_SESSION_SECRET` değerlerini de tanımlayın.
+| Ortam | Uygulama ve veri | Durum |
+|---|---|---|
+| Mevcut canlı | `https://bildiriyonetim.stativera.store`, Coolify; PostgreSQL 16 `aibildiri` | Korundu; canlıya migration/dağıtım yapılmadı |
+| Üniversite sitesi | `https://eyi2026-iibf.mcbu.edu.tr/`, ayrı üniversite CMS'i | Korundu; CMS kaynak koduna erişim doğrulanmadı |
+| Tarihsel Vercel | Başarılı dağıtım kayıtları mevcut | Güncel üniversite başvuru bağlantısının hedefi değil |
+| Yerel v2 | `http://127.0.0.1:3100`, ayrı `v2/` checkout; PostgreSQL `127.0.0.1:55432/aibildiri_v2` | Yalnız sentetik veri ve yakalanan e-posta |
+| v2 deneme | Seçilecek ayrı HTTPS adresi; ayrı `aibildiri_v2_preview` DB/kullanıcısı ve volume'lar | Yapılandırma hazır; uzak yayın bekliyor |
 
-## 2. Neon
+Canlı commit `a0c224b793102dd9ad134defc39f456fb0bebec2`. Önceki Neon/Vercel
+metni çalışan sürümün yedeğinde saklandı; güncel DB Neon değildir. Dosyalar
+DB byte alanlarında saklanır. Obje depolama sonraki paketlerde ele alınacak.
 
-- Yeni bir PostgreSQL veritabanı oluşturun.
-- Connection string içinden `DATABASE_URL` ve `DIRECT_URL` değerlerini alın.
-- Şemayı uygulamak için:
+- [Yerel başlatma](docs/YEREL_GELISTIRME.md)
+- [Deneme ortamı](docs/DENEME_ORTAMI.md)
+- [P01 kapanışı](docs/P01_KAPANIS.md)
+- [P02 kapanışı](docs/P02_KAPANIS.md)
 
-```bash
-npm install
-npm run prisma:migrate:deploy
-```
-
-## 3. GitHub
-
-- Repo'yu private oluşturun.
-- İlk push için:
-
-```bash
-git remote add origin <github-repo-url>
-git branch -M main
-git push -u origin main
-```
-
-## 4. Vercel
-
-- Projeyi GitHub üzerinden import edin.
-- Build command olarak `npm run vercel-build` kullanın.
-- Aşağıdaki environment variable'ları ekleyin:
-  - `DATABASE_URL`
-  - `DIRECT_URL`
-  - `APP_BASE_URL`
-  - `DRAFT_SESSION_SECRET`
-  - `ADMIN_PASSWORD`
-  - `ADMIN_SESSION_SECRET`
-  - `RESEND_API_KEY`
-  - `RESEND_SENDER_EMAIL`
-  - `RESEND_SENDER_NAME`
-
-## 5. Dosya Yükleme Notu
-
-- Yüklenen DOCX dosyaları şu an PostgreSQL veritabanında saklanıyor.
-- Bu sayede Vercel dosya sistemi sınırlaması aşılmış durumda.
-- Uzun vadede daha büyük arşiv ihtiyacı için Blob/S3 benzeri obje depolama yine değerlendirilebilir.
+`build` ve `vercel-build` yalnız derleme yapar. Migration build/start sırasında
+çalışmaz; `prisma:migrate:deploy` ayrı adımdır, P02'de yalnız yerel/deneme
+DB'sine izin verir. Bu dal mevcut canlı Coolify uygulamasına bağlanmayacak.

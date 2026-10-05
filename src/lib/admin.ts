@@ -12,6 +12,7 @@ import {
   tierLabel,
 } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
+import { sessionCookieName, secureSessionCookie } from "@/lib/environment";
 import type {
   AdminCongressSettings,
   AdminPaymentTier,
@@ -24,7 +25,7 @@ import type {
   AdminSubmissionListItem,
 } from "@/types/admin";
 
-const ADMIN_COOKIE = "admin_session";
+const ADMIN_COOKIE = sessionCookieName("admin_session");
 const EYI_CONGRESS_SLUG = "eyi-2026";
 type ManageableSubmissionStatus = "SUBMITTED" | "UNDER_REVIEW" | "ACCEPTED" | "REJECTED";
 
@@ -56,7 +57,7 @@ export async function setAdminSessionCookie() {
   cookieStore.set(ADMIN_COOKIE, `${EYI_CONGRESS_SLUG}.${signature}`, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: secureSessionCookie(),
     path: "/",
     maxAge: 60 * 60 * 8,
   });

@@ -1,0 +1,46 @@
+name: aibildiri-v2-preview
+services:
+  db-v2-preview:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aibildiri_v2_preview
+      POSTGRES_USER: aibildiri_v2_preview
+      POSTGRES_PASSWORD: ${V2_PREVIEW_DB_PASSWORD:?Set a new v2 test DB password}
+    volumes:
+      - v2-preview-db:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U aibildiri_v2_preview -d aibildiri_v2_preview']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  # Run as a separate job BEFORE starting/updating app; never in build/start.
+  migrate:
+    profiles: [migration]
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.preview
+      target: builder
+    env_file: ../.env.preview
+    command: [npm, run, 'prisma:migrate:deploy']
+    depends_on:
+      db-v2-preview:
+        condition: service_healthy
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.preview
+      target: runner
+    env_file: ../.env.preview
+    # Local tunnel/reverse proxy only. Attach the chosen HTTPS domain separately.
+    ports:
+      - '127.0.0.1:3101:3000'
+    volumes:
+      - v2-preview-mail:/app/.preview/mail
+    depends_on:
+      db-v2-preview:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  v2-preview-db:
+  v2-preview-mail:
