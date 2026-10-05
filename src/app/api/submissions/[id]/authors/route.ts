@@ -1,3 +1,4 @@
+import { requireEditableDraft, configuredAuthors, submissionRules } from "@/integrations/congress/submission-rules";
 import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -5,10 +6,8 @@ import {
   canAccessDraft,
   getSubmissionSnapshot,
   isSubmissionClosedForDraft,
-  validateAuthors,
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
-import type { SubmissionAuthorInput } from "@/types/submission";
 
 type RouteProps = {
   params: Promise<{ id: string }>;
@@ -20,16 +19,13 @@ async function handlePATCH(request: Request, { params }: RouteProps) {
   if (!(await canAccessDraft(id))) {
     return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
   }
+  await requireEditableDraft(id);
   if (await isSubmissionClosedForDraft(id)) {
     return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
-  const body = (await request.json()) as { authors?: SubmissionAuthorInput[] };
-  const authors = body.authors ?? [];
-  const errors = validateAuthors(authors, t);
-  if (errors.length) {
-    return NextResponse.json({ error: errors[0] }, { status: 400 });
-  }
+  const body = await request.json();
+  const authors = configuredAuthors(body.authors ?? [], await submissionRules(id));
 
   await prisma.$transaction([
     prisma.submissionAuthor.deleteMany({

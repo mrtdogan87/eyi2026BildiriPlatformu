@@ -1,3 +1,4 @@
+import { requireEditableDraft, configuredParticipation, submissionRules } from "@/integrations/congress/submission-rules";
 import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -5,10 +6,8 @@ import {
   canAccessDraft,
   getSubmissionSnapshot,
   isSubmissionClosedForDraft,
-  validateParticipation,
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
-import type { SubmissionParticipationInput } from "@/types/submission";
 
 type RouteProps = {
   params: Promise<{ id: string }>;
@@ -20,16 +19,12 @@ async function handlePATCH(request: Request, { params }: RouteProps) {
   if (!(await canAccessDraft(id))) {
     return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
   }
+  await requireEditableDraft(id);
   if (await isSubmissionClosedForDraft(id)) {
     return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
-  const body = (await request.json()) as SubmissionParticipationInput;
-  const errors = validateParticipation(body, t);
-
-  if (errors.length) {
-    return NextResponse.json({ error: errors[0] }, { status: 400 });
-  }
+  const body = configuredParticipation(await request.json(), await submissionRules(id));
 
   await prisma.submission.update({
     where: { id },

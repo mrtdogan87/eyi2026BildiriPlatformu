@@ -2018,3 +2018,11 @@ textarea {
 
 .platform-card { padding: 28px; }
 @media (max-width: 760px) { .platform-card { padding: 20px; } }
+
+/* Congress configuration */
+.platform-card fieldset { border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin: 0 0 22px; min-width: 0; }
+.platform-card legend { font-weight: 700; padding: 0 8px; }
+.setup-stage { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.setup-review { padding: 24px; }
+[data-congress-theme="simple"] .platform-hero, [data-congress-theme="simple"] .hub-hero { background: var(--primary); color: white; border-radius: 12px; }
+[data-congress-theme="simple"] .hero p, [data-congress-theme="simple"] .hero span, [data-congress-theme="simple"] .hub-hero p, [data-congress-theme="simple"] .hub-hero span { color: white; }

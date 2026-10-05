@@ -30,7 +30,12 @@ export async function requireContext(action: Action = 'context', module?: Module
   const session = await actorSession();
   if (!session) throw new AccessError(401, 'Kişisel hesabınızla giriş yapın.');
   if (!session.congressId) throw new AccessError(403, 'Önce bir kongre seçin.');
-  const congress = await prisma.congress.findUnique({ where: { id: session.congressId }, include: { organization: true } });
+  return authorizeCongress(session.congressId, action, module);
+}
+export async function authorizeCongress(congressId: string, action: Action = 'context', module?: ModuleKey) {
+  const session = await actorSession();
+  if (!session) throw new AccessError(401, 'Kişisel hesabınızla giriş yapın.');
+  const congress = await prisma.congress.findUnique({ where: { id: congressId }, include: { organization: true } });
   if (!congress) throw new AccessError(403, 'Kongre erişimi kaldırılmış.');
   const org = await prisma.organizationMembership.findUnique({ where: { organizationId_userId: { organizationId: congress.organizationId, userId: session.userId } } });
   const membership = await prisma.congressMembership.findUnique({ where: { congressId_userId: { congressId: congress.id, userId: session.userId } } });

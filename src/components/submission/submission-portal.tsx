@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatCurrencyAmount } from "@/lib/payment";
+import { formatCurrencyAmount } from "@/lib/payment-helpers";
 import { ACADEMIC_TITLES, OTHER_TITLE, academicTitleLabel } from "@/lib/titles";
 import { useLocale, useT } from "@/lib/i18n/provider";
 import type {

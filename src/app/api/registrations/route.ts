@@ -1,9 +1,11 @@
+import { effectiveConfiguration } from "@/modules/congress/configuration";
 import { apiRoute } from "@/platform/http";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import type { AudienceType, PresentationMode } from "@prisma/client";
 import {
   calculateRegistration,
+  effectivePricingCongress,
   clearRegistrationCookie,
   readRegistrationSession,
 } from "@/lib/registration";
@@ -57,14 +59,16 @@ async function handlePOST(request: Request) {
     return NextResponse.json({ error: t("api.selectPaperOrListener") }, { status: 400 });
   }
 
-  const congress = await getCongressWithTiers((await prisma.congress.findUniqueOrThrow({
+  const rawCongress = await getCongressWithTiers((await prisma.congress.findUniqueOrThrow({
     where: { id: session.congressId },
     select: { slug: true },
   })).slug);
-  if (!congress) {
+  if (!rawCongress) {
     return NextResponse.json({ error: t("api.congressNotFound") }, { status: 404 });
   }
 
+  const congress = effectivePricingCongress(rawCongress);
+  const fields = effectiveConfiguration(congress.configuration).fields;
   // Kullanıcı yalnızca SUNDUĞU bildirilerin ücretini ödeyebilir (e-posta == sunan yazar).
   const normalizedEmail = session.email.toLowerCase();
   const selectedSubmissions = await prisma.submission.findMany({
@@ -124,7 +128,9 @@ async function handlePOST(request: Request) {
 
   // Receipt file is required only for the ana ücret (gala is collected separately)
   const receiptFile = formData.get("receipt");
-  const needsReceipt = calculation.quote.totalAmount > 0;
+  if (receiptFile instanceof File && fields.receipt === 'HIDDEN') return NextResponse.json({ error: 'Bu kongrede dekont istenmiyor.' }, { status: 400 });
+  const needsReceipt = calculation.quote.totalAmount > 0 && fields.receipt === 'REQUIRED';
+  if (receiptFile instanceof File && !isValidReceiptFile(receiptFile)) return NextResponse.json({ error: t('api.receiptInvalid') }, { status: 400 });
   if (needsReceipt) {
     if (!(receiptFile instanceof File)) {
       return NextResponse.json({ error: t("api.receiptRequired") }, { status: 400 });
@@ -139,6 +145,8 @@ async function handlePOST(request: Request) {
 
   // Öğrenci belgesi isteğe bağlıdır; varsa dekontun yanına yüklenir.
   const studentDocumentFile = formData.get("studentDocument");
+  if (fields.studentDocument === 'REQUIRED' && !(studentDocumentFile instanceof File)) return NextResponse.json({ error: 'Öğrenci belgesi gerekli.' }, { status: 400 });
+  if (fields.studentDocument === 'HIDDEN' && studentDocumentFile instanceof File) return NextResponse.json({ error: 'Bu kongrede öğrenci belgesi istenmiyor.' }, { status: 400 });
   if (studentDocumentFile instanceof File && !isValidReceiptFile(studentDocumentFile)) {
     return NextResponse.json({ error: t("api.studentDocInvalid") }, { status: 400 });
   }

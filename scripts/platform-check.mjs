@@ -39,7 +39,9 @@ try {
   const list = (await req('/api/admin/submissions', { jar: organizer })).data.submissions;
   assert(!list.some(p => p.id === 'local-paper-b'));
   const contexts = (await req('/api/platform/context', { jar: organizer })).data.contexts;
-  assert.deepEqual(contexts.map(c => c.id), ['local-eyi-2026']);
+  assert(contexts.some(c => c.id === 'local-eyi-2026'));
+  assert(!contexts.some(c => ['local-closed','local-congress-b'].includes(c.id)));
+  for (const context of contexts.filter(c => c.id !== 'local-eyi-2026')) assert(context.name.startsWith('P04 '), 'Only explicitly created P04 fixtures may add organizer contexts');
   const orgContexts = (await req('/api/platform/context', { jar: jars.institution })).data.contexts;
   assert(orgContexts.some(c => c.id === 'local-closed')); assert(!orgContexts.some(c => c.id === 'local-congress-b'));
   await req('/api/platform/context', { method: 'POST', body: { congressId: 'local-congress-b' }, jar: organizer, status: 403 });

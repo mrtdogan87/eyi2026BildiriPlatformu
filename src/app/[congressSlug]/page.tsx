@@ -1,3 +1,4 @@
+import { effectiveConfiguration } from "@/modules/congress/configuration";
 import { publicCongress } from "@/integrations/congress/public-context";
 import { moduleEnabled } from "@/platform/context";
 import Link from "next/link";
@@ -14,12 +15,13 @@ type PageProps = {
 
 export default async function CongressHubPage({ params }: PageProps) {
   const { congressSlug } = await params;
-  const { locale, t } = await getServerT();
   const congress = await publicCongress(congressSlug);
+  const { locale, t } = await getServerT(effectiveConfiguration(congress.configuration).languages);
+  const submissionsEnabled = await moduleEnabled(congress.id, "SUBMISSIONS");
   const registrationEnabled = await moduleEnabled(congress.id, "REGISTRATION");
   const submissionsClosed = await isSubmissionClosed(congressSlug);
   const congressTitle =
-    congressSlug === "eyi-2026"
+    congress.configuration ? congress.name : congressSlug === "eyi-2026"
       ? locale === "en"
         ? "ISEOS 2026"
         : "EYİ 2026"
@@ -35,13 +37,13 @@ export default async function CongressHubPage({ params }: PageProps) {
             <p>{t("hub.intro")}</p>
           </div>
           <div className="hub-event-card">
-            <span>{t("hub.eventOrdinal")}</span>
-            <strong>{t("hub.eventName")}</strong>
+            <span>{congress.configuration ? congress.year : t("hub.eventOrdinal")}</span>
+            <strong>{congress.configuration ? congress.name : t("hub.eventName")}</strong>
           </div>
         </section>
 
         <div className="hub-action-grid">
-          {submissionsClosed ? (
+          {!submissionsEnabled ? <div className="hub-action-card is-disabled"><h2>Bildiri modülü kapalı</h2></div> : submissionsClosed ? (
             <div className="hub-action-card hub-action-card-submission is-disabled" aria-disabled="true">
               <div className="hub-action-top">
                 <span className="hub-action-label">{t("hub.submissionClosedLabel")}</span>
@@ -50,7 +52,7 @@ export default async function CongressHubPage({ params }: PageProps) {
                 </span>
               </div>
               <h2>{t("hub.submissionClosedTitle")}</h2>
-              <p>{t("hub.submissionClosedDesc")}</p>
+              <p>{t("hub.submissionClosedDesc")}</p><Link href={`/${congressSlug}/bildiri-gonder`}>Süreli izin / taslak erişimi →</Link>
             </div>
           ) : (
             <Link className="hub-action-card hub-action-card-submission" href={`/${congressSlug}/bildiri-gonder`}>
@@ -84,6 +86,7 @@ export default async function CongressHubPage({ params }: PageProps) {
         </div>
 
         <div className="hub-reminder">
+          {congress.eventStartsAt && <span>{congress.eventStartsAt.toLocaleDateString(locale, { timeZone:"Europe/Istanbul" })} — {congress.eventEndsAt?.toLocaleDateString(locale, { timeZone:"Europe/Istanbul" })}</span>}
           <span>{t("hub.reminder1")}</span>
           <span>{t("hub.reminder2")}</span>
         </div>

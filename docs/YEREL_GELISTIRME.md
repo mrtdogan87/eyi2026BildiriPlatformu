@@ -79,3 +79,22 @@ parolasını sıfırlamaz. Hakem/editör/başkan ekranları ilgili paketlerde a�
 `test:platform` yerel sentetik davet/kayıtlar bırakır; modül ve rol ayarlarını
 prova sonrası geri getirir. Derlenmiş sürümü test etmek için dev'i kapatıp
 build/start çalıştırın. Kabul kanıtı `.local/platform-check-result.json`.
+
+## P04 kongre kurulumu
+
+Panelde **Yeni kongre oluştur**, **Kongre yapılandırması** ve **Teslim
+istisnaları** ekranları açıldı. Ayrıntılı davranış ve kapsam sınırları
+[P04 kapanışında](P04_KAPANIS.md) kayıtlıdır.
+
+`npm run test:congress` 9 saf yapılandırma testi ve 29 sentetik HTTP/DB
+senaryosu çalıştırır; ek yerel kongre/taslak/istisna/kayıt örnekleri bırakır.
+`npm run test:smoke`, `npm run test:platform`, `npm run test:safety` ve
+`npm run test:preview` önceki korumaları doğrular. DB'ye yazan senaryoları
+sıralı çalıştırın. E-posta yalnız `.local/mail` altında yakalanır.
+
+Paket commit'i temizken `node scripts/checkpoint.mjs P04-20261005-final`
+yeni, özel root `.recovery` klasörünü oluşturur; kaynak ve yerel DB'yi
+kopyalar ve ayrı rastgele adlı geçici yerel DB'de tam geri yükleme yaparak
+tüm tablo parmak izlerini karşılaştırır. Klasör zaten varsa üzerine yazmaz.
+PostgreSQL araçları için varsayılan yol `/opt/homebrew/opt/postgresql@16/bin`;
+farklı kurulumda `PG_BIN` kullanılır. Hiçbir aşamada uzak DB seçilemez.

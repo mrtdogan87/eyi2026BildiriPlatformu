@@ -1,6 +1,7 @@
 import { getServerT } from "@/lib/i18n/server";
 
 type Props = {
+  languages?: readonly ("TR" | "EN")[];
   caption?: string;
   variant?: "default" | "submission" | "registration" | "hub";
   congressName?: string;
@@ -8,12 +9,12 @@ type Props = {
 };
 
 export async function PlatformHero({
-  caption,
+  caption, languages,
   variant = "default",
   congressName,
   subtitle,
 }: Props) {
-  const { locale, t } = await getServerT();
+  const { locale, t } = await getServerT(languages);
   const eventShortName = locale === "en" ? "ISEOS 2026" : "EYİ 2026";
   const normalizedCongressName = congressName?.toLocaleLowerCase("tr-TR") ?? "";
   const isEyiCongress =

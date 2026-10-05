@@ -1,3 +1,5 @@
+import { deliveryAllowed } from "@/modules/congress/delivery";
+import { effectiveConfiguration } from "@/modules/congress/configuration";
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
@@ -17,7 +19,6 @@ import type {
   SubmissionSnapshot,
 } from "@/types/submission";
 import { AccessError } from "@/platform/http";
-import { moduleEnabled } from "@/platform/context";
 import type { Locale, TFunction } from "@/lib/i18n";
 
 const DRAFT_COOKIE = sessionCookieName("draft_access");
@@ -284,7 +285,8 @@ export async function getSubmissionConfig(
     tiers: congress.paymentTiers
       .filter((tier) => tier.active)
       .map((tier) => tierToOption(tier, locale)),
-    submissionsClosed: congress.submissionsClosed,
+    submissionsClosed: !(await deliveryAllowed(congress.id)),
+    workflow: congress.configuration ? effectiveConfiguration(congress.configuration) : null,
   };
 }
 
@@ -293,21 +295,16 @@ export async function getSubmissionConfig(
  * Sunucu tarafındaki her gönderim yolu bunu kontrol etmek zorundadır; arayüzde butonu
  * gizlemek yeterli değildir çünkü taslak bağlantıları ve API uçları doğrudan çağrılabilir.
  */
-export async function isSubmissionClosed(congressSlug: string): Promise<boolean> {
-  const congress = await prisma.congress.findUnique({
-    where: { slug: congressSlug },
-    select: { id: true, submissionsClosed: true },
-  });
-  return !congress || congress.submissionsClosed || !(await moduleEnabled(congress.id, "SUBMISSIONS"));
+export async function isSubmissionClosed(congressSlug: string, email?: string): Promise<boolean> {
+  const congress = await prisma.congress.findUnique({ where: { slug: congressSlug }, select: { id: true } });
+  return !congress || !(await deliveryAllowed(congress.id, { email }));
 }
-
-/** Aynı kontrolün taslak kimliği üzerinden yapılan hâli (kongre slug'ı istekte yer almayan uçlar için). */
-export async function isSubmissionClosedForDraft(submissionId: string): Promise<boolean> {
-  const submission = await prisma.submission.findUnique({
-    where: { id: submissionId },
-    select: { congress: { select: { id: true, submissionsClosed: true } } },
-  });
-  return !submission || submission.congress.submissionsClosed || !(await moduleEnabled(submission.congress.id, "SUBMISSIONS"));
+export async function canResumeDraft(id: string) {
+  return !(await isSubmissionClosedForDraft(id)) || !(await isSubmissionClosedForDraft(id, 'FULL_TEXT'));
+}
+export async function isSubmissionClosedForDraft(submissionId: string, stage?: 'ABSTRACT' | 'FULL_TEXT' | 'SUBMIT'): Promise<boolean> {
+  const submission = await prisma.submission.findUnique({ where: { id: submissionId }, select: { congressId: true, draftOwnerEmail: true } });
+  return !submission || !(await deliveryAllowed(submission.congressId, { email: submission.draftOwnerEmail, submissionId, stage }));
 }
 
 export async function getSubmissionSnapshot(

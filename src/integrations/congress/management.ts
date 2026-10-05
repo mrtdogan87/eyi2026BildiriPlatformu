@@ -533,7 +533,7 @@ export async function updateAdminCongressSettings(input: {
   const before = await tx.congress.findUniqueOrThrow({ where: { id: context.congress.id } });
   const result = await tx.congress.update({
     where: { id: context.congress.id },
-    data,
+    data: { ...data, configVersion: { increment: 1 } },
   });
   const keys = Object.keys(data);
   await auditSink(tx)(context, 'congress.settings.update', result.id, JSON.parse(JSON.stringify({ before: Object.fromEntries(keys.map(key => [key, before[key as keyof typeof before]])), after: data })));

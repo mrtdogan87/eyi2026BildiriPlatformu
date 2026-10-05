@@ -1,3 +1,4 @@
+import { effectiveConfiguration } from "@/modules/congress/configuration";
 import Link from "next/link";
 import { PlatformHero } from "@/components/submission/platform-hero";
 import { RegistrationEmailForm } from "@/components/registration/registration-email-form";
@@ -13,12 +14,13 @@ type PageProps = {
 export default async function RegistrationStartPage({ params }: PageProps) {
   const { congressSlug } = await params;
   const congress = await publicCongress(congressSlug);
-  const { t } = await getServerT();
+  const languages = effectiveConfiguration(congress.configuration).languages;
+  const { t } = await getServerT(languages);
 
   return (
     <main className="page-shell submission-shell">
       <div className="page-box submission-page-box">
-        <PlatformHero variant="registration" congressName={congress.name} />
+        <PlatformHero variant="registration" congressName={congress.name} languages={languages} />
 
         <div className="card start-card">
           <h2 className="section-title">{t("registration.startTitle")}</h2>

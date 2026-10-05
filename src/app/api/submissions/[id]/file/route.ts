@@ -1,3 +1,4 @@
+import { requireEditableDraft } from "@/integrations/congress/submission-rules";
 import { apiRoute } from "@/platform/http";
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
@@ -20,7 +21,8 @@ async function handlePUT(request: Request, { params }: RouteProps) {
   if (!(await canAccessDraft(id))) {
     return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
   }
-  if (await isSubmissionClosedForDraft(id)) {
+  await requireEditableDraft(id);
+  if (await isSubmissionClosedForDraft(id, "FULL_TEXT")) {
     return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 

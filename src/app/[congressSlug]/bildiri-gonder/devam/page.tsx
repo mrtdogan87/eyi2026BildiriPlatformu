@@ -5,6 +5,7 @@ import {
   getDraftTokenWindowMinutes,
   inspectDraftToken,
   isSubmissionClosed,
+  canResumeDraft,
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 
@@ -24,7 +25,7 @@ export default async function ContinueDraftPage({
   const trimmedToken = token?.trim() ?? "";
   const submission = trimmedToken ? await inspectDraftToken(trimmedToken) : null;
   const { t } = await getServerT();
-  const submissionsClosed = await isSubmissionClosed(congressSlug);
+  const submissionsClosed = submission?.congress.slug === congressSlug ? !(await canResumeDraft(submission.id)) : await isSubmissionClosed(congressSlug);
 
   return (
     <main className="page-shell submission-shell">

@@ -47,6 +47,12 @@ enum RegistrationKind {
 }
 
 model Congress {
+  year                     Int?
+  eventStartsAt            DateTime?
+  eventEndsAt              DateTime?
+  configuration            Json?
+  configVersion            Int                       @default(0)
+  deliveryExceptions       DeliveryException[]
   organizationId           String
   organization             Organization              @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   memberships              CongressMembership[]
@@ -100,6 +106,7 @@ model PaymentTier {
 }
 
 model Submission {
+  deliveryExceptions DeliveryException[]
   id                 String                    @id @default(cuid())
   congressId         String
   status             SubmissionStatus          @default(DRAFT)
@@ -298,21 +305,22 @@ model Organization {
 }
 
 model PlatformUser {
-  id               String                   @id @default(cuid())
-  email            String                   @unique
-  name             String
-  passwordHash     String?
-  platformAdmin    Boolean                  @default(false)
-  active           Boolean                  @default(true)
-  failedLogins     Int                      @default(0)
-  lockedUntil      DateTime?
-  createdAt        DateTime                 @default(now())
-  updatedAt        DateTime                 @updatedAt
-  organizations    OrganizationMembership[]
-  congresses       CongressMembership[]
-  sessions         PlatformSession[]
-  activationTokens ActivationToken[]
-  audits           AuditLog[]
+  id                 String                   @id @default(cuid())
+  email              String                   @unique
+  name               String
+  passwordHash       String?
+  platformAdmin      Boolean                  @default(false)
+  active             Boolean                  @default(true)
+  failedLogins       Int                      @default(0)
+  lockedUntil        DateTime?
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  organizations      OrganizationMembership[]
+  congresses         CongressMembership[]
+  sessions           PlatformSession[]
+  deliveryExceptions DeliveryException[]
+  activationTokens   ActivationToken[]
+  audits             AuditLog[]
 }
 
 model OrganizationMembership {
@@ -390,4 +398,28 @@ model AuditLog {
   congress       Congress?     @relation(fields: [congressId], references: [id], onDelete: Restrict)
 
   @@index([congressId, createdAt])
+}
+
+enum DeliveryStage {
+  ABSTRACT
+  FULL_TEXT
+}
+
+model DeliveryException {
+  id           String        @id @default(cuid())
+  congressId   String
+  email        String
+  submissionId String?
+  stage        DeliveryStage
+  reason       String
+  startsAt     DateTime      @default(now())
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  createdById  String?
+  createdAt    DateTime      @default(now())
+  congress     Congress      @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  submission   Submission?   @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  createdBy    PlatformUser? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([congressId, email, stage, expiresAt])
 }

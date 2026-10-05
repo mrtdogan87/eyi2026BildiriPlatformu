@@ -1,3 +1,4 @@
+import { effectiveConfiguration } from "@/modules/congress/configuration";
 import { requireModule } from "@/platform/context";
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
@@ -161,16 +162,24 @@ export async function readRegistrationSession(): Promise<{
 
 export type CongressWithTiers = Congress & { paymentTiers: PaymentTier[] };
 
+export function effectivePricingCongress(congress: CongressWithTiers): CongressWithTiers {
+  if (effectiveConfiguration(congress.configuration).stages.PAYMENT.enabled) return congress;
+  return { ...congress, earlyDeadline: null, lateDeadline: null, galaFeeAmount: 0, bankName: null, bankAccountHolder: null, bankIban: null, bankBranch: null, paymentTiers: congress.paymentTiers.map(tier => ({ ...tier, amount: 0 })) };
+}
+
 function toRegistrationConfig(
   congress: CongressWithTiers,
   locale: Locale = "tr",
 ): RegistrationConfig {
+  const workflow = congress.configuration == null ? null : effectiveConfiguration(congress.configuration);
+  congress = effectivePricingCongress(congress);
   return {
+    workflow,
     congressName: congress.name,
     congressSlug: congress.slug,
     earlyDeadline: congress.earlyDeadline?.toISOString() ?? null,
     lateDeadline: congress.lateDeadline?.toISOString() ?? null,
-    currentPeriod: getCurrentPaymentPeriod(congress),
+    currentPeriod: workflow?.stages.PAYMENT.enabled && workflow.stages.PAYMENT.deadline && new Date(workflow.stages.PAYMENT.deadline) <= new Date() ? null : getCurrentPaymentPeriod(congress),
     bank: getCongressBankInfo(congress),
     gala: getCongressGalaInfo(congress),
     trip: getCongressTripInfo(congress),
@@ -310,6 +319,10 @@ export type CalculatedRegistration = {
 
 export function calculateRegistration(input: RegistrationCalculationInput): CalculatedRegistration {
   const now = input.now ?? new Date();
+  const config = effectiveConfiguration(input.congress.configuration);
+  const free = !config.stages.PAYMENT.enabled;
+  input = { ...input, congress: effectivePricingCongress(input.congress), selectedPapers: input.selectedPapers.map(p => ({ ...p, audience: p.audience ?? (free ? 'ACADEMIC' : null) })) };
+  if (config.stages.PAYMENT.enabled && config.stages.PAYMENT.deadline && new Date(config.stages.PAYMENT.deadline) <= now) throw new Error(input.t('api.paymentClosed'));
   if (isPaymentClosed(input.congress, now)) {
     throw new Error(input.t("api.paymentClosed"));
   }

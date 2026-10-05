@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { formatCurrencyAmount } from "@/lib/payment";
+import { formatCurrencyAmount } from "@/lib/payment-helpers";
 import { normalizeName } from "@/lib/utils";
 import { ACADEMIC_TITLES, OTHER_TITLE, academicTitleLabel } from "@/lib/titles";
 import { useLocale, useT } from "@/lib/i18n/provider";
@@ -204,7 +204,7 @@ export function RegistrationPortal({ context }: Props) {
       identityCounts.set(identityKey, seen + 1);
       const order: 1 | 2 = seen === 0 ? 1 : 2;
       const tier = period
-        ? findPaperTier(config.tiers, paper.audience, order, period)
+        ? findPaperTier(config.tiers, paper.audience ?? (config.workflow && !config.workflow.stages.PAYMENT.enabled ? "ACADEMIC" : null), order, period)
         : null;
       // İkinci ve sonraki bildiriler ücretsizdir; yalnızca birinci bildiride ücret tanımı zorunlu.
       if (order === 1 && !tier) {
@@ -324,6 +324,7 @@ export function RegistrationPortal({ context }: Props) {
     period,
     config.tiers,
     config.gala,
+    config.workflow,
     config.trip,
     listenerEnabled,
     listenerSelection,
@@ -337,7 +338,11 @@ export function RegistrationPortal({ context }: Props) {
   ]);
 
   // Gala ücretsiz ve kayıt tutarına dahil değil; dekont yalnızca ödenecek tutar varsa gerekir.
-  const needsReceipt = computed.paperTotal > 0;
+  const paidStage = config.workflow?.stages.PAYMENT.enabled ?? true;
+  const receiptMode = config.workflow?.fields.receipt ?? 'REQUIRED';
+  const studentMode = config.workflow?.fields.studentDocument ?? 'OPTIONAL';
+  const receiptVisible = paidStage && computed.paperTotal > 0 && receiptMode !== 'HIDDEN';
+  const needsReceipt = receiptVisible && receiptMode === 'REQUIRED';
 
   function toggleSubmission(submissionId: string) {
     setSelectedSubmissionIds((current) =>
@@ -385,6 +390,7 @@ export function RegistrationPortal({ context }: Props) {
       return;
     }
 
+    if (studentMode === 'REQUIRED' && !studentDocumentFile) { setError('Öğrenci belgesi gerekli.'); return; }
     setError("");
     setLoading(true);
 
@@ -694,7 +700,7 @@ export function RegistrationPortal({ context }: Props) {
         </div>
       </div>
 
-      <div className="grid two" style={{ marginTop: 18 }}>
+      {paidStage && <div className="grid two" style={{ marginTop: 18 }}>
         <div className="author-card">
           <h3>{t("registration.bankHeading")}</h3>
           <div className="form-stack">
@@ -739,15 +745,15 @@ export function RegistrationPortal({ context }: Props) {
             </button>
           </div>
         </div>
-      </div>
+      </div>}
 
       <div className="author-card" style={{ marginTop: 18 }}>
         <h3>{t("registration.receiptHeading")}</h3>
         <div className="form-stack">
-          {needsReceipt ? (
+          {receiptVisible ? (
             <div className="field">
               <label htmlFor="receipt">
-                {t("registration.receiptUpload")} <span className="required">*</span>
+                {t("registration.receiptUpload")} {needsReceipt ? <span className="required">*</span> : "(İsteğe bağlı)"}
               </label>
               <input
                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
@@ -762,16 +768,16 @@ export function RegistrationPortal({ context }: Props) {
               {t("registration.noReceiptNeeded")}
             </div>
           )}
-          <div className="field">
-            <label htmlFor="student-document">{t("registration.studentDocLabel")}</label>
+          {studentMode !== "HIDDEN" && <div className="field">
+            <label htmlFor="student-document">{studentMode === "REQUIRED" ? (locale === "en" ? "Student document *" : "Öğrenci belgesi *") : t("registration.studentDocLabel")}</label>
             <input
               accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
               id="student-document"
               onChange={(event) => setStudentDocumentFile(event.target.files?.[0] ?? null)}
               type="file"
             />
-            <span className="field-hint">{t("registration.studentDocHint")}</span>
-          </div>
+            <span className="field-hint">{studentMode === "REQUIRED" ? "Zorunlu belge" : t("registration.studentDocHint")}</span>
+          </div>}
         </div>
       </div>
 

@@ -19,7 +19,8 @@
     "test:smoke": "node scripts/run.mjs smoke",
     "test:preview": "node scripts/preview-check.mjs",
     "postinstall": "prisma generate",
-    "test:platform": "node scripts/platform-check.mjs"
+    "test:platform": "node scripts/platform-check.mjs",
+    "test:congress": "node --test scripts/configuration.test.mjs && node scripts/congress-check.mjs"
   },
   "keywords": [],
   "author": "",

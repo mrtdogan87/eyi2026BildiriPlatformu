@@ -51,11 +51,10 @@ try {
   await request('/api/submissions/drafts', { method: 'POST', body: { congressSlug: 'eyi-2026-kapali-test', email }, status: 403 });
   checks.push('Closed congress rejects new submissions');
   const draft = await (await request('/api/submissions/drafts', { method: 'POST', cookies: participant, body: { congressSlug: 'eyi-2026', email, submissionLanguage: 'TR' } })).json();
-  const id = draft.submissionId;
-  ok(Boolean(id) && !draft.magicLinkPreview, 'Draft persisted and access link stays out of API response');
-  ok(participant.has('aibildiri_v2_local_draft_access') && !participant.has('draft_access'), 'Draft cookie uses independent namespace');
-  participant.clear();
-  await request('/api/submissions/drafts/verify', { method: 'POST', cookies: participant, body: { token: tokenFrom(captured(email, 'Taslak')) } });
+  ok(!draft.submissionId && !draft.submission && !draft.magicLinkPreview && participant.size === 0, 'Draft request exposes no draft data or authenticated cookie');
+  const verified = await (await request('/api/submissions/drafts/verify', { method: 'POST', cookies: participant, body: { token: tokenFrom(captured(email, 'Taslak')) } })).json();
+  const id = verified.submission.id;
+  ok(participant.has('aibildiri_v2_local_draft_access') && !participant.has('draft_access'), 'Verified draft cookie uses independent namespace');
   checks.push('Captured draft link can be verified');
   const details = { submissionLanguage: 'TR', titleTr: `P02 uçtan uca sentetik bildiri ${runId.slice(0,8)}`, titleEn: '', abstractTr: 'Yalnız bağımsız yerel geliştirme için sentetik başvuru.', abstractEn: '', keywordsTr: 'test, yerel', keywordsEn: '' };
   await request(`/api/submissions/${id}/details`, { method: 'PATCH', body: details, status: 403 });

@@ -1,3 +1,4 @@
+import { configuredDetails, configuredAuthors, configuredParticipation, submissionRules } from "@/integrations/congress/submission-rules";
 import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
@@ -8,9 +9,6 @@ import {
   isSubmissionClosedForDraft,
   findPresenter,
   getSubmissionSnapshot,
-  validateAuthors,
-  validateDetails,
-  validateParticipation,
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 import { isEmailConfigured, sendSubmissionReceivedEmail } from "@/lib/email";
@@ -35,7 +33,7 @@ async function handlePOST(_request: Request, { params }: RouteProps) {
   if (!(await canAccessDraft(id))) {
     return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
   }
-  if (await isSubmissionClosedForDraft(id)) {
+  if (await isSubmissionClosedForDraft(id, "SUBMIT")) {
     return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
@@ -52,69 +50,25 @@ async function handlePOST(_request: Request, { params }: RouteProps) {
 
   const submission = await prisma.submission.findUnique({
     where: { id },
-    include: { authors: true, file: true },
+    include: { authors: true, file: true, congress: true },
   });
 
   if (!submission) {
     return NextResponse.json({ error: t("api.submissionNotFound") }, { status: 404 });
   }
 
-  const detailsErrors = validateDetails(
-    {
-      submissionLanguage: (submission.submissionLanguage ?? "TR") as "TR" | "EN",
-      titleTr: submission.titleTr ?? "",
-      titleEn: submission.titleEn ?? "",
-      abstractTr: submission.abstractTr ?? "",
-      abstractEn: submission.abstractEn ?? "",
-      keywordsTr: submission.keywordsTr ?? "",
-      keywordsEn: submission.keywordsEn ?? "",
-    },
-    t,
-  );
-
-  if (detailsErrors.length) {
-    return NextResponse.json({ error: detailsErrors[0] }, { status: 400 });
-  }
-
-  const authorErrors = validateAuthors(
-    submission.authors.map((author) => ({
-      fullName: author.fullName,
-      title: author.title ?? "",
-      email: author.email,
-      institution: author.institution ?? "",
-      country: author.country ?? "",
-      isPresenter: author.isPresenter,
-    })),
-    t,
-  );
-
-  if (authorErrors.length) {
-    return NextResponse.json({ error: authorErrors[0] }, { status: 400 });
-  }
-
+  const rules = await submissionRules(id);
+  if (submission.status !== 'DRAFT') return NextResponse.json({ error: 'Bildiri zaten gönderilmiş.' }, { status: 409 });
+  configuredDetails({ submissionLanguage: submission.submissionLanguage, titleTr: submission.titleTr ?? '', titleEn: submission.titleEn ?? '', abstractTr: rules.fields.abstract === 'HIDDEN' ? '' : submission.abstractTr ?? '', abstractEn: rules.fields.abstract === 'HIDDEN' ? '' : submission.abstractEn ?? '', keywordsTr: rules.fields.keywords === 'HIDDEN' ? '' : submission.keywordsTr ?? '', keywordsEn: rules.fields.keywords === 'HIDDEN' ? '' : submission.keywordsEn ?? '' }, rules);
+  configuredAuthors(submission.authors.map(author => ({ fullName: author.fullName, title: rules.fields.authorTitle === 'HIDDEN' ? '' : author.title ?? '', email: author.email, institution: rules.fields.authorInstitution === 'HIDDEN' ? '' : author.institution ?? '', country: rules.fields.authorCountry === 'HIDDEN' ? '' : author.country ?? '', isPresenter: author.isPresenter })), rules);
+  configuredParticipation({ presentationMode: rules.fields.presentationMode === 'HIDDEN' ? null : submission.presentationMode, audience: rules.fields.audience === 'HIDDEN' ? null : submission.audience }, rules);
   const presenterAuthor = findPresenter(submission.authors);
-
-  if (!submission.presentationMode || !submission.audience) {
-    return NextResponse.json({ error: t("api.participationRequiredSubmit") }, { status: 400 });
-  }
-
-  const participationErrors = validateParticipation(
-    {
-      presentationMode: submission.presentationMode,
-      audience: submission.audience,
-    },
-    t,
-  );
-
-  if (participationErrors.length) {
-    return NextResponse.json({ error: participationErrors[0] }, { status: 400 });
-  }
 
   if (!presenterAuthor?.fullName.trim()) {
     return NextResponse.json({ error: t("api.presenterNotFound") }, { status: 400 });
   }
 
-  if (!submission.file) {
+  if (rules.fields.file === "REQUIRED" && !submission.file) {
     return NextResponse.json({ error: t("api.docxRequired") }, { status: 400 });
   }
 
@@ -131,10 +85,11 @@ async function handlePOST(_request: Request, { params }: RouteProps) {
     );
   }
 
-  await prisma.submission.update({
-    where: { id },
-    data: { status: "SUBMITTED", submittedAt: new Date() },
+  const changed = await prisma.submission.updateMany({
+    where: { id, status:'DRAFT' },
+    data: { status: 'SUBMITTED', submittedAt: new Date() },
   });
+  if (!changed.count) return NextResponse.json({ error:'Bildiri zaten gönderilmiş.' }, { status:409 });
 
   // Tüm yazarlara "bildiriniz alındı" bildirimi (bildirinin dilinde). Hata gönderimi engellemez.
   if (isEmailConfigured()) {
@@ -153,7 +108,7 @@ async function handlePOST(_request: Request, { params }: RouteProps) {
         recipients.map((recipient) =>
           sendSubmissionReceivedEmail({
             to: recipient,
-            congressName: "EYİ 2026 / ISEOS 2026",
+            congressName: submission.congress.name,
             paperTitle,
             locale: emailLocale,
           }),

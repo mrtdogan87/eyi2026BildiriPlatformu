@@ -1,3 +1,4 @@
+import type { CongressConfiguration } from "@/modules/congress/configuration";
 export type SubmissionLanguage = "TR" | "EN";
 export type PresentationMode = "ONLINE" | "IN_PERSON";
 export type AudienceType = "ACADEMIC" | "STUDENT";
@@ -67,7 +68,9 @@ export type SubmissionConfig = {
   lateDeadline: string | null;
   currentPeriod: PaymentPeriod | null;
   tiers: PaymentTierOption[];
+  deliveryAccess?: { metadata: boolean; fullText: boolean };
   submissionsClosed: boolean;
+  workflow: CongressConfiguration | null;
 };
 
 export type SubmissionSnapshot = SubmissionDetailsInput & {
@@ -100,6 +103,7 @@ export type RegistrationAcceptedPaper = {
 };
 
 export type RegistrationConfig = {
+  workflow: CongressConfiguration | null;
   congressName: string;
   congressSlug: string;
   earlyDeadline: string | null;

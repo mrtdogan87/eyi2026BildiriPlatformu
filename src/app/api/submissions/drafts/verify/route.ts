@@ -4,7 +4,7 @@ import {
   consumeDraftToken,
   inspectDraftToken,
   getSubmissionSnapshot,
-  isSubmissionClosedForDraft,
+  canResumeDraft,
   setDraftAccessCookie,
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
@@ -23,7 +23,7 @@ async function handlePOST(request: Request) {
     return NextResponse.json({ error: t("api.invalidOrExpiredLink") }, { status: 400 });
   }
 
-  if (await isSubmissionClosedForDraft(submission.id)) {
+  if (!(await canResumeDraft(submission.id))) {
     return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
