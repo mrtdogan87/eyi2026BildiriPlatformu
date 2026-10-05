@@ -1,6 +1,6 @@
 # v2 yerel geliştirme
 
-Dizin `/Users/mrt/Documents/Codex/AIBildiriYonetim/v2`, güncel paket dalı `codex/v2-p06`.
+Dizin `/Users/mrt/Documents/Codex/AIBildiriYonetim/v2`, güncel paket dalı `codex/v2-p07`.
 Üst checkout korunmuştur. Node.js 22.13+ ve PostgreSQL 16 CLI araçları gerekir.
 Bu makinede Node 25.8.2/PostgreSQL 16.13 ile doğrulandı. Docker gerekmez.
 
@@ -139,3 +139,49 @@ içinde; tarayıcı kanıtı `.local/p06-browser-check-result.json` içindedir.
 Temiz paket commit'inden sonra `node scripts/checkpoint.mjs P06-20261005-final`
 27 tabloyu geçici yerel DB'ye tam geri yükleyip karşılaştırır. Önceki paket
 checkpoint'lerine yazılmaz. Kapsam ve bağımlılık bulguları [P06 kapanışında](P06_KAPANIS.md).
+
+
+## P07 başlangıç sayfaları, menüler ve EYİ arşivi
+
+Yeni kongre ve yeni yıl kopyası 41 genel başlangıç sayfasını boş taslak
+olarak oluşturur. CMS modülü kendiliğinden açılmaz. Eski kongrede CMS
+sayfalarındaki **Eksik başlangıç sayfalarını ekle** eksikleri ekler;
+mevcut içerik ve adreslerin üzerine yazmaz. Ana sayfa P05 editöründe yönetilir.
+
+TR/EN menü etiketi, üst menü ve sıra sayfa editöründedir. En fazla üç
+menü düzeyi kullanılabilir; döngü reddedilir. Üst sayfa yayımlanıp menüye
+açılmalıdır. Sayfa işlemleri çoğaltma, adres değiştirme ve arşivleme sunar.
+Eski adres yayın açıkken yeni adrese 308 yönlenir. Arşivden çıkarmak yayını
+açmaz; editörde yeniden Yayımla gerekir. Geçmiş ve dosyalar korunur.
+
+Kitaplık artık PDF/görsel yanında DOCX/DOTX şablonlarını kabul eder.
+Dosya bağlantısı bloğunda PDF veya Word seçilir. Doğrulama sınırlamaları
+[P07 kapanışında](P07_KAPANIS.md) kayıtlıdır.
+
+**EYİ 2026 aktarım kaynakları** `/admin/cms/aktarim` adresindedir. Kaynak
+paketi 5 Ekim 2026'da salt okunur yakalanmıştır: 40 hedef, 38 erişilebilir,
+2 eksik; 22 görsel, 4 PDF, 4 Word şablonu. Kaynakları seçip tarihsel arşiv
+uyarısını doğrulayın. İşlem menüye kapalı yeni taslaklar ve kongreye ait
+medya oluşturur; mevcut aktarımları korur. Kaynak/saklanan SHA-256 ve
+kaynak adresleri panelde incelenebilir. Tarih, banka/ücret, kişiler ve
+yayın vaatleri yeni kongre ayarlarına taşınmaz. Envanter
+[P07 kaynak belgesinde](P07_KAYNAK_ENVANTERI.md).
+
+Kaynağı yeniden yakalamak yalnız ayrı bir inceleme için yapılır:
+`python3 scripts/eyi-source-capture.py`, `python3 scripts/eyi-asset-capture.py`,
+`node scripts/eyi-prepare-assets.mjs`, `python3 scripts/eyi-prepare-pages.py`.
+Yeni kaynak adresleri `data/eyi-2026/routes.json` içinde gözden geçirilmelidir.
+Son derleyici kaynak metinlerinin ve tablo hücrelerinin korunduğunu denetler;
+çıktıdan sonra `test:cms-starter`, kaynak/dosya karşılaştırması ve görsel
+kontrol gereklidir. Uygulama aktarım sırasında uzaktan dosya indirmez.
+
+`npm run test:cms-starter` 9 saf test + 34 sentetik HTTP/DB senaryosudur.
+Önceki paketlerle toplam 218 kontrol ve bağımsız preview kapısı doğrulanır.
+DB testlerini sırayla çalıştırın. Son örnek ve kanıtlar
+`.local/cms-starter-check-result.json`, `.local/p07-browser-check-result.json`.
+
+Temiz paket commit'inden sonra `node scripts/checkpoint.mjs P07-20261006-final`
+kaynak/yerel DB/özel ortam/test kanıtlarını yeni kurtarma klasörüne alır;
+28 tablo ayrı geçici yerel DB'ye tam geri yüklenip parmak izleri eşleştirilir.
+Önceki checkpoint'ler korunur. Kaynak HTML yakalaması Git dışı özel yedektedir;
+uygulamanın dondurulmuş kaynak manifestleri ve doğrulanmış dosyaları Git'tedir.

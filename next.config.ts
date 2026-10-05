@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   logging: { incomingRequests: false },
   output: "standalone",
   outputFileTracingRoot: process.cwd(),
+  outputFileTracingIncludes: { '/api/platform/cms/eyi-import': ['data/eyi-2026/assets/**/*'] },
   turbopack: { root: process.cwd() },
   outputFileTracingExcludes: {
     "*": [".env*", ".local/**/*", ".preview/**/*", ".recovery/**/*", ".next/standalone/**/*", ".next/export-detail.json"],

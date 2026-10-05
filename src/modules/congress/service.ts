@@ -1,3 +1,4 @@
+import { initializeCmsTemplates } from '@/integrations/congress/cms-templates';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
@@ -44,6 +45,7 @@ export async function createCongress(raw: unknown) {
       const settings = input.settings;
       const congress = await tx.congress.create({ data: { organizationId: input.organizationId, slug: input.slug, name: settings.name, year: settings.year, eventStartsAt: settings.eventStartsAt, eventEndsAt: settings.eventEndsAt, earlyDeadline: settings.earlyDeadline, lateDeadline: settings.lateDeadline, bankName: settings.bankName || null, bankAccountHolder: settings.bankAccountHolder || null, bankIban: settings.bankIban || null, bankBranch: settings.bankBranch || null, configuration: settings.configuration, configVersion: 1 } });
       await writeModuleSettings(tx, congress.id, settings.configuration.modules);
+      await initializeCmsTemplates(tx, congress.id, session.userId);
       if (input.copyFees && source) await copyFeeSchedule(tx, source.id, congress.id); else await createFeeSchedule(tx, congress.id, settings.fees);
       await tx.organizationMembership.upsert({ where: { organizationId_userId: { organizationId: input.organizationId, userId: session.userId } }, update: {}, create: { organizationId: input.organizationId, userId: session.userId } });
       await tx.congressMembership.create({ data: { congressId: congress.id, userId: session.userId, role: 'ORGANIZER' } });
@@ -51,7 +53,7 @@ export async function createCongress(raw: unknown) {
       await tx.platformSession.update({ where: { id: session.id }, data: { congressId: congress.id } });
       await tx.auditLog.create({ data: { actorId: session.userId, organizationId: congress.organizationId, congressId: congress.id, action: source ? 'congress.year.copy' : 'congress.create', targetId: congress.id, detail: { sourceId: source?.id ?? null, profile: settings.configuration.profile, copiedFees: input.copyFees, selectedMembers: copied, cleared: ['sourceDates', 'sourceBank', 'submissions', 'registrations', 'files', 'tokens', 'exceptions', 'auditHistory'] } } });
       return { id: congress.id, slug: congress.slug };
-    });
+    }, {timeout:15000});
   } catch (error) { if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') throw new AccessError(409, 'Bu kongre adresi kullanılıyor.'); throw error; }
 }
 export async function congressSettings() {

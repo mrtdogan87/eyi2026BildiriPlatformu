@@ -1,0 +1,3911 @@
+{
+  "capturedAt": "2026-10-05T20:46:56.095370+00:00",
+  "origin": "https://eyi2026-iibf.mcbu.edu.tr",
+  "homeSha256": "233230ac0d2e363e45b488ff9187de2f37abfe74f8afa5858d3a6874e4ebba35",
+  "pages": [
+    {
+      "key": "b724f111d0a2c6cd",
+      "slug": "eyi-2026-davet",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Davet",
+      "title": "Davet",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "182fe16131f05c5bf44604c2d4ad5f7d92df2da88d4da211dc5c9316c302a227",
+      "sourceParts": 19,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Davet",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "EYİ 2026"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu\n\nSempozyum SLOGANI\n\nEkonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)\n\n23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu (EYİ 2026) , Manisa Celal Bayar Üniversitesi, İktisadi ve İdari Bilimler Fakültesi, Ekonometri Bölümü ev sahipliğinde, 17–19 Eylül 2026 tarihleri arasında Manisa’da bulunan Prof. Dr. Ümit Doğay Arınç Kültür Merkezi ’nde gerçekleştirilecektir.\n\nBu yılın sempozyum sloganı “Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)” olarak belirlenmiştir. Bu slogan, ekonometri disiplininin son yüzyıldaki entelektüel gelişimini vurgularken, kuramsal akıl yürütme ile ampirik kanıt arasındaki süreklilik taşıyan etkileşime dikkat çekmektedir. Yirminci yüzyılın başlarında ortaya çıkışından bu yana ekonometri, ekonomik teori ile gerçek yaşam verileri arasında sıkı istatistiksel ve nicel yöntemler aracılığıyla köprü kuran temel alanlardan biri olmuştur. Bugün ise veri bilimi, yapay zekâ ve hesaplamalı tekniklerde yaşanan hızlı gelişmelerle birlikte ekonometri; karmaşık ekonomik ve toplumsal olguların anlaşılmasında vazgeçilmez araçlar sunmaya devam etmektedir.\n\nEYİ Sempozyumu, uzun yıllardır ekonometri, yöneylem araştırması, istatistik ve ilgili nicel disiplinlerde çalışan araştırmacıları, akademisyenleri ve profesyonelleri bir araya getiren saygın bir uluslararası bilimsel platform olma niteliğini sürdürmektedir. Sempozyum; yenilikçi fikirlerin paylaşılmasını, güncel bilimsel gelişmelerin tartışılmasını ve farklı ülkelerden ve kurumlardan bilim insanları arasında iş birliğinin güçlendirilmesini amaçlamaktadır.\n\nSempozyum programında davetli konuşmalar, genel oturumlar ve paralel oturumlar yer alacak; kuramsal gelişmeler, yöntemsel ilerlemeler ve ampirik uygulamalarla ilgili geniş bir konu yelpazesi ele alınacaktır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Katılım Biçimi"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "17–18 Eylül 2026: Yüz yüze sunumlar\n\n19 Eylül 2026: Çevrim içi sunumlar\n\nTüm sunum yapılan bildiriler için, sempozyum bildiriler kitabında yayımlanmak üzere tam metin gönderme imkânı sunulacaktır. Kabul edilen her bildiriye DOI atanacak, bildiri kitapları ise ISBN ile yayımlanacaktır. Ayrıca seçilen çalışmaların, akademik dergilerin özel sayılarında değerlendirilmesi planlanmaktadır. Çevrim içi katılım durumunda dergi yayım olanaklarından faydalanılamayacaktır.\n\nAraştırmacıları ve uygulayıcıları, özgün çalışmalarını paylaşmak ve bu uluslararası bilimsel buluşmaya katkı sunmak üzere sempozyumumuza davet ediyoruz. Katılımınızın, bilimsel etkileşime ve ekonometri ile ilişkili disiplinlerin gelişimine önemli katkılar sağlayacağına inanıyoruz.\n\nEylül 2026’da sizleri Manisa’da ağırlamaktan memnuniyet duyacağız.\n\nProf. Dr. Sibel Selim\n\nKongre Düzenleme Kurulu Başkanı\n\nManisa Celal Bayar Üniversitesi\n\nİktisadi ve İdari Bilimler Fakültesi\n\nEkonometri Bölüm Başkanı"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Davet"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "b185492415460e59",
+      "slug": "eyi-2026-kongre-hakkinda",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/EkonometriYllkBilimselYolculuk",
+      "title": "Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "5dd7acb00699b16bbffbf7cd3b0683ef4dfa2fce19cded9aa49c00453c6726ba",
+      "sourceParts": 8,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Kelime anlamı itibarıyla “ekonomik ölçüm” şeklinde tanımlanabilecek olan ekonometri, iktisadi teorilerin istatistiksel ve matematiksel yöntemlerle sınanmasını sağlayan disiplinler arası bir alan olarak 20. yüzyılın başlarında ortaya çıkmıştır. Bugün ekonomi politikalarının şekillenmesinde, geleceğe yönelik tahminlerde ve nedensellik ilişkilerinin ortaya konmasında vazgeçilmez bir araç olan ekonometrinin kökleri, iktisat biliminin kendi içinde yaşadığı dönüşümle de doğrudan bağlantılıdır.\n\nEkonometrinin kökeni ve öncülleri, henüz ekonomi biliminin bağımsız bir disiplin olarak rüştünü ispat etmediği 17. yüzyıla kadar uzanmaktadır. Toplumsal olguları sayılarla açıklamaya çalışan W. Petty ve J. Graunt gibi isimlerin öncülük ettiği “Politik Aritmetik” akımı, yaygın bir şekilde ekonometrinin doğuşuna giden yolun ilk adımları olarak kabul edilmektedir. Cournot, Wicksell, Walras ve Pareto gibi iktisatçıların katkılarıyla matematiksel iktisadın gelişmesi, bir yandan ekonometrik analizlerin ihtiyaç duyduğu teorik zemini hazırlamış, diğer yandan teorinin verilerle desteklenmesi ihtiyacını daha hissedilir hâle getirmiştir. Ayrıca 18. ve 19. yüzyıllarda olasılık teorisinde kaydedilen gelişmeler de ekonometrinin ortaya çıkışını hızlandıran etkenler arasında yer almıştır.\n\nHer ne kadar 1930 yılında R. Frisch, I. Fisher ve C. Roos gibi isimlerin öncülüğünde Ekonometri Derneği’nin kurulmasıyla ekonometrinin kurumsal görünürlüğü belirginleşmiş olsa da disiplinin adı olan “ekonometri”, türetilmiş bir sözcük olarak R. Frisch tarafından ilk defa 1926 yılında bir yazışmada kullanılmıştır. Bu bakımdan, 1926 yılı ekonometrinin doğum yılı olarak kabul edildiğinde, 2026 yılında ekonometrinin 100. yaşına ulaştığı söylenebilir. 1933 yılında derneğin yayın organı olan Econometrica dergisinin yayın hayatına başlaması ve çalışmaların Cowles Komisyonu bünyesinde gelişmesi, disiplinin kurumsallaşması açısından önemli dönemeçler olmuştur.\n\nÖzellikle 1930’lu ve 1940’lı yıllarda yaşanan hızlı gelişmeler sonucunda ortaya çıkan ve Cowles Yaklaşımı olarak adlandırılan makroekonomik yapısal (eşanlı) modelleme yaklaşımı, II. Dünya Savaşı sonrasında uygulanan planlı kalkınma hareketlerinde yaygın biçimde kullanılmıştır. Zamanla iktisat teorisi içinde ekonometrik çalışmalar o denli öne çıkmıştır ki 1969 yılında verilmeye başlanan Nobel Ekonomi Ödülü, ilk olarak ekonometrinin öncülerinden Frisch ve Tinbergen’e verilmiştir.\n\n1970’li yıllara gelindiğinde, ekonomik ve teknolojik gelişmelerin ekonometride de yeni yönelimlerin ortaya çıkmasına neden olduğu görülmektedir. 1973 Petrol Krizi ve ardından gelen stagflasyon, Cowles Komisyonu’nun sunduğu büyük ölçekli makro modellerin tahmin ve istikrar açısından sorgulanmasına yol açarken; ARIMA ve VAR modelleri gibi daha esnek yaklaşımların geliştirilmesine de zemin hazırlamıştır. Bu dönemde büyük gelişim gösteren bilgisayar teknolojisi, ARIMA gibi mevcut yöntemlerin uygulanabilirliğini artırırken yeni yöntemlerin geliştirilmesini de hızlandırmıştır. 1980’lerde C. Granger ve R. Engle tarafından ortaya konulan eşbütünleşme teorisi ise hem teori hem uygulama açısından önemli bir dönüm noktası olmuştur.\n\n21. yüzyılda hesaplama teknolojisinin daha da gelişmesi ve internet tabanlı uygulamaların yaygınlaşması, veri analizini, tahmini ve bunlara dayalı politika oluşturma süreçlerini çok daha önemli hâle getirmiştir. Her ne kadar makro düzeyli analizler önemini ve yerini korumaya devam etse de büyük veri analizi ve makine öğrenmesine dayalı yöntemlerin, ekonometrik analizlerin daha ziyade mikro ölçeğe yoğunlaşmasına imkân verdiği söylenebilir. Böylece ekonometri biliminin, tüketici ve firma düzeyinde analizlerle gündelik hayata daha fazla nüfuz ettiği ve etkilerinin daha görünür hâle geldiği bir döneme girilmiş bulunmaktadır.\n\nBu gelişim eğilimi, gelecekte ekonometrinin daha yaygın kullanım alanları bulacağı ve daha görünür olacağı bir dünyanın habercisi olarak değerlendirilebilir."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/EkonometriYllkBilimselYolculuk"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "6c887b06b4e9bcc8",
+      "slug": "eyi-2026-duzenleme-kurulu",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/DzenlemeKurulu",
+      "title": "Düzenleme Kurulu",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "333a97bc939c690621eaa8377abcc3fc0174f8d27e27facd7cbf8b1baa30dc78",
+      "sourceParts": 12,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Düzenleme Kurulu",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Düzenleme Kurulu"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Prof. Dr. Rana KİBAR - Manisa Celal Bayar Üniversitesi / Rektör, Sempozyum Onursal Başkanı\n\nProf. Dr. Coşkun ÇILBANT - Manisa Celal Bayar Üniversitesi / İktisadi ve İdari Bilimler Fakültesi Dekanı\n\nProf. Dr. Sibel SELİM - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü, Sempozyum Düzenleme Kurulu Başkanı\n\nDoç. Dr. Kadir KARAGÖZ - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Rana ŞEN DOĞAN - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Murat DOĞAN - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Aynur İNCEKIRIK - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Mehmet SANDAL - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Burcu KOCARIK GACAR - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nArş. Gör. Dr. Gökhan ÖZKUBAT - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nArş. Gör. Dr. Tuğçe DABANLI KURT - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/DzenlemeKurulu"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "bbc4d9af57e10284",
+      "slug": "eyi-2026-danisma-kurulu",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/DanmaKurulu",
+      "title": "Danışma Kurulu",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "0281bd55caec55a9f10cde1aadf97415666d986d42d4e32e590cc51bc55945e8",
+      "sourceParts": 26,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Danışma Kurulu",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Danışma Kurulu Üyeleri"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Prof. Dr. Ali Kemal ŞEHİRLİOĞLU - Dokuz Eylül Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Atilla GÖKÇE - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Erkan OKTAY - Atatürk Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Fatma ZEREN - İnönü Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Hakan DEMİRGİL - Süleyman Demirel Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Hakan TÜRKAY - Sivas Cumhuriyet Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Hilal YILDIZ - Sakarya Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Kutluk Kağan SÜMER - İstanbul Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Mahmut KARA - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Mahmut ZORTUK - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Mehmet Kenan TERZİOĞLU - Trakya Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Metehan YILGÖR - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Nihat IŞIK - Kırıkkale Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Nuran BAYRAM ARLI - Bursa Uludağ Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Pınar Kaya Samut - Akdeniz Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Sait Erdal DİNÇER - Marmara Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Seda ŞENGÜL - Çukurova Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Sibel SELİM - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Sinem Güler KANGALLI UYAR - Pamukkale Üniversitesi / Ekonometri Bölümü Başkanı\n\nProf. Dr. Zehra ABDİOĞLU - Karadeniz Teknik Üniversitesi / Ekonometri Bölümü Başkanı\n\nDoç. Dr. Anıl ERALP - Bolu Abant İzzet Baysal Üniversitesi / Ekonometri Bölümü Başkanı\n\nDoç. Dr. Esin Cumhur YALÇIN - Kırklareli Üniversitesi / Ekonometri Bölümü Başkanı\n\nDoç. Dr. Merve ERTOK ONURLU - Çanakkale Onsekiz Mart Üniversitesi / Ekonometri Bölümü Başkanı\n\nDoç. Dr. Tuğba AKIN - Aydın Adnan Menderes Üniversitesi / Ekonometri Bölümü Başkanı\n\nDoç. Dr. Zerife YILDIRIM - Harran Üniversitesi / Ekonometri Bölümü Başkan"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/DanmaKurulu"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "ccd46ef9b9ce56db",
+      "slug": "eyi-2026-bilim-kurulu",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/BilimKurulu",
+      "title": "Bilim Kurulu",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "c923fbecca606df91102e067e3c4da171973dd8d0e0dbecb9d51df8451d467eb",
+      "sourceParts": 245,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Bilim Kurulu",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Bilim Kurulu Üyeleri"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Prof. Dr. Abdulkerim Karaaslan - Atatürk Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ahmet Mete Çilingirtürk - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ahmet Şengönül - Sivas Cumhuriyet Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ali Karun Nemlioğlu - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ali Kemal Şehirliğlu - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Alpaslan Akçoraoğlu - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Arzu Eren Şenaras - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Atalay Çağlar - Pamukkale Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Atilla Gökçe - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ayşe Oğuzlar - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Bahadır Yüzbaşı - İnönü Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Burak Güris - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Burcu Kıran Baygın - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Cavit Yeşilyurt - Atatürk Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Dilek Altaş Karaca - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ebru Çağlayan Akay - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ebru Özgür Güler - Çukurova Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Emre İpekçi Çetin - Akdeniz Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ercan Sarıdoğan - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Erkan Arı - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Erkan Işığıçok - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Erkan Oktay - Atatürk Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ersin Kıral - Çukurova Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Eylem Acar - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Fatma Zeren - İnönü Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ferda Yerdelen Tatoğlu - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Fevzi Erdoğan - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Funda Yurdakul - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Furkan Emirmahmutoğlu - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Gökçe Candan - Sakarya Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Gülsen Kıral - Çukurova Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Hakan Demirgil - Süleyman Demirel Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Hakan Eygü - Atatürk Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Hakan Türkay - Sivas Cumhuriyet Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Halit Eray Çelik - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Handan Yolsal - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Harun Sulak - Süleyman Demirel Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Hilal Yıldız - Sakarya Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Hüseyin Güler - Çukurova Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Hüseyin Özer - Atatürk Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. İpek Deveci Kocakoç - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. İstem Köymen - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. İ. Esen Yıldırım - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Kadir Yasin Eryiğit - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Kenan Lopcu - Çukurova Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Kenan Oğuzhan Oruç - Süleyman Demirel Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Kutluk Kağan Sümer - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mahmut Kara - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mahmut Zortuk - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mehmet Çınar - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mehmet Güngör - İnönü Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mehmet Hakan Satman - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mehmet Kenan Terzioğlu - Trakya Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mehmet Mert - Akdeniz Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mehmet Özmen - Çukurova Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mehmet Suphi Özçomak - Atatürk Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mehmet Zanbak - Akdeniz Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Melda Akın - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Metehan Yılgör - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Murat Atan - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Murat Karaöz - Süleyman Demirel Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Murat Tanık - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mustafa Sevüktekin - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Mustafa Tekin - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Necati Alp Erilli - Sivas Cumhuriyet Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Necla Tektaş - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Nesrin Güler - Sakarya Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Nihat Işık - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Nilgün Çil - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Noyan Aydın - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Nuran Bayram Arlı - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Nükhet Doğan - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ömer Alkan - Atatürk Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ömer Yılmaz - Atatürk Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Özer Arabacı - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Özlem Taşseven - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Özlem Yorulmaz - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Pınar Kaya Samut - Akdeniz Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Rabia Ece Omay - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Rahmi Yamak - Karadeniz Teknik Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Sait Erdal Dinçer - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Seda Şengül - Çukurova Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Seher Nur Sülkü - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Selay Giray Yakut - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Selim Tüzüntürk - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Selin Devrim Özdemir Yazgan - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Sema Behdioğlu - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Sema Ulutürk Akman - İstanbul Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Serdar Kurt - Çanakkale Onsekiz Mart Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Sevda Gürsakal - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Sibel Atan - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Sibel Selim - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Sinem Güler Kangallı Uyar - Pamukkale Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Süleyman Değirmen - Sivas Cumhuriyet Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Şenay Üçdoğruk Birecikli - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Şenol Altan - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Tuba Yakıcı Ayan - Karadeniz Teknik Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Tuncay Can - Marmara Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Vesile Sinem Arıkan Kargı - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Yeliz Yalçın - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Yunus Bulut - İnönü Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Zehra Abdioğlu - Karadeniz Teknik Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Zehra Berna Aydın - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nProf. Dr. Ziya Gökalp Göktolga - Sivas Cumhuriyet Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Anıl Eralp - Bolu Abant İzzet Baysal Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Avni Önder Hanedar - Sakarya Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Aycan Hepsağ - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Ayça Özekin - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Aygül Anavatan - Pamukkale Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Ayşegül İşcanoğlu Çekiç - Trakya Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Ceren Yaman Yılmaz - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Çiğdem Demir Toker - Akdeniz Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Çiler Sigeze Güney - Çukurova Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Dilek Murat - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Efe Can Kılınç - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Elvan Hayat - Aydın Adnan Menderes Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Emrah Gülay - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Engin Karakış - Sivas Cumhuriyet Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Erkan Ağaslan - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Esin Cumhur YALÇIN - Kırklareli Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Esra Canpolat Gökçe - İnönü Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Fatih Demir - Süleyman Demirel Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Ferda Esin Gülel - Pamukkale Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Gökçen Altun - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Gökhan Konat - Bolu Abant İzzet Baysal Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Hakan Bektaş - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Halil İbrahim Keskin - Çukurova Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Hamdi Emeç - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Hasan Arda Burhan - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Hasan Söyler - İnönü Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Hasan Türe - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "Doç. Dr. Hatice Akdağ - Aydın Adnan Menderes Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Havva Gültekin - Trakya Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. İkram Yusuf Yarbaşı - Erzurum Teknik Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Kadir Karagöz - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Kübra Akyol Özcan - Atatürk Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Kübra Bağcı Genel - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Kübranur Çebi Karaaslan - Erzurum Teknik Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Levent Kaya - Harran Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Leyla Aylin Aktükün - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Mehmet Aydın - Sakarya Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Merve Ertok Onurlu - Çanakkale Onsekiz Mart Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Mesut Savrul - Çanakkale Onsekiz Mart Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Muhammed Hanifi Van - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Muhammet Sait Talha Arslan - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Murat Doğan - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Mücahit Aydın - Sakarya Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Nazan Şak - Marmara Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. N. Tuba Yılmaz - Marmara Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Özlem Ergüt Caner - Marmara Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Özlem Kızılgöl - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Özlem Kiren Gürler - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Rana Şen Doğan - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Salih Çam - Çukurova Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Sanem Şehribanoğlu - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Savaş Gayaker - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Semin Topaloğlu Paksoy - Çukurova Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Sera Şanlı - Çukurova Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Serkan Aras - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Sibel Örk Özel - Çukurova Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Sinem Koçak - Karadeniz Teknik Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Şahika Gökmen - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Şakir İşleyen - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Şebnem Zorlutuna - Sivas Cumhuriyet Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Tuğba Akın - Aydın Adnan Menderes Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Tülay Demiralay - Trakya Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Yağmur Kaya - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Yasemin Koldere Akın - Trakya Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Yıldırım Demir - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDoç. Dr. Zerife Yıldırım - Harran Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Ahmet Demiralp - Harran Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Ahmet Koncak - Bolu Abant İzzet Baysal Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Anıl Lögün - Atatürk Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Aslı Özmen - Bolu Abant İzzet Baysal Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Asuman Yılmaz - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Ayça Büyükyılmaz Ercan - Akdeniz Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Aynur İncekırık - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Ayşe Ediz - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Ayşegül Yıldız - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Burak Uyar - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Burcu Kocarık Gacar - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Canan Güneş - Çanakkale Onsekiz Mart Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Cansu Bahçeci - Aydın Adnan Menderes Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Ceren Camkıran - Marmara Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Cüneyt Toyganözü - Süleyman Demirel Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Çağın Karul - Pamukkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Çiğdem Demir Toker - Akdeniz Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Çiğdem Koşar Taş - Çukurova Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Çisem Bektur - Sakarya Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Derya Topdağ - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Efe Sarıbay - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Esma Birişçi - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Fadime Aksoy - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Fela Özbey - Çukurova Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Fulden Kömüryakan Kaygısız - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Fulya Gezer - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Gökhan Erkal - Atatürk Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Gökhan Yılmaz - Süleyman Demirel Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Gülen Arıkan Kokkaya - Marmara Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Hakan Öndes - Bandırma Onyedi Eylül Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Hasan Hüseyin Tekmanlı - Atatürk Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Hoşeng Bülbül - Marmara Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Hüseyin İçen - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Hüseyin Örs - Karadeniz Teknik Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Hüseyin Ünal - Karadeniz Teknik Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi İsa Gürkan Meral - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi İsmail Koçak - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Kevser Tüter Şahinoğlu - Kırklareli Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Kübra Coşar - Ankara Hacı Bayram Veli Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Leyla İşbilen - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Mehmet Ozan Özdemir - Dokuz Eylül Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Mehmet Öksüzkaya - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Mehmet Sandal - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Mehmet Serhan Sekreter - Akdeniz Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Mesut Çakır - Aydın Adnan Menderes Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Mine Aydemir Dev - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Muhammed Şamil Şık - Erzurum Teknik Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Nazmi Yükselen Yağanoğlu - Çanakkale Onsekiz Mart Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Neslihan Çilesiz - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Neşe Aral - Bursa Uludağ Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Nimet Melis Esenyel İçen - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Öncü Yanmaz Arpaci - Pamukkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Özge Gündoğdu - Süleyman Demirel Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Özgür Engeloğlu - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Özlem Göktaş - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Rüya Karcı - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Sayın San - Sakarya Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Seda Başar Yılmaz - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Seda Karakaş Geyik - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Semih Karacan - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Serkan Samut - Karadeniz Teknik Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Seyhat Bayrak Gezdim - Kütahya Dumlupınar Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Suat Serhat Yılmaz - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Suzan Kantarcı Savaş - Kırklareli Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Süreyya Temelli - Trakya Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Şaban Kızılarslan - Van Yüzüncü Yıl Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Şenol Emir - İstanbul Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Şeyda Ünver - Atatürk Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Taylan Taner Doğan - Kırıkkale Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Turgut Ün - Marmara Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Verda Davasligil Atmaca - Çanakkale Onsekiz Mart Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Vildan Kistik - Marmara Üniversitesi / Ekonometri Bölümü\n\nDr. Öğr. Üyesi Yavuz Yıldırım - Çanakkale Onsekiz Mart Üniversitesi / Ekonometri Bölümü\n\nBilim Kurulu listesine ilişkin güncellemeler devam etmektedir..."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/BilimKurulu"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "6e5efe8c33a05ebc",
+      "slug": "eyi-2026-sekreterya",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Sekreterya",
+      "title": "Sekreterya",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "079e237585aaa97bbcb2e39ea09ff243c65412374932d05adc3b7be52c600e1e",
+      "sourceParts": 3,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Sekreterya",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Sekreterya"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Araş. Gör. Dr. Gökhan ÖZKUBAT - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü\n\nAraş. Gör. Dr. Tuğçe DABANLI KURT - Manisa Celal Bayar Üniversitesi / Ekonometri Bölümü"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Sekreterya"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "a794c78acc9c5cf2",
+      "slug": "eyi-2026-konular",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Konular",
+      "title": "Konular",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "4732affe82e9e822c09ebf4799fe4e37dbec065d836d873008a48e9c7c13dd2f",
+      "sourceParts": 56,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Konular",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Sempozyum Konuları"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Sempozyum, Ekonometri, Yöneylem Araştırması, İstatistik ve ilgili nicel disiplinler alanlarında kuramsal ve uygulamalı araştırma katkılarını kabul etmektedir.\n\nGeleceği Yönetmek: Yapay Zekâ, Sürdürülebilirlik ve Dijital Dönüşüm"
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 3,
+                "text": "Ekonometri"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Ekonometrik Kuram ve Yöntemler\n\nUygulamalı Ekonometri\n\nZaman Serileri ve Tahminleme\n\nPanel Veri Analizi\n\nMikroekonometrik Modelleme\n\nMakroekonometrik Modelleme\n\nFinansal Ekonometri\n\nMekânsal Ekonometri\n\nNedensel Çıkarım\n\nBayesyen Ekonometri\n\nBüyük Veri Ekonometrisi\n\nNonparametrik Ekonometri"
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 3,
+                "text": "İstatistik ve Veri Bilimi"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "İstatistik Kuramı\n\nÇok Değişkenli İstatistik\n\nHesaplamalı İstatistik\n\nVeri Madenciliği\n\nTahmine Dayalı Analitik\n\nİstatistiksel Öğrenme\n\nBüyük Veri Analitiği\n\nUygulamalı İstatistik\n\nYapısal Eşitlik Modellemesi"
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 3,
+                "text": "Yöneylem Araştırması ve Optimizasyon"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Matematiksel Optimizasyon\n\nDoğrusal ve Doğrusal Olmayan Programlama\n\nTamsayılı Programlama\n\nStokastik Optimizasyon\n\nKarar Analizi\n\nOyun Teorisi\n\nSimülasyon ve Modelleme\n\nLojistik ve Tedarik Zinciri Optimizasyonu\n\nRisk Yönetimi"
+              },
+              {
+                "id": "heading-9",
+                "type": "heading",
+                "level": 3,
+                "text": "Yapay Zekâ ve Analitik"
+              },
+              {
+                "id": "text-10",
+                "type": "paragraph",
+                "text": "Yapay Zekâ Uygulamaları\n\nMakine Öğrenmesi\n\nDerin Öğrenme\n\nAçıklanabilir Yapay Zekâ\n\nAkıllı Karar Sistemleri\n\nTahmine Dayalı Modelleme"
+              },
+              {
+                "id": "heading-11",
+                "type": "heading",
+                "level": 3,
+                "text": "Sürdürülebilirlik ve Yeşil Dönüşüm"
+              },
+              {
+                "id": "text-12",
+                "type": "paragraph",
+                "text": "Çevre Ekonomisi\n\nYeşil Dönüşüm Modellemesi\n\nEnerji Ekonomisi\n\nİklim Politikası Analizi\n\nESG Analitiği\n\nDöngüsel Ekonomi"
+              },
+              {
+                "id": "heading-13",
+                "type": "heading",
+                "level": 3,
+                "text": "Disiplinlerarası Uygulamalar"
+              },
+              {
+                "id": "text-14",
+                "type": "paragraph",
+                "text": "Dijital Ekonomi\n\nAkıllı Şehir Analitiği\n\nSağlık Ekonomisi\n\nDavranışsal Analitik\n\nKamu Politikası Değerlendirmesi"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Konular"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "a1150446aa0ad2a8",
+      "slug": "eyi-2026-davetli-konusmacilar",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/DavetliKonumaclarSonuncu",
+      "title": "Davetli Konuşmacılar",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "7107fad7db7092a616d8f2d051315a7dad9275a08fd735d83a6572c238dd9371",
+      "sourceParts": 16,
+      "sourceLinks": [],
+      "assetFiles": [
+        "2aaf8658e795706b7ae9.webp",
+        "c2ab97ad4dd342da859e.webp",
+        "2ae647a6e7bc0f431642.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Davetli Konuşmacılar",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Davetli Konuşmacılar"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında, ekonometri, istatistik, yöneylem araştırması, veri bilimi ve yapay zekâ alanlarında güncel bilimsel tartışmaları farklı bakış açılarıyla ele almak amacıyla davetli konuşmalar gerçekleştirilecektir.\n\nDavetli konuşmalar, ekonometri disiplininin tarihsel birikimini, güncel yöntemsel dönüşümleri ve farklı disiplinler için sunduğu teorik ve uygulamalı katkıları tartışmaya açmayı amaçlamaktadır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Keynote Konuşmacıları"
+              },
+              {
+                "id": "heading-4",
+                "type": "heading",
+                "level": 3,
+                "text": "Prof. Manuel Arellano"
+              },
+              {
+                "id": "text-5",
+                "type": "paragraph",
+                "text": "Panel veri ekonometrisinin önde gelen isimlerinden Prof. Manuel Arellano, EYİ 2026’nın açılış konuşmasını yüz yüze gerçekleştirecektir.\n\nProf. Manuel Arellano, kongre kapsamında Martín Almuzara, Richard Blundell ve Stéphane Bonhomme ile birlikte yürüttüğü çalışmadan hareketle “Nonlinear Micro Income Processes with Macro Shocks” başlıklı açılış konuşmasıyla katılımcılarla buluşacaktır.\n\nProf. Arellano'nun güncel araştırmalarını paylaşacağı bu özel oturum, panel veri ekonometrisi, uygulamalı ekonometri ve mikroekonometrik analizlerle ilgilenen araştırmacılar için önemli bir bilimsel paylaşım ortamı sunacaktır."
+              },
+              {
+                "id": "heading-6",
+                "type": "heading",
+                "level": 3,
+                "text": "Prof. Dr. Necmi Gürsakal"
+              },
+              {
+                "id": "text-7",
+                "type": "paragraph",
+                "text": "Davetli konuşmada, yapay zekâdan sonra bilimsel üretimin nasıl dönüşeceği; istatistik, ekonometri ve yöneylem araştırmasının bu yeni dönemdeki yeri tartışılacaktır.\n\nKonuşmada ayrıca veri çağından model çağına ve yapay zekâ çağına uzanan dönüşüm, istatistiksel düşüncenin vazgeçilmezliği ve yapay zekânın akademisyenler için araştırma süreçlerini destekleyen bir asistan olarak nasıl değerlendirilebileceği üzerinde durulacaktır."
+              },
+              {
+                "id": "heading-8",
+                "type": "heading",
+                "level": 3,
+                "text": "Prof. Dr. Münevver Turanlı"
+              },
+              {
+                "id": "text-9",
+                "type": "paragraph",
+                "text": "Davetli konuşmada, veri çağında istatistiğin değişen rolü ve bilimsel araştırmalardaki artan önemi ele alınacaktır. İstatistiksel düşünmenin; veriyi anlamlandırma, belirsizliği ölçme ve güvenilir sonuçlara ulaşma süreçlerindeki vazgeçilmez işlevi tartışılacaktır.\n\nKonuşmada ayrıca istatistiğin tarihsel gelişimi, değişen veri yapıları ve araştırma ihtiyaçları doğrultusunda geçirdiği dönüşüm ile veri biliminin ortaya çıkışındaki temel rolü ele alınacaktır."
+              },
+              {
+                "id": "heading-10",
+                "type": "heading",
+                "level": 3,
+                "text": "Davetli Konuşmaların Odağı"
+              },
+              {
+                "id": "text-11",
+                "type": "paragraph",
+                "text": "Davetli konuşmaların, EYİ 2026’nın “Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)” sloganıyla uyumlu biçimde ekonometri disiplininin geçmişten bugüne uzanan bilimsel birikimini ve geleceğe yönelik yöntemsel açılımlarını tartışmaya katkı sunması beklenmektedir."
+              },
+              {
+                "id": "asset-12",
+                "type": "image",
+                "mediaId": "asset-2aaf8658e795706b7ae9.webp",
+                "alt": "Prof. Manuel Arellano",
+                "caption": "Davetli Konuşmacılar — EYİ 2026"
+              },
+              {
+                "id": "asset-13",
+                "type": "image",
+                "mediaId": "asset-c2ab97ad4dd342da859e.webp",
+                "alt": "Prof. Dr. Necmi Gürsakal",
+                "caption": "Davetli Konuşmacılar — EYİ 2026"
+              },
+              {
+                "id": "asset-14",
+                "type": "image",
+                "mediaId": "asset-2ae647a6e7bc0f431642.webp",
+                "alt": "Prof. Dr. Münevver Turanlı",
+                "caption": "Davetli Konuşmacılar — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/DavetliKonumaclarSonuncu"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "ca9f6a3652c0f1ff",
+      "slug": "eyi-2026-panel",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Panel",
+      "title": "Panel",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "ffec6d93a053b3ec89d42a855aec7a8a97ccca8f00388334e457e3a32af71a24",
+      "sourceParts": 12,
+      "sourceLinks": [],
+      "assetFiles": [
+        "b62fd5496d81d94410a8.webp",
+        "52083fe16504d5a31734.webp",
+        "299bd6e80daacf6d97ed.webp",
+        "f18dd6496b32e819d974.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Panel",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Panel"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında, sempozyumun akademik vizyonunu güçlendirmek ve kongre temasını farklı bakış açılarıyla tartışmaya açmak amacıyla özel panel oturumu düzenlenecektir.\n\nPanel oturumu, ekonometri, istatistik ve yöneylem araştırmasının yapay zekâ çağındaki dönüşümünü; veri analitiği, modelleme, makine öğrenmesi, nedensellik, belirsizlik ve akademik araştırmanın geleceği gibi başlıklar etrafında ele alacaktır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Özel Panel"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Kongre temasıyla uyumlu olarak düzenlenecek özel panelde, ekonometri alanının güncel yönelimleri ile yapay zekâ, veri bilimi, istatistiksel modelleme, makine öğrenmesi ve disiplinin geleceği üzerine değerlendirmeler yapılacaktır.\n\nPanelin, farklı akademik birikimleri bir araya getirerek hem yöntembilimsel hem de uygulama odaklı bir tartışma zemini oluşturması hedeflenmektedir."
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Panel Katılımcıları"
+              },
+              {
+                "id": "heading-6",
+                "type": "heading",
+                "level": 2,
+                "text": "Panelin Odağı"
+              },
+              {
+                "id": "text-7",
+                "type": "paragraph",
+                "text": "Panelde, yapay zekâ çağında ekonometri, istatistik ve yöneylem araştırmasının nasıl konumlanacağı; akademisyenlerin, araştırmacıların ve yöntem geliştiricilerin yeni bilimsel üretim biçimleriyle nasıl ilişki kuracağı tartışılacaktır.\n\nBu çerçevede panelin, EYİ 2026’nın “Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)” sloganıyla uyumlu biçimde geçmişten geleceğe uzanan bir değerlendirme sunması beklenmektedir."
+              },
+              {
+                "id": "heading-8",
+                "type": "heading",
+                "level": 2,
+                "text": "Genel Değerlendirme"
+              },
+              {
+                "id": "text-9",
+                "type": "paragraph",
+                "text": "Panel oturumunun, EYİ 2026’nın bilimsel niteliğine katkı sağlaması; ekonometri disiplininin tarihsel birikimini yapay zekâ, veri bilimi ve yeni araştırma pratikleriyle birlikte yeniden düşünmeye imkân sunması beklenmektedir."
+              },
+              {
+                "id": "asset-10",
+                "type": "image",
+                "mediaId": "asset-b62fd5496d81d94410a8.webp",
+                "alt": "Prof. Dr. Sibel Selim",
+                "caption": "Panel — EYİ 2026"
+              },
+              {
+                "id": "asset-11",
+                "type": "image",
+                "mediaId": "asset-52083fe16504d5a31734.webp",
+                "alt": "Prof. Dr. Ferda Yerdelen Tatoğlu",
+                "caption": "Panel — EYİ 2026"
+              },
+              {
+                "id": "asset-12",
+                "type": "image",
+                "mediaId": "asset-299bd6e80daacf6d97ed.webp",
+                "alt": "Prof. Dr. Ebru Çağlayan Akay",
+                "caption": "Panel — EYİ 2026"
+              },
+              {
+                "id": "asset-13",
+                "type": "image",
+                "mediaId": "asset-f18dd6496b32e819d974.webp",
+                "alt": "Prof. Dr. Veysel Yılmaz",
+                "caption": "Panel — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Panel"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "a29bb4a0acb4e6f6",
+      "slug": "eyi-2026-workshop",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/WorkshopVdort",
+      "title": "Workshop",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "af95d42c88a06f11ac40bfa30cbe042189ff03f0c6e934953476e446fb2266bf",
+      "sourceParts": 18,
+      "sourceLinks": [],
+      "assetFiles": [
+        "b596b8626394e51ac33e.webp",
+        "7bbfa884f28394cd9b15.webp",
+        "de9f82a7a1b2c62615ce.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Workshop",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Workshop"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında, sempozyumun bilimsel kapsamını desteklemek ve katılımcılara güncel yöntemsel yaklaşımlar konusunda uygulamaya dönük bir perspektif sunmak amacıyla üç ayrı workshop oturumu düzenlenecektir.\n\nWorkshop oturumları; ekonometri, panel veri analizi, makine öğrenmesi ve sosyal bilimlerde yapısal eşitlik modellemesi gibi güncel araştırma alanlarına odaklanarak katılımcıların hem kuramsal hem de uygulamalı bilgi birikimlerine katkı sağlamayı amaçlamaktadır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Kantil Regresyonun Ekonometri ve Makine Öğrenmesindeki Yeri"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Workshop Yürütücüsü: Prof. Dr. Ebru Çağlayan Akay\n\nBu workshop oturumunda, kantil regresyonun ekonometri ve makine öğrenmesi alanlarındaki kullanım olanakları ele alınacaktır. Koşullu ve koşulsuz kantil regresyon yöntemlerinin temel yapısı tanıtılacak; Kantil Rassal Ormanlar ve Kantil XGBoost gibi güncel makine öğrenmesi yaklaşımlarının araştırma süreçlerindeki yeri değerlendirilecektir.\n\nOturumda yöntemlerin dağılımsal analiz, heterojen etki incelemesi ve tahmin performansı açısından sunduğu avantajlar örnek uygulamalar çerçevesinde tartışılacaktır."
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Panel Veri Analizinde Doğru Yöntem Seçimi ve Güncel Yaklaşımlar: Veri Yapısına Göre Modelleme Stratejileri"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "Workshop Yürütücüsü: Prof. Dr. Ferda Yerdelen Tatoğlu\n\nBu workshop oturumunda, panel veri analizinde uygun ekonometrik yöntemin belirlenmesinde panel verinin yatay kesit ve zaman boyutlarının rolü ele alınacaktır. Farklı panel veri yapılarının gerektirdiği modelleme yaklaşımları değerlendirilecek; kısa ve uzun panel veri yapıları için uygun yöntem seçimi teorik çerçeve ve uygulama örnekleriyle incelenecektir.\n\nOturumda statik ve dinamik panel modelleri, yatay kesit bağımlılığı, heterojenlik ve güncel tahmin yaklaşımları üzerinde durulacak; farklı veri yapılarına uygun modelleme stratejileri uygulamalı örneklerle değerlendirilecektir."
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 2,
+                "text": "Sosyal Bilimlerde Yapısal Eşitlik Modellemesi"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Workshop Yürütücüsü: Prof. Dr. Veysel Yılmaz\n\nBu workshop oturumunda, sosyal bilimlerde kuramsal modellerin test edilmesinde yaygın olarak kullanılan yapısal eşitlik modellemesinin temel mantığı, araştırma tasarımındaki yeri ve uygulama alanları ele alınacaktır.\n\nOturum kapsamında ölçüm modeli, yapısal model, değişkenler arası ilişkilerin test edilmesi ve model uyumunun değerlendirilmesi gibi temel konular üzerinde durulacak; yapısal eşitlik modellemesinin sosyal bilim araştırmalarında sunduğu yöntemsel imkânlar uygulama odaklı bir yaklaşımla değerlendirilecektir."
+              },
+              {
+                "id": "heading-9",
+                "type": "heading",
+                "level": 3,
+                "text": "Workshop Programı"
+              },
+              {
+                "id": "text-10",
+                "type": "paragraph",
+                "text": "Workshop oturumları 25’er kişilik kontenjanla planlanmıştır.\n\nWorkshop oturumlarına ilişkin tarih ve saat bilgileri sempozyum programı ile birlikte paylaşılmıştır."
+              },
+              {
+                "id": "asset-11",
+                "type": "image",
+                "mediaId": "asset-b596b8626394e51ac33e.webp",
+                "alt": "Prof. Dr. Ebru Çağlayan Akay",
+                "caption": "Workshop — EYİ 2026"
+              },
+              {
+                "id": "asset-12",
+                "type": "image",
+                "mediaId": "asset-7bbfa884f28394cd9b15.webp",
+                "alt": "Prof. Dr. Ferda Yerdelen Tatoğlu",
+                "caption": "Workshop — EYİ 2026"
+              },
+              {
+                "id": "asset-13",
+                "type": "image",
+                "mediaId": "asset-de9f82a7a1b2c62615ce.webp",
+                "alt": "Prof. Dr. Veysel Yılmaz",
+                "caption": "Workshop — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/WorkshopVdort"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "887fc2163b62c602",
+      "slug": "eyi-2026-sempozyum-programi",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/cevrim-ici-oturumlar-ve-microsoft-teams-baglantilari-2",
+      "title": "Çevrim İçi Oturumlar ve Microsoft Teams Bağlantıları",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "07f4faeefa5a0a4a768b390064711ef0093507ab33bf14cc27ca05e23aed68da",
+      "sourceParts": 12,
+      "sourceLinks": [
+        {
+          "label": "Sempozyum Programını İndir",
+          "url": "https://drive.google.com/file/d/1_2UQREevPMsAD2cdjHBIwUF88vfkA9bp/view"
+        },
+        {
+          "label": "Çevrim İçi Oturumlara Katıl",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/cevrim-ici-oturumlar-ve-microsoft-teams-baglantilari"
+        }
+      ],
+      "assetFiles": [
+        "06dad8b2474c4dfcf2f1.pdf"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Çevrim İçi Oturumlar ve Microsoft Teams Bağlantıları",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "EYİ 2026 Bilimsel Programı"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "17–19 Eylül 2026 tarihlerinde gerçekleştirilecek 23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu'nun ayrıntılı bilimsel programına aşağıdan ulaşabilirsiniz. Not: Sempozyum bilimsel programına oturum başkanları eklenerek program nihai hâline getirilmiştir . Bu aşamadan sonra program üzerinde herhangi bir değişiklik yapılması öngörülmemektedir. Katılımcıların sunum ve oturum planlamalarını güncel programı esas alarak gerçekleştirmeleri önemle rica olunur."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "19 Eylül 2026 Çevrim İçi Oturumları"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "19 Eylül 2026 tarihinde gerçekleştirilecek çevrim içi oturumlara ait Microsoft Teams bağlantıları, 19 Eylül sabahı saat 08.30'da çevrim içi oturum sayfası üzerinden yayımlanacaktır.\n\nÇevrim içi oturumlara katılacak sunucu ve dinleyicilerimizin aşağıdaki hususlara dikkat etmeleri rica olunur:\n\nKatılımcılar, programda yer alan ilgili çevrim içi salonun Microsoft Teams bağlantısını kullanarak oturuma katılacaktır.\n\nBağlantı açıldığında toplantıya Microsoft Teams uygulaması veya web tarayıcısı üzerinden katılım sağlanabilir. Teams uygulamasının yüklü olması zorunlu değildir.\n\nSisteme giriş sırasında ad ve soyad bilgisi istenmesi hâlinde, katılımcıların ad ve soyadlarını eksiksiz olarak yazmaları önemlidir.\n\nMicrosoft Teams veya kullanılan web tarayıcısı tarafından mikrofon ve kamera erişimi talep edilmesi durumunda gerekli izinlerin verilmesi gerekmektedir. Bu husus özellikle sunum yapacak katılımcılar için önemlidir.\n\nSunum yapacak katılımcıların, teknik kontrollerin sağlıklı biçimde gerçekleştirilebilmesi için oturum başlangıç saatinden en az 10 dakika önce ilgili çevrim içi salona bağlanmaları önerilir.\n\nSunucu ve dinleyiciler aynı Teams bağlantısı üzerinden oturuma katılacaktır. Sunum sırası gelen katılımcıya gerekli sunum ve ekran paylaşımı yetkisi oturum sırasında verilecektir.\n\nOturum sırasında söz hakkı bulunmayan katılımcıların mikrofonlarını kapalı tutmaları, oturumun sağlıklı yürütülmesi açısından önemlidir."
+              },
+              {
+                "id": "asset-5",
+                "type": "download",
+                "mediaId": "asset-06dad8b2474c4dfcf2f1.pdf",
+                "label": "Sempozyum Programını İndir"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/cevrim-ici-oturumlar-ve-microsoft-teams-baglantilari-2"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "d6eae119c86c9cf2",
+      "slug": "eyi-2026-kongre-kitaplari",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/KongreKitaplar",
+      "title": "Kongre Kitapları",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "135d326e2781e435d1f59089f040a05577756a333cbefa55a57cc3cdeb40cf0c",
+      "sourceParts": 9,
+      "sourceLinks": [
+        {
+          "label": "EYİ 2026 BİLDİRİ ÖZETLERİ KİTABI 03.10.2026",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/ShareFileGallery/ShareFileGallery-20261003213332573-LPCGV.pdf"
+        }
+      ],
+      "assetFiles": [
+        "d1d4c08745964f248ceb.pdf"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Kongre Kitapları",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Kongre Kitapları"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında sempozyum sürecinde kabul edilen çalışmalara ilişkin yayınlar bu sayfa üzerinden duyurulmaktadır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Bildiri Özetleri Kitabı"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında kabul edilen bildirilerin özet metinlerini içeren Bildiri Özetleri Kitabı 'na aşağıdaki bağlantıya tıklayarak ulaşabilirsiniz.\n\nEYİ 2026 BİLDİRİ ÖZETLERİ KİTABI 03.10.2026\n\nYayın Tarihi: 3 Ekim 2026"
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Tam Metin Bildiri Kitabı"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında tam metin olarak kabul edilen bildirileri içeren Tam Metin Bildiri Kitabı , sempozyum sonrasında akademik bir yayın olarak hazırlanacaktır.\n\nYayın Tarihi: 16 Ekim 2026"
+              },
+              {
+                "id": "asset-7",
+                "type": "download",
+                "mediaId": "asset-d1d4c08745964f248ceb.pdf",
+                "label": "EYİ 2026 BİLDİRİ ÖZETLERİ KİTABI 03.10.2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/KongreKitaplar"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "aed357951506c971",
+      "slug": "eyi-2026-onemli-tarihler",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/nemliTarihler",
+      "title": "Önemli Tarihler",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "03136be80be38e877ddf7ca692f377c02535426b1d2d465ad7d5aac16339c6d4",
+      "sourceParts": 16,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Önemli Tarihler",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Önemli Tarihler"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında bildiri gönderimi, değerlendirme, kayıt ve yayın süreçlerine ilişkin önemli tarihler aşağıda sunulmaktadır. Katılımcıların başvuru ve kayıt işlemlerini belirtilen takvime uygun şekilde tamamlamaları beklenmektedir."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Başvuru ve Değerlendirme Süreci"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Bildiri Çağrısı İlanı: 15 Mayıs 2026\n\nÖzet Gönderim Son Tarihi (Son Kez Uzatılmıştır): 7 Ağustos 2026\n\nBildiri Kabul/Ret Bildirim Tarihi: 11 Ağustos 2026\n\nProgram İlanı: 1 Eylül 2026\n\nEn İyi Bildiri Ödülü İçin Tam Metin Son Gönderim Tarihi (Uzatılmıştır): 4 Eylül 2026\n\nTam Metin Son Gönderim Tarihi: 30 Eylül 2026"
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Kayıt ve Yayın Süreci"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "Erken Kayıt Son Tarihi: 14 Ağustos 2026\n\nGeç Kayıt Son Tarihi: 30 Ağustos 2026\n\nÖzetler Kitabı Yayın Tarihi: 28 Eylül 2026\n\nTam Metin Bildiri Kitabı Yayın Tarihi: 16 Ekim 2026"
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 3,
+                "text": "Not"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Belirtilen tarihlerde değişiklik yapılması halinde güncellemeler kongre web sayfası üzerinden duyurulacaktır. Katılımcıların süreci düzenli olarak takip etmeleri önerilir."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/nemliTarihler"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "78898920d077d4ec",
+      "slug": "eyi-2026-yazarlar-icin-bilgiler",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/YazarlariinBilgileriki",
+      "title": "Yazarlar için Bilgiler",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "e1993c797562ddbcb0fbeef2675ee63c5a3e13b28a2f4703e8ab1b4ce81c6adb",
+      "sourceParts": 42,
+      "sourceLinks": [
+        {
+          "label": "EYI2026 Tr Özet Bildiri.dotx",
+          "url": "https://drive.google.com/file/d/1bKzV3fbg0hZfw0W-BkBGKtQu2pH90wUT/view?usp=sharing"
+        },
+        {
+          "label": "ISEOS2026 En Özet Bildiri.dotx",
+          "url": "https://drive.google.com/file/d/1eyArobMUdzF82NHSxMTBlLwO_MNxIEoW/view?usp=sharing"
+        },
+        {
+          "label": "EYI2026 Tr Tam Metin Bildiri.dotx",
+          "url": "https://drive.google.com/file/d/1PKtpQ5gufiNx1x1CJV9ytlB6hXm6-TXI/view?usp=sharing"
+        },
+        {
+          "label": "ISEOS2026",
+          "url": "https://drive.google.com/file/d/1eyArobMUdzF82NHSxMTBlLwO_MNxIEoW/view?usp=sharing"
+        },
+        {
+          "label": "En Tam Metin Bildiri.dotx",
+          "url": "https://drive.google.com/file/d/1dvMorn4SgfaoJfaNpY3cNmy8OLzpoVGv/view?usp=sharing"
+        }
+      ],
+      "assetFiles": [
+        "0042c9522df8e3fa94a8.dotx",
+        "386b8c90419498d14f7d.dotx",
+        "ef21c2526dc2d399490e.dotx",
+        "c4d2da9b6ac787efd370.dotx"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Yazarlar için Bilgiler",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Yazarlar İçin Bilgiler"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında gönderilecek özet ve tam metin bildirilerin, sempozyum için hazırlanmış şablon dosyalarına uygun biçimde düzenlenmesi beklenmektedir. Yazarların, çalışma türüne uygun şablonu kullanarak metinlerini hazırlamaları ve temel yazım kurallarına dikkat etmeleri önem taşımaktadır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Genel Yazım Kuralları"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Çalışmalar, ilgili şablon dosyası kullanılarak hazırlanmalıdır.\n\nBildiri dili Türkçe ve İngilizcedir .\n\nBaşlık, şablonda gösterilen biçime uygun olarak düzenlenmelidir.\n\nYazar adı, soyadı ve unvan bilgileri başlığın altında yer almalıdır.\n\nŞablonda yer alan temel yazı tipi, punto ve sayfa düzeni korunmalıdır.\n\nMetin içinde gereksiz biçim değişikliklerinden kaçınılmalıdır."
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Özet Bildiri Kuralları"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "Özet metni 300–400 kelime aralığında olmalıdır.\n\nÖzet, Times New Roman 10 punto ile yazılmalıdır.\n\nÖzette çalışmanın amacı, yöntemi, bulguları ve sonucu açık biçimde yer almalıdır.\n\nAnahtar kelimeler en az 3, en fazla 5 adet olmalıdır.\n\nÇalışmaya uygun JEL kodları eklenmelidir.\n\nTürkçe hazırlanan bildirilerde, ana başlığın ardından bildirinin İngilizce başlığı ikinci başlık olarak verilmelidir.\n\nİngilizce hazırlanan bildirilerde, ana başlığın ardından bildirinin Türkçe başlığı ikinci başlık olarak verilmelidir."
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 2,
+                "text": "Tam Metin Bildiri Kuralları"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Tam metinler, sempozyum için paylaşılan tam metin şablonuna göre hazırlanmalıdır.\n\nÇalışmada başlık, ikinci dilde başlık, yazar bilgileri, özet, anahtar kelimeler ve JEL kodları eksiksiz biçimde yer almalıdır.\n\nTürkçe hazırlanan tam metin bildirilerde, ana başlığın ardından bildirinin İngilizce başlığı ikinci başlık olarak verilmelidir.\n\nİngilizce hazırlanan tam metin bildirilerde, ana başlığın ardından bildirinin Türkçe başlığı ikinci başlık olarak verilmelidir.\n\nTam metinler, Türkçe veya İngilizce tam metin şablonlarından uygun olanına göre hazırlanmalıdır.\n\nÖzet bölümünde kısaltma kullanımından kaçınılmalı, içerik açık ve akademik bir dille sunulmalıdır.\n\nAna metin, çalışmanın içeriğine uygun başlıklar altında sistematik biçimde düzenlenmelidir.\n\nKaynakça bölümü metnin sonunda yer almalı ve düzenli bir biçimde verilmelidir.\n\nNot: Kongre takviminde ilan edilen tarihe kadar bildirilerin tam metinlerini eyi2026@cbu.edu.tr adresine gönderebilirsiniz."
+              },
+              {
+                "id": "heading-9",
+                "type": "heading",
+                "level": 2,
+                "text": "DOTX Şablonu Nasıl Kullanılır?"
+              },
+              {
+                "id": "text-10",
+                "type": "paragraph",
+                "text": "Paylaşılan dosyalar .dotx uzantılıdır. Bu dosya türü, Microsoft Word şablonu anlamına gelir.\n\nŞablon dosyasını açtıktan sonra doğrudan onun üzerinde çalışmak yerine, önce “Farklı Kaydet” seçeneğiyle dosyanızı .docx formatında kaydetmeniz önerilir. Böylece kendi çalışma dosyanızı oluşturabilir ve metninizi bu dosya üzerinden düzenleyebilirsiniz.\n\nŞablonun amacı; başlık yapısı, sayfa düzeni ve temel biçimlendirmeyi koruyarak tüm bildirilerin ortak bir formatta hazırlanmasını sağlamaktır."
+              },
+              {
+                "id": "heading-11",
+                "type": "heading",
+                "level": 2,
+                "text": "Bildiri Değerlendirme Esasları"
+              },
+              {
+                "id": "text-12",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında gönderilen bildiriler, bilimsel değerlendirme sürecine alınacaktır. Her bildiri, değerlendirme sürecinde iki hakeme gönderilecektir.\n\nHakem değerlendirmeleri doğrultusunda bildirilerin kabul, düzeltme veya ret süreci yürütülecektir. Yazarların, değerlendirme sürecinin sağlıklı ilerleyebilmesi için bildirilerini ilgili şablonlara ve yazım kurallarına uygun şekilde hazırlamaları beklenmektedir."
+              },
+              {
+                "id": "heading-13",
+                "type": "heading",
+                "level": 2,
+                "text": "Şablon Dosyaları"
+              },
+              {
+                "id": "text-14",
+                "type": "paragraph",
+                "text": "Yazarların, çalışmalarını hazırlarken aşağıdaki şablon dosyalarından uygun olanı kullanmaları gerekmektedir.\n\nEYI2026 Tr Özet Bildiri.dotx\n\nISEOS2026 En Özet Bildiri.dotx\n\nEYI2026 Tr Tam Metin Bildiri.dotx\n\nISEOS2026 En Tam Metin Bildiri.dotx"
+              },
+              {
+                "id": "heading-15",
+                "type": "heading",
+                "level": 3,
+                "text": "Önemli Not"
+              },
+              {
+                "id": "text-16",
+                "type": "paragraph",
+                "text": "Yazarların, bildiri hazırlama sürecinde uygun şablonu kullanmaları ve gönderim öncesinde metinlerini biçimsel açıdan kontrol etmeleri önerilir. Tam metin bildirilerde ana başlığa ek olarak ikinci dilde başlık bilgisinin de verilmesi gerekmektedir. Şablona uygun hazırlanmayan metinlerde teknik düzenleme talep edilebilir. Bildirilerin bilimsel değerlendirme süreci, hakem raporları doğrultusunda yürütülecektir."
+              },
+              {
+                "id": "asset-17",
+                "type": "download",
+                "mediaId": "asset-0042c9522df8e3fa94a8.dotx",
+                "label": "EYI2026 Tr Özet Bildiri.dotx"
+              },
+              {
+                "id": "asset-18",
+                "type": "download",
+                "mediaId": "asset-386b8c90419498d14f7d.dotx",
+                "label": "ISEOS2026 En Özet Bildiri.dotx"
+              },
+              {
+                "id": "asset-19",
+                "type": "download",
+                "mediaId": "asset-ef21c2526dc2d399490e.dotx",
+                "label": "EYI2026 Tr Tam Metin Bildiri.dotx"
+              },
+              {
+                "id": "asset-20",
+                "type": "download",
+                "mediaId": "asset-c4d2da9b6ac787efd370.dotx",
+                "label": "En Tam Metin Bildiri.dotx"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/YazarlariinBilgileriki"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "6845aa4d70f96e90",
+      "slug": "eyi-2026-kongre-yeri",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/KongreYeriTr",
+      "title": "Kongre Yeri",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "48321a07e8c36f7229729d9a5d97b502cae3ab8245fcf75cf0ffcd1501b44ff8",
+      "sourceParts": 13,
+      "sourceLinks": [],
+      "assetFiles": [
+        "498196675b28a43aad4d.webp",
+        "223042405dd03a4939ed.webp",
+        "23cd986dfc0d9f115162.webp",
+        "026f17fa5d960772ea5d.webp",
+        "872e511655558509c356.webp",
+        "c6145f47552f6ab2f552.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Kongre Yeri",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Kongre Mekânı"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Prof. Ümit Doğay Arınç Kültür Merkezi\n\n23. Uluslararası Ekonometri, Yöneylem Araştırması ve İstatistik Sempozyumu, Manisa Celal Bayar Üniversitesi’nin önemli etkinlik alanlarından biri olan Prof. Ümit Doğay Arınç Kültür Merkezi ’nde gerçekleştirilecektir.\n\nMekân, sempozyum süresince davetli konuşmalar, paralel sunumlar ve katılımcılar arası etkileşim için uygun bir akademik ortam sunmaktadır.\n\nSempozyum programı kapsamında açılış oturumu ve genel oturumlar için bir ana salon ile paralel sunumlar için dört amfi tipi salon planlanmaktadır. Bu yapı, bilimsel programın verimli bir şekilde yürütülmesine olanak sağlarken, konuşmacılar ve katılımcılar için de konforlu bir ortam sunacaktır.\n\nAşağıda, kongre mekânının genel atmosferini ve fiziksel olanaklarını yansıtan ek görsellere yer verilmiştir."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 3,
+                "text": "Mekân Bilgileri"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Mekân: Prof. Ümit Doğay Arınç Kültür Merkezi\n\nKurum: Manisa Celal Bayar Üniversitesi\n\nAna Kullanım: Açılış Oturumu ve Genel Program\n\nParalel Oturumlar: 4 Amfi Salonu\n\nEtkinlik Türü: Uluslararası Akademik Sempozyum"
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Mekân Galerisi"
+              },
+              {
+                "id": "asset-6",
+                "type": "image",
+                "mediaId": "asset-498196675b28a43aad4d.webp",
+                "alt": "Mekân Fotoğrafı 1",
+                "caption": "Kongre Yeri — EYİ 2026"
+              },
+              {
+                "id": "asset-7",
+                "type": "image",
+                "mediaId": "asset-223042405dd03a4939ed.webp",
+                "alt": "Mekân Fotoğrafı 2",
+                "caption": "Kongre Yeri — EYİ 2026"
+              },
+              {
+                "id": "asset-8",
+                "type": "image",
+                "mediaId": "asset-23cd986dfc0d9f115162.webp",
+                "alt": "Mekân Fotoğrafı 3",
+                "caption": "Kongre Yeri — EYİ 2026"
+              },
+              {
+                "id": "asset-9",
+                "type": "image",
+                "mediaId": "asset-026f17fa5d960772ea5d.webp",
+                "alt": "Mekân Fotoğrafı 4",
+                "caption": "Kongre Yeri — EYİ 2026"
+              },
+              {
+                "id": "asset-10",
+                "type": "image",
+                "mediaId": "asset-872e511655558509c356.webp",
+                "alt": "Mekân Fotoğrafı 5",
+                "caption": "Kongre Yeri — EYİ 2026"
+              },
+              {
+                "id": "asset-11",
+                "type": "image",
+                "mediaId": "asset-c6145f47552f6ab2f552.webp",
+                "alt": "Mekân Fotoğrafı 6",
+                "caption": "Kongre Yeri — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/KongreYeriTr"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "e1ece4c3f0ef346b",
+      "slug": "eyi-2026-konaklama-transfer",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/KonaklamaTransfer",
+      "title": "Konaklama - Transfer",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "e0d9d805bd7d4d319d26f69848254de2061f833a0321305ce8c2e46dee4ee601",
+      "sourceParts": 12,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Konaklama - Transfer",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Konaklama / Transfer"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "Konaklama Seçenekleri"
+              },
+              {
+                "id": "table-3",
+                "type": "table",
+                "caption": "Konaklama - Transfer — kaynak tablosu",
+                "headers": [
+                  "Konaklama",
+                  "Adres",
+                  "Telefon"
+                ],
+                "rows": [
+                  [
+                    "MCBÜ Sosyal Tesisleri – Merkez Misafirhanesi",
+                    "Ahmet Bedevi, Akhisar Cd. No:26, 45040 Şehzadeler / Manisa",
+                    "+90 236 201 11 07"
+                  ],
+                  [
+                    "Manisa Öğretmenevi",
+                    "Peker, 1713. Sk. No:92, 45020 Şehzadeler / Manisa",
+                    "+90 236 231 18 43"
+                  ],
+                  [
+                    "Manisa Polis Evi",
+                    "Akmescit, 45110 Manisa Merkez / Manisa",
+                    "+90 236 250 03 55"
+                  ],
+                  [
+                    "Yunusemre Belediyesi Misafirhanesi",
+                    "Yeni Mahalle Mah., Manisa Merkez / Manisa",
+                    "+90 533 437 95 85"
+                  ],
+                  [
+                    "Türkiye Diyanet Vakfı Misafirhanesi",
+                    "Güzelyurt Mah., İngolstadt Bulv. No:16 A, Yunusemre / Manisa",
+                    "+90 236 233 13 43 - +90 532 686 19 23"
+                  ],
+                  [
+                    "Manisa Defterdarlık Misafirhanesi",
+                    "Ayni Ali Mah., 3316 Sk. No:22, Yunusemre / Manisa",
+                    "+90 236 231 46 43"
+                  ],
+                  [
+                    "Büyük Saruhanlı Otel - EYİ Misafirlerine Özel Fiyat",
+                    "Nusret Köklü Cad. No:4, Laleli / Manisa",
+                    "+90 236 233 02 72"
+                  ],
+                  [
+                    "DoubleTree by Hilton Manisa",
+                    "Laleli, Mimar Sinan Blv. No:242, 45030 Yunusemre / Manisa",
+                    "+90 236 999 11 11"
+                  ]
+                ]
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "+90 236 233 13 43 - +90 532 686 19 23"
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Transfer Bilgileri"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "17 Eylül 2026 ve 18 Eylül 2026 tarihlerinde kongre katılımcıları için servis hizmeti planlanmıştır.\n\nGüzergah: Servis, Manisa Öğretmenevi 'nden Forum Magnesia AVM, DoubleTree Hotel, Büyük Saruhanlı Otel, Manisa Adliyesi ve Anemon Grand Manisa Otel güzergâhından geçerek MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi ’ne ulaşacaktır. Dönüş servisleri aynı güzergâhı ters yönde izleyecektir.\n\nSabah Servisi: Saat 08.30’da Manisa Öğretmenevi’nden MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi’ne hareket edecektir.\n\nAkşam Dönüşü: Saat 17.45’te MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi’nden Manisa Öğretmenevi’ne hareket edecektir.\n\nSabah Servisi: Saat 08.30’da Manisa Öğretmenevi’nden MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi’ne hareket edecektir.\n\nAkşam Dönüşü: Saat 17.15’te MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi’nden Manisa Öğretmenevi’ne hareket edecektir.\n\nGala Yemeği Ulaşımı: Katılımcılar için servis aracı, saat 18.45’te Manisa Öğretmenevi’nden MCBÜ Gala Yemeği alanına hareket edecektir."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/KonaklamaTransfer"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "b7dfebb7bf0679d0",
+      "slug": "eyi-2026-ucretler",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/UcretlerUc",
+      "title": "Ücretler",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "d76c94f6740b77c8e1eebc99c2d7209790ccc0db4e8c76dde28ce94d086b360b",
+      "sourceParts": 26,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Ücretler",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Ücretler"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında uygulanacak kayıt ücretleri aşağıda yer almaktadır. Ücretlendirme esasları, yüz yüze ve çevrim içi katılım türlerine göre düzenlenmiş olup erken kayıt ve geç kayıt dönemleri dikkate alınarak belirlenmiştir.\n\nÖğrenci statüsündeki katılımcıların sempozyum kayıt işlemleri esnasında öğrenci belgesi beyan etmeleri gerekmektedir."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Kayıt Ücretleri"
+              },
+              {
+                "id": "table-4",
+                "type": "table",
+                "caption": "Ücretler — kaynak tablosu",
+                "headers": [
+                  "Katılım Türü",
+                  "Yüz Yüze",
+                  "Çevrim İçi",
+                  "Sütun 4",
+                  "Sütun 5"
+                ],
+                "rows": [
+                  [
+                    "Erken Kayıt",
+                    "Geç Kayıt",
+                    "Erken Kayıt",
+                    "Geç Kayıt",
+                    ""
+                  ],
+                  [
+                    "Öğretim Üyesi / Diğer Katılımcı",
+                    "3000 TL",
+                    "3600 TL",
+                    "3000 TL",
+                    "3600 TL"
+                  ],
+                  [
+                    "Öğrenci",
+                    "2000 TL",
+                    "2400 TL",
+                    "2000 TL",
+                    "2400 TL"
+                  ]
+                ]
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Bildiri Sayısı ve İkinci Bildiri Esası"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "Bir katılımcı sempozyuma en fazla iki bildiri ile katılma hakkına sahiptir.\n\nKongreye kayıt yaptırarak katılım ücreti ödeyen bir katılımcı, ikinci bildiri sunumu için ek bir ücret ödemeyecektir ."
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 2,
+                "text": "Öğrenci Belgesi"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Öğrenci ücreti üzerinden kayıt yaptırmak isteyen katılımcıların, öğrenci statüsünde olduklarını geçerli bir öğrenci belgesi ile beyan etmeleri gerekmektedir."
+              },
+              {
+                "id": "heading-9",
+                "type": "heading",
+                "level": 2,
+                "text": "Yüz Yüze Katılım"
+              },
+              {
+                "id": "text-10",
+                "type": "paragraph",
+                "text": "Birden fazla yazarlı bildirilerde, sunum yapan katılımcı dışında sempozyuma yüz yüze katılım sağlayarak sempozyum imkânlarından yararlanmak isteyen diğer yazarların da kayıt yaptırması ve katılım ücreti ödemesi gerekmektedir.\n\nBildirisiz dinleyici katılımcıların da sempozyum imkânlarından yararlanmak istemeleri halinde kayıt yaptırmaları ve katılım ücreti ödemeleri gerekmektedir."
+              },
+              {
+                "id": "heading-11",
+                "type": "heading",
+                "level": 2,
+                "text": "Çevrim İçi Katılım"
+              },
+              {
+                "id": "text-12",
+                "type": "paragraph",
+                "text": "Bir katılımcı sempozyuma en fazla iki bildiri ile katılma hakkına sahiptir.\n\nKongreye kayıt yaptırarak katılım ücreti ödeyen bir katılımcı, ikinci bildiri sunumu için ek bir ücret ödemeyecektir .\n\nBildiride adı geçen diğer yazarlar çevrim içi tüm oturumlara ücretsiz katılabilirler."
+              },
+              {
+                "id": "heading-13",
+                "type": "heading",
+                "level": 2,
+                "text": "Sempozyum Katılım Ücretinin Kapsamı"
+              },
+              {
+                "id": "text-14",
+                "type": "paragraph",
+                "text": "Kongre materyalleri\n\nAra ikramlar\n\nÖğle yemekleri (2 gün)\n\nGezi programı (yemek hariç)\n\nGala yemeği"
+              },
+              {
+                "id": "heading-15",
+                "type": "heading",
+                "level": 3,
+                "text": "Önemli Notlar"
+              },
+              {
+                "id": "text-16",
+                "type": "paragraph",
+                "text": "Kayıt yaptırdığı halde sempozyuma katılamayanlara sempozyum katılım ücret iadesi yapılmayacaktır ve katılım belgesi verilmeyecektir.\n\nSempozyum katılım ücreti yatırılmayan ve sunulmayan bildiriler sempozyum kapsamına alınmayacaktır."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/UcretlerUc"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "c87add36d871acff",
+      "slug": "eyi-2026-kayit-bilgileri",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Kayt",
+      "title": "Kayıt",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "ef779e5705bfba6f64a6d18fa4444aa0a868b2c969f12e9c0a46366332e39c74",
+      "sourceParts": 20,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Kayıt",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Kayıt"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026’ya katılım, yüz yüze ve çevrim içi olmak üzere iki farklı formatta gerçekleştirilecektir. Katılımcılar, sempozyum kapsamında kendilerine uygun katılım türüne göre kayıt yaptırabilecektir.\n\nAşağıda katılım biçimleri, katılım belgeleri ve yayın sürecine ilişkin temel bilgiler yer almaktadır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Katılım Formatı"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Kongre hibrit formatta düzenlenecektir.\n\n17–18 Eylül 2026: Yüz yüze sunumlar\n\n19 Eylül 2026: Çevrim içi sunumlar"
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Yayın Olanakları"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "Kabul edilen özetler Sempozyum Özetler Kitabı içinde yayımlanacaktır.\n\nKabul edilen tam metinler Tam Metin Bildiri Kitabı içinde ayrıca yayımlanacaktır.\n\nHer iki yayın da ayrı kitaplar halinde hazırlanacaktır.\n\nKabul edilen bildirilere uygun süreçte DOI ve yayın bilgileri tanımlanacaktır.\n\nSadece yüz yüze sunulan bildiriler , uygun bulunmaları halinde dergilerde makale olarak değerlendirilme hakkı elde edecektir."
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 2,
+                "text": "Katılım Belgeleri"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Yüz yüze sunum yapan katılımcılara basılı katılım belgesi verilecektir.\n\nÇevrim içi sunum yapan katılımcılara dijital katılım belgesi verilecektir."
+              },
+              {
+                "id": "heading-9",
+                "type": "heading",
+                "level": 2,
+                "text": "Kayıt Bilgilendirmesi"
+              },
+              {
+                "id": "text-10",
+                "type": "paragraph",
+                "text": "Kayıt işlemleri, sempozyuma katılım türüne uygun şekilde tamamlanacaktır. Katılım ücretleri ve ücretlendirme esasları için Ücretler sayfasını inceleyiniz."
+              },
+              {
+                "id": "heading-11",
+                "type": "heading",
+                "level": 3,
+                "text": "Önemli Not"
+              },
+              {
+                "id": "text-12",
+                "type": "paragraph",
+                "text": "EYİ 2026, yüz yüze akademik etkileşimi çevrim içi katılımın erişilebilirliği ile birleştiren hibrit bir yapıda tasarlanmıştır. Bu model, uluslararası katılımı artırmayı hedeflerken, aynı zamanda yüz yüze bilimsel tartışma ve sunum ortamının sağladığı avantajları korumayı amaçlamaktadır."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Kayt"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "ac92a9c7941bd38b",
+      "slug": "eyi-2026-yayin-olanaklari",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/YaynOlanaklarveDergiAlternatifleri",
+      "title": "Yayın Olanakları ve Dergi Alternatifleri",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "9dccfb73fc39787640b237f368d7ca07fc5164def51e9dc2c87727703322661f",
+      "sourceParts": 12,
+      "sourceLinks": [
+        {
+          "label": "Akademik Yaklaşımlar Dergisi",
+          "url": "https://dergipark.org.tr/tr/pub/ayd"
+        },
+        {
+          "label": "EKOIST Journal of Econometrics and Statistics",
+          "url": "https://dergipark.org.tr/tr/pub/ekoist"
+        },
+        {
+          "label": "Eurasian Business & Economics Journal",
+          "url": "https://www.eurasianacademy.org/index.php/busecon"
+        },
+        {
+          "label": "Eurasian Econometrics Statistics & Empirical Economics Journal",
+          "url": "https://www.eurasianacademy.org/index.php/econstat"
+        },
+        {
+          "label": "İstatistik Araştırma Dergisi",
+          "url": "https://dergipark.org.tr/tr/pub/jsstr"
+        },
+        {
+          "label": "Journal of Applied Microeconometrics",
+          "url": "https://journals.gen.tr/index.php/jame"
+        },
+        {
+          "label": "Manisa Celal Bayar Üniversitesi Sosyal Bilimler Dergisi",
+          "url": "https://dergipark.org.tr/tr/pub/cbayarsos"
+        },
+        {
+          "label": "Structural Equation Modelling and Multivariate Research",
+          "url": "https://semmrjournal.com/"
+        },
+        {
+          "label": "Yönetim ve Ekonomi Dergisi",
+          "url": "https://dergipark.org.tr/tr/pub/yonveek"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Yayın Olanakları ve Dergi Alternatifleri",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Yayın Olanakları ve Dergi Alternatifleri"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında sunulan bildiriler, sempozyum yayın süreçleri ve dergi alternatifleri bakımından farklı değerlendirme olanaklarına sahip olacaktır. Kabul edilen özetler Sempozyum Özetler Kitabı içinde, uygun görülen tam metinler ise Tam Metin Bildiri Kitabı içinde yayımlanabilecektir.\n\nYüz yüze sunulan ve makale formatına dönüştürülmeye uygun bulunan çalışmalar, aşağıda yer alan dergi alternatifleri kapsamında ayrıca değerlendirilebilecektir. Bu süreç, doğrudan yayın garantisi anlamına gelmemekte olup tüm aday çalışmalar ilgili dergilerin editoryal ve hakemlik süreçlerine tabidir."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 3,
+                "text": "Yayın Sürecine İlişkin Önemli Notlar"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Tam Metin Bildiri Kitabı içinde yayımlanan çalışmalar, özellikle EKOIST Journal of Econometrics and Statistics kapsamında makale adayı olarak değerlendirilmeyecektir.\n\nYeterli sayıda ve nitelikte makale adayı oluşması halinde, ilgili dergilerde özel sayı hazırlanması değerlendirilebilecektir.\n\nMakale adayı olarak yönlendirilecek tüm çalışmalar, ilgili dergilerin hakemlik ve editoryal değerlendirme süreçlerinden geçecektir.\n\nDergi ücretleri, dizin bilgileri ve yayın koşulları zaman içinde güncellenebileceğinden, yazarların başvuru öncesinde ilgili derginin güncel sayfasını kontrol etmeleri önerilir."
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Dergi Alternatifleri"
+              },
+              {
+                "id": "table-6",
+                "type": "table",
+                "caption": "Yayın Olanakları ve Dergi Alternatifleri — kaynak tablosu",
+                "headers": [
+                  "Dergi",
+                  "Ücret Bilgisi",
+                  "Öne Çıkan Dizinler",
+                  "Not"
+                ],
+                "rows": [
+                  [
+                    "Akademik Yaklaşımlar Dergisi",
+                    "Ücret alınmamaktadır.",
+                    "TR Dizin, DOAJ, ERIH PLUS",
+                    "Açık erişimli, hakemli akademik dergidir."
+                  ],
+                  [
+                    "EKOIST Journal of Econometrics and Statistics",
+                    "Ücret alınmamaktadır.",
+                    "ESCI, TR Dizin, DOAJ, ProQuest Central, ERIH PLUS, RePEc",
+                    "Tam Metin Bildiri Kitabı’nda yayımlanan çalışmalar EKOIST için makale adayı olarak değerlendirilmeyecektir."
+                  ],
+                  [
+                    "Eurasian Business & Economics Journal",
+                    "Makale değerlendirme ücreti talep edilmektedir.",
+                    "EconLit, RePEc, IDEAS, EconPapers, Google Scholar",
+                    "Yayın süreci derginin kendi başvuru ve değerlendirme koşullarına göre yürütülür."
+                  ],
+                  [
+                    "Eurasian Econometrics Statistics & Empirical Economics Journal",
+                    "Makale değerlendirme ücreti talep edilmektedir.",
+                    "EconLit, RePEc, IDEAS, EconPapers, Google Scholar",
+                    "Ekonometri, istatistik ve ampirik iktisat alanındaki çalışmalar için uygun bir alternatif olarak değerlendirilebilir."
+                  ],
+                  [
+                    "İstatistik Araştırma Dergisi",
+                    "Ücret alınmamaktadır.",
+                    "EBSCO, Google Scholar",
+                    "İstatistik ve ilgili nicel yöntem alanlarındaki çalışmalar için uygundur."
+                  ],
+                  [
+                    "Journal of Applied Microeconometrics",
+                    "Ücret alınmamaktadır.",
+                    "EBSCO, RePEc / IDEAS, EconPapers, ASOS Index",
+                    "Mikroekonometri ve uygulamalı nicel analiz odaklı çalışmalar için uygundur."
+                  ],
+                  [
+                    "Manisa Celal Bayar Üniversitesi Sosyal Bilimler Dergisi",
+                    "Ücret alınmamaktadır.",
+                    "TR Dizin, EBSCO, MLA, Academindex, ASCI Database, Google Scholar",
+                    "Sosyal bilimler alanındaki uygun çalışmalar için değerlendirilebilir."
+                  ],
+                  [
+                    "Structural Equation Modelling and Multivariate Research",
+                    "Ücret alınmamaktadır.",
+                    "SIS, Zenodo arşiv/topluluk kaydı",
+                    "SEM, PLS-SEM ve çok değişkenli istatistiksel yöntemler odaklı çalışmalar için uygundur."
+                  ],
+                  [
+                    "Yönetim ve Ekonomi Dergisi",
+                    "Ücret alınmamaktadır.",
+                    "TR Dizin",
+                    "Yönetim, ekonomi ve sosyal bilimler alanındaki çalışmalar için uygundur."
+                  ]
+                ]
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 3,
+                "text": "Genel Değerlendirme"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Dergi alternatifleri, EYİ 2026 kapsamında sunulan çalışmaların akademik yayın potansiyelini artırmak amacıyla paylaşılmaktadır. Ancak her dergi kendi kapsamı, yayın politikası, yazım kuralları, ücret politikası ve hakemlik süreci çerçevesinde bağımsız değerlendirme yapacaktır."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/YaynOlanaklarveDergiAlternatifleri"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "33cbe9ca95709014",
+      "slug": "eyi-2026-gezi-programi",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/GeziProgram",
+      "title": "Gezi Programı",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "4c8151d3d2554cff5bd73eda85d41b8333342c70e1f5cd96a040610fe96b7e92",
+      "sourceParts": 24,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Gezi Programı",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Manisa Kültürel Gezi Programı"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Kongre programı kapsamında, katılımcıların Manisa’nın tarihî ve kültürel mirasını yakından tanıyabilmeleri amacıyla şehir merkezinde kültürel bir gezi programı planlanmıştır. Program, Manisa’nın önemli tarihî ve kültürel noktalarını kapsayacak şekilde hazırlanmış olup katılımcılara şehrin Osmanlı dönemindeki “Şehzadeler Şehri” kimliği ile antik dönem mirası hakkında genel bir perspektif sunmayı amaçlamaktadır.\n\nGezi programı 19 Eylül 2026 sabah 10.00 ’da başlayacak ve 16.00 ’da sona erecek şekilde planlanmıştır. Program süresince şehir merkezinde yer alan müzeler, tarihî yapılar ve doğal-kültürel alanlar ziyaret edilecek; ayrıca katılımcılar için 1 saatlik öğle yemeği molası verilecektir.\n\nBu program kapsamında katılımcılar, Manisa’nın Osmanlı dönemindeki idarî ve kültürel önemini yansıtan yapılar ile şehrin antik dönem mitolojik mirasını temsil eden alanları yerinde görme fırsatı bulacaktır.\n\nNot: Gezi programına katılmayı planlayan katılımcıların, ziyaret edilecek müze ve ören yerlerinde giriş işlemlerinin daha hızlı ve sorunsuz gerçekleştirilebilmesi amacıyla geçerli MüzeKartlarını yanlarında bulundurmaları önemle rica olunur."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Program Bilgisi"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "19 Eylül 2026\n\nBaşlangıç Saati: 10.00\n\nBitiş Saati: 16.00\n\nKapsam: Manisa şehir merkezinde kültürel gezi programı\n\nİçerik: Müzeler, tarihî yapılar ve kültürel alan ziyaretleri\n\nMola: 1 saatlik öğle yemeği arası"
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Gezi Rotası"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "Yunusemre Kültürpark\n\nManisa Kurtuluş Müzesi\n\nŞehzadeler Parkı ve Fatih Kulesi\n\nŞehzadeler Müzesi\n\nSultan Camii ve Ayşe Hafsa Sultan Darüşşifası (Tıp Tarihi Müzesi)\n\nNiobe (Ağlayan Kaya)\n\nFetih Mescidi ve eski kale kalıntıları\n\nMevlevihane\n\nDarphane Ulu Camii"
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 3,
+                "text": "Önemli Not"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Katılımcıların programa rahat bir şekilde katılabilmeleri için ulaşım ve organizasyon detayları kongre organizasyon komitesi tarafından ayrıca duyurulacaktır."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/GeziProgram"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "bbd024b66af67b29",
+      "slug": "eyi-2026-oduller",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/OdullerViki",
+      "title": "Ödüller",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "82749e63b34c7b19075a04b22b462f680fe513c47f4b9846203f1930d2d437cf",
+      "sourceParts": 43,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Ödüller",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "EYİ 2026 En İyi Bildiri Ödülleri"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 En İyi Bildiri Ödülleri; ekonometri, yöneylem araştırması ve istatistik alanlarında özgün, bilimsel niteliği yüksek ve alana önemli katkı sağlayan çalışmaları teşvik etmek amacıyla verilmektedir.\n\nSempozyum kapsamında bilimsel değerlendirme sürecini başarıyla tamamlayan ve sunumu gerçekleştirilen bildiriler arasından en iyi bildirilerin belirlenmesi planlanmaktadır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Ödül Kategorileri"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "En İyi Bildiri Birincilik Ödülü\n\nEn İyi Bildiri İkincilik Ödülü\n\nEn İyi Bildiri Üçüncülük Ödülü\n\nDüzenleme Kurulu, gerekli gördüğü durumlarda özel ödül verebilir ya da yeterli nitelikte bildiri bulunmaması halinde ödül vermeme hakkını saklı tutar."
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Değerlendirme Komisyonu"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "EYİ 2026 En İyi Bildirileri; Düzenleme Kurulu, Danışma Kurulu ve Bilim Kurulu üyeleri arasından oluşturulacak En İyi Bildiri Değerlendirme Komisyonu tarafından belirlenir.\n\nKomisyon en az üç üyeden oluşur. Komisyon üyeleri, çıkar çatışması bulunan bildirilerin değerlendirilmesine katılamaz."
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 2,
+                "text": "Değerlendirme Süreci"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Ödül değerlendirmesine yalnızca sempozyum programına kabul edilen, Bilim/Hakem Kurulu tarafından bilimsel değerlendirme sürecini başarıyla tamamlayan ve sempozyumda sunumu gerçekleştirilmiş bildiriler dahil edilir.\n\nÖdül değerlendirme sürecine katılmak isteyen yazarların, kongre takviminde ilan edilen tarihe kadar bildirilerinin tam metinlerini eyi2026@cbu.edu.tr adresine göndermeleri gerekmektedir. Değerlendirme, tam metinler üzerinden ve önceden belirlenmiş bilimsel ölçütler çerçevesinde gerçekleştirilecektir.\n\nKongre programında sözlü olarak sunulan ve değerlendirme koşullarını sağlayan bildiriler arasından en yüksek puanı alan çalışmalar, En İyi Bildiri Değerlendirme Komisyonu kararıyla En İyi Bildiri Ödülü almaya hak kazanacaktır.\n\nBelirlenen tarihe kadar tam metni teslim edilmeyen bildiriler ödül değerlendirme sürecine dahil edilmeyecektir.\n\nAday bildiriler, En İyi Bildiri Değerlendirme Komisyonu tarafından iki aşama üzerinden değerlendirilir. Komisyon üyeleri aday bildirileri birbirlerinden bağımsız olarak değerlendirir."
+              },
+              {
+                "id": "heading-9",
+                "type": "heading",
+                "level": 2,
+                "text": "1. Aşama: Bilimsel Nitelik"
+              },
+              {
+                "id": "text-10",
+                "type": "paragraph",
+                "text": "Araştırmanın özgünlüğü\n\nProblemin bilimsel önemi\n\nLiteratüre katkısı\n\nKullanılan yöntemin uygunluğu\n\nAnalizlerin doğruluğu ve yeterliliği\n\nBulguların güvenilirliği\n\nSonuçların bilimsel katkısı"
+              },
+              {
+                "id": "heading-11",
+                "type": "heading",
+                "level": 2,
+                "text": "2. Aşama: Sunum Performansı"
+              },
+              {
+                "id": "text-12",
+                "type": "paragraph",
+                "text": "Sunumun açıklığı ve düzeni\n\nBilimsel içeriğin etkili aktarımı\n\nGörsel materyalin etkin kullanımı\n\nSüre yönetimi\n\nSorulara verilen yanıtların yeterliliği"
+              },
+              {
+                "id": "heading-13",
+                "type": "heading",
+                "level": 2,
+                "text": "Puanlama Esası"
+              },
+              {
+                "id": "text-14",
+                "type": "paragraph",
+                "text": "Her iki aşamada da Komisyon üyeleri her bir değerlendirme ölçütünü 1-5 puan aralığında değerlendirir. İlgili ölçütlerden alınan puanların ortalaması, o aşamaya ilişkin komisyon puanının hesaplanmasında esas alınır.\n\nNihai puan, bildirinin bilimsel niteliği ile sunum performansına ilişkin komisyon değerlendirmelerinin sırasıyla %70 ve %30 ağırlıklandırılmasıyla hesaplanır.\n\nKomisyon tarafından yapılan değerlendirme sonucunda en yüksek nihai puanı alan bildiriler sırasıyla birincilik, ikincilik ve üçüncülük ödülüne layık görülür. Puan eşitliği halinde öncelikle bilimsel nitelik puanı dikkate alınır. Eşitliğin devam etmesi durumunda En İyi Bildiri Değerlendirme Komisyonu nihai kararı verir."
+              },
+              {
+                "id": "heading-15",
+                "type": "heading",
+                "level": 2,
+                "text": "Ödüllerin Takdimi"
+              },
+              {
+                "id": "text-16",
+                "type": "paragraph",
+                "text": "Ödüle layık görülen bildiriler sempozyumun kapanış töreninde ilan edilir ve ödül belgeleri takdim edilir.\n\nAyrıca ödül kazanan çalışmalar sempozyumun resmî internet sayfasında ilan edilir."
+              },
+              {
+                "id": "heading-17",
+                "type": "heading",
+                "level": 2,
+                "text": "Diğer Hükümler"
+              },
+              {
+                "id": "text-18",
+                "type": "paragraph",
+                "text": "Değerlendirme süreci gizlilik ilkesi çerçevesinde yürütülür.\n\nKomisyon gerekli gördüğü takdirde ödül vermeme kararı alabilir.\n\nKomisyon kararları kesindir.\n\nÖdül esaslarında yer almayan hususlarda karar verme yetkisi Düzenleme Kuruluna aittir."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/OdullerViki"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "7e9fcdadc12780c0",
+      "slug": "eyi-2026-sponsorluk",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Sponsorlar",
+      "title": "Sponsorlar",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "d94a4e752d218f7bc1a0c2a02f65c232be36318510242663ae12888717b4a97c",
+      "sourceParts": 9,
+      "sourceLinks": [],
+      "assetFiles": [
+        "c06e8e0d1210bc07b070.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Sponsorlar",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Sponsorluk"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "EYİ 2026 kapsamında sempozyuma katkı sunan kurum ve kuruluşlara bu sayfada yer verilecektir. Sponsorlarımız kesinleştikçe logoları ve katkı alanlarına ilişkin bilgiler bu bölümde paylaşılacaktır."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 2,
+                "text": "Yaşam Boyu Eğitim ve Bilime Destek Derneği"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Katkı Alanı: Ödeme süreçleri ve faturalandırma işlemleri\n\nEYİ 2026 kapsamında ödeme süreçlerinin yönetimi ve faturalandırma işlemlerinin yürütülmesine katkı sunmaktadır."
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 2,
+                "text": "Sponsor Adı"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "Bu bölümde sponsorun katkı sağladığı oturum, etkinlik ya da destek türü belirtilebilir. Metin daha sonra kurum bilgilerine göre güncellenebilir."
+              },
+              {
+                "id": "heading-7",
+                "type": "heading",
+                "level": 3,
+                "text": "Takipte Kalınız"
+              },
+              {
+                "id": "text-8",
+                "type": "paragraph",
+                "text": "Sponsorlarımız netleştikçe bu sayfa düzenli olarak güncellenecek, kurumsal logolar ve katkı alanlarına ilişkin detaylar burada duyurulacaktır."
+              },
+              {
+                "id": "asset-9",
+                "type": "image",
+                "mediaId": "asset-c06e8e0d1210bc07b070.webp",
+                "alt": "Sponsorlar — kaynak görseli",
+                "caption": "Sponsorlar — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Sponsorlar"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "6a97cb6e8620c95f",
+      "slug": "eyi-2026-galeri",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Galeri",
+      "title": "Galeri",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "a1f0c2e68ebe21570ed0a7c4db2227fe23559200eeb1c42c6dd98a65684bbd84",
+      "sourceParts": 4,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Galeri",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "EYİ 2026 kapsamında gerçekleştirilecek akademik oturumlar, sosyal etkinlikler, kültürel gezi programı ve kongreye ilişkin diğer önemli anlar bu sayfada paylaşılacaktır."
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Kongre süresince ve kongre sonrasında fotoğraflar düzenli olarak galeriye eklenecektir. Güncel içerikler için bu sayfayı takipte kalınız."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 3,
+                "text": "Takipte Kalınız"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Kongre ile ilgili fotoğraflar, etkinlik süreci boyunca ve etkinlik sonrasında düzenli olarak bu alana eklenecektir. EYİ 2026’nın öne çıkan anlarını görmek için galerimizi takip etmeyi unutmayınız."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/Galeri"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "fc34db6520243334",
+      "slug": "eyi-2026-iletisim",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/GeriBildirim",
+      "title": "Geri Bildirim",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "1b8c71d7d341adf729720c2e78560c15023afb01f80fd9c1e158455114da4c16",
+      "sourceParts": 8,
+      "sourceLinks": [
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "eyi2026@cbu.edu.tr",
+          "url": "mailto:eyi2026@cbu.edu.tr"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Geri Bildirim",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "heading-1",
+                "type": "heading",
+                "level": 2,
+                "text": "Geri Bildirim"
+              },
+              {
+                "id": "text-2",
+                "type": "paragraph",
+                "text": "Anasayfa\n\nGeri Bildirim\n\nÜniversitemiz ile ilgili her türlü soru ve problemlerinizi bizimle paylaşabilirsiniz."
+              },
+              {
+                "id": "heading-3",
+                "type": "heading",
+                "level": 3,
+                "text": "Adres"
+              },
+              {
+                "id": "text-4",
+                "type": "paragraph",
+                "text": "Prof. Dr. Ümit Doğay Arınç Kültür Merkezi,Muradiye, 45110 Manisa Merkez/Manisa"
+              },
+              {
+                "id": "heading-5",
+                "type": "heading",
+                "level": 3,
+                "text": "E-posta"
+              },
+              {
+                "id": "text-6",
+                "type": "paragraph",
+                "text": "eyi2026@cbu.edu.tr"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/GeriBildirim"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "f68a08c24ea2b1bd",
+      "slug": "eyi-2026-arsiv-f68a0",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/1/101",
+      "title": "Arşiv",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "f26b9020c041b671f1fb35d96cf707a4ee02d453da29b5fb11217d9b5a948d73",
+      "sourceParts": 4,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "03 Eki 2026 📕 EYİ 2026 Bildiri Özetleri Kitabı Bildiri Özetleri Kitabı Yayımlanmıştır...",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-bildiri-ozetleri-kitabi"
+        },
+        {
+          "label": "17 Eyl 2026 📢19 Eylül 2026 Çevrim İçi Oturumları Microsoft Teams bağlantıları, 19 Eylül sabahı saat 08.30'da yayımlanacaktır.",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/19-eylul-2026-cevrim-ici-oturumlari"
+        },
+        {
+          "label": "12 Eyl 2026 📑EYİ 2026 Bilimsel Programı Oturum Başkanları Eklenerek Program Güncellenmiştir...",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-bilimsel-programi"
+        },
+        {
+          "label": "07 Eyl 2026 📚 EYİ 2026 Workshop Programı Katılım ve Kontenjan Bilgilendirmesi",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-workshop-programi"
+        },
+        {
+          "label": "05 Eyl 2026 📢Transfer Bilgileri Servis Güzergahı ve Saatleri Hakkında Duyuru",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/transfer-bilgileri-hakkinda"
+        },
+        {
+          "label": "02 Eyl 2026 🎫 MüzeKart | 🏛️ Gezi Programı Hakkında Hatırlatma",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/%F0%9F%8E%AB-MuzeKart-%7C-%F0%9F%8F%9B%EF%B8%8F-Gezi-Programi-Hakkinda-Hatirlatma-750"
+        },
+        {
+          "label": "19 Ağu 2026 📆 EYİ2026 | Tam Metin Gönderimi ve En İyi Bildiri Ödülleri Hakkında Hatırlatma",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/EYI-2026-%7C-Tam-Metin-Gonderimi-ve-En-Iyi-Bildiri-Odulleri-Hakkinda-Hatirlatma-126"
+        },
+        {
+          "label": "11 Ağu 2026 📄 EYİ2026 – Kabul Edilen Bildiriler Listesi Kabul Alan Bildirilerin Listesi",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/Kabul-Alan-Bildirilerin-Listesi-239"
+        },
+        {
+          "label": "25 Tem 2026 🚌 EYİ2026 Gezi Programı",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/GeziProgram"
+        },
+        {
+          "label": "25 Tem 2026 🏆 EYİ2026 En İyi Bildiri Ödülleri",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/OdullerViki"
+        },
+        {
+          "label": "Önceki",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/1/101?page=0&pageSize=10"
+        },
+        {
+          "label": "1",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/1/101?page=1&pageSize=10"
+        },
+        {
+          "label": "2",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/1/101?page=2&pageSize=10"
+        },
+        {
+          "label": "Sonraki",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/1/101?page=2&pageSize=10"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Arşiv",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Önceki\n\n1\n\n2\n\nSonraki"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/1/101"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "68d8328db53e7f17",
+      "slug": "eyi-2026-03-eki-yeni-eyi-2026-bildiri-ozetleri-kitab-68d83",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-bildiri-ozetleri-kitabi",
+      "title": "📕 EYİ 2026 Bildiri Özetleri Kitabı",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "e87512945277614a4b98b18bf07309d1cc0f2b216f89fd3c902d89514eed91f2",
+      "sourceParts": 5,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Özet ve Tam Metin Kitabı",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/KongreKitaplar"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "📕 EYİ 2026 Bildiri Özetleri Kitabı",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n📕 EYİ 2026 Bildiri Özetleri Kitabı"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "📕 EYİ 2026 Bildiri Özetleri Kitabı"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "EYİ 2026 Bildiri Özetleri Kitabı 'na Özet ve Tam Metin Kitabı menüsünden ulaşabilirsiniz.\n\nEYİ 2026 Bildiri Özetleri Kitabı 'na Özet ve Tam Metin Kitabı menüsünden ulaşabilirsiniz."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-bildiri-ozetleri-kitabi"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "a1cb39195e8fa17d",
+      "slug": "eyi-2026-17-eyl-19-eylul-2026-cevrim-ici-oturumlari-a1cb3",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/19-eylul-2026-cevrim-ici-oturumlari",
+      "title": "📢19 Eylül 2026 Çevrim İçi Oturumları",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "c6ef80f52f9a6e2b856dc624db984e3dbb200936fbe51eed343b8b8e2beecf8e",
+      "sourceParts": 4,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Sempozyum Programı",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/cevrim-ici-oturumlar-ve-microsoft-teams-baglantilari-2"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "📢19 Eylül 2026 Çevrim İçi Oturumları",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n📢19 Eylül 2026 Çevrim İçi Oturumları"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "📢19 Eylül 2026 Çevrim İçi Oturumları"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "19 Eylül 2026 Çevrim İçi Oturumları hakkında detaylı bilgilendirmeye Sempozyum Programı menüsünden ulaşabilirsiniz."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/19-eylul-2026-cevrim-ici-oturumlari"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "a18d130d19ba0134",
+      "slug": "eyi-2026-12-eyl-eyi-2026-bilimsel-programi-oturum-ba-a18d1",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-bilimsel-programi",
+      "title": "📑EYİ 2026 Bilimsel Programı",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "fa159dbd6c890bdf2fc49aeb7fba346e95639412d705a43cebc6e35849313966",
+      "sourceParts": 6,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Sempozyum Programı",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Sayfa/SempozyumProgram"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "📑EYİ 2026 Bilimsel Programı",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n📑EYİ 2026 Bilimsel Programı"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "📑EYİ 2026 Bilimsel Programı"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "📑 Güncellenmiş ve oturum başkanları eklenmiş EYİ 2026 Bilimsel Programı 'na Sempozyum Programı menüsünden ulaşabilirsiniz.\n\n📑 Güncellenmiş ve oturum başkanları eklenmiş EYİ 2026 Bilimsel Programı 'na Sempozyum Programı menüsünden ulaşabilirsiniz.\n\nNot: Bildiri sunumları, 10 dakika sunum ve 5 dakika soru-cevap olmak üzere toplam 15 dakika olarak planlanmıştır. Oturumların program akışına uygun biçimde yürütülebilmesi için sunum sürelerine riayet edilmesi önemle rica olunur."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-bilimsel-programi"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "6ed4342bd409d263",
+      "slug": "eyi-2026-07-eyl-eyi-2026-workshop-programi-katilim-v-6ed43",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-workshop-programi",
+      "title": "📚 EYİ 2026 Workshop Programı",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "10f1bc196e06e16eba3eabbe35302a9131e99b26b20030989083a48b4ee88a0e",
+      "sourceParts": 6,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "📚 EYİ 2026 Workshop Programı",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n📚 EYİ 2026 Workshop Programı"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "📚 EYİ 2026 Workshop Programı"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "EYİ 2026 Workshop Programı EYİ 2026 Workshop Programı Workshop I Kantil Regresyonun Ekonometri ve Makine Öğrenmesindeki Yeri Yürütücü: Prof.\n\nWorkshoplar 25 kişilik kontenjanla sınırlıdır.\n\nBaşvurular değerlendirilirken lisans ve lisansüstü öğrencilere öncelik verilecek olup, kalan kontenjanlar başvuru sırasına göre tahsis edilecektir."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/eyi-2026-workshop-programi"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "a409f233c48b7b5b",
+      "slug": "eyi-2026-05-eyl-transfer-bilgileri-servis-guzergahi-a409f",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/transfer-bilgileri-hakkinda",
+      "title": "📢Transfer Bilgileri",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "358307ffbf6d86627f1ec086541703e54a15421a0011344454c980d3adebd1d2",
+      "sourceParts": 12,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "📢Transfer Bilgileri",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n📢Transfer Bilgileri"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "📢Transfer Bilgileri"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "Transfer Bilgileri 17 Eylül 2026 ve 18 Eylül 2026 tarihlerinde kongre katılımcıları için servis hizmeti planlanmıştır."
+              },
+              {
+                "id": "heading-4",
+                "type": "heading",
+                "level": 2,
+                "text": "Transfer Bilgileri"
+              },
+              {
+                "id": "text-5",
+                "type": "paragraph",
+                "text": "17 Eylül 2026 ve 18 Eylül 2026 tarihlerinde kongre katılımcıları için servis hizmeti planlanmıştır.\n\nGüzergah: Servis, Manisa Öğretmenevi 'nden Forum Magnesia AVM, DoubleTree Hotel, Büyük Saruhanlı Otel, Manisa Adliyesi ve Anemon Grand Manisa Otel güzergâhından geçerek MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi ’ne ulaşacaktır. Dönüş servisleri aynı güzergâhı ters yönde izleyecektir.\n\nSabah Servisi: Saat 08.30’da Manisa Öğretmenevi’nden MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi’ne hareket edecektir.\n\nAkşam Dönüşü: Saat 17.45’te MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi’nden Manisa Öğretmenevi’ne hareket edecektir.\n\nSabah Servisi: Saat 08.30’da Manisa Öğretmenevi’nden MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi’ne hareket edecektir.\n\nAkşam Dönüşü: Saat 17.15’te MCBÜ Prof. Ümit Doğay Arınç Kültür Merkezi’nden Manisa Öğretmenevi’ne hareket edecektir.\n\nGala Yemeği Ulaşımı: Katılımcılar için servis aracı, saat 18.45’te Manisa Öğretmenevi’nden MCBÜ Gala Yemeği alanına hareket edecektir."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/transfer-bilgileri-hakkinda"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "afd74a5d5af7e4ad",
+      "slug": "eyi-2026-02-eyl-muzekart-gezi-programi-hakkinda-hati-afd74",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/%F0%9F%8E%AB-MuzeKart-%7C-%F0%9F%8F%9B%EF%B8%8F-Gezi-Programi-Hakkinda-Hatirlatma-750",
+      "title": "🎫 MüzeKart | 🏛️ Gezi Programı Hakkında Hatırlatma",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "031e3b817b50e0420b79e4fd2f71429eb09789c187c2a52208821d832f1eab1c",
+      "sourceParts": 6,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        }
+      ],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "🎫 MüzeKart | 🏛️ Gezi Programı Hakkında Hatırlatma",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n🎫 MüzeKart | 🏛️ Gezi Programı Hakkında Hatırlatma"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "🎫 MüzeKart | 🏛️ Gezi Programı Hakkında Hatırlatma"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "✨ HATIRLATMA 🎫🏛️ 🚌Gezi programına katılmayı planlayan katılımcıların, ziyaret edilecek müze ve ören yerlerinde giriş işlemlerinin daha hızlı ve sorunsuz…"
+              },
+              {
+                "id": "heading-4",
+                "type": "heading",
+                "level": 2,
+                "text": "✨ HATIRLATMA 🎫🏛️"
+              },
+              {
+                "id": "text-5",
+                "type": "paragraph",
+                "text": "🚌Gezi programına katılmayı planlayan katılımcıların, ziyaret edilecek müze ve ören yerlerinde giriş işlemlerinin daha hızlı ve sorunsuz gerçekleştirilebilmesi amacıyla geçerli MüzeKartlarını yanlarında bulundurmaları önemle rica olunur."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/%F0%9F%8E%AB-MuzeKart-%7C-%F0%9F%8F%9B%EF%B8%8F-Gezi-Programi-Hakkinda-Hatirlatma-750"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "20ffefb8d1be555a",
+      "slug": "eyi-2026-19-agu-eyi2026-tam-metin-gonderimi-ve-en-iy-20ffe",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/EYI-2026-%7C-Tam-Metin-Gonderimi-ve-En-Iyi-Bildiri-Odulleri-Hakkinda-Hatirlatma-126",
+      "title": "📆 EYİ2026 | Tam Metin Gönderimi ve En İyi Bildiri Ödülleri Hakkında Hatırlatma",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "ede152f49d7bc927cce6c5b1aa729cdd6fbe209968c7de902312e451a4214cb5",
+      "sourceParts": 9,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "eyi2026@cbu.edu.tr",
+          "url": "mailto:eyi2026@cbu.edu.tr"
+        },
+        {
+          "label": "eyi2026@cbu.edu.tr",
+          "url": "mailto:eyi2026@cbu.edu.tr"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/Gallery-16438-YMTK190820261407.png"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/Gallery-16438-YMTK190820261407.png"
+        }
+      ],
+      "assetFiles": [
+        "22fa47a36079a76a83ef.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "📆 EYİ2026 | Tam Metin Gönderimi ve En İyi Bildiri Ödülleri Hakkında Hatırlatma",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n📆 EYİ2026 | Tam Metin Gönderimi ve En İyi Bildiri Ödülleri Hakkında Hatırlatma"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "📆 EYİ2026 | Tam Metin Gönderimi ve En İyi Bildiri Ödülleri Hakkında Hatırlatma"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "En İyi Bildiri Ödülleri ve Tam Metin Gönderim Tarihleri En İyi Bildiri Ödülleri değerlendirme sürecine katılmak isteyen katılımcıların, bildirilerinin tam…"
+              },
+              {
+                "id": "heading-4",
+                "type": "heading",
+                "level": 2,
+                "text": "En İyi Bildiri Ödülleri ve Tam Metin Gönderim Tarihleri"
+              },
+              {
+                "id": "text-5",
+                "type": "paragraph",
+                "text": "En İyi Bildiri Ödülleri değerlendirme sürecine katılmak isteyen katılımcıların, bildirilerinin tam metinlerini en geç 4 Eylül 2026 tarihine kadar eyi2026@cbu.edu.tr adresine göndermeleri gerekmektedir. Belirtilen tarihe kadar tam metni iletilmeyen bildiriler En İyi Bildiri Ödülleri değerlendirme sürecine dâhil edilmeyecektir.\n\nEn İyi Bildiri Ödülleri değerlendirmesinden bağımsız olarak, bildirisinin tam metninin sempozyum bildiri kitabında yayımlanmasını isteyen katılımcılar için tam metin son gönderim tarihi 30 Eylül 2026 olarak belirlenmiştir.\n\nTam metinlerinizi belirtilen tarihler doğrultusunda eyi2026@cbu.edu.tr adresine iletebilirsiniz.\n\nFotoğraf"
+              },
+              {
+                "id": "asset-6",
+                "type": "image",
+                "mediaId": "asset-22fa47a36079a76a83ef.webp",
+                "alt": "📆 EYİ2026 | Tam Metin Gönderimi ve En İyi Bildiri Ödülleri Hakkında Hatırlatma",
+                "caption": "📆 EYİ2026 | Tam Metin Gönderimi ve En İyi Bildiri Ödülleri Hakkında Hatırlatma — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/EYI-2026-%7C-Tam-Metin-Gonderimi-ve-En-Iyi-Bildiri-Odulleri-Hakkinda-Hatirlatma-126"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "22733057adcb55d0",
+      "slug": "eyi-2026-11-agu-eyi2026-kabul-edilen-bildiriler-list-22733",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/Kabul-Alan-Bildirilerin-Listesi-239",
+      "title": "📄 EYİ2026 – Kabul Edilen Bildiriler Listesi",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "7846b2037ebdeffd03b17ddab61fcc3f03d010db3293f5caddd57b718c0bd3e9",
+      "sourceParts": 9,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Görüntüle",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/FileArchive/File-15349-OIQG110820260846.xlsx"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/FileArchive/File-15349-OIQG110820260846.xlsx"
+        },
+        {
+          "label": "Görüntüle",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/FileArchive/File-15349-BRHE110820260847.pdf"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/FileArchive/File-15349-BRHE110820260847.pdf"
+        }
+      ],
+      "assetFiles": [
+        "0b113283cff2a5657211.pdf"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "📄 EYİ2026 – Kabul Edilen Bildiriler Listesi",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n📄 EYİ2026 – Kabul Edilen Bildiriler Listesi"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "📄 EYİ2026 – Kabul Edilen Bildiriler Listesi"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "📄 EYİ2026 kapsamında değerlendirme süreci tamamlanan ve sempozyumda sunulmak üzere kabul edilen bildirilerin listesi aşağıda yer almaktadır.\n\n📄 EYİ2026 kapsamında değerlendirme süreci tamamlanan ve sempozyumda sunulmak üzere kabul edilen bildirilerin listesi aşağıda yer almaktadır.\n\n📝 Bildirisi kabul edilen katılımcılarımızın, sempozyuma katılımlarını kesinleştirmek için kayıt işlemlerini tamamlamaları önemle hatırlatılır.\n\n🎓 Tüm katılımcılarımıza katkıları için teşekkür eder, başarılı bir sempozyum dileriz.\n\nkabul alan bildirilerin listesi\n\nkabul alan bildirilerin listesi"
+              },
+              {
+                "id": "asset-4",
+                "type": "download",
+                "mediaId": "asset-0b113283cff2a5657211.pdf",
+                "label": "Görüntüle"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Duyuru/Kabul-Alan-Bildirilerin-Listesi-239"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "54a2cceba8e7e710",
+      "slug": "eyi-2026-arsiv-54a2c",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/2/101",
+      "title": "Arşiv",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "b89acb5ea3f3f5404156cf2a3e03eef8869d4f5c952ec443363e19aa5f9a5b0e",
+      "sourceParts": 0,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "12 Eyl 2026 Manisa Tanıtımı Discover Manisa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/ShareFileGallery/ShareFileGallery-20260912133524274-HVZ8E.pdf"
+        },
+        {
+          "label": "07 Eyl 2026 ✨ EYİ 2026 | AFİŞ EYİ 2026 | AFİŞ",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/eyi-2026-afis"
+        },
+        {
+          "label": "25 Tem 2026 🚌 EYİ2026 Gezi Programı",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/%F0%9F%9A%8C-EYI2026-Gezi-Rotasi-709"
+        },
+        {
+          "label": "25 Tem 2026 🏆 EYİ2026 En İyi Bildiri Ödülleri",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/%F0%9F%9A%8C-EYI2026-Gezi-Rotasi-248"
+        },
+        {
+          "label": "09 Mar 2026 Kongre Sloganı Kongre Sloganı, “Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)” ...",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/Congress-Motto-378"
+        }
+      ],
+      "assetFiles": [
+        "0575bc562f84513de31a.pdf"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Arşiv",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "asset-1",
+                "type": "download",
+                "mediaId": "asset-0575bc562f84513de31a.pdf",
+                "label": "12 Eyl 2026 Manisa Tanıtımı Discover Manisa"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/2/101"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "cb80e0d065c00958",
+      "slug": "eyi-2026-eyi-2026-afis-cb80e",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/eyi-2026-afis",
+      "title": "✨ EYİ 2026 | AFİŞ",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "50f26cfc25e67eff0b64fba2aff412f220b7a57d58c126b2e813b229c76c74b7",
+      "sourceParts": 4,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/PictureGallery-20260907155947816-3PE7P.jpeg"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/PictureGallery-20260907155947816-3PE7P.jpeg"
+        }
+      ],
+      "assetFiles": [
+        "a1663a050d75544cff01.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "✨ EYİ 2026 | AFİŞ",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n✨ EYİ 2026 | AFİŞ"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "✨ EYİ 2026 | AFİŞ"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "Fotoğraf"
+              },
+              {
+                "id": "asset-4",
+                "type": "image",
+                "mediaId": "asset-a1663a050d75544cff01.webp",
+                "alt": "✨ EYİ 2026 | AFİŞ",
+                "caption": "✨ EYİ 2026 | AFİŞ — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/eyi-2026-afis"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "2c94deeeffbf233f",
+      "slug": "eyi-2026-eyi2026-gezi-programi-2c94d",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/%F0%9F%9A%8C-EYI2026-Gezi-Rotasi-709",
+      "title": "🚌 EYİ2026 Gezi Programı",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "a0fbeb9f9221d4a291f590151d3afeb81ee1a096d3e5ecbccb02ed5b2c89b4bf",
+      "sourceParts": 6,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/Gallery-14143-BXNF250720260101.png"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/Gallery-14143-BXNF250720260101.png"
+        }
+      ],
+      "assetFiles": [
+        "9addf2c522d51a5ad391.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "🚌 EYİ2026 Gezi Programı",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n🚌 EYİ2026 Gezi Programı"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "🚌 EYİ2026 Gezi Programı"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "Gezi Programı menüsünden detayları inceleyebilirsiniz...\n\nGezi Programı menüsünden detayları inceleyebilirsiniz...\n\nFotoğraf"
+              },
+              {
+                "id": "asset-4",
+                "type": "image",
+                "mediaId": "asset-9addf2c522d51a5ad391.webp",
+                "alt": "🚌 EYİ2026 Gezi Programı",
+                "caption": "🚌 EYİ2026 Gezi Programı — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/%F0%9F%9A%8C-EYI2026-Gezi-Rotasi-709"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "da4055167165659a",
+      "slug": "eyi-2026-eyi2026-en-iyi-bildiri-odulleri-da405",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/%F0%9F%9A%8C-EYI2026-Gezi-Rotasi-248",
+      "title": "🏆 EYİ2026 En İyi Bildiri Ödülleri",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "5669fabda9373c13eddabfd9d7016001cd17c7476a545c55557e14f684321c13",
+      "sourceParts": 7,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "eyi2026@cbu.edu.tr",
+          "url": "mailto:eyi2026@cbu.edu.tr"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/Gallery-14142-UAQS190820261532.png"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/Gallery-14142-UAQS190820261532.png"
+        }
+      ],
+      "assetFiles": [
+        "aa2a4dfe366347719786.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "🏆 EYİ2026 En İyi Bildiri Ödülleri",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\n🏆 EYİ2026 En İyi Bildiri Ödülleri"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "🏆 EYİ2026 En İyi Bildiri Ödülleri"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "En İyi Bildiri Ödülleri için tam metin gönderim süresi 4 Eylül 2026 tarihine uzatılmıştır.\n\nEn İyi Bildiri Ödülleri için tam metin gönderim süresi 4 Eylül 2026 tarihine uzatılmıştır.\n\nTam metinlerinizi eyi2026@cbu.edu.tr adresine gönderebilirsiniz. Ödüller menüsünden detayları inceleyebilirsiniz...\n\nFotoğraf"
+              },
+              {
+                "id": "asset-4",
+                "type": "image",
+                "mediaId": "asset-aa2a4dfe366347719786.webp",
+                "alt": "🏆 EYİ2026 En İyi Bildiri Ödülleri",
+                "caption": "🏆 EYİ2026 En İyi Bildiri Ödülleri — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/%F0%9F%9A%8C-EYI2026-Gezi-Rotasi-248"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "2a63e5e37ad51778",
+      "slug": "eyi-2026-slogan",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/Congress-Motto-378",
+      "title": "Kongre Sloganı",
+      "status": 200,
+      "state": "ready",
+      "sourceSha256": "bf3361d5fc8d05ba616e41f23d8c8c43da4928f7d79da7909086f2363384c228",
+      "sourceParts": 9,
+      "sourceLinks": [
+        {
+          "label": "Geri dön",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "Anasayfa",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/Gallery-6699-OYYX290320261459.png"
+        },
+        {
+          "label": "",
+          "url": "https://eyi2026-iibf.mcbu.edu.tr/WebSiteContent/101/PictureGallery/Gallery-6699-OYYX290320261459.png"
+        }
+      ],
+      "assetFiles": [
+        "5536753a9b9ac0c0e4c3.webp"
+      ],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Kongre Sloganı",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "text-1",
+                "type": "paragraph",
+                "text": "Anasayfa\n\nKongre Sloganı"
+              },
+              {
+                "id": "heading-2",
+                "type": "heading",
+                "level": 2,
+                "text": "Kongre Sloganı"
+              },
+              {
+                "id": "text-3",
+                "type": "paragraph",
+                "text": "Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026) Kongrenin sloganı olan “Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)”, ekonometri disiplininin son…\n\nEkonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)\n\nKongrenin sloganı olan “Ekonometri: 100 Yıllık Bilimsel Yolculuk (1926–2026)”, ekonometri disiplininin son yüzyıldaki entelektüel gelişimini vurgulamakta ve teorik düşünce ile ampirik kanıt arasındaki kalıcı ilişkiye dikkat çekmektedir. Yirminci yüzyılın başlarında ortaya çıkışından bu yana ekonometri, ekonomik teoriyi gerçek dünya verileriyle titiz istatistiksel yöntemler aracılığıyla buluşturmayı amaçlamıştır.\n\nBu slogan, ekonometri disiplininin klasik istatistiksel uygulamalardan, ileri düzey istatistiksel modelleme, hesaplamalı yöntemler ve büyük veri analizi gibi unsurları bir araya getiren geniş ve disiplinler arası bir alana nasıl evrildiğini yansıtmaktadır. Geçtiğimiz yüz yıl boyunca ekonometri, teori ile veri arasındaki etkileşimi sürekli güçlendirerek araştırmacıların hipotezleri test etmesine, politikaları değerlendirmesine ve karmaşık ekonomik ve toplumsal olgular hakkında güvenilir çıkarımlar üretmesine olanak sağlamıştır.\n\nBu sloganın seçilmesiyle kongre, ekonometri disiplininin tarihsel gelişimini kutlamayı amaçlarken, aynı zamanda yapay zekâ, büyük veri ve veri odaklı karar alma süreçlerinin şekillendirdiği günümüzdeki önemini de vurgulamaktadır. Bu tema, araştırmacıları alanın geçmiş başarılarını değerlendirmeye ve teori ile verinin birlikte ilerlemeye devam ettiği yeni yönelimleri keşfetmeye davet etmektedir.\n\nFotoğraf"
+              },
+              {
+                "id": "asset-4",
+                "type": "image",
+                "mediaId": "asset-5536753a9b9ac0c0e4c3.webp",
+                "alt": "Kongre Sloganı",
+                "caption": "Kongre Sloganı — EYİ 2026"
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Haber/Congress-Motto-378"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "a88ab0850dfc630e",
+      "slug": "eyi-2026-etkinlik-arsivi-a88ab",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/3/101",
+      "title": "Etkinlik arşivi",
+      "status": 0,
+      "state": "missing",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceParts": 0,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Etkinlik arşivi",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Arsiv/3/101"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    },
+    {
+      "key": "464305c8592efc59",
+      "slug": "eyi-2026-alt-bilgi-iletisim-46430",
+      "url": "https://eyi2026-iibf.mcbu.edu.tr/Iletisim",
+      "title": "Alt bilgi iletişim",
+      "status": 0,
+      "state": "missing",
+      "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sourceParts": 0,
+      "sourceLinks": [],
+      "assetFiles": [],
+      "document": {
+        "version": 1,
+        "showInMenu": false,
+        "menuParent": "",
+        "menuOrder": 10,
+        "translations": {
+          "tr": {
+            "enabled": true,
+            "title": "Alt bilgi iletişim",
+            "menuLabel": "",
+            "lead": "EYİ 2026 tarihsel referansı; yeni kongre başlangıç içeriğinden ayrıdır.",
+            "blocks": [
+              {
+                "id": "archive-warning",
+                "type": "notice",
+                "text": "Tarihsel arşiv — Bu içerik EYİ 2026 kaynağından 5 Ekim 2026 tarihinde alınmıştır. Buradaki tarihler, ücretler, kişiler, iletişim ve yayın vaatleri yeni bir kongrenin bilgileri değildir."
+              },
+              {
+                "id": "official-source",
+                "type": "button",
+                "label": "Resmî EYİ 2026 kaynağı",
+                "target": "EXTERNAL",
+                "pageSlug": "",
+                "url": "https://eyi2026-iibf.mcbu.edu.tr/Iletisim"
+              }
+            ]
+          },
+          "en": {
+            "enabled": false,
+            "title": "",
+            "menuLabel": "",
+            "lead": "",
+            "blocks": []
+          }
+        }
+      }
+    }
+  ]
+}

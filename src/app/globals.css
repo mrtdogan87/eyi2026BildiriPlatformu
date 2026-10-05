@@ -2202,3 +2202,12 @@ textarea {
 .cms-media-thumb img { height:180px; max-width:100%; width:auto; object-fit:contain; }
 .cms-media-thumb span { font-family:Georgia,serif; font-size:2rem; color:#536375; }
 @media(max-width:760px) { .cms-create,.cms-fields,.cms-media-grid { grid-template-columns:1fr; } .cms-edit-block,.cms-publish-box,.cms-live-preview { padding:18px; } .cms-block-toolbar { align-items:start; flex-wrap:wrap; } .cms-public { padding-block:36px 48px; } .cms-blocks h2 { font-size:1.6rem; } .cms-table-scroll td,.cms-table-scroll th { padding:12px; } .cms-private-banner { padding:18px; } }
+.site-submenu { position: relative; }
+.site-submenu summary { cursor: pointer; padding: .7rem .85rem; font-weight: 650; }
+.site-submenu summary:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.site-submenu-items { position: absolute; top: 100%; left: 0; width: min(310px, 80vw); background: white; border: 1px solid #d8e0e7; border-radius: 8px; box-shadow: 0 10px 26px #102c4c20; padding: .4rem; z-index: 30; }
+.site-submenu-items a { display: block; white-space: normal; }
+.site-submenu-items .site-submenu-items { position: static; width: 100%; box-shadow: none; }
+.cms-list-tools { display: flex; flex-wrap: wrap; gap: .6rem; align-items: end; }
+.cms-page-list article.is-archived { opacity: .75; }
+@media(max-width: 760px) { .site-submenu-items { position: static; width: 100%; box-shadow: none; } .site-submenu { width: 100%; } }

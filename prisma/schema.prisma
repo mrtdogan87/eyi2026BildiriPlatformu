@@ -47,6 +47,7 @@ enum RegistrationKind {
 }
 
 model Congress {
+  cmsAliases               CmsPageAlias[]
   cmsPages                 CmsPage[]
   cmsMedia                 CmsMedia[]
   siteConfiguration        Json?
@@ -462,23 +463,28 @@ enum CmsRevisionKind {
 enum CmsMediaKind {
   IMAGE
   PDF
+  WORD_TEMPLATE
 }
 
 model CmsPage {
-  id                  String        @id @default(cuid())
+  archived            Boolean        @default(false)
+  templateKey         String?
+  aliases             CmsPageAlias[]
+  id                  String         @id @default(cuid())
   congressId          String
   slug                String
   internalName        String
   draft               Json
-  version             Int           @default(1)
-  publishedRevisionId String?       @unique
-  publishedRevision   CmsRevision?  @relation("CmsPublication", fields: [publishedRevisionId], references: [id], onDelete: SetNull)
-  revisions           CmsRevision[] @relation("CmsHistory")
-  congress            Congress      @relation(fields: [congressId], references: [id], onDelete: Cascade)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  version             Int            @default(1)
+  publishedRevisionId String?        @unique
+  publishedRevision   CmsRevision?   @relation("CmsPublication", fields: [publishedRevisionId], references: [id], onDelete: SetNull)
+  revisions           CmsRevision[]  @relation("CmsHistory")
+  congress            Congress       @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
 
   @@unique([congressId, slug])
+  @@unique([congressId, templateKey])
 }
 
 model CmsRevision {
@@ -526,4 +532,16 @@ model CmsRevisionMedia {
   media      CmsMedia    @relation(fields: [mediaId], references: [id], onDelete: Restrict)
 
   @@id([revisionId, mediaId])
+}
+
+model CmsPageAlias {
+  id         String   @id @default(cuid())
+  congressId String
+  slug       String
+  pageId     String
+  congress   Congress @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  page       CmsPage  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([congressId, slug])
+  @@index([pageId])
 }
