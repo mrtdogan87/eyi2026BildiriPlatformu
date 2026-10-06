@@ -22,7 +22,13 @@ export function emptyDocument():CmsDocument{return documentSchema.parse({version
 export const blockLabels:Record<CmsBlock['type'],string>={heading:'Alt başlık',paragraph:'Metin',notice:'Bilgi kutusu',list:'Liste',image:'Görsel',download:'Dosya bağlantısı',button:'Buton',table:'Tablo',dynamic:'Ortak kayıt / form'};
 export function newBlock(type:CmsBlock['type'],id:string):CmsBlock{switch(type){case'dynamic':return {id,type,source:'COMMITTEE',recordId:'',label:''};case'heading':return {id,type,text:'',level:2};case'paragraph':case'notice':return {id,type,text:''};case'list':return{id,type,ordered:false,items:['']};case'image':return{id,type,mediaId:'',alt:'',caption:''};case'download':return{id,type,mediaId:'',label:''};case'button':return{id,type,label:'',target:'EXTERNAL',pageSlug:'',url:''};case'table':return{id,type,caption:'',headers:['Başlık 1','Başlık 2'],rows:[['','']]};}}
 export function mediaReferences(doc:CmsDocument,publishedOnly=false){return [...new Set(Object.values(doc.translations).filter(t=>!publishedOnly||t.enabled).flatMap(t=>t.blocks.flatMap(b=>b.type==='image'||b.type==='download'?b.mediaId?[b.mediaId]:[]:[])))];}
-export function selectTranslation(doc:CmsDocument,locale:CmsLocale){const other=locale==='tr'?'en':'tr';const selected=doc.translations[locale].enabled&&doc.translations[locale].title?locale:doc.translations[other].enabled&&doc.translations[other].title?other:null;return selected?{locale:selected,...doc.translations[selected]}:null;}
+export function selectTranslation(doc:CmsDocument,locale:CmsLocale){
+  const selected=doc.translations[locale];
+  if(!selected.enabled)return null;
+  const other=locale==='tr'?'en':'tr';
+  const isolated={...doc,translations:{...doc.translations,[other]:{...doc.translations[other],enabled:false}}};
+  return publicationProblems(isolated,[locale==='en'?'EN':'TR']).length?null:{locale,...selected};
+}
 export function publicationProblems(doc:CmsDocument,languages:readonly ('TR'|'EN')[]=['TR','EN']) {
   const issues:string[]=[];if(!languages.some(l=>doc.translations[l==='TR'?'tr':'en'].enabled))issues.push('Kongrede açık dillerden en az biri yayımlanmalı.');
   for(const lang of ['tr','en'] as const){const t=doc.translations[lang];if(!t.enabled)continue;const prefix=lang.toUpperCase()+': ';if(!t.title.trim())issues.push(prefix+'Halka açık başlık gerekli.');if(!t.blocks.length)issues.push(prefix+'En az bir içerik bloğu gerekli.');

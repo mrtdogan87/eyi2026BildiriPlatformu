@@ -220,7 +220,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P20 tamamlandı. Güncel P20 kapanışı 1129 otomatik kontrol, 147 preview, 17 tarayıcı kontrolü ve 94 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P20_KAPANIS.md` içindedir. P21–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P21 arşiv ve taşınabilirliktir. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P21 tamamlandı; P06-E1 yerel İngilizce görünürlük kabulü tamamlandı. P21: 1175 otomatik/155 preview/21 tarayıcı ve 97 tablo restore. P06-E1: 164 odaklı kontrol, içerik kaybı olmadan dil görünürlüğü ve kalıcı PDF izin düzeltmesi. Ayrıntılar `docs/P21_KAPANIS.md` ve `docs/P06_E1_KAPANIS.md`. Sıradaki P22 yerel pilot; uzak deneme/gerçek üretim açılışı ayrı dağıtım yetkisi bekler.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
@@ -233,7 +233,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 | P04 | Kongre ayarları, oluşturma sihirbazı ve güvenli yıl çoğaltma | P03 | 1–2 |
 | P05 | Ortak ön yüz, ilk tema, ana sayfa ve mobil görünüm | P03 | 1–2 |
 | P06 | CMS editörü, medya kitaplığı, TR/EN, taslak/önizleme ve sürümler | P03, P05 | 2–3 |
-| P06-E1 | Sayfa bazında İngilizce içerik seçeneği ve dil bazında görünürlük — Planlandı | P06, P07 | İncelemede |
+| P06-E1 | Sayfa bazında İngilizce içerik seçeneği ve dil bazında görünürlük — Yerel kabul tamamlandı (07.10.2026) | P06, P07 | İncelemede |
 | P07 | Eksiksiz başlangıç sayfaları/menüler ve EYİ referans içeriğinin kontrollü aktarımı | P04, P06 | 2–3 |
 | P08 | Ortak kişi/kurul/konuşmacı ve organizasyon kayıtlarıyla dinamik sayfalar | P07 | 2–3 |
 | P09 | E-posta şablonları, gönderim kuyruğu, yeniden deneme ve geçmiş | P03, P04 | 1–2 |
@@ -290,7 +290,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Süre, kendi uygulamamızda çalışan hazır editör bileşenleri ve başlangıç sayfalarını karşılayan belirli bir blok seti varsayar; sıfırdan genel amaçlı görsel editör geliştirme içermez.
 - Başvuru, hakemlik veya ödeme modülü kurulmadan örnek bir etkinlik/kurum sitesi yönetilebiliyor; ortak altyapı bağımlılıkları belgelenmiş.
 
-**P06-E1 — Sayfa bazında İngilizce içerik ve görünürlük (Planlandı)**
+**P06-E1 — Sayfa bazında İngilizce içerik ve görünürlük (yerel kabul tamamlandı: 07.10.2026)**
 
 - Yeni/mevcut sayfada İngilizce sürüm seçeneği bulunur; İngilizce başlık, menü etiketi ve içerik girilir. İngilizce hazırlamak Türkçe yayın koşulu değildir.
 - İngilizce sitede yalnız seçeneği açık, gerekli içeriği tamamlanmış ve yayımlanmış sayfalar görünür. Kapalı, eksik veya taslak İngilizce sayfalar menü/liste/doğrudan adres/dil geçişinde açılmaz; Türkçe içerik İngilizce yerine sunulmaz.

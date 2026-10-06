@@ -1,11 +1,12 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { createContext, useCallback, useContext, useMemo, useState, useEffect } from "react";
 import { LOCALE_COOKIE, makeT, type Locale, type TFunction } from ".";
 
 type LanguageContextValue = {
   locale: Locale;
+  pageLocales: readonly Locale[] | undefined;
+  setPageLocales: (locales: readonly Locale[] | undefined) => void;
   t: TFunction;
   setLocale: (locale: Locale) => void;
 };
@@ -19,21 +20,23 @@ export function LanguageProvider({
   initialLocale: Locale;
   children: React.ReactNode;
 }) {
-  const router = useRouter();
+  const [pageLocales, setPageLocales] = useState<readonly Locale[] | undefined>();
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
 
   const setLocale = useCallback(
     (next: Locale) => {
       document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
       setLocaleState(next);
-      router.refresh();
+      const url = new URL(window.location.href);
+      url.searchParams.set("lang", next);
+      window.location.assign(url.pathname + url.search + url.hash);
     },
-    [router],
+    [],
   );
 
   const value = useMemo<LanguageContextValue>(
-    () => ({ locale, t: makeT(locale), setLocale }),
-    [locale, setLocale],
+    () => ({ locale, pageLocales, setPageLocales, t: makeT(locale), setLocale }),
+    [locale, pageLocales, setLocale],
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
@@ -51,4 +54,11 @@ export function useT(): TFunction {
 
 export function useLocale(): Locale {
   return useLanguage().locale;
+}
+
+export function PageLanguageAvailability({available}:{available:readonly Locale[]}) {
+  const {setPageLocales}=useLanguage();
+  const key=available.join(',');
+  useEffect(()=>{setPageLocales(key?key.split(',') as Locale[]:[]);return ()=>setPageLocales(undefined);},[key,setPageLocales]);
+  return null;
 }

@@ -40,7 +40,8 @@
     "test:promotion": "node --test scripts/promotion.test.mjs && node scripts/promotion-check.mjs",
     "test:publications": "node --test scripts/publications.test.mjs && node scripts/publications-check.mjs",
     "test:books": "node --test scripts/books.test.mjs && node scripts/books-check.mjs",
-    "test:archive": "node --test scripts/archive.test.mjs && node scripts/archive-check.mjs"
+    "test:archive": "node --test scripts/archive.test.mjs && node scripts/archive-check.mjs",
+    "test:cms-language": "node --test scripts/cms-configuration.test.mjs scripts/cms-starter.test.mjs && node scripts/cms-language-check.mjs"
   },
   "keywords": [],
   "author": "",
