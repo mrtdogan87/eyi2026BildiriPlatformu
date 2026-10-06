@@ -1,11 +1,11 @@
 # v2 yerel geliştirme
 
-Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p14`.
+Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p15`.
 Üst checkout korunmuştur. Node.js 22.13+ ve PostgreSQL 16 CLI araçları gerekir.
 Mac mini kurulumu 6 Ekim 2026'da Node 24.21.0/PostgreSQL 16.15 ile doğrulandı.
 Docker gerekmez. Taşıma ve doğrulama kaydı: [Mac mini kurulumu](MAC_MINI_KURULUM.md).
 
-Taşınmış mevcut veriler korunmuş, P14 migration'ı uygulanmıştır. Yeni terminal oturumunda araç
+Taşınmış mevcut veriler korunmuş, P15 migration'ı uygulanmıştır. Yeni terminal oturumunda araç
 yollarını ayarlayın; uygulama zaten 3100'de çalışıyorsa ikinci kez başlatmayın:
 
 ```sh
@@ -490,3 +490,12 @@ sonrası web/worker durdurularak `node scripts/checkpoint.mjs P14-20261006-final
 çalıştırıldı; 60 tablo tam restore/parmak iziyle eşleşti. Restore doğrulanmış
 yedek `../.recovery/P14-20261006-final`; aynı etiketi tekrar kullanmayın.
 Sıradaki geliştirme P15 workshop ve sosyal katılımdır.
+
+
+## P15 workshop ve sosyal katılım
+
+Panel → **Workshop ve sosyal etkinlikler**, kişisel panel → **Workshop ve sosyal katılımım**. Genel liste `/<kongre>/etkinlikler`. Kontenjan kişi sayısıyla hesaplanır; bekleyen gruplar bölünmez. İptal sonrası katılım açıksa sıra korunarak yer aktarılır. Eski gala/gezi tercihi sekreteryanın açık eşleştirmesini ister; kaynak kayıt/ücret değiştirilmez. Program bağı isteğe bağlıdır, kaynak değişince yeni katılım durur.
+
+`npm run test:activities` 20 birim ve 57 HTTP senaryosu çalıştırır. Kontrollü testler otomatik worker kapalıyken sıralıdır. P15 toplam 755 otomatik, 92 ayrı preview ve 11 tarayıcı kontrolünden geçti; 24 migration/63 tablo. Final restore doğrulanmış yedek `../.recovery/P15-20261006-final`. Ayrıntılar [P15 kapanışında](P15_KAPANIS.md).
+
+Kullanıcının 06.10.2026 talimatıyla P16A–P22 ve P06-E1 ardışık sürdürülür. Yerel sohbet heartbeat kimliği `aibildiriyonv2-p22-yerel-teslim`; bilgisayar ve uygulama açıkken devam kontrolü yapar, P22 yerel teslimde durdurulur. Canlı dağıtım ve gerçek e-posta ayrı yetki ister.

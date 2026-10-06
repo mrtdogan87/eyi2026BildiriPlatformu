@@ -12,9 +12,11 @@ export default async function PanelPage({ searchParams }: { searchParams: Promis
   let context; try { context = await requireContext(); } catch (error) { if (!(error instanceof AccessError)) throw error; }
   if (!context) return <main className="page-shell"><section className="card platform-card"><h1>Kongre seçin</h1><p>Üst menüden erişiminiz olan kongrelerden birini seçin. Üyeliğiniz kaldırıldıysa kongre yönetimiyle görüşün.</p>{canCreate && <Link className="button primary" href="/admin/kongre-olustur">Yeni kongre oluştur</Link>}<AdminLogoutButton /></section></main>;
   const submissions = await moduleEnabled(context.congress.id, 'SUBMISSIONS'); const registration = await moduleEnabled(context.congress.id, 'REGISTRATION');const cms=await moduleEnabled(context.congress.id,'CMS');
+  const activities = await moduleEnabled(context.congress.id, 'ACTIVITIES');
   const program = await moduleEnabled(context.congress.id, 'PROGRAM');
   const reviews = submissions && await moduleEnabled(context.congress.id, 'REVIEWS');
   const links = [
+    ['activities.read', activities, '/admin/etkinlikler', 'Workshop ve sosyal katılım'],
     ['program.read', program, '/admin/program', 'Program ve oturumlar'],
     ['program.perform', program, '/admin/program/gorevler', 'Program görevlerim'],
     ['reviews.read', reviews, '/admin/hakemlik', 'Hakemlik ve editör kararları'],

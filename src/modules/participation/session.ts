@@ -18,7 +18,7 @@ export async function participantCongress(congressSlug: string) {
   return congress;
 }
 export function participationEnabled(congress: { modules: { key: string; enabled: boolean }[] }) {
-  return congress.modules.some(m => ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM'].includes(m.key) && m.enabled);
+  return congress.modules.some(m => ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM', 'ACTIVITIES'].includes(m.key) && m.enabled);
 }
 export async function requestParticipantAccess(raw: unknown) {
   const input = z.object({ congressSlug: slug, email: z.string().trim().toLowerCase().email().max(254), locale: z.enum(['tr', 'en']) }).strict().safeParse(raw);

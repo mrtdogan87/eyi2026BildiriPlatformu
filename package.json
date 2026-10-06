@@ -32,7 +32,8 @@
     "test:payments": "node --test scripts/payments.test.mjs && node scripts/payments-check.mjs",
     "test:revisions": "node --test scripts/revisions.test.mjs && node scripts/revisions-check.mjs",
     "test:reviews": "node --test scripts/reviews.test.mjs && node scripts/reviews-check.mjs",
-    "test:program": "node --test scripts/program.test.mjs && node scripts/program-check.mjs"
+    "test:program": "node --test scripts/program.test.mjs && node scripts/program-check.mjs",
+    "test:activities": "node --test scripts/activities.test.mjs && node scripts/activities-check.mjs"
   },
   "keywords": [],
   "author": "",

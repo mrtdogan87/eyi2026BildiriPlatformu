@@ -1,3 +1,4 @@
+import { activityFollowup } from './activities';
 import { programFollowup } from './program';
 import { paymentSummary, paymentLabels } from '@/modules/payments/core';
 import type { Prisma } from '@prisma/client';
@@ -105,7 +106,7 @@ export async function workRequestDetail(id: string) {
   return { request: staffRequest(row), events: row.events.map(event => ({ id: event.id, number: event.number, action: event.action, actorName: event.actor?.name ?? 'Katılımcı', fromStatus: event.fromStatus, toStatus: event.toStatus, assigneeId: event.assigneeId, publicResult: event.publicResult, internalNote: event.internalNote, createdAt: event.createdAt.toISOString() })) };
 }
 
-type MissingItem = { id: string; sourceType: 'SUBMISSION' | 'REGISTRATION' | 'PROGRAM'; sourceId: string; subject: string; email: string; reasons: string[]; href: string };
+type MissingItem = { id: string; sourceType: 'SUBMISSION' | 'REGISTRATION' | 'PROGRAM' | 'ACTIVITY'; sourceId: string; subject: string; email: string; reasons: string[]; href: string };
 async function missingRecords(c: CongressContext, enabled: Set<string>): Promise<MissingItem[]> {
   const configuration = effectiveConfiguration(c.congress.configuration);
   const missing: MissingItem[] = [];
@@ -143,6 +144,7 @@ async function missingRecords(c: CongressContext, enabled: Set<string>): Promise
     const rounds = await prisma.reviewRound.findMany({where:{congressId:c.congress.id,status:'OPEN'},take:200,orderBy:{createdAt:'desc'},select:{id:true,submissionId:true,number:true,deadline:true,sourceVersion:true,submission:{select:{titleTr:true,titleEn:true,draftOwnerEmail:true,correctionVersion:true}},assignments:{select:{status:true}}}});
     for(const r of rounds){const reasons:string[]=[];if(!r.assignments.length)reasons.push('Hakem ataması bekliyor');if(r.assignments.some(a=>a.status==='INVITED'))reasons.push('Hakem davet yanıtı bekliyor');if(r.assignments.some(a=>['DECLINED','CONFLICT'].includes(a.status)))reasons.push('Ret / çıkar çatışması: yerine hakem kontrolü');if(r.deadline<=new Date())reasons.push('Hakemlik son tarihi geçti');if(r.assignments.some(a=>a.status==='ACCEPTED'))reasons.push('Hakem değerlendirmesi bekliyor');if(r.assignments.some(a=>a.status==='SUBMITTED'))reasons.push('Editör kararı bekliyor');if(r.sourceVersion!==r.submission.correctionVersion)reasons.push('Bildiri sürümü değişti: yeni tur kontrolü');if(reasons.length)missing.push({id:'REVIEW:'+r.id,sourceType:'SUBMISSION',sourceId:r.submissionId,subject:(r.submission.titleTr||r.submission.titleEn||'Bildiri')+' · Tur '+r.number,email:r.submission.draftOwnerEmail,reasons,href:'/admin/hakemlik/bildiriler/'+r.submissionId});}
   }
+  if(enabled.has('ACTIVITIES')) missing.push(...await activityFollowup(c.congress.id));
   if(enabled.has('PROGRAM')){const p=await programFollowup(c.congress.id);missing.push(...p.items,...p.unplaced);}
   return missing;
 }

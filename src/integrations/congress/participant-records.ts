@@ -7,6 +7,7 @@ import { submissionTasks } from '@/modules/participation/status';
 import { AccessError } from '@/platform/http';
 import { setDraftAccessCookie } from '@/lib/submission';
 import { setRegistrationCookie } from '@/lib/registration';
+import { ownActivities } from './activities';
 import { ownProgram } from './program';
 import { authorReviewResults } from './reviews';
 import { listParticipantWorkRequests } from './worklist';
@@ -32,7 +33,9 @@ export async function participantRecords(congressId: string, email: string) {
   const reviewResults = reviewAvailable ? await authorReviewResults(congressId, papers.map(p => p.id)) : [];
   const programAvailable=congress.modules.some(m=>m.key==='PROGRAM'&&m.enabled);
   const program=programAvailable?await ownProgram(congressId,email):null;
-  return { program, reviewResults, congress: { id: congress.id, name: congress.name, slug: congress.slug }, email, modules,
+  const activitiesAvailable=congress.modules.some(m=>m.key==='ACTIVITIES'&&m.enabled);
+  const activities=activitiesAvailable?await ownActivities(congressId,email):null;
+  return { activities, program, reviewResults, congress: { id: congress.id, name: congress.name, slug: congress.slug }, email, modules,
     submissions: papers.map(p => ({ id: p.id, titleTr: p.titleTr, titleEn: p.titleEn, status: p.status, submittedAt: p.submittedAt?.toISOString() ?? null,
       canWithdraw: p.status !== 'DRAFT' && p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), canOpen: p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), declaration: declaration('SUBMISSION', p.id),
       missing: submissionTasks({ status: p.status, owner: p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), fileRequired: rules.stages.FULL_TEXT.enabled && rules.fields.file === 'REQUIRED', fileReceived: !!p.file, registrationEnabled: modules.REGISTRATION, registered: !!p.paperItem, presenter: p.authors.some(a => a.isPresenter) }) })),

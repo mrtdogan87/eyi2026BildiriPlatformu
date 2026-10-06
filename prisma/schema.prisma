@@ -47,6 +47,7 @@ enum RegistrationKind {
 }
 
 model Congress {
+  activityEvents ActivityEvent[]
   programVersion Int @default(0)
   programPublishedId String? @unique
   programPublished ProgramPublication? @relation("ProgramPublished", fields: [programPublishedId], references: [id], onDelete: SetNull)
@@ -333,6 +334,7 @@ model SubmissionStatusHistory {
 }
 
 model Registration {
+  activityBookings ActivityBooking[]
   paymentVersion           Int                          @default(0)
   paymentEvents            PaymentEvent[]
   id                       String                       @id @default(cuid())
@@ -434,6 +436,7 @@ enum ModuleKey {
   CMS
   REVIEWS
   PROGRAM
+  ACTIVITIES
   CERTIFICATES
 }
 
@@ -1182,6 +1185,7 @@ model ProgramPerson {
 }
 
 model ProgramSession {
+  activities ActivityEvent[]
   id String @id @default(uuid())
   congressId String
   congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
@@ -1205,6 +1209,78 @@ model ProgramSession {
   talks ProgramTalk[]
   duties ProgramDuty[]
   @@index([congressId, active, startsAt])
+}
+
+model ActivityEvent {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  kind String
+  version Int @default(0)
+  titleTr String
+  titleEn String
+  descriptionTr String
+  descriptionEn String
+  location String
+  startsAt DateTime
+  endsAt DateTime
+  opensAt DateTime
+  closesAt DateTime
+  capacity Int
+  published Boolean @default(false)
+  bookingOpen Boolean @default(false)
+  cancelledAt DateTime?
+  programSessionId String?
+  programSourceVersion Int?
+  programSession ProgramSession? @relation(fields: [programSessionId], references: [id], onDelete: Restrict)
+  feeMinor Int @default(0)
+  currency String @default("TRY")
+  notifyParticipants Boolean @default(false)
+  nextQueue Int @default(0)
+  bookings ActivityBooking[]
+  @@index([congressId, published, startsAt])
+}
+
+model ActivityBooking {
+  id String @id @default(uuid())
+  eventId String
+  event ActivityEvent @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  email String
+  name String
+  seats Int
+  status String
+  version Int @default(0)
+  queueNumber Int
+  locale String @default("tr")
+  feeMinor Int
+  currency String
+  feeSource String
+  registrationId String?
+  registration Registration? @relation(fields: [registrationId], references: [id], onDelete: Restrict)
+  legacyKind String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  history ActivityBookingEvent[]
+  @@unique([eventId, email])
+  @@unique([registrationId, legacyKind])
+  @@index([eventId, status, queueNumber])
+  @@index([email])
+}
+
+model ActivityBookingEvent {
+  id String @id @default(uuid())
+  bookingId String
+  booking ActivityBooking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  number Int
+  action String
+  fromStatus String?
+  toStatus String
+  reason String
+  origin String
+  actorId String?
+  snapshot Json
+  createdAt DateTime @default(now())
+  @@unique([bookingId, number])
 }
 
 model ProgramTalk {

@@ -1,5 +1,5 @@
 import type { CongressRole } from '@prisma/client';
-export type Action = 'context' | 'submissions.read' | 'submissions.status' | 'submissions.delete' | 'registrations.read' | 'registrations.delete' | 'settings' | 'members' | 'modules' | 'audit' | 'own' | 'cms' | 'feedback' | 'communications' | 'communication.manage' | 'worklist' | 'submissions.correct' | 'payments.read' | 'payments.manage' | 'reviews.read' | 'reviews.manage' | 'reviews.perform' | 'program.read' | 'program.manage' | 'program.perform';
+export type Action = 'context' | 'submissions.read' | 'submissions.status' | 'submissions.delete' | 'registrations.read' | 'registrations.delete' | 'settings' | 'members' | 'modules' | 'audit' | 'own' | 'cms' | 'feedback' | 'communications' | 'communication.manage' | 'worklist' | 'submissions.correct' | 'payments.read' | 'payments.manage' | 'reviews.read' | 'reviews.manage' | 'reviews.perform' | 'program.read' | 'program.manage' | 'program.perform' | 'activities.read' | 'activities.manage';
 export const roleLabels: Record<CongressRole, string> = {
   ORGANIZER: 'Organizatör', SECRETARY: 'Sekreter', CONTENT_EDITOR: 'İçerik editörü',
   REVIEWER: 'Hakem', SESSION_CHAIR: 'Oturum başkanı', PARTICIPANT: 'Katılımcı',
@@ -13,7 +13,7 @@ export function allows(role: CongressRole | 'PLATFORM_ADMIN', action: Action) {
   if (action === 'communications') return role === 'SECRETARY';
   if (action === 'worklist') return role === 'SECRETARY';
   if (action === 'cms') return role === 'CONTENT_EDITOR';
-  return role === 'SECRETARY' && ['submissions.read', 'submissions.status', 'submissions.correct', 'registrations.read', 'payments.read', 'payments.manage', 'reviews.read', 'reviews.manage', 'program.read', 'program.manage'].includes(action);
+  return role === 'SECRETARY' && ['submissions.read', 'submissions.status', 'submissions.correct', 'registrations.read', 'payments.read', 'payments.manage', 'reviews.read', 'reviews.manage', 'program.read', 'program.manage', 'activities.read', 'activities.manage'].includes(action);
 }
 export const moduleCatalog = {
   SUBMISSIONS: { label: 'Bildiri gönderimi', implemented: true },
@@ -21,5 +21,6 @@ export const moduleCatalog = {
   CMS: { label: 'Sayfalar ve medya (CMS)', implemented: true },
   REVIEWS: { label: 'Hakem değerlendirmesi', implemented: true },
   PROGRAM: { label: 'Bilimsel program', implemented: true },
+  ACTIVITIES: { label: 'Workshop ve sosyal katılım', implemented: true },
   CERTIFICATES: { label: 'Belgeler', implemented: false },
 };

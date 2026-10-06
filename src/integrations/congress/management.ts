@@ -763,6 +763,7 @@ export async function deleteAdminRegistration(registrationId: string) {
       select: { id: true },
   });
   if (!registration) return false;
+  if (await tx.activityBooking.count({ where: { registrationId } })) throw new AccessError(409, "Etkinlik katılım geçmişine bağlı kayıt silinemez; bağlantı ve geçmiş korunmalı.");
   if (await tx.paymentEvent.count({ where: { registrationId } })) throw new AccessError(409, "Ödeme geçmişi bulunan kayıt silinemez. Gerekçeli ödeme düzeltmesi veya iptal talebi kullanın.");
   await tx.registration.delete({ where: { id: registration.id } });
   await auditSink(tx)(context, "registration.delete", registration.id);

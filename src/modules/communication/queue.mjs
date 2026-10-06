@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 
-const MODULES = new Set(['SUBMISSIONS', 'REGISTRATION', 'CMS', 'REVIEWS', 'PROGRAM', 'CERTIFICATES']);
+const MODULES = new Set(['SUBMISSIONS', 'REGISTRATION', 'CMS', 'REVIEWS', 'PROGRAM', 'ACTIVITIES', 'CERTIFICATES']);
 const PROVIDERS = new Set(['capture', 'smtp', 'resend']);
 const SUMMARY = Object.freeze({
   TEMPORARY_FAILURE: 'The provider temporarily refused the message.',
@@ -74,6 +74,12 @@ function clockDate(now) { return now ? new Date(now) : new Date(); }
 async function sourceIsValid(prisma, message, now) {
   // Preview samples never represent live tokens and must never enter a real transport.
   if (message.sourceType === 'TEMPLATE_TEST') return message.provider === 'capture' && message.recipient.endsWith('.invalid');
+  if (message.sourceType === 'activity-booking') {
+    const enabled = await prisma.congressModule.findUnique({where:{congressId_key:{congressId:message.congressId,key:'ACTIVITIES'}}});
+    const history = await prisma.activityBookingEvent.findUnique({where:{id:message.sourceId},include:{booking:{include:{event:true}}}});
+    const booking = history?.booking;
+    return !!enabled?.enabled && !!booking && booking.event.congressId === message.congressId && booking.email === message.recipient && booking.version === history.snapshot?.bookingVersion;
+  }
   if (message.sourceType === 'program-duty') {
     const enabled = await prisma.congressModule.findUnique({where:{congressId_key:{congressId:message.congressId,key:'PROGRAM'}}});
     const duty = await prisma.programDuty.findUnique({where:{id:message.sourceId},include:{person:true,session:true}});
@@ -106,7 +112,7 @@ async function sourceIsValid(prisma, message, now) {
     token = await prisma.registrationAccessToken.findUnique({ where: { id: message.sourceId } });
     if (!token || token.email.toLowerCase() !== message.recipient || token.congressId !== message.congressId) return false;
   } else if (expectedSource === 'participant-access-token') {
-    token = await prisma.participantAccessToken.findUnique({ where: { id: message.sourceId }, include: { congress: { select: { modules: { where: { key: { in: ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM'] }, enabled: true }, select: { key: true } } } } } });
+    token = await prisma.participantAccessToken.findUnique({ where: { id: message.sourceId }, include: { congress: { select: { modules: { where: { key: { in: ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM', 'ACTIVITIES'] }, enabled: true }, select: { key: true } } } } } });
     if (!token || token.email.toLowerCase() !== message.recipient || token.congressId !== message.congressId || !token.congress.modules.length) return false;
   } else {
     token = await prisma.activationToken.findUnique({

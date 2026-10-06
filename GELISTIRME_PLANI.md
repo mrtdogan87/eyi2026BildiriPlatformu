@@ -1,8 +1,10 @@
 # Bildiri Yönetim Sistemi — v2 Geliştirme Planı
 
-> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13 ve P14 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
+> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14 ve P15 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
 > İlk gerçek kullanım: EYİ 2026 (`eyi-2026`); canlı sistem korunuyor.
-> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`, `docs/P12_KAPANIS.md`, `docs/P13_KAPANIS.md`, `docs/P14_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
+> Kullanıcının 06.10.2026 devam yetkisi: kalan paketler ve P06-E1 ardışık tamamlanarak P22 dahil yerel kullanıcı testine hazır sürüm hazırlanır. Gerçek yayın/deploy, merge, harici paylaşım ve gerçek e-posta gönderimi ayrı yetki ister.
+
+> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`, `docs/P12_KAPANIS.md`, `docs/P13_KAPANIS.md`, `docs/P14_KAPANIS.md`, `docs/P15_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
 
 ## 1. Hedef
 
@@ -218,7 +220,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P14 tamamlandı. Güncel P14 kapanışı 678 otomatik kontrol, 85 preview kontrolü, 10 tarayıcı kontrolü ve 60 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P14_KAPANIS.md` içindedir. Önceki paketlerin kendi kapanış kayıtları korunmuştur. P15–P22 planlandı; sıradaki geliştirme P15 workshop ve sosyal katılımdır, henüz başlatılmadı. Ayrı test adresi/projesi seçilmediği için uzak deneme yayını bekliyor. Kaynak planın kapsam/süre tablosu korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P15 tamamlandı. Güncel P15 kapanışı 755 otomatik kontrol, 92 preview kontrolü, 11 tarayıcı kontrolü ve 63 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P15_KAPANIS.md` içindedir. P16A–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P16A bağımsız PDF sertifikadır. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
@@ -231,6 +233,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 | P04 | Kongre ayarları, oluşturma sihirbazı ve güvenli yıl çoğaltma | P03 | 1–2 |
 | P05 | Ortak ön yüz, ilk tema, ana sayfa ve mobil görünüm | P03 | 1–2 |
 | P06 | CMS editörü, medya kitaplığı, TR/EN, taslak/önizleme ve sürümler | P03, P05 | 2–3 |
+| P06-E1 | Sayfa bazında İngilizce içerik seçeneği ve dil bazında görünürlük — Planlandı | P06, P07 | İncelemede |
 | P07 | Eksiksiz başlangıç sayfaları/menüler ve EYİ referans içeriğinin kontrollü aktarımı | P04, P06 | 2–3 |
 | P08 | Ortak kişi/kurul/konuşmacı ve organizasyon kayıtlarıyla dinamik sayfalar | P07 | 2–3 |
 | P09 | E-posta şablonları, gönderim kuyruğu, yeniden deneme ve geçmiş | P03, P04 | 1–2 |
@@ -286,6 +289,13 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Medya yükleme ve kongreye göre erişim çalışıyor; iç düzenleme adları halka görünen başlığa sızmıyor.
 - Süre, kendi uygulamamızda çalışan hazır editör bileşenleri ve başlangıç sayfalarını karşılayan belirli bir blok seti varsayar; sıfırdan genel amaçlı görsel editör geliştirme içermez.
 - Başvuru, hakemlik veya ödeme modülü kurulmadan örnek bir etkinlik/kurum sitesi yönetilebiliyor; ortak altyapı bağımlılıkları belgelenmiş.
+
+**P06-E1 — Sayfa bazında İngilizce içerik ve görünürlük (Planlandı)**
+
+- Yeni/mevcut sayfada İngilizce sürüm seçeneği bulunur; İngilizce başlık, menü etiketi ve içerik girilir. İngilizce hazırlamak Türkçe yayın koşulu değildir.
+- İngilizce sitede yalnız seçeneği açık, gerekli içeriği tamamlanmış ve yayımlanmış sayfalar görünür. Kapalı, eksik veya taslak İngilizce sayfalar menü/liste/doğrudan adres/dil geçişinde açılmaz; Türkçe içerik İngilizce yerine sunulmaz.
+- İngilizce seçeneğini kapatmak Türkçe yayını veya kaydedilmiş İngilizce içeriği silmez. Yeniden açma mevcut yayın denetimlerinden geçer.
+- Yalnız TR, TR yayında/EN taslak, iki dil yayında ve EN kapalı örnekleri içerik kaybı olmadan doğrulanır. 06.10.2026 tarihinde kaynak plana eklenmiştir; P22 pilotundan önce tamamlanacaktır.
 
 **P07 — Tüm sayfalar ve aktarım**
 
@@ -346,10 +356,11 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Bilimsel kaynak değişince güncel yerleşim ve yeni yayın gerekir; önceki yayın ve görev yanıtı korunur. PROGRAM-only seminer bildiri/ödeme/CMS olmadan doğrulandı.
 - 678 otomatik, 85 ayrı preview ve 10 tarayıcı kontrolü başarılı. Final yedekte 60 tablo tam restore/parmak iziyle eşleşti. Kullanım ve ilk sürüm sınırları: `docs/P14_KAPANIS.md`.
 
-**P15 — Workshop ve sosyal katılım**
+**P15 — Workshop ve sosyal katılım · yerelde tamamlandı (06.10.2026)**
 
 - Kontenjan doluluğu, bekleme listesi, iptal ve katılımcı listesi örneği çalışıyor.
-- Gezi/gala tercihleri ve program ilişkisi panelde görülebiliyor; mevcut ücret kuralları korunuyor.
+- Gezi/gala tercihleri açıkça eşleştiriliyor; mevcut kaynak/ücretler korunuyor. Program kaynak değişikliği katılımı durduruyor.
+- 755 otomatik, 92 ayrı preview ve 11 tarayıcı kontrolü başarılı; final 63 tablo restore/parmak iziyle eşleşti. Ayrıntılar `docs/P15_KAPANIS.md`.
 
 **P16A — Bağımsız sertifika modülü (2–3 iş günü)**
 

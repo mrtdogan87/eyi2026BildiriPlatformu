@@ -2257,3 +2257,6 @@ textarea {
 .program-manager summary { cursor: pointer; font-weight: 650; }
 .program-manager input, .program-manager select { min-width: 0; max-width: 100%; }
 @media (max-width: 560px) { .program-talk { grid-template-columns: 1fr; gap: .25rem; } .program-session > header, .program-session > div { padding: 1rem; } }
+
+.activity-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:1.25rem; }
+.activity-grid .platform-card { margin:0; }
