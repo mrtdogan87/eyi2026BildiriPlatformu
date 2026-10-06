@@ -38,6 +38,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
   const isTurkish = submission.submissionLanguage === "TR";
   const revisions = await revisionOverview(id);
   const reviewHistory = await prisma.reviewRound.count({ where: { submissionId: id } });
+  const programHistory = await prisma.programTalk.count({ where: { submissionId: id } });
   const reviewsEnabled = await moduleEnabled(context.congress.id, 'REVIEWS');
 
   return (
@@ -197,7 +198,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
         <div className="admin-detail-block admin-detail-block-danger">
           <h2>Tehlikeli İşlem · Bildiriyi Sil</h2>
-          {reviewHistory || revisions.files.length || revisions.changes.length || revisions.requests.length ? <p className="notice">Bu bildirinin dosya veya düzeltme geçmişi korunur; kalıcı silme kapalıdır.</p> : allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
+          {programHistory || reviewHistory || revisions.files.length || revisions.changes.length || revisions.requests.length ? <p className="notice">Bu bildirinin dosya veya düzeltme geçmişi korunur; kalıcı silme kapalıdır.</p> : allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
             submissionId={submission.id}
             submissionTitle={isTurkish ? submission.titleTr : submission.titleEn}
           /> : null}

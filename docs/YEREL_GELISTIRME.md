@@ -1,11 +1,11 @@
 # v2 yerel geliştirme
 
-Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p09`.
+Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p14`.
 Üst checkout korunmuştur. Node.js 22.13+ ve PostgreSQL 16 CLI araçları gerekir.
 Mac mini kurulumu 6 Ekim 2026'da Node 24.21.0/PostgreSQL 16.15 ile doğrulandı.
 Docker gerekmez. Taşıma ve doğrulama kaydı: [Mac mini kurulumu](MAC_MINI_KURULUM.md).
 
-Mevcut P08 verisi geri yüklenmiş durumdadır. Yeni terminal oturumunda araç
+Taşınmış mevcut veriler korunmuş, P14 migration'ı uygulanmıştır. Yeni terminal oturumunda araç
 yollarını ayarlayın; uygulama zaten 3100'de çalışıyorsa ikinci kez başlatmayın:
 
 ```sh
@@ -455,3 +455,38 @@ sıfırlamadan `npm run prisma:migrate:deploy` uygulanır. 592 otomatik ve
 `../.recovery/P13-20261006-final`; aynı etiketi yeniden kullanmayın.
 Kapsam, dosya/anonimlik ve 200 kayıt liste sınırı `P13_KAPANIS.md` içindedir.
 Sıradaki geliştirme P14 program ve oturum yönetimidir.
+
+
+## P14 program ve oturum yönetimi
+
+P14 yerelde tamamlandı. Panel → **Program ve oturumlar**; oturum başkanı
+hesabında **Programım ve görevlerim** bulunur. Salon/kişi oluşturup oturumu
+ve sunumları yerleştirin; başkan/teknik destek davetini ayrı gönderin.
+Kişi kaydı kullanıcı hesabı veya CMS kaydı oluşturmaz. E-posta doğrulanmış
+katılımcı kendi görevine kişisel panelinden yanıt verebilir.
+
+Form saatleri İstanbul (UTC+03:00) saatidir. Çakışmalar yayını durdurur;
+eksik zorunlu görev kabulü ve yerleşmemiş bildiri için ayrı gerekçeli onay
+istenir. **Programı yeni sürüm olarak yayımla** genel programı
+`/<kongre>/program` adresine açar. Taslak değişiklikleri eski yayını değiştirmez.
+Oturum düzenlenirse görev yeniden kabul edilir ve çevrim içi erişim kapanır.
+Yenilenen görev kişisel panelde görünür; otomatik yenileme e-postası yoktur.
+
+Çevrim içi HTTPS bağlantısının erişim aralığı ayrıca ayarlanır. Varsayılan
+yalnız e-posta doğrulanmış katılımcıdır; ödeme/kayıt kontrolü anlamına gelmez.
+Herkese açma ayrıca onay ister. Bağlantı kapansa da genel program okunur.
+Bildiri modülü olmadan bağımsız konuşma ve PROGRAM-only seminer çalışır.
+
+`npm run test:program` 24 birim ve 62 yerel HTTP senaryosu çalıştırır.
+Kontrollü testler otomatik worker kapalıyken sıralı yürütülür:
+`MAIL_WORKER_AUTOSTART=false npm run start`. Normal `npm run start`
+capture worker'ı açar. Yerel testler sentetik kayıtlar bırakır, gerçek
+e-posta göndermez. Güncel toplam 678 otomatik, 85 ayrı preview ve 10 tarayıcı
+kontrolüdür. Ayrıntılar [P14 kapanışında](P14_KAPANIS.md).
+
+P14 altı tablo ekledi; toplam 23 migration/60 tablo. Mevcut veriyi
+sıfırlamadan `npm run prisma:migrate:deploy` uygulanır. Temiz paket commit'i
+sonrası web/worker durdurularak `node scripts/checkpoint.mjs P14-20261006-final`
+çalıştırıldı; 60 tablo tam restore/parmak iziyle eşleşti. Restore doğrulanmış
+yedek `../.recovery/P14-20261006-final`; aynı etiketi tekrar kullanmayın.
+Sıradaki geliştirme P15 workshop ve sosyal katılımdır.

@@ -31,7 +31,8 @@
     "test:participation": "node --test scripts/participation.test.mjs && node scripts/participation-check.mjs",
     "test:payments": "node --test scripts/payments.test.mjs && node scripts/payments-check.mjs",
     "test:revisions": "node --test scripts/revisions.test.mjs && node scripts/revisions-check.mjs",
-    "test:reviews": "node --test scripts/reviews.test.mjs && node scripts/reviews-check.mjs"
+    "test:reviews": "node --test scripts/reviews.test.mjs && node scripts/reviews-check.mjs",
+    "test:program": "node --test scripts/program.test.mjs && node scripts/program-check.mjs"
   },
   "keywords": [],
   "author": "",

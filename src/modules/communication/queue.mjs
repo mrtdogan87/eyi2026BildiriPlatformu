@@ -74,6 +74,11 @@ function clockDate(now) { return now ? new Date(now) : new Date(); }
 async function sourceIsValid(prisma, message, now) {
   // Preview samples never represent live tokens and must never enter a real transport.
   if (message.sourceType === 'TEMPLATE_TEST') return message.provider === 'capture' && message.recipient.endsWith('.invalid');
+  if (message.sourceType === 'program-duty') {
+    const enabled = await prisma.congressModule.findUnique({where:{congressId_key:{congressId:message.congressId,key:'PROGRAM'}}});
+    const duty = await prisma.programDuty.findUnique({where:{id:message.sourceId},include:{person:true,session:true}});
+    return !!enabled?.enabled && !!duty && duty.session.congressId === message.congressId && duty.session.active && duty.session.endsAt > now && duty.person.active && duty.person.email === message.recipient && duty.status === 'INVITED';
+  }
   if (message.sourceType === 'review-invitation' || message.sourceType === 'review-decision') {
     const modules = await prisma.congressModule.findMany({ where: { congressId: message.congressId, key: { in: ['REVIEWS', 'SUBMISSIONS'] }, enabled: true } });
     if (modules.length !== 2) return false;
@@ -101,7 +106,7 @@ async function sourceIsValid(prisma, message, now) {
     token = await prisma.registrationAccessToken.findUnique({ where: { id: message.sourceId } });
     if (!token || token.email.toLowerCase() !== message.recipient || token.congressId !== message.congressId) return false;
   } else if (expectedSource === 'participant-access-token') {
-    token = await prisma.participantAccessToken.findUnique({ where: { id: message.sourceId }, include: { congress: { select: { modules: { where: { key: { in: ['SUBMISSIONS', 'REGISTRATION'] }, enabled: true }, select: { key: true } } } } } });
+    token = await prisma.participantAccessToken.findUnique({ where: { id: message.sourceId }, include: { congress: { select: { modules: { where: { key: { in: ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM'] }, enabled: true }, select: { key: true } } } } } });
     if (!token || token.email.toLowerCase() !== message.recipient || token.congressId !== message.congressId || !token.congress.modules.length) return false;
   } else {
     token = await prisma.activationToken.findUnique({

@@ -47,6 +47,13 @@ enum RegistrationKind {
 }
 
 model Congress {
+  programVersion Int @default(0)
+  programPublishedId String? @unique
+  programPublished ProgramPublication? @relation("ProgramPublished", fields: [programPublishedId], references: [id], onDelete: SetNull)
+  programPublications ProgramPublication[] @relation("ProgramHistory")
+  programRooms ProgramRoom[]
+  programPeople ProgramPerson[]
+  programSessions ProgramSession[]
   reviewRounds ReviewRound[]
   paymentEvents            PaymentEvent[]
   bankStatements           BankStatement[]
@@ -127,6 +134,7 @@ model PaymentTier {
 }
 
 model Submission {
+  programTalks ProgramTalk[]
   reviewVersion Int @default(0)
   reviewRounds ReviewRound[]
   correctionVersion  Int                       @default(0)
@@ -1146,4 +1154,109 @@ model ReviewDecision {
   overrideIncomplete Boolean @default(false)
   revisionRequestId String?
   createdAt DateTime @default(now())
+}
+
+
+model ProgramRoom {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  name String
+  location String
+  active Boolean @default(true)
+  sessions ProgramSession[]
+  @@unique([congressId, name])
+}
+
+model ProgramPerson {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  name String
+  email String
+  institution String
+  active Boolean @default(true)
+  talks ProgramTalk[]
+  duties ProgramDuty[]
+  @@unique([congressId, email])
+}
+
+model ProgramSession {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  roomId String
+  room ProgramRoom @relation(fields: [roomId], references: [id], onDelete: Restrict)
+  version Int @default(0)
+  titleTr String
+  titleEn String
+  startsAt DateTime
+  endsAt DateTime
+  requiresChair Boolean @default(true)
+  requiresSupport Boolean @default(false)
+  active Boolean @default(true)
+  onlineVersion Int @default(0)
+  onlineEnabled Boolean @default(false)
+  onlineUrl String @default("")
+  onlineOpensAt DateTime?
+  onlineClosesAt DateTime?
+  onlineAudience String @default("PARTICIPANTS")
+  onlineForVersion Int @default(0)
+  talks ProgramTalk[]
+  duties ProgramDuty[]
+  @@index([congressId, active, startsAt])
+}
+
+model ProgramTalk {
+  id String @id @default(uuid())
+  sessionId String
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  presenterId String
+  presenter ProgramPerson @relation(fields: [presenterId], references: [id], onDelete: Restrict)
+  submissionId String?
+  submission Submission? @relation(fields: [submissionId], references: [id], onDelete: Restrict)
+  sourceVersion Int?
+  sourceReviewVersion Int?
+  titleTr String
+  titleEn String
+  startsAt DateTime
+  endsAt DateTime
+  active Boolean @default(true)
+  @@index([sessionId, active])
+  @@index([submissionId])
+}
+
+model ProgramDuty {
+  id String @id @default(uuid())
+  sessionId String
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  personId String
+  person ProgramPerson @relation(fields: [personId], references: [id], onDelete: Restrict)
+  kind String
+  status String @default("INVITED")
+  version Int @default(0)
+  inviteReason String
+  responseReason String?
+  replacedById String? @unique
+  replacedBy ProgramDuty? @relation("ProgramReplacement", fields: [replacedById], references: [id], onDelete: Restrict)
+  replaces ProgramDuty? @relation("ProgramReplacement")
+  createdAt DateTime @default(now())
+  respondedAt DateTime?
+  @@index([sessionId, kind, status])
+  @@index([personId, status])
+}
+
+model ProgramPublication {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation("ProgramHistory", fields: [congressId], references: [id], onDelete: Restrict)
+  publishedByCongress Congress? @relation("ProgramPublished")
+  number Int
+  sourceVersion Int
+  snapshot Json
+  reason String
+  actorId String
+  actorName String
+  createdAt DateTime @default(now())
+  @@unique([congressId, number])
 }

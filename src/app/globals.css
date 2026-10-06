@@ -2242,3 +2242,18 @@ textarea {
 .review-round, .review-blind, .review-decision { overflow-wrap: anywhere; min-width: 0; }
 .review-round > summary { font-weight: 700; cursor: pointer; padding: 12px 0; }
 .review-blind, .review-decision { border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0; }
+
+/* P14 schedule, readable on narrow screens. */
+.program-page { padding-block: 3rem; }
+.program-public { display: grid; gap: 1.25rem; }
+.program-heading { padding-block: 1rem 2rem; }
+.program-heading h1 { font-size: clamp(1.8rem, 4vw, 3.1rem); line-height: 1.12; }
+.program-session { padding: 0; overflow: hidden; min-width: 0; overflow-wrap: anywhere; }
+.program-session > header { padding: 1.5rem; background: var(--primary); color: white; }
+.program-session > div { padding: 1.5rem; }
+.program-talk { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 1rem; border-top: 1px solid var(--border); padding-block: 1rem; }
+.program-talk time { font-variant-numeric: tabular-nums; font-size: .9rem; }
+.program-manager details { padding: .8rem 0; border-top: 1px solid var(--border); }
+.program-manager summary { cursor: pointer; font-weight: 650; }
+.program-manager input, .program-manager select { min-width: 0; max-width: 100%; }
+@media (max-width: 560px) { .program-talk { grid-template-columns: 1fr; gap: .25rem; } .program-session > header, .program-session > div { padding: 1rem; } }

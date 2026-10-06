@@ -1,8 +1,8 @@
 # Bildiri Yönetim Sistemi — v2 Geliştirme Planı
 
-> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12 ve P13 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
+> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13 ve P14 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
 > İlk gerçek kullanım: EYİ 2026 (`eyi-2026`); canlı sistem korunuyor.
-> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`, `docs/P12_KAPANIS.md`, `docs/P13_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
+> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`, `docs/P12_KAPANIS.md`, `docs/P13_KAPANIS.md`, `docs/P14_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
 
 ## 1. Hedef
 
@@ -218,7 +218,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09 ve P10 tamamlandı. P10 katılımcı paneli, sürümlü beyanlar, yapılandırılmış özet ve sekreterya iş listesi; 400 otomatik kontrol, 50 preview kontrolü ve 42 tablonun geri yükleme doğrulamasıyla kapatıldı. P10 kayıtları `docs/P10_KAPANIS.md`, P09 kanıtları `docs/P09_KAPANIS.md` içindedir. P11–P22 planlandı; sıradaki geliştirme P11 gerekçeli düzeltmeler ve sürüm geçmişidir, henüz başlatılmadı. Ayrı test adresi/projesi seçilmediği için uzak deneme yayını bekliyor. Kaynak planın kapsam/süre tablosu korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P14 tamamlandı. Güncel P14 kapanışı 678 otomatik kontrol, 85 preview kontrolü, 10 tarayıcı kontrolü ve 60 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P14_KAPANIS.md` içindedir. Önceki paketlerin kendi kapanış kayıtları korunmuştur. P15–P22 planlandı; sıradaki geliştirme P15 workshop ve sosyal katılımdır, henüz başlatılmadı. Ayrı test adresi/projesi seçilmediği için uzak deneme yayını bekliyor. Kaynak planın kapsam/süre tablosu korunmuştur.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
@@ -338,11 +338,13 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 
 - 592 otomatik kontrol ve 75 ayrı preview kontrolü başarılı. Tarayıcıda davet, taslak, teslim, karar, körlük ve TR/EN yazar sonuçları doğrulandı. Final yedekte 54 tablo restore/parmak iziyle eşleşti. Kullanım, anonimlik ve ilk sürüm sınırları: `docs/P13_KAPANIS.md`.
 
-**P14 — Program**
+**P14 — Program · yerelde tamamlandı (06.10.2026)**
 
 - Bildiri, sunucu, salon, oturum başkanı ve teknik destek bağlanabiliyor; çakışma/yerleşmemiş bildiri uyarıları var.
 - Program yayın sürümü ve çevrim içi bağlantıların açılma/kapanma zamanı ayrı; genel program erişimi bağlantı kapatılınca kaybolmuyor.
 - Oturum başkanlığı/görev daveti için bekliyor/kabul/reddetti/değiştirildi durumları var. Ret halinde boş görev ve yerine atama ihtiyacı sekreteryada görünür; aynı kişinin kendi bildiri sunumu ayrıca izlenir.
+- Bilimsel kaynak değişince güncel yerleşim ve yeni yayın gerekir; önceki yayın ve görev yanıtı korunur. PROGRAM-only seminer bildiri/ödeme/CMS olmadan doğrulandı.
+- 678 otomatik, 85 ayrı preview ve 10 tarayıcı kontrolü başarılı. Final yedekte 60 tablo tam restore/parmak iziyle eşleşti. Kullanım ve ilk sürüm sınırları: `docs/P14_KAPANIS.md`.
 
 **P15 — Workshop ve sosyal katılım**
 

@@ -70,7 +70,7 @@ export function WorklistManager({ initial }: { initial: Overview }) {
       {message && <p role="status" aria-live="polite" style={{ overflowWrap: 'anywhere' }}>{message}</p>}
     </section>
 
-    <section className="card platform-card"><h2>Eksik işlemler ve dekont takibi</h2><p>Açık modüllerin mevcut kurallarına göre hazırlanır. Dekontun alınması ödeme doğrulaması değildir. Doğrulama ve henüz geliştirilmemiş program/görev işlemleri tamamlanmış sayılmaz.</p>
+    <section className="card platform-card"><h2>Eksik işlemler ve dekont takibi</h2><p>Açık modüllerin mevcut kurallarına göre hazırlanır. Dekontun alınması ödeme doğrulaması değildir. Ödeme doğrulaması, program yerleşimi, görev yanıtı ve belge hakkı ayrı süreçlerdir.</p>
       {data.sources.missing.length ? <div className="content-management">{data.sources.missing.map(item => <article className="content-entry" key={item.id} style={{ overflowWrap: 'anywhere' }}><h3><Link href={item.href}>{item.subject}</Link></h3><p>{item.email}</p><ul>{item.reasons.map(reason => <li key={reason}>{reason}</li>)}</ul></article>)}</div> : <p>Gösterilecek eksik işlem yok.</p>}
     </section>
 
