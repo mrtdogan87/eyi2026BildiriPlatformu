@@ -47,6 +47,10 @@ enum RegistrationKind {
 }
 
 model Congress {
+  closedAt DateTime?
+  archiveSettings ArchiveSettings?
+  archivePublications ArchivePublication[]
+  archiveEvents ArchiveEvent[]
   bookOutputs BookOutput[]
   publicationCalendar PublicationCalendar?
   publicationItems PublicationItem[]
@@ -538,6 +542,7 @@ enum CongressRole {
 }
 
 enum ModuleKey {
+  ARCHIVE
   SUBMISSIONS
   REGISTRATION
   CMS
@@ -1858,4 +1863,46 @@ model BookOutput {
  createdAt DateTime @default(now())
  @@unique([congressId, number])
  @@index([congressId, kind, locale])
+}
+
+
+model ArchiveSettings {
+  id String @id @default(uuid())
+  congressId String @unique
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  version Int @default(0)
+  publicEnabled Boolean @default(false)
+  preserveCertificates Boolean @default(false)
+  publishedNumber Int?
+  reviewAt DateTime?
+  policyNote String @default("")
+  withdrawnBooks Json @default("[]")
+  certificateSnapshot Json @default("[]")
+  closedModules Json @default("[]")
+  updatedAt DateTime @updatedAt
+}
+
+model ArchivePublication {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  number Int
+  snapshot Json
+  checksum String
+  actorId String
+  reason String
+  createdAt DateTime @default(now())
+  @@unique([congressId, number])
+}
+
+model ArchiveEvent {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  action String
+  actorId String
+  reason String
+  detail Json
+  createdAt DateTime @default(now())
+  @@index([congressId, createdAt])
 }

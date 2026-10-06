@@ -17,8 +17,8 @@ export async function participantCongress(congressSlug: string) {
   if (!congress) throw new AccessError(404, 'Kongre bulunamadı.');
   return congress;
 }
-export function participationEnabled(congress: { modules: { key: string; enabled: boolean }[] }) {
-  return congress.modules.some(m => ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM', 'ACTIVITIES', 'CERTIFICATES', 'AWARDS', 'PUBLICATIONS'].includes(m.key) && m.enabled);
+export function participationEnabled(congress: { closedAt?:Date|null; modules: { key: string; enabled: boolean }[] }) {
+  return !congress.closedAt&&congress.modules.some(m => ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM', 'ACTIVITIES', 'CERTIFICATES', 'AWARDS', 'PUBLICATIONS'].includes(m.key) && m.enabled);
 }
 export async function requestParticipantAccess(raw: unknown) {
   const input = z.object({ congressSlug: slug, email: z.string().trim().toLowerCase().email().max(254), locale: z.enum(['tr', 'en']) }).strict().safeParse(raw);

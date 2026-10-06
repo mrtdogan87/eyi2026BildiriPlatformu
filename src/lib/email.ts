@@ -10,6 +10,8 @@ export type NotificationInput = {
 
 // The caller supplies its business transaction. Only the worker performs transport.
 export async function enqueueNotification(tx: Prisma.TransactionClient, input: NotificationInput) {
+  await tx.$queryRaw`SELECT id FROM "Congress" WHERE id=${input.congressId} FOR UPDATE`;
+  if((await tx.congress.findUnique({where:{id:input.congressId},select:{closedAt:true}}))?.closedAt)throw new AccessError(409,'Kongre kapandı; yeni bildirim oluşturulamaz.');
   const [template, settings] = await Promise.all([
     tx.emailTemplate.findUnique({ where: { congressId_key_locale: { congressId: input.congressId, key: input.key, locale: input.locale } } }),
     tx.emailSettings.findUnique({ where: { congressId: input.congressId } }),

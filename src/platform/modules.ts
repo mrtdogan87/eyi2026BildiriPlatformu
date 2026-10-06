@@ -15,6 +15,8 @@ export async function setModule(key: ModuleKey, enabled: boolean) {
   if (!Object.hasOwn(moduleCatalog, key) || !moduleCatalog[key].implemented || typeof enabled !== 'boolean') throw new AccessError(400, 'Bu modül henüz kullanıma hazır değil.');
   await prisma.$transaction(async tx => {
     await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${context.congress.id} FOR UPDATE`;
+    const lifecycle=await tx.congress.findUniqueOrThrow({where:{id:context.congress.id},select:{closedAt:true}});
+    if(enabled&&lifecycle.closedAt&&key!=='ARCHIVE')throw new AccessError(409,'Önce kongreyi kapanış/arşiv ekranından yeniden açın.');
     const before = await tx.congressModule.findUnique({ where: { congressId_key: { congressId: context.congress.id, key } } });
     await tx.congressModule.upsert({ where: { congressId_key: { congressId: context.congress.id, key } }, create: { congressId: context.congress.id, key, enabled }, update: { enabled } });
     const congress = await tx.congress.findUniqueOrThrow({ where: { id: context.congress.id } });
@@ -30,4 +32,12 @@ export async function setModule(key: ModuleKey, enabled: boolean) {
 
 export async function writeModuleSettings(tx: import('@prisma/client').Prisma.TransactionClient, congressId: string, settings: { SUBMISSIONS: boolean; REGISTRATION: boolean }) {
   for (const key of ['SUBMISSIONS', 'REGISTRATION'] as const) await tx.congressModule.upsert({ where: { congressId_key: { congressId, key } }, create: { congressId, key, enabled: settings[key] }, update: { enabled: settings[key] } });
+}
+
+
+// Closure belongs to the platform; the archive integration supplies the saved setting list.
+export async function closureModuleChange(tx: import('@prisma/client').Prisma.TransactionClient, congressId:string, closed:boolean, previous:unknown){
+  if(closed){const enabled=await tx.congressModule.findMany({where:{congressId,enabled:true,key:{notIn:['ARCHIVE','CMS']}},select:{key:true}});await tx.congressModule.updateMany({where:{congressId,key:{notIn:['ARCHIVE','CMS']}},data:{enabled:false}});return enabled.map(m=>m.key);}
+  const keys=(Array.isArray(previous)?previous:[]).filter((k):k is ModuleKey=>typeof k==='string'&&Object.hasOwn(moduleCatalog,k)&&k!=='ARCHIVE'&&k!=='CMS');
+  for(const key of keys)await tx.congressModule.upsert({where:{congressId_key:{congressId,key}},create:{congressId,key,enabled:true},update:{enabled:true}});return keys;
 }

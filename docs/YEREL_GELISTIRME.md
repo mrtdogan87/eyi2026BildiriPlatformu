@@ -541,3 +541,9 @@ Panel → Tam metin, prova ve yayın onayı (`/admin/yayinlar`), yazar → Kendi
 Panel → **Kitap ve program PDF** (`/admin/kitaplar`); genel kitaplar `/<kongre>/kitaplar`. Güncel prova/yazar onayı/editör hazır kararı ve ilgili kitap tercihi olan kaynakları seçin, bütün PDF'yi önizleyip indirin. Gerekçeli onay özel sürüm üretir; genel yayın ayrıca onaylanır. İngilizce kitap bağımsız İngilizce kaynak, program PDF güncel yayımlanmış program ister. Hazırlanmış PDF tam metinleri A4'e derlenir; DOCX otomatik dizgisi yoktur.
 
 `npm run test:books`: 18 birim + 24 HTTP. P20 toplam 1129 otomatik, 147 preview, 17 tarayıcı kontrolü; 32 migration/94 tablo. Gerçek 15 MB multipart yükleme geçti; proxy sınırı 20 MB. Final kurtarma etiketi `../.recovery/P20-20261007-final`; gerçek restore kanıtı manifestte. Ayrıntılar [P20 kapanışında](P20_KAPANIS.md). Sıradaki P21 arşiv; P06-E1 ve P22'ye kadar devam edilir.
+
+## P21 kalıcı arşiv ve kapanış
+
+Panel → **Kongre arşivi ve dışa aktarma** (`/admin/arsiv`); genel `/<kongre>/arsiv?version=N`. Organizatör kaynakları önizleyip gerekçeli onayla arşivler. Belge doğrulamasını koruma seçeneğini kapanıştan önce ayarlayın. Kapanış iş modüllerini ve bekleyen mesajları durdurur; yayımlanmış arşiv/CMS ayrı yaşam döngüsüdür. Yeniden açma iptal edilmiş mesajları göndermez. Kişisel hesabıyla oturum açmış sorumlu yazar kapalı kongrede de Kendi kayıtlarım üzerinden arşiv PDF iznini geri alır. Saklama inceleme tarihi otomatik silme değildir; DOI/ISBN elle metadata kaydıdır. ZIP kaynak yetkisine uygun seçili içeriktir, tam DB yedeği değildir.
+
+P21: 1175 otomatik (345 birim/830 HTTP), 155 preview, 21 tarayıcı; 33 migration/97 tablo. Güncel `test:books` 18 birim/26 HTTP; `test:archive` 10 birim/34 HTTP. Final kurtarma `../.recovery/P21-20261007-final`; gerçek tam restore kanıtı manifestte. Ayrıntılar [P21 kapanışında](P21_KAPANIS.md). P06-E1 ve P22 yerel pilotuna devam edilir.

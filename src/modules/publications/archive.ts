@@ -1,0 +1,14 @@
+import {z} from 'zod';
+import {approval} from './core.ts';
+import type {publicProjection} from '@/modules/program/core';
+const text=(n:number)=>z.string().trim().max(n).refine(v=>!/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(v),'Kontrol karakteri kullanmayın.');
+export const archiveInput=z.object({title:text(500).min(3),note:text(4000),books:z.array(z.object({id:z.string().uuid(),doi:text(200),isbn:text(100),citation:text(2000)}).strict()).max(100),includeProgram:z.boolean()}).strict().refine(v=>new Set(v.books.map(b=>b.id)).size===v.books.length,'Bir kitap iki kez seçilemez.');
+export const publishArchiveInput=archiveInput.safeExtend({...approval,version:z.number().int().min(0),previewHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict();
+export const archiveSettingsInput=z.object({...approval,version:z.number().int().min(0),publicEnabled:z.boolean(),preserveCertificates:z.boolean(),reviewAt:z.iso.datetime({offset:true}).nullable(),policyNote:text(4000)}).strict();
+export const closeArchiveInput=z.object({...approval,version:z.number().int().min(0),closed:z.boolean()}).strict();
+export const withdrawArchiveBookInput=z.object({...approval,version:z.number().int().min(0),bookId:z.string().uuid(),withdrawn:z.boolean()}).strict();
+export const cancelArchiveCertificateInput=z.object({...approval,id:z.string().uuid(),version:z.number().int().min(0)}).strict();
+export const ownArchiveWithdrawalInput=z.object({...approval,bookId:z.string().uuid()}).strict();
+export const archiveExportInput=z.object({kind:z.enum(['PUBLIC','PUBLICATIONS','CERTIFICATES','CMS']),fileIds:z.array(z.string().min(1).max(100)).max(50)}).strict().refine(v=>new Set(v.fileIds).size===v.fileIds.length,'Dosya seçimi tekrar ediyor.');
+export type ArchiveInput=z.infer<typeof archiveInput>;
+export type ArchiveSnapshot={formatVersion:1;title:string;note:string;congress:{id:string;name:string;slug:string;organization:string};books:{id:string;number:number;kind:string;locale:string;title:string;pages:number;checksum:string;doi:string;isbn:string;citation:string}[];program:null|{id:string;number:number;publishedAt:string;projection:ReturnType<typeof publicProjection>}};

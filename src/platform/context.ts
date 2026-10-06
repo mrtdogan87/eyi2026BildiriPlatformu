@@ -46,10 +46,13 @@ export async function authorizeCongress(congressId: string, action: Action = 'co
 }
 export type CongressContext = Awaited<ReturnType<typeof requireContext>>;
 export async function requireModule(congressId: string, key: ModuleKey) {
+  const congress = await prisma.congress.findUnique({where:{id:congressId},select:{closedAt:true}});
+  if (congress?.closedAt && key!=='ARCHIVE') throw new AccessError(403,'Kongre kapandı; yeni modül işlemleri durdu.');
   const setting = await prisma.congressModule.findUnique({ where: { congressId_key: { congressId, key } } });
   if (!setting?.enabled) throw new AccessError(403, 'Bu kongrede modül kapalı.');
 }
 export async function moduleEnabled(congressId: string, key: ModuleKey) {
+  if(key!=='ARCHIVE'&&(await prisma.congress.findUnique({where:{id:congressId},select:{closedAt:true}}))?.closedAt)return false;
   return Boolean((await prisma.congressModule.findUnique({ where: { congressId_key: { congressId, key } } }))?.enabled);
 }
 export async function requirePage(action: Action = 'context', module?: ModuleKey) {

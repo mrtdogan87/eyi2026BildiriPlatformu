@@ -195,10 +195,14 @@ export async function processEmailQueue({ prisma, transport, now, batchSize = 20
   for (const candidate of candidates) {
     const startedAt = clockDate(now);
     const leaseToken = randomUUID();
-    const acquired = await prisma.emailMessage.updateMany({
+    const acquired = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT id FROM "Congress" WHERE id=${candidate.congressId} FOR UPDATE`;
+      if((await tx.congress.findUnique({where:{id:candidate.congressId},select:{closedAt:true}}))?.closedAt)return {count:0};
+      return tx.emailMessage.updateMany({
       where: { id: candidate.id, status: { in: ['PENDING', 'RETRY'] }, attempts: candidate.attempts, nextAttemptAt: { lte: startedAt } },
       data: { status: 'PROCESSING', leaseToken, leaseUntil: new Date(startedAt.getTime() + leaseMs),
         provider: candidate.provider ?? transport.provider, lastAttemptAt: startedAt, attempts: { increment: 1 }, version: { increment: 1 } },
+      });
     });
     if (!acquired.count) continue;
     claimed += 1;

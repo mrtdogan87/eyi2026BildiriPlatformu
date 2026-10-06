@@ -248,7 +248,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 | P18 | Düzenlenebilir davet ve şablonlu afiş/tanıtım çıktıları | P08 | 1–2 |
 | P19 | Tam metin teslimi, yayın tercihi, prova ve yazar onayı | P11, P13 | 2–3 |
 | P20 | Program/özet kitabı PDF üretimi ve onaylı tam metinlerden kitap derleme | P14, P19 | 2–3 |
-| P21 | Kongre kapanışı, kalıcı yayın arşivi ve veri/dosya dışa aktarma | P16, P20 | 1–2 |
+| P21 | Kongre kapanışı, kalıcı yayın arşivi ve veri/dosya dışa aktarma — Yerel kabul tamamlandı (07.10.2026) | P16, P20 | 1–2 |
 | P22 | Uçtan uca pilot, yük/erişim kontrolleri, geçiş provası ve yeni v2 yayını | P01–P21 | 2–3 |
 
 ### Paketlerin tamamlanma ölçütleri
@@ -402,7 +402,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Tam metin kitabı ilk sürümde onaylı, yayın için hazırlanmış PDF'lerden veya açıkça desteklenen standart şablondan derleniyor; çıktı sürümü ve kaynak dosyalar izleniyor.
 - Rastgele biçimlendirilmiş bütün DOCX dosyalarının tablo/denklem/şekilleriyle kusursuz otomatik dizgisi bu süreye dahil değil; örnek dosyalarla ayrıca kapsamlandırılacak.
 
-**P21 — Arşiv ve taşınabilirlik**
+**P21 — Arşiv ve taşınabilirlik (yerel kabul tamamlandı: 07.10.2026; docs/P21_KAPANIS.md)**
 
 - Kongre kapanınca yayın/kitap/program bağlantıları kalıcı; sonradan düzeltmeler sürümlü.
 - İçerik, metadata ve yetkiye uygun dosyalar dışa aktarılabiliyor; saklama/arşivleme ayarları tanımlı. DOI/ISBN alanlarını kaydetmek, dış kurumdan numara almak değildir.

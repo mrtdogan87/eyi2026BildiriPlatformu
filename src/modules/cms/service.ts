@@ -1,3 +1,4 @@
+import {lockCongress} from '@/platform/congress-lock';
 import {checkDynamicBlocks,dynamicViews} from '@/modules/content/public';
 import {validateWordTemplate,wordMime} from './word-template';
 import {initializeCmsTemplates} from '@/integrations/congress/cms-templates';
@@ -13,7 +14,7 @@ import {AccessError} from '@/platform/http';
 import {effectiveConfiguration} from '@/modules/congress/configuration';
 import {cmsSlug,documentSchema,emptyDocument,mediaReferences,publicationProblems,type CmsDocument} from './configuration';
 const context=()=>requireContext('cms','CMS');
-async function cmsTransaction<T>(c:CongressContext,fn:(tx:Prisma.TransactionClient)=>Promise<T>){return prisma.$transaction(async tx=>{await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${c.congress.id}))`;return fn(tx);},{timeout:15000});}
+async function cmsTransaction<T>(c:CongressContext,fn:(tx:Prisma.TransactionClient)=>Promise<T>){return prisma.$transaction(async tx=>{await lockCongress(tx,c,'cms','CMS');await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${c.congress.id}))`;return fn(tx);},{timeout:15000});}
 async function checkMenu(doc:CmsDocument,page:{slug:string},c:CongressContext,tx:Prisma.TransactionClient,publishing=false){
  const rows=await tx.cmsPage.findMany({where:{congressId:c.congress.id,archived:false},select:{slug:true,draft:true,publishedRevision:{select:{content:true}},aliases:{select:{slug:true}}}});
  const canonical=(slug:string)=>rows.find(p=>p.slug===slug||p.aliases.some(a=>a.slug===slug))?.slug??slug;
