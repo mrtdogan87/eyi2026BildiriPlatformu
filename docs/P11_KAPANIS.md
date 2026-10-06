@@ -114,7 +114,10 @@ temiz commit'in kaynak bundle/arşivini, özel ortam/hesap/capture dosyalarını
 kontrol kanıtlarını ve DB dump'ını içerir. Web ve worker durdurularak
 alınan dump ayrı geçici DB'ye tam restore edildi; **47 tablonun satır
 sayıları ve SHA-256 parmak izleri eşleşti**. Özel yedek klasörleri 0700,
-ortam/hesap/dump/kanıt dosyaları 0600 izinlidir. Mevcut DB üzerine init/seed
+ortam/hesap/dump/kanıt dosyaları 0600 izinlidir. Büyük medya tablolarının
+parmak izi, 0600 geçici dosyadan 64 KB parçalarla hesaplanır; tablo
+çıktısını tek bir bellek tamponuna sığdırma sınırı kaldırıldı. Geçici
+parmak izi dosyası işlem sonunda kaldırılır. Mevcut DB üzerine init/seed
 çalıştırılmadı.
 
 Sonraki paket **P12 — Ödeme doğrulama**. Uzak v2 yayını, gerçek alıcılara
