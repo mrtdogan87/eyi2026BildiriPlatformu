@@ -1,0 +1,12 @@
+import {z} from 'zod';
+import {approval} from './core.ts';
+const text=(max:number)=>z.string().trim().max(max).refine(v=>!/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(v),'Kontrol karakteri kullanmayın.');
+export const bookMetadata=z.object({title:text(500).min(3),subtitle:text(800),publisher:text(300),editors:text(1000),note:text(2000)}).strict();
+const item=z.object({id:z.string().uuid(),version:z.number().int().min(0)}).strict();
+export const bookInput=z.object({kind:z.enum(['ABSTRACT','FULL_TEXT','PROGRAM']),locale:z.enum(['tr','en']),metadata:bookMetadata,items:z.array(item).max(100),programId:z.string().uuid().nullable()}).strict().refine(v=>v.kind==='PROGRAM'?!!v.programId&&v.items.length===0:!v.programId&&v.items.length>0,'Kitap için kayıtlar; program için yayımlanmış program sürümü seçin.').refine(v=>new Set(v.items.map(i=>i.id)).size===v.items.length,'Aynı yayın iki kez seçilemez.');
+export const generateBookInput=bookInput.safeExtend({...approval,previewHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict();
+export const previewBookFileInput=bookInput.safeExtend({previewHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict();
+export const publishBookInput=z.object({...approval,id:z.string().uuid(),version:z.number().int().min(0),published:z.boolean()}).strict();
+export type BookInput=z.infer<typeof bookInput>;
+export type BookMetadata=z.infer<typeof bookMetadata>;
+export type BookSnapshot={kind:BookInput['kind'];locale:'tr'|'en';metadata:BookMetadata;congress:{id:string;name:string;organization:string};items:{id:string;version:number;sourceVersion:number;sourceHash:string;proofId:string;proofHash:string;approvalId:string;decisionId:string;fileId:string;fileChecksum:string;source:{title:string;abstract:string;locale:string;structuredAbstract:unknown;authors:{name:string;institution:string}[]}}[];program:null|{id:string;number:number;sourceVersion:number;sessions:{id:string;title:string;room:string;location:string;startsAt:string;endsAt:string;talks:{title:string;name:string;institution:string;startsAt:string;endsAt:string}[];duties:{name:string;kind:string}[]}[]}};

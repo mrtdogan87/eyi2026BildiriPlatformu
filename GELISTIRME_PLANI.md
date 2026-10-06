@@ -220,7 +220,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P19 tamamlandı. Güncel P19 kapanışı 1087 otomatik kontrol, 139 preview, 18 tarayıcı kontrolü ve 93 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P19_KAPANIS.md` içindedir. P20–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P20 kitap/program PDF üretimidir. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P20 tamamlandı. Güncel P20 kapanışı 1129 otomatik kontrol, 147 preview, 17 tarayıcı kontrolü ve 94 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P20_KAPANIS.md` içindedir. P21–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P21 arşiv ve taşınabilirliktir. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
@@ -396,7 +396,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Prova → belirli sürüme yazar onayı → editörün yayına hazır kararı çalışıyor. Dergiye yönlendirme kaydı dergi kabulü anlamına gelmiyor.
 - Ödül için tam metin teslimi, tam metin kitapta yayın izni sayılmıyor. Yalnız özet yayını, tam metin kitap tercihi ve dergiye yönlendirme isteği ayrı alanlarda tutuluyor; tercih/onay geçmişi hangi dosya sürümünü kapsadığını gösteriyor.
 
-**P20 — Kitap ve PDF**
+**P20 — Kitap ve PDF (Yerel kabul tamamlandı; docs/P20_KAPANIS.md)**
 
 - Yapılandırılmış özetlerden kapak/içindekiler/sayfa numarası/yazar dizini içeren örnek kitap; aynı program verisinden PDF üretimi.
 - Tam metin kitabı ilk sürümde onaylı, yayın için hazırlanmış PDF'lerden veya açıkça desteklenen standart şablondan derleniyor; çıktı sürümü ve kaynak dosyalar izleniyor.

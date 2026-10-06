@@ -534,3 +534,10 @@ Panel → Davet ve afiş çıktıları (`/admin/tanitim`). İçerik editörü, s
 Panel → Tam metin, prova ve yayın onayı (`/admin/yayinlar`), yazar → Kendi kayıtlarım / katılımcı paneli. Bağımsız ilk teslim/revizyon takvimi; kabul edilmiş bildiri veya dış bilimsel kaynak. Yayın PDF dosyası ödül dosyasından ayrı ve özeldir. Özet kitabı, tam metin kitabı ve dergi isteği ayrı yazar tercihleridir. Editör prova sürümü açar, doğrulanmış sorumlu yazar tam sürümü onaylar, editör güncel onaya hazır kararı verir. Kaynak/tercih/dosya değişikliği eski izni geçersiz kılar; eski tercihe dönmek izni canlandırmaz. Yazar son tarihten sonra da izni geri alabilir. Dergi kaydı dergi kabulü değildir.
 
 `npm run test:publications`: 20 birim + 37 HTTP. P19 toplam 1087 otomatik, 139 preview ve 18 tarayıcı kontrolü; 31 migration/93 tablo. Final kurtarma etiketi `../.recovery/P19-20261007-final`; gerçek restore kanıtı manifestte. Ayrıntılar [P19 kapanışında](P19_KAPANIS.md). Sıradaki P20 kitap/program PDF; P22 ve P06-E1'e kadar devam edilir.
+
+
+## P20 kitap ve program PDF
+
+Panel → **Kitap ve program PDF** (`/admin/kitaplar`); genel kitaplar `/<kongre>/kitaplar`. Güncel prova/yazar onayı/editör hazır kararı ve ilgili kitap tercihi olan kaynakları seçin, bütün PDF'yi önizleyip indirin. Gerekçeli onay özel sürüm üretir; genel yayın ayrıca onaylanır. İngilizce kitap bağımsız İngilizce kaynak, program PDF güncel yayımlanmış program ister. Hazırlanmış PDF tam metinleri A4'e derlenir; DOCX otomatik dizgisi yoktur.
+
+`npm run test:books`: 18 birim + 24 HTTP. P20 toplam 1129 otomatik, 147 preview, 17 tarayıcı kontrolü; 32 migration/94 tablo. Gerçek 15 MB multipart yükleme geçti; proxy sınırı 20 MB. Final kurtarma etiketi `../.recovery/P20-20261007-final`; gerçek restore kanıtı manifestte. Ayrıntılar [P20 kapanışında](P20_KAPANIS.md). Sıradaki P21 arşiv; P06-E1 ve P22'ye kadar devam edilir.

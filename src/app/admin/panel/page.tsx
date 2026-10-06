@@ -20,6 +20,7 @@ export default async function PanelPage({ searchParams }: { searchParams: Promis
   const program = await moduleEnabled(context.congress.id, 'PROGRAM');
   const reviews = submissions && await moduleEnabled(context.congress.id, 'REVIEWS');
   const links = [
+    ['publications.read', publications, '/admin/kitaplar', 'Kitap ve program PDF'],
     ['publications.read', publications, '/admin/yayinlar', 'Tam metin, prova ve yayın onayı'],
     ['promotion.read', promotion, '/admin/tanitim', 'Davet ve afiş çıktıları'],
     ['awards.read', awards, '/admin/oduller', 'Ödül başvuruları ve kurul kararları'],

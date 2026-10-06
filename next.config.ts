@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   typedRoutes: false,
-  // P11 permits a 10 MB DOCX plus 2 MB evidence and multipart metadata.
+  // P19 permits a 15 MB publication PDF plus multipart metadata.
   // Individual routes still enforce their own streamed/upload limits.
-  experimental: { proxyClientMaxBodySize: '14mb' },
+  experimental: { proxyClientMaxBodySize: '20mb' },
   // Access links carry secrets in their query; never log incoming request URLs in dev.
   logging: { incomingRequests: false },
   output: "standalone",

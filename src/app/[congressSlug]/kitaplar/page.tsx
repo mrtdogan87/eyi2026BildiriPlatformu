@@ -1,0 +1,5 @@
+import {notFound} from 'next/navigation';
+import {AccessError} from '@/platform/http';
+import {publicBooks} from '@/integrations/congress/books';
+export const dynamic='force-dynamic';
+export default async function Page({params,searchParams}:{params:Promise<{congressSlug:string}>;searchParams:Promise<{lang?:string}>}){const {congressSlug}=await params,en=(await searchParams).lang==='en';let data;try{data=await publicBooks(congressSlug);}catch(e){if(e instanceof AccessError)notFound();throw e;}const files=data.files.filter(f=>f.locale===(en?'en':'tr'));return <main className="page-shell"><section className="card platform-card"><h1>{en?'Books and publications':'Kitaplar ve yayınlar'}</h1><p>{data.congressName}</p>{!files.length&&<p>{en?'No current approved publication is available in this language.':'Bu dilde güncel onaylı yayın henüz yok.'}</p>}{files.map(f=><article className="content-entry" key={f.id}><h2>{f.title}</h2><p>{en?'Version':'Sürüm'} {f.number} · {f.pages} {en?'pages':'sayfa'}</p><a href={'/api/public/congresses/'+encodeURIComponent(congressSlug)+'/books/'+f.id}>{en?'Download PDF':'PDF indir'}</a></article>)}</section></main>;}

@@ -47,6 +47,7 @@ enum RegistrationKind {
 }
 
 model Congress {
+  bookOutputs BookOutput[]
   publicationCalendar PublicationCalendar?
   publicationItems PublicationItem[]
   publicationEvents PublicationEvent[]
@@ -1834,4 +1835,27 @@ model PublicationEvent {
  detail Json
  createdAt DateTime @default(now())
  @@index([congressId, createdAt])
+}
+
+model BookOutput {
+ id String @id @default(uuid())
+ congressId String
+ congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+ number Int
+ kind String
+ locale String
+ title String
+ snapshot Json
+ sourceFingerprint String
+ checksum String
+ content Bytes
+ pages Int
+ layout Json
+ published Boolean @default(false)
+ publicationVersion Int @default(0)
+ actorId String
+ reason String
+ createdAt DateTime @default(now())
+ @@unique([congressId, number])
+ @@index([congressId, kind, locale])
 }

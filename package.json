@@ -38,7 +38,8 @@
     "test:attendance": "node --test scripts/attendance.test.mjs && node scripts/attendance-check.mjs",
     "test:awards": "node --test scripts/awards.test.mjs && node scripts/awards-check.mjs",
     "test:promotion": "node --test scripts/promotion.test.mjs && node scripts/promotion-check.mjs",
-    "test:publications": "node --test scripts/publications.test.mjs && node scripts/publications-check.mjs"
+    "test:publications": "node --test scripts/publications.test.mjs && node scripts/publications-check.mjs",
+    "test:books": "node --test scripts/books.test.mjs && node scripts/books-check.mjs"
   },
   "keywords": [],
   "author": "",
