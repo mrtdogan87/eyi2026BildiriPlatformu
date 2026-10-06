@@ -109,7 +109,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
             <label htmlFor="registration">Kayıt</label>
             <select id="registration" name="registration" defaultValue={filters.registration}>
               <option value="ALL">Tümü</option>
-              <option value="PAID">Ödendi</option>
+              <option value="PAID">Dekont tarihi var</option>
               <option value="PENDING">Bekleniyor</option>
             </select>
           </div>

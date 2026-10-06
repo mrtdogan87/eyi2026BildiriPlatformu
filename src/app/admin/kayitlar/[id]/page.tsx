@@ -1,5 +1,7 @@
 import { allows } from "@/platform/policy";
 import Link from "next/link";
+import { paymentOverview } from "@/integrations/congress/payments";
+import { PaymentManager } from "@/components/payments/manager";
 import { notFound } from "next/navigation";
 import { AdminDeleteRegistration } from "@/components/admin/admin-delete-registration";
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
@@ -29,6 +31,7 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
   const registration = await getAdminRegistrationDetail(id);
 
   if (!registration) notFound();
+  const payment = await paymentOverview(id);
 
   return (
     <main className="page-shell admin-page-shell">
@@ -43,6 +46,7 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
         <AdminLogoutButton />
       </section>
 
+      <PaymentManager initial={payment} canManage={allows(context.role, "payments.manage")} />
       <section className="card admin-panel-card admin-detail-grid">
         <div className="admin-detail-block">
           <h2>Kayıt Bilgileri</h2>
@@ -80,7 +84,7 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
               <dd>{registration.paymentDescription}</dd>
             </div>
             <div>
-              <dt>Ödeme Tarihi</dt>
+              <dt>Dekont Kayıt Tarihi</dt>
               <dd>{formatDate(registration.paidAt)}</dd>
             </div>
             <div>
@@ -109,7 +113,7 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
         </div>
 
         <div className="admin-detail-block">
-          <h2>Ödenen Bildiriler</h2>
+          <h2>Kayıtla İlişkili Bildiriler</h2>
           {registration.paperItems.length ? (
             <div className="admin-author-list">
               {registration.paperItems.map((item) => (
@@ -139,8 +143,8 @@ export default async function AdminRegistrationDetailPage({ params }: PageProps)
         </div>
 
         <div className="admin-detail-block admin-detail-block-danger">
-          <h2>Tehlikeli İşlem · Kaydı Sil</h2>
-          {allows(context.role, "registrations.delete") ? <AdminDeleteRegistration
+          <h2>{payment.events.length ? 'Ödeme Geçmişi Korunuyor' : 'Tehlikeli İşlem · Kaydı Sil'}</h2>
+          {payment.events.length ? <p>Ödeme inceleme veya banka işlem geçmişi bulunan kayıt kalıcı silinemez. İptal talebi ya da gerekçeli ödeme düzeltmesi kullanın.</p> : allows(context.role, "registrations.delete") ? <AdminDeleteRegistration
             registrationId={registration.id}
             registrationEmail={registration.email}
           /> : null}

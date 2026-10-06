@@ -1,3 +1,4 @@
+import { paymentSummary, paymentLabels } from '@/modules/payments/core';
 import { AccessError } from "@/platform/http";
 import { enqueueNotification } from '@/platform/notifications';
 import { createHash } from 'node:crypto';
@@ -158,7 +159,7 @@ export async function getAdminSubmissionList(
       presentationMode: mapPresentationMode(submission.presentationMode),
       audienceLabel: mapAudience(submission.audience),
       registrationStatusLabel: paid
-        ? `Ödendi (${submission.paperItem?.paperOrder === 2 ? "İkinci" : "Birinci"})`
+        ? `Kayıt / dekont var (${submission.paperItem?.paperOrder === 2 ? "İkinci" : "Birinci"})`
         : "Bekleniyor",
       submittedAt: submission.submittedAt?.toISOString() ?? null,
     };
@@ -632,6 +633,8 @@ export async function getAdminRegistrationList(
       paidAt: true,
       createdAt: true,
       paperItems: { select: { id: true } },
+      receipt: { select: { id: true } },
+      paymentEvents: { orderBy: { number: "asc" }, select: { id: true, kind: true, amountMinor: true, currency: true, targetId: true, createdAt: true } },
     },
   });
 
@@ -642,6 +645,7 @@ export async function getAdminRegistrationList(
     paperCount: registration.paperItems.length,
     totalAmountLabel: formatCurrencyAmount(registration.totalAmount, registration.currency),
     paymentPeriodLabel: mapPeriodLabel(registration.paymentPeriod),
+    paymentStateLabel: paymentLabels[paymentSummary({ ...registration, receiptReceived: !!registration.receipt }, registration.paymentEvents).state]?.[0] ?? "Kontrol gerekli",
     paidAt: registration.paidAt?.toISOString() ?? null,
     createdAt: registration.createdAt.toISOString(),
   }));
@@ -758,6 +762,7 @@ export async function deleteAdminRegistration(registrationId: string) {
       select: { id: true },
   });
   if (!registration) return false;
+  if (await tx.paymentEvent.count({ where: { registrationId } })) throw new AccessError(409, "Ödeme geçmişi bulunan kayıt silinemez. Gerekçeli ödeme düzeltmesi veya iptal talebi kullanın.");
   await tx.registration.delete({ where: { id: registration.id } });
   await auditSink(tx)(context, "registration.delete", registration.id);
   return true;

@@ -71,7 +71,7 @@ export async function correctSubmission(id: string, raw: unknown, evidence: Revi
       const registration = paper.paperItem.registration;
       if (input.registrationHandling === 'UPDATE') {
         if (registration.email.toLowerCase() !== oldPresenter || registration.paperItems.length !== 1) throw new AccessError(409, 'Ortak kayıt veya farklı kayıt sahibi var. Kayıt kontrolü seçeneğiyle gerekçeli takip açın.');
-        await tx.registration.update({ where: { id: registration.id }, data: { email: newPresenter } });
+        await tx.registration.update({ where: { id: registration.id }, data: { email: newPresenter, paymentVersion: { increment: 1 } } });
       }
     }
     const oldEmails = [paper.draftOwnerEmail.toLowerCase(), ...paper.authors.map(a => a.email.toLowerCase())], nextEmails = [input.draftOwnerEmail, ...authors.map(a => a.email)];

@@ -13,6 +13,7 @@ export default async function PanelPage({ searchParams }: { searchParams: Promis
   if (!context) return <main className="page-shell"><section className="card platform-card"><h1>Kongre seçin</h1><p>Üst menüden erişiminiz olan kongrelerden birini seçin. Üyeliğiniz kaldırıldıysa kongre yönetimiyle görüşün.</p>{canCreate && <Link className="button primary" href="/admin/kongre-olustur">Yeni kongre oluştur</Link>}<AdminLogoutButton /></section></main>;
   const submissions = await moduleEnabled(context.congress.id, 'SUBMISSIONS'); const registration = await moduleEnabled(context.congress.id, 'REGISTRATION');const cms=await moduleEnabled(context.congress.id,'CMS');
   const links = [
+    ['payments.read', registration, '/admin/odemeler', 'Ödeme doğrulama ve banka ekstresi'],
     ['worklist', true, '/admin/is-listesi', 'Sekreterya iş listesi'],
     ['communications', true, '/admin/iletisim', 'E-posta ve teslim sorunları'],
     ['submissions.read', submissions, '/admin/bildiriler', 'Bildiriler'], ['registrations.read', registration, '/admin/kayitlar', 'Kayıtlar'],

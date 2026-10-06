@@ -106,6 +106,7 @@ export type AdminPricingPayload = {
 };
 
 export type AdminRegistrationListItem = {
+  paymentStateLabel: string;
   id: string;
   email: string;
   kindLabel: string;

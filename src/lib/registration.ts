@@ -214,7 +214,7 @@ export async function getRegistrationContext(input: {
       presentationMode: submission.presentationMode,
       audience: submission.audience,
       submittedAt: submission.submittedAt?.toISOString() ?? null,
-      alreadyPaid: Boolean(submission.paperItem?.registration?.paidAt),
+      alreadyPaid: Boolean(submission.paperItem),
       paidAt: submission.paperItem?.registration?.paidAt?.toISOString() ?? null,
       isPresenter: presenter?.email.toLowerCase() === normalizedEmail,
       presenterName: presenter?.fullName ?? null,

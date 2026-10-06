@@ -1,5 +1,5 @@
 import type { CongressRole } from '@prisma/client';
-export type Action = 'context' | 'submissions.read' | 'submissions.status' | 'submissions.delete' | 'registrations.read' | 'registrations.delete' | 'settings' | 'members' | 'modules' | 'audit' | 'own' | 'cms' | 'feedback' | 'communications' | 'communication.manage' | 'worklist' | 'submissions.correct';
+export type Action = 'context' | 'submissions.read' | 'submissions.status' | 'submissions.delete' | 'registrations.read' | 'registrations.delete' | 'settings' | 'members' | 'modules' | 'audit' | 'own' | 'cms' | 'feedback' | 'communications' | 'communication.manage' | 'worklist' | 'submissions.correct' | 'payments.read' | 'payments.manage';
 export const roleLabels: Record<CongressRole, string> = {
   ORGANIZER: 'Organizatör', SECRETARY: 'Sekreter', CONTENT_EDITOR: 'İçerik editörü',
   REVIEWER: 'Hakem', SESSION_CHAIR: 'Oturum başkanı', PARTICIPANT: 'Katılımcı',
@@ -11,7 +11,7 @@ export function allows(role: CongressRole | 'PLATFORM_ADMIN', action: Action) {
   if (action === 'communications') return role === 'SECRETARY';
   if (action === 'worklist') return role === 'SECRETARY';
   if (action === 'cms') return role === 'CONTENT_EDITOR';
-  return role === 'SECRETARY' && ['submissions.read', 'submissions.status', 'submissions.correct', 'registrations.read'].includes(action);
+  return role === 'SECRETARY' && ['submissions.read', 'submissions.status', 'submissions.correct', 'registrations.read', 'payments.read', 'payments.manage'].includes(action);
 }
 export const moduleCatalog = {
   SUBMISSIONS: { label: 'Bildiri gönderimi', implemented: true },

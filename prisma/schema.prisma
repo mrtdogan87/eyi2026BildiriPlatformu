@@ -47,6 +47,9 @@ enum RegistrationKind {
 }
 
 model Congress {
+  paymentEvents            PaymentEvent[]
+  bankStatements           BankStatement[]
+  bankTransactions         BankTransaction[]
   flowSessions             FlowSession[]
   workRequests             WorkRequest[]
   participantAccessTokens  ParticipantAccessToken[]
@@ -118,7 +121,7 @@ model PaymentTier {
   congress         Congress                @relation(fields: [congressId], references: [id], onDelete: Cascade)
   paperItems       RegistrationPaperItem[]
 
-  @@unique([congressId, presentationMode, role, audience, paperOrder, period])
+  @@unique([congressId, presentationMode, role, audience, paperOrder, period], map: "PaymentTier_unique_combo")
   @@index([congressId, active])
 }
 
@@ -319,6 +322,8 @@ model SubmissionStatusHistory {
 }
 
 model Registration {
+  paymentVersion           Int                          @default(0)
+  paymentEvents            PaymentEvent[]
   id                       String                       @id @default(cuid())
   congressId               String
   email                    String
@@ -981,4 +986,77 @@ model DeclarationAcceptance {
 
   @@unique([entityType, entityId])
   @@index([congressId, email, acceptedAt])
+}
+
+// P12: append-only verification facts, kept separately from legacy paidAt.
+model PaymentEvent {
+  id                   String           @id @default(uuid())
+  congressId           String
+  congress             Congress         @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  registrationId       String
+  registration         Registration     @relation(fields: [registrationId], references: [id], onDelete: Restrict)
+  number               Int
+  kind                 String
+  amountMinor          Int              @default(0)
+  currency             String
+  occurredAt           DateTime?
+  reference            String?
+  bankTransactionId    String?
+  bankTransaction      BankTransaction? @relation(fields: [bankTransactionId], references: [id], onDelete: Restrict)
+  targetId             String?          @unique
+  target               PaymentEvent?    @relation("PaymentVoid", fields: [targetId], references: [id], onDelete: Restrict)
+  voidedBy             PaymentEvent?    @relation("PaymentVoid")
+  reason               String
+  actorId              String?
+  actorName            String
+  registrationSnapshot Json
+  evidenceName         String?
+  evidenceMime         String?
+  evidenceHash         String?
+  evidence             Bytes?
+  createdAt            DateTime         @default(now())
+
+  @@unique([registrationId, number])
+  @@index([congressId, kind, reference])
+  @@index([bankTransactionId])
+}
+
+model BankStatement {
+  id           String            @id @default(uuid())
+  congressId   String
+  congress     Congress          @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  accountKey   String
+  note         String
+  originalName String
+  sha256       String
+  content      Bytes
+  rowCount     Int
+  actorId      String?
+  actorName    String
+  createdAt    DateTime          @default(now())
+  transactions BankTransaction[]
+
+  @@unique([congressId, accountKey, sha256])
+}
+
+model BankTransaction {
+  id              String         @id @default(uuid())
+  congressId      String
+  congress        Congress       @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  statementId     String
+  statement       BankStatement  @relation(fields: [statementId], references: [id], onDelete: Restrict)
+  accountKey      String
+  reference       String
+  occurredAt      DateTime
+  amountMinor     Int
+  currency        String
+  description     String
+  payerEmail      String
+  registrationRef String
+  rowNumber       Int
+  createdAt       DateTime       @default(now())
+  paymentEvents   PaymentEvent[]
+
+  @@unique([congressId, accountKey, reference])
+  @@index([statementId])
 }

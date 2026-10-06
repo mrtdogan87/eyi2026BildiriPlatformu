@@ -45,7 +45,7 @@ export const registration = {
     acceptedPapersHeading: "Kabul Edilmiş Bildirileriniz",
     noAcceptedPapers:
       "Bu e-postaya bağlı kabul edilmiş bildiri bulunmuyor. Dinleyici olarak kaydolabilirsiniz.",
-    paid: "Ödendi",
+    paid: "Kayıt yapılmış",
     presenterPapersHeading: "Sunduğunuz Bildiriler",
     noPresenterPapers:
       "Bu e-postayla sunan yazar olduğunuz kabul edilmiş bildiri yok. Kongreye katılımcı/dinleyici olarak kaydolabilirsiniz.",
@@ -174,7 +174,7 @@ export const registration = {
     acceptedPapersHeading: "Your Accepted Papers",
     noAcceptedPapers:
       "There are no accepted papers linked to this email. You can register as a listener.",
-    paid: "Paid",
+    paid: "Registered",
     presenterPapersHeading: "Papers You Present",
     noPresenterPapers:
       "There are no accepted papers where you are the presenting author for this email. You can register as a participant/listener.",

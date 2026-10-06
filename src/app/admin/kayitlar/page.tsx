@@ -81,11 +81,11 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
             </select>
           </div>
           <div className="field">
-            <label htmlFor="status">Ödeme Durumu</label>
+            <label htmlFor="status">Eski Dekont Tarihi Filtresi</label>
             <select id="status" name="status" defaultValue={filters.status}>
               <option value="ALL">Tümü</option>
-              <option value="PAID">Ödendi</option>
-              <option value="PENDING">Bekleniyor</option>
+              <option value="PAID">Dekont tarihi var</option>
+              <option value="PENDING">Dekont tarihi yok</option>
             </select>
           </div>
           <div className="field">
@@ -116,7 +116,8 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
                   <th>Bildiri Sayısı</th>
                   <th>Toplam</th>
                   <th>Dönem</th>
-                  <th>Ödendi</th>
+                  <th>Ödeme doğrulama</th>
+                  <th>Dekont tarihi</th>
                   <th>Oluşturuldu</th>
                 </tr>
               </thead>
@@ -132,6 +133,7 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
                     <td>{registration.paperCount}</td>
                     <td>{registration.totalAmountLabel}</td>
                     <td>{registration.paymentPeriodLabel}</td>
+                    <td>{registration.paymentStateLabel}</td>
                     <td>{formatDate(registration.paidAt)}</td>
                     <td>{formatDate(registration.createdAt)}</td>
                   </tr>

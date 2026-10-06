@@ -1,8 +1,8 @@
 # Bildiri Yönetim Sistemi — v2 Geliştirme Planı
 
-> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10 ve P11 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
+> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10, P11 ve P12 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
 > İlk gerçek kullanım: EYİ 2026 (`eyi-2026`); canlı sistem korunuyor.
-> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
+> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`, `docs/P12_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
 
 ## 1. Hedef
 
@@ -320,11 +320,14 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Önceki metin/dosya kaybolmuyor; değişikliğe bağlı belge/çıktı güncelleme ihtiyacı izleniyor.
 - 450 otomatik kontrol, 56 ayrı preview kontrolü ve tarayıcı kanıtı başarılı. 47 tablo final yedekten restore/parmak iziyle doğrulandı. Kapsam ve manuel çıktı takibi sınırı: `docs/P11_KAPANIS.md`.
 
-**P12 — Ödeme doğrulama**
+**P12 — Ödeme doğrulama — TAMAMLANDI (06.10.2026, yerel)**
 
 - Dekont alındı/kontrol bekliyor/doğrulandı/eksik-fazla ödeme/davetli-muaf/iade durumları ayrı.
 - İlk sürümde elle doğrulama ve bir anlaşılmış banka CSV/XLSX biçiminden eşleştirme önerisi; belirsiz eşleşme otomatik onaylanmıyor.
 - Eski `paidAt` kayıtlarının anlamı korunuyor, kanıtsız doğrulama üretilmiyor. Doğrudan banka API'si, kart tahsilatı veya otomatik para iadesi bu paket değildir.
+
+- Elle kanıtlı doğrulama, kısmi/fazla ödeme, muafiyet ve yapılmış iade; değişmez geçmiş ve gerekçeli geçersizleştirme çalışıyor. İlk ekstre biçimi sabit sütunlu UTF-8 CSV; XLSX bu biçime dışa aktarılır.
+- 523 otomatik kontrol ve 62 ayrı preview kontrolü başarılı. Final yedekte 50 tablo restore/parmak iziyle doğrulandı. Kapsam ve CSV/hesap anahtarı sınırı: `docs/P12_KAPANIS.md`.
 
 **P13 — Hakemlik**
 

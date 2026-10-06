@@ -1,3 +1,4 @@
+import { paymentSummary, paymentLabels } from '@/modules/payments/core';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { requireContext, type CongressContext } from '@/platform/context';
@@ -128,11 +129,11 @@ async function missingRecords(c: CongressContext, enabled: Set<string>): Promise
     for (const o of outputs) missing.push({ id: `OUTPUT:${o.id}`, sourceType: 'SUBMISSION', sourceId: o.submissionId, subject: o.submission.titleTr || o.submission.titleEn || 'Düzeltme sonrası kontrol', email: o.submission.draftOwnerEmail, reasons: [`Düzeltme sonrası çıktı/kayıt güncellemesi bekliyor: ${o.kind}`], href: `/admin/bildiriler/${o.submissionId}` });
   }
   if (enabled.has('REGISTRATION')) {
-    const registrations = await prisma.registration.findMany({ where: { congressId: c.congress.id }, select: { id: true, email: true, totalAmount: true, paidAt: true, receipt: { select: { id: true } }, studentDocument: { select: { id: true } } }, orderBy: { createdAt: 'desc' }, take: 200 });
+    const registrations = await prisma.registration.findMany({ where: { congressId: c.congress.id }, select: { id: true, email: true, totalAmount: true, currency: true, paymentEvents: { orderBy: { number: 'asc' }, select: { id: true, kind: true, amountMinor: true, currency: true, targetId: true, createdAt: true } }, paidAt: true, receipt: { select: { id: true } }, studentDocument: { select: { id: true } } }, orderBy: { createdAt: 'desc' }, take: 200 });
     for (const registration of registrations) {
-      const reasons: string[] = [];
-      if (configuration.stages.PAYMENT.enabled && configuration.fields.receipt === 'REQUIRED' && registration.totalAmount > 0 && !registration.receipt) reasons.push('Zorunlu dekont eksik');
-      if (configuration.stages.PAYMENT.enabled && registration.totalAmount > 0 && (registration.receipt || registration.paidAt)) reasons.push(registration.receipt ? 'Dekont alındı; ödeme doğrulaması henüz kullanıma açık değil' : 'Eski dekont tarihi mevcut; ödeme doğrulaması henüz kullanıma açık değil');
+      const reasons: string[] = [], payment = paymentSummary({ ...registration, receiptReceived: !!registration.receipt }, registration.paymentEvents);
+      if (configuration.stages.PAYMENT.enabled && configuration.fields.receipt === 'REQUIRED' && registration.totalAmount > 0 && !registration.receipt && !['VERIFIED', 'EXEMPT', 'OVERPAID', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(payment.state)) reasons.push('Zorunlu dekont eksik');
+      if (['RECEIPT_RECEIVED_UNVERIFIED', 'PENDING', 'UNDERPAID', 'OVERPAID', 'PARTIALLY_REFUNDED'].includes(payment.state)) reasons.push(paymentLabels[payment.state]?.[0] ?? payment.state);
       if (configuration.fields.studentDocument === 'REQUIRED' && !registration.studentDocument) reasons.push('Zorunlu öğrenci belgesi eksik');
       if (reasons.length) missing.push({ id: `REGISTRATION:${registration.id}`, sourceType: 'REGISTRATION', sourceId: registration.id, subject: 'Kayıt / dekont takibi', email: registration.email, reasons, href: `/admin/kayitlar/${registration.id}` });
     }

@@ -413,3 +413,21 @@ klasöre yazılmaz. Başka paket için yeni, benzersiz etiket kullanın.
 Kabul mektubu/listesi ve sonraki program/kitap/belge ihtiyacı takip işi
 olarak kaydedilir; P11 bunların dosyasını üretmez. Sıradaki geliştirme
 P12 ödeme doğrulamasıdır; eski dekont tarihi ödeme onayı sayılmaz.
+
+
+## P12 ödeme doğrulama
+
+P12'nin yerel uygulaması tamamlandı. Panel → Ödeme doğrulama ve banka ekstresi;
+kayıt detayında elle doğrulama, muafiyet, yapılmış iade ve bağlı geçmiş düzeltmesi
+vardır. İlk ekstre biçimi şablonla aynı sütunlu UTF-8 CSV'dir; XLSX'i bu biçime
+aktararak yükleyin. Gerçek banka bağlantısı veya otomatik para transferi yoktur.
+Eski paidAt hâlâ dekont tarihidir; yeni onayın kaynağı PaymentEvent geçmişidir.
+
+`npm run test:payments` 24 birim ve 49 yerel HTTP senaryosu çalıştırır.
+Diğer kontrollü kuyruk testleri gibi webi `MAIL_WORKER_AUTOSTART=false npm run start`
+ile açın. Gündelik kullanımda normal `npm run start` capture worker'ı otomatik açar.
+P12 üç tablo ekledi; toplam 21 migration/50 tablo. Veri sıfırlamadan
+`npm run prisma:migrate:deploy` uygulanır. Restore doğrulanmış kapanış:
+`../.recovery/P12-20261006-final`; aynı etiketi yeniden kullanmayın.
+Kapsam, CSV biçimi, para/kanıt ve güvenlik sınırları `P12_KAPANIS.md` içindedir.
+Sıradaki geliştirme P13 hakemliktir.

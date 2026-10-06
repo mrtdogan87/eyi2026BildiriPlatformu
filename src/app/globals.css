@@ -2230,3 +2230,10 @@ textarea {
 .content-management summary { cursor: pointer; font-weight: 600; }
 .content-management textarea { min-height: 90px; }
 @media (max-width: 600px) { .content-people li { flex-direction: column; } .content-record { padding: 1rem; } }
+
+.payment-totals, .payment-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; margin: 20px 0; }
+.payment-totals > div { background: var(--surface-muted, #f4f7fa); padding: 16px; border-radius: 12px; }
+.payment-totals span, .payment-totals strong { display: block; }
+.payment-totals span { font-size: 0.85rem; margin-bottom: 8px; color: #526277; }
+.payment-totals strong { font-size: 1.12rem; }
+.payment-manager fieldset { min-width: 0; }

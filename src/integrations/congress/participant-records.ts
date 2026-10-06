@@ -2,7 +2,8 @@ import type { Prisma } from '@prisma/client';
 import type { FlowParent } from '@/platform/flow-sessions';
 import { prisma } from '@/lib/prisma';
 import { effectiveConfiguration } from '@/modules/congress/configuration';
-import { paymentState, submissionTasks } from '@/modules/participation/status';
+import { paymentSummary } from '@/modules/payments/core';
+import { submissionTasks } from '@/modules/participation/status';
 import { AccessError } from '@/platform/http';
 import { setDraftAccessCookie } from '@/lib/submission';
 import { setRegistrationCookie } from '@/lib/registration';
@@ -16,7 +17,7 @@ export async function participantRecords(congressId: string, email: string) {
   const [papers, entries, declarations, requests, revisions] = await Promise.all([
     modules.SUBMISSIONS ? prisma.submission.findMany({ where: { congressId, OR: [{ draftOwnerEmail: emailMatch }, { status: { not: 'DRAFT' }, authors: { some: { email: emailMatch } } }] },
       select: { id: true, titleTr: true, titleEn: true, status: true, draftOwnerEmail: true, submittedAt: true, file: { select: { id: true } }, paperItem: { select: { id: true } }, authors: { where: { email: emailMatch }, select: { isPresenter: true } } }, orderBy: { createdAt: 'desc' }, take: 100 }) : [],
-    modules.REGISTRATION ? prisma.registration.findMany({ where: { congressId, email: emailMatch }, select: { id: true, totalAmount: true, currency: true, paidAt: true, audience: true, createdAt: true, receipt: { select: { id: true } }, studentDocument: { select: { id: true } } }, orderBy: { createdAt: 'desc' }, take: 100 }) : [],
+    modules.REGISTRATION ? prisma.registration.findMany({ where: { congressId, email: emailMatch }, select: { id: true, totalAmount: true, currency: true, paidAt: true, audience: true, createdAt: true, receipt: { select: { id: true } }, studentDocument: { select: { id: true } }, paymentEvents: { orderBy: { number: 'asc' }, select: { id: true, kind: true, amountMinor: true, currency: true, targetId: true, createdAt: true } } }, orderBy: { createdAt: 'desc' }, take: 100 }) : [],
     prisma.declarationAcceptance.findMany({ where: { congressId, email: emailMatch }, select: { entityType: true, entityId: true, version: true, locale: true, acceptedAt: true } }),
     listParticipantWorkRequests(prisma, { congressId, email }),
     modules.SUBMISSIONS ? prisma.submissionRevisionRequest.findMany({ where: { ownerEmail: emailMatch, submission: { congressId, draftOwnerEmail: emailMatch } }, orderBy: { createdAt: 'desc' }, take: 100, select: { id: true, status: true, reason: true, expiresAt: true, fileName: true, reviewReason: true } }) : [],
@@ -30,8 +31,8 @@ export async function participantRecords(congressId: string, email: string) {
       canWithdraw: p.status !== 'DRAFT' && p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), canOpen: p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), declaration: declaration('SUBMISSION', p.id),
       missing: submissionTasks({ status: p.status, owner: p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), fileRequired: rules.stages.FULL_TEXT.enabled && rules.fields.file === 'REQUIRED', fileReceived: !!p.file, registrationEnabled: modules.REGISTRATION, registered: !!p.paperItem, presenter: p.authors.some(a => a.isPresenter) }) })),
     registrations: entries.map(r => ({ id: r.id, totalAmount: r.totalAmount, currency: r.currency, paidAt: r.paidAt?.toISOString() ?? null, createdAt: r.createdAt.toISOString(), receiptReceived: !!r.receipt,
-      paymentState: paymentState({ totalAmount: r.totalAmount, receiptReceived: !!r.receipt, legacyReceiptAt: r.paidAt }), paymentVerificationAvailable: false, declaration: declaration('REGISTRATION', r.id),
-      missing: [...(rules.stages.PAYMENT.enabled && rules.fields.receipt === 'REQUIRED' && r.totalAmount > 0 && !r.receipt ? ['UPLOAD_RECEIPT'] : []), ...(rules.fields.studentDocument === 'REQUIRED' && !r.studentDocument ? ['UPLOAD_STUDENT_DOCUMENT'] : [])] })),
+      paymentState: paymentSummary({ ...r, receiptReceived: !!r.receipt }, r.paymentEvents).state, payment: paymentSummary({ ...r, receiptReceived: !!r.receipt }, r.paymentEvents), paymentVerificationAvailable: true, declaration: declaration('REGISTRATION', r.id),
+      missing: [...(rules.stages.PAYMENT.enabled && rules.fields.receipt === 'REQUIRED' && r.totalAmount > 0 && !r.receipt && !['EXEMPT', 'VERIFIED', 'OVERPAID', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(paymentSummary({ ...r, receiptReceived: !!r.receipt }, r.paymentEvents).state) ? ['UPLOAD_RECEIPT'] : []), ...(rules.fields.studentDocument === 'REQUIRED' && !r.studentDocument ? ['UPLOAD_STUDENT_DOCUMENT'] : [])] })),
     requests, revisions: revisions.map(r => ({ ...r, expiresAt: r.expiresAt.toISOString() })), unavailable: ['reviews', 'program', 'tasks', 'certificates'] as const };
 }
 export type ParticipantOverview = Awaited<ReturnType<typeof participantRecords>>;
