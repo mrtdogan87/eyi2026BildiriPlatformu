@@ -362,13 +362,15 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Gezi/gala tercihleri açıkça eşleştiriliyor; mevcut kaynak/ücretler korunuyor. Program kaynak değişikliği katılımı durduruyor.
 - 755 otomatik, 92 ayrı preview ve 11 tarayıcı kontrolü başarılı; final 63 tablo restore/parmak iziyle eşleşti. Ayrıntılar `docs/P15_KAPANIS.md`.
 
-**P16A — Bağımsız sertifika modülü (2–3 iş günü)**
+**P16A — Bağımsız sertifika modülü · yerelde tamamlandı (06.10.2026)**
 
 - Bölüm 15'teki PDF arka planı, alıcı ve alt katılım/görev alanları için konum, yazı tipi/boyutu, hizalama ve uzun metin davranışı ayarlanabiliyor; önizleme ile tekli/toplu PDF üretimi çalışıyor.
 - Kongre kaydından veya bağımsız Excel/CSV listesinden katılımcı, konuşmacı ve diğer görev türleri için belge üretilebiliyor. Liste eşleştirme/hata özeti görülüyor; hatalı kayıtlar sessizce atlanmıyor.
 - Türkçe karakterler, uzun isim/kurum ve farklı PDF sayfa ölçüleri örneklerle kontrol edilmiş; kullanılan şablon/veri sürümü ve doğrulama kodu kayıtlı.
 - Katılımcı indirme ve isteğe bağlı toplu e-posta akışı P09 arayüzüyle bağlanabiliyor; başka örnek uygulamada kongreye özel modüller olmadan kullanımı gösterilmiş.
 - Belgenin üretilmesi ve alıcıya teslim süreci ayrı izleniyor. Geri dönen e-posta doğru belge/alıcıya bağlanıyor; doğrulanmış adres düzeltmesi sonrası belgeyi gereksiz yere yeniden numaralandırmadan tekrar gönderme örneği çalışıyor.
+
+- 823 otomatik, 103 ayrı preview ve 12 tarayıcı kontrolü; final 69 tablo restore/parmak iziyle eşleşti. Ayrıntılar `docs/P16A_KAPANIS.md`.
 
 **P16B — Yoklama ve kongre bağlantısı (1–2 iş günü)**
 

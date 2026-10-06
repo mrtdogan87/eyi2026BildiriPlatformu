@@ -156,6 +156,7 @@ export async function updateCommunicationIssue(id: string, raw: unknown) {
     if (issue.status !== 'OPEN' || issue.version !== input.version) throw new AccessError(409, 'Teslim sorunu değişti; listeyi yenileyin.');
     const m = issue.message; let replacementId: string | undefined;
     if (input.action === 'CORRECT_ADDRESS') {
+      if(m.sourceType==='certificate-file')throw new AccessError(400,'Sertifika adresi Belgeler ekranında doğrulanmış kişiye bağlanmalı; ardından aynı belge için yeni bildirim oluşturun.');
       if (authTemplates.has(m.templateKey)) throw new AccessError(400, 'Erişim/etkinleştirme bağlantıları başka adrese taşınamaz. Önce ilgili hesap veya başvuru akışında adresi doğrulayın ve yeni bağlantı oluşturun.');
       if (m.status !== 'PERMANENT_FAILURE' || !input.recipient || input.recipient === m.recipient || (m.expiresAt && m.expiresAt <= new Date())) throw new AccessError(400, 'Kalıcı hata için doğrulanmış farklı alıcı adresi ve geçerli ileti gerekir.');
       const claimed = await tx.emailMessage.updateMany({ where: { id: m.id, status: 'PERMANENT_FAILURE', version: m.version }, data: { version: { increment: 1 } } });

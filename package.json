@@ -33,7 +33,8 @@
     "test:revisions": "node --test scripts/revisions.test.mjs && node scripts/revisions-check.mjs",
     "test:reviews": "node --test scripts/reviews.test.mjs && node scripts/reviews-check.mjs",
     "test:program": "node --test scripts/program.test.mjs && node scripts/program-check.mjs",
-    "test:activities": "node --test scripts/activities.test.mjs && node scripts/activities-check.mjs"
+    "test:activities": "node --test scripts/activities.test.mjs && node scripts/activities-check.mjs",
+    "test:certificates": "node --test scripts/certificates.test.mjs && node scripts/certificates-check.mjs"
   },
   "keywords": [],
   "author": "",
@@ -42,8 +43,10 @@
   "private": true,
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@pdf-lib/fontkit": "1.1.1",
     "@prisma/client": "^6.19.2",
     "clsx": "^2.1.1",
+    "fast-xml-parser": "5.11.2",
     "jszip": "3.10.1",
     "lucide-react": "^1.0.1",
     "mammoth": "^1.12.0",

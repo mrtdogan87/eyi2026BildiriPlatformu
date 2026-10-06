@@ -1,0 +1,10 @@
+import { NextResponse } from 'next/server';
+import { apiRoute } from '@/platform/http';
+import { requireContext } from '@/platform/context';
+import { certificateUpload } from '@/modules/certificates/http';
+import { certificateColumns,importCertificateRecipients } from '@/integrations/congress/certificates';
+import { parsed } from '@/modules/certificates/http';
+import { z } from 'zod';
+import { readFile } from 'node:fs/promises';
+export const GET=apiRoute(async()=>{await requireContext('certificates.manage','CERTIFICATES');return new Response(new Uint8Array(await readFile(process.cwd()+'/data/certificates/recipients-example.xlsx')),{headers:{'content-type':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','content-disposition':'attachment; filename="recipients-example.xlsx"','cache-control':'no-store','x-content-type-options':'nosniff'}});});
+export const POST=apiRoute(async request=>{await requireContext('certificates.manage','CERTIFICATES');const f=await certificateUpload(request);if((f.input as {inspect?:boolean})?.inspect){parsed(z.object({inspect:z.literal(true)}).strict(),f.input);return NextResponse.json(await certificateColumns(f.bytes,f.name));}return NextResponse.json(await importCertificateRecipients(f.input,f.bytes,f.name));});

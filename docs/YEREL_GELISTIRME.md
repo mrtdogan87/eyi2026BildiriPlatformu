@@ -499,3 +499,10 @@ Panel → **Workshop ve sosyal etkinlikler**, kişisel panel → **Workshop ve s
 `npm run test:activities` 20 birim ve 57 HTTP senaryosu çalıştırır. Kontrollü testler otomatik worker kapalıyken sıralıdır. P15 toplam 755 otomatik, 92 ayrı preview ve 11 tarayıcı kontrolünden geçti; 24 migration/63 tablo. Final restore doğrulanmış yedek `../.recovery/P15-20261006-final`. Ayrıntılar [P15 kapanışında](P15_KAPANIS.md).
 
 Kullanıcının 06.10.2026 talimatıyla P16A–P22 ve P06-E1 ardışık sürdürülür. Yerel sohbet heartbeat kimliği `aibildiriyonv2-p22-yerel-teslim`; bilgisayar ve uygulama açıkken devam kontrolü yapar, P22 yerel teslimde durdurulur. Canlı dağıtım ve gerçek e-posta ayrı yetki ister.
+
+
+## P16A PDF sertifikalar
+
+Panel → **PDF sertifikalar ve alıcılar**. Arka plan PDF ve alan yerleşimi ayrı; önizleme, Excel/CSV eşleştirme, tekli/toplu PDF/ZIP, kişisel indirme ve kod doğrulama hazırdır. Aynı kişi farklı görevlerde belge alabilir. Numara korunarak yeni PDF sürümü, iptal, metin düzeltmesi ve doğrulanmış adres düzeltmesi geçmişte saklanır. Bildirim P09'a isteğe bağlı eklenir; üretim/teslim ayrıdır.
+
+`npm run test:certificates` 21 birim ve 47 HTTP kontrolü; kontrollü testlerde worker kapalı. P16A toplam 823 otomatik, 103 preview ve 12 tarayıcı kontrolünden geçti. 25 migration/69 tablo; `../.recovery/P16A-20261006-final` tam restore/parmak izi doğrulamalı yedektir. Kapsam, lisanslar, ölçü/liste sınırları ve bağımsız altyapı [P16A kapanışında](P16A_KAPANIS.md). Sıradaki P16B yoklama ve kongre uygunluğudur.

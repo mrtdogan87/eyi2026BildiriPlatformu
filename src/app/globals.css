@@ -2260,3 +2260,5 @@ textarea {
 
 .activity-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:1.25rem; }
 .activity-grid .platform-card { margin:0; }
+
+.certificate-slot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px}.certificate-slots{display:grid;gap:16px}.certificate-preview{width:100%;height:550px;border:1px solid #ccd4de;border-radius:8px}.certificate-slots fieldset{min-width:0}

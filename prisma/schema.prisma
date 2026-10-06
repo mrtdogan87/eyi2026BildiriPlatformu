@@ -47,6 +47,8 @@ enum RegistrationKind {
 }
 
 model Congress {
+  certificateTemplates CertificateTemplate[]
+  certificateRecipients CertificateRecipient[]
   activityEvents ActivityEvent[]
   programVersion Int @default(0)
   programPublishedId String? @unique
@@ -111,6 +113,98 @@ model Congress {
   registrationAccessTokens RegistrationAccessToken[]
 
   @@index([organizationId])
+}
+
+model CertificateTemplate {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  name String
+  version Int @default(0)
+  active Boolean @default(true)
+  revisions CertificateTemplateRevision[]
+  recipients CertificateRecipient[]
+  createdAt DateTime @default(now())
+  @@index([congressId, active])
+}
+
+model CertificateTemplateRevision {
+  id String @id @default(uuid())
+  templateId String
+  template CertificateTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  number Int
+  name String
+  layout Json
+  background Bytes
+  backgroundHash String
+  width Float
+  height Float
+  reason String
+  actorId String
+  createdAt DateTime @default(now())
+  files CertificateFile[]
+  @@unique([templateId, number])
+}
+
+model CertificateRecipient {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  templateId String
+  template CertificateTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
+  email String
+  role String
+  contextKey String @default("")
+  version Int @default(0)
+  data Json
+  source String
+  sourceId String?
+  sourceVersion Json?
+  certificate Certificate?
+  createdAt DateTime @default(now())
+  @@unique([templateId, email, role, contextKey])
+  @@index([congressId, email])
+}
+
+model Certificate {
+  id String @id @default(uuid())
+  recipientId String @unique
+  recipient CertificateRecipient @relation(fields: [recipientId], references: [id], onDelete: Restrict)
+  number String @unique
+  verificationCode String @unique
+  version Int @default(0)
+  status String @default("READY")
+  files CertificateFile[]
+  events CertificateEvent[]
+  createdAt DateTime @default(now())
+}
+
+model CertificateFile {
+  id String @id @default(uuid())
+  certificateId String
+  certificate Certificate @relation(fields: [certificateId], references: [id], onDelete: Restrict)
+  number Int
+  templateRevisionId String
+  templateRevision CertificateTemplateRevision @relation(fields: [templateRevisionId], references: [id], onDelete: Restrict)
+  recipientVersion Int
+  data Json
+  pdf Bytes
+  checksum String
+  actorId String
+  createdAt DateTime @default(now())
+  @@unique([certificateId, number])
+}
+
+model CertificateEvent {
+  id String @id @default(uuid())
+  certificateId String
+  certificate Certificate @relation(fields: [certificateId], references: [id], onDelete: Restrict)
+  action String
+  reason String
+  actorId String
+  detail Json
+  createdAt DateTime @default(now())
+  @@index([certificateId, createdAt])
 }
 
 model PaymentTier {
