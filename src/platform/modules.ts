@@ -14,6 +14,7 @@ export async function setModule(key: ModuleKey, enabled: boolean) {
   const context = await requireContext('modules');
   if (!Object.hasOwn(moduleCatalog, key) || !moduleCatalog[key].implemented || typeof enabled !== 'boolean') throw new AccessError(400, 'Bu modül henüz kullanıma hazır değil.');
   await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${context.congress.id} FOR UPDATE`;
     const before = await tx.congressModule.findUnique({ where: { congressId_key: { congressId: context.congress.id, key } } });
     await tx.congressModule.upsert({ where: { congressId_key: { congressId: context.congress.id, key } }, create: { congressId: context.congress.id, key, enabled }, update: { enabled } });
     const congress = await tx.congress.findUniqueOrThrow({ where: { id: context.congress.id } });

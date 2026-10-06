@@ -1,5 +1,5 @@
 import type { CongressRole } from '@prisma/client';
-export type Action = 'context' | 'submissions.read' | 'submissions.status' | 'submissions.delete' | 'registrations.read' | 'registrations.delete' | 'settings' | 'members' | 'modules' | 'audit' | 'own' | 'cms' | 'feedback' | 'communications' | 'communication.manage';
+export type Action = 'context' | 'submissions.read' | 'submissions.status' | 'submissions.delete' | 'registrations.read' | 'registrations.delete' | 'settings' | 'members' | 'modules' | 'audit' | 'own' | 'cms' | 'feedback' | 'communications' | 'communication.manage' | 'worklist';
 export const roleLabels: Record<CongressRole, string> = {
   ORGANIZER: 'Organizatör', SECRETARY: 'Sekreter', CONTENT_EDITOR: 'İçerik editörü',
   REVIEWER: 'Hakem', SESSION_CHAIR: 'Oturum başkanı', PARTICIPANT: 'Katılımcı',
@@ -9,6 +9,7 @@ export function allows(role: CongressRole | 'PLATFORM_ADMIN', action: Action) {
   if (action === 'context' || action === 'own') return true;
   if (action === 'feedback') return role === 'SECRETARY';
   if (action === 'communications') return role === 'SECRETARY';
+  if (action === 'worklist') return role === 'SECRETARY';
   if (action === 'cms') return role === 'CONTENT_EDITOR';
   return role === 'SECRETARY' && ['submissions.read', 'submissions.status', 'registrations.read'].includes(action);
 }

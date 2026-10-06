@@ -27,7 +27,8 @@
     "test:site": "node --test scripts/site-configuration.test.mjs && node scripts/site-check.mjs",
     "test:cms": "node --test scripts/cms-configuration.test.mjs && node scripts/cms-check.mjs",
     "test:cms-starter": "node --test scripts/cms-starter.test.mjs && node scripts/cms-starter-check.mjs",
-    "test:content": "node --test scripts/content-configuration.test.mjs && node scripts/content-check.mjs"
+    "test:content": "node --test scripts/content-configuration.test.mjs && node scripts/content-check.mjs",
+    "test:participation": "node --test scripts/participation.test.mjs && node scripts/participation-check.mjs"
   },
   "keywords": [],
   "author": "",

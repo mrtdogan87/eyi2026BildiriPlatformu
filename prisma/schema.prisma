@@ -47,6 +47,10 @@ enum RegistrationKind {
 }
 
 model Congress {
+  workRequests             WorkRequest[]
+  participantAccessTokens  ParticipantAccessToken[]
+  participantSessions      ParticipantSession[]
+  declarationAcceptances   DeclarationAcceptance[]
   emailSettings            EmailSettings?
   emailTemplates           EmailTemplate[]
   emailMessages            EmailMessage[]
@@ -118,6 +122,7 @@ model PaymentTier {
 }
 
 model Submission {
+  structuredAbstract Json?
   deliveryExceptions DeliveryException[]
   id                 String                    @id @default(cuid())
   congressId         String
@@ -317,25 +322,30 @@ model Organization {
 }
 
 model PlatformUser {
-  emailDeliveryIssues EmailDeliveryIssue[]
-  cmsRevisions        CmsRevision[]
-  cmsMedia            CmsMedia[]
-  id                  String                   @id @default(cuid())
-  email               String                   @unique
-  name                String
-  passwordHash        String?
-  platformAdmin       Boolean                  @default(false)
-  active              Boolean                  @default(true)
-  failedLogins        Int                      @default(0)
-  lockedUntil         DateTime?
-  createdAt           DateTime                 @default(now())
-  updatedAt           DateTime                 @updatedAt
-  organizations       OrganizationMembership[]
-  congresses          CongressMembership[]
-  sessions            PlatformSession[]
-  deliveryExceptions  DeliveryException[]
-  activationTokens    ActivationToken[]
-  audits              AuditLog[]
+  assignedWorkRequests  WorkRequest[]            @relation("WorkAssignee")
+  createdWorkRequests   WorkRequest[]            @relation("WorkCreator")
+  updatedWorkRequests   WorkRequest[]            @relation("WorkUpdater")
+  requestedWorkRequests WorkRequest[]            @relation("WorkRequester")
+  workRequestEvents     WorkRequestEvent[]
+  emailDeliveryIssues   EmailDeliveryIssue[]
+  cmsRevisions          CmsRevision[]
+  cmsMedia              CmsMedia[]
+  id                    String                   @id @default(cuid())
+  email                 String                   @unique
+  name                  String
+  passwordHash          String?
+  platformAdmin         Boolean                  @default(false)
+  active                Boolean                  @default(true)
+  failedLogins          Int                      @default(0)
+  lockedUntil           DateTime?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  organizations         OrganizationMembership[]
+  congresses            CongressMembership[]
+  sessions              PlatformSession[]
+  deliveryExceptions    DeliveryException[]
+  activationTokens      ActivationToken[]
+  audits                AuditLog[]
 }
 
 model OrganizationMembership {
@@ -748,4 +758,118 @@ model EmailDeliveryIssue {
   resolvedAt  DateTime?
 
   @@index([congressId, status, createdAt])
+}
+
+enum WorkRequestKind {
+  WITHDRAWAL_REQUEST
+  CANCELLATION_REQUEST
+  MANUAL_EMAIL
+  QUESTION
+}
+
+enum WorkRequestStatus {
+  NEW
+  IN_PROGRESS
+  WAITING
+  RESOLVED
+}
+
+model WorkRequest {
+  id              String             @id @default(uuid())
+  congressId      String
+  congress        Congress           @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  requestKey      String
+  payloadHash     String
+  kind            WorkRequestKind
+  origin          String
+  subject         String
+  description     String
+  requesterEmail  String
+  requesterName   String?
+  requesterUserId String?
+  requesterUser   PlatformUser?      @relation("WorkRequester", fields: [requesterUserId], references: [id], onDelete: SetNull)
+  sourceType      String?
+  sourceId        String?
+  sourceModule    ModuleKey?
+  assigneeId      String?
+  assignee        PlatformUser?      @relation("WorkAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  status          WorkRequestStatus  @default(NEW)
+  publicResult    String             @default("")
+  internalNote    String             @default("")
+  version         Int                @default(1)
+  createdById     String?
+  createdBy       PlatformUser?      @relation("WorkCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedById     String?
+  updatedBy       PlatformUser?      @relation("WorkUpdater", fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  resolvedAt      DateTime?
+  events          WorkRequestEvent[]
+
+  @@unique([congressId, requestKey])
+  @@index([congressId, status, updatedAt])
+  @@index([congressId, assigneeId, status])
+  @@index([congressId, requesterEmail, createdAt])
+  @@index([congressId, sourceType, sourceId])
+}
+
+model WorkRequestEvent {
+  id           String             @id @default(cuid())
+  requestId    String
+  request      WorkRequest        @relation(fields: [requestId], references: [id], onDelete: Restrict)
+  number       Int
+  action       String
+  actorId      String?
+  actor        PlatformUser?      @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  fromStatus   WorkRequestStatus?
+  toStatus     WorkRequestStatus
+  assigneeId   String?
+  publicResult String             @default("")
+  internalNote String             @default("")
+  createdAt    DateTime           @default(now())
+
+  @@unique([requestId, number])
+}
+
+model ParticipantAccessToken {
+  id         String    @id @default(uuid())
+  congressId String
+  congress   Congress  @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  email      String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([congressId, email, expiresAt])
+}
+
+model ParticipantSession {
+  id         String    @id @default(uuid())
+  congressId String
+  congress   Congress  @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  email      String
+  tokenHash  String    @unique
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([congressId, email, expiresAt])
+}
+
+model DeclarationAcceptance {
+  id         String   @id @default(cuid())
+  congressId String
+  congress   Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  entityType String
+  entityId   String
+  email      String
+  locale     String
+  version    String
+  texts      Json
+  rules      Json
+  acceptedAt DateTime @default(now())
+
+  @@unique([entityType, entityId])
+  @@index([congressId, email, acceptedAt])
 }

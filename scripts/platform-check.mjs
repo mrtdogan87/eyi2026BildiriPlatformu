@@ -140,7 +140,8 @@ try {
   try {
     for (const key of ['SUBMISSIONS', 'REGISTRATION']) await req('/api/platform/modules', { method: 'PATCH', body: { key, enabled: false }, jar: organizer });
     await req('/api/platform/context', { jar: organizer }); await req('/api/platform/members', { jar: organizer }); await req('/admin/panel', { jar: organizer });
-    assert.deepEqual((await req('/api/platform/own', { jar: jars.participant })).data, { submissions: [], registrations: [] });
+    const closedOwn = (await req('/api/platform/own', { jar: jars.participant })).data;
+    assert.deepEqual(closedOwn.submissions, []); assert.deepEqual(closedOwn.registrations, []);
   } finally { for (const key of ['SUBMISSIONS', 'REGISTRATION']) await req('/api/platform/modules', { method: 'PATCH', body: { key, enabled: true }, jar: organizer }); }
   passed('Platform context/accounts remain usable with both business modules disabled');
   await req('/api/platform/modules', { method: 'PATCH', body: { key: 'SUBMISSIONS', enabled: false }, jar: organizer, origin: 'https://foreign.example.invalid', status: 403 });

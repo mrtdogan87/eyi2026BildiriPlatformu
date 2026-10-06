@@ -1,4 +1,5 @@
 import { effectiveConfiguration } from "@/modules/congress/configuration";
+import { declarationDocuments } from '@/modules/participation/declarations';
 import { requireModule } from "@/platform/context";
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
@@ -31,6 +32,7 @@ import { enqueueNotification } from '@/platform/notifications';
 const REGISTRATION_COOKIE = sessionCookieName("registration_access");
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24;
 const TOKEN_GRACE_WINDOW_MS = 5 * 60 * 1000;
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 
 function getSessionSecret() {
   return process.env.DRAFT_SESSION_SECRET ?? "development-secret";
@@ -129,7 +131,7 @@ export async function consumeRegistrationToken(token: string) {
 }
 
 function cookieValue(email: string, congressId: string) {
-  const raw = `${email.toLowerCase()}|${congressId}`;
+  const raw = `${email.toLowerCase()}|${congressId}|${Date.now() + SESSION_TTL_MS}`;
   const signature = signSession(raw);
   return `${raw}|${signature}`;
 }
@@ -159,10 +161,12 @@ export async function readRegistrationSession(): Promise<{
   if (!value) return null;
 
   const parts = value.split("|");
-  if (parts.length !== 3) return null;
+  if (parts.length !== 4) return null;
 
-  const [email, congressId, signature] = parts;
-  const expected = signSession(`${email}|${congressId}`);
+  const [email, congressId, expiry, signature] = parts;
+  const expiresAt = Number(expiry); const now = Date.now();
+  if (!email || !congressId || !/^[a-f0-9]{64}$/.test(signature) || !/^\d{13}$/.test(expiry) || !Number.isSafeInteger(expiresAt) || expiresAt <= now || expiresAt > now + SESSION_TTL_MS) return null;
+  const expected = signSession(`${email}|${congressId}|${expiry}`);
   if (!signature || Buffer.byteLength(expected) !== Buffer.byteLength(signature)) return null;
 
   if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
@@ -185,6 +189,7 @@ function toRegistrationConfig(
   congress = effectivePricingCongress(congress);
   return {
     workflow,
+    declarations: declarationDocuments(effectiveConfiguration(congress.configuration), 'REGISTRATION'),
     congressName: congress.name,
     congressSlug: congress.slug,
     earlyDeadline: congress.earlyDeadline?.toISOString() ?? null,

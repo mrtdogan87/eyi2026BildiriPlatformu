@@ -22,11 +22,14 @@ import { AccessError } from "@/platform/http";
 import type { Locale, TFunction } from "@/lib/i18n";
 import type { Prisma } from '@prisma/client';
 import { enqueueNotification } from '@/platform/notifications';
+import { declarationDocuments } from '@/modules/participation/declarations';
+import { structuredAbstractSchema, emptyStructuredAbstract } from '@/modules/participation/abstract';
 
 const DRAFT_COOKIE = sessionCookieName("draft_access");
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const DRAFT_TOKEN_GRACE_WINDOW_MS = 5 * 60 * 1000;
+const DRAFT_SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const RECEIPT_ALLOWED_EXTENSIONS = [".pdf", ".jpg", ".jpeg", ".png"];
 const RECEIPT_ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
@@ -73,8 +76,9 @@ function signDraftSession(submissionId: string) {
 
 export async function setDraftAccessCookie(submissionId: string) {
   const cookieStore = await cookies();
-  const signature = signDraftSession(submissionId);
-  cookieStore.set(DRAFT_COOKIE, `${submissionId}.${signature}`, {
+  const payload = `${submissionId}.${Date.now() + DRAFT_SESSION_TTL_MS}`;
+  const signature = signDraftSession(payload);
+  cookieStore.set(DRAFT_COOKIE, `${payload}.${signature}`, {
     httpOnly: true,
     sameSite: "lax",
     secure: secureSessionCookie(),
@@ -95,12 +99,15 @@ export async function canAccessDraft(submissionId: string) {
     return false;
   }
 
-  const [cookieSubmissionId, signature] = value.split(".");
-  if (!cookieSubmissionId || !signature || cookieSubmissionId !== submissionId) {
+  const parts = value.split('.');
+  if (parts.length !== 3) return false;
+  const [cookieSubmissionId, expiry, signature] = parts;
+  const expiresAt = Number(expiry); const now = Date.now();
+  if (!cookieSubmissionId || !/^[a-f0-9]{64}$/.test(signature) || cookieSubmissionId !== submissionId || !/^\d{13}$/.test(expiry) || !Number.isSafeInteger(expiresAt) || expiresAt <= now || expiresAt > now + DRAFT_SESSION_TTL_MS) {
     return false;
   }
 
-  const expected = signDraftSession(submissionId);
+  const expected = signDraftSession(`${submissionId}.${expiry}`);
   if (Buffer.byteLength(signature) !== Buffer.byteLength(expected)) return false;
   return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }
@@ -287,6 +294,7 @@ export async function getSubmissionConfig(
 
   return {
     congressName: congress.name,
+    declarations: declarationDocuments(effectiveConfiguration(congress.configuration), 'SUBMISSION'),
     congressSlug: congress.slug,
     earlyDeadline: congress.earlyDeadline?.toISOString() ?? null,
     lateDeadline: congress.lateDeadline?.toISOString() ?? null,
@@ -334,6 +342,8 @@ export async function getSubmissionSnapshot(
 
   return {
     id: submission.id,
+    declarations: declarationDocuments(effectiveConfiguration(submission.congress.configuration), 'SUBMISSION'),
+    structuredAbstract: structuredAbstractSchema.safeParse(submission.structuredAbstract).success ? structuredAbstractSchema.parse(submission.structuredAbstract) : emptyStructuredAbstract(),
     congressSlug: submission.congress.slug,
     draftOwnerEmail: submission.draftOwnerEmail,
     status: submission.status,
@@ -365,9 +375,9 @@ export async function getSubmissionSnapshot(
   };
 }
 
-export async function countSubmittedEmailUsage(congressId: string, emails: string[]) {
+export async function countSubmittedEmailUsage(congressId: string, emails: string[], client: Pick<Prisma.TransactionClient, 'submissionAuthor'> = prisma) {
   const normalized = [...new Set(emails.map((email) => email.trim().toLowerCase()))];
-  const authors = await prisma.submissionAuthor.findMany({
+  const authors = await client.submissionAuthor.findMany({
     where: {
       email: { in: normalized },
       submission: {

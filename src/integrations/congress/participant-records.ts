@@ -1,0 +1,47 @@
+import type { Prisma } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { effectiveConfiguration } from '@/modules/congress/configuration';
+import { paymentState, submissionTasks } from '@/modules/participation/status';
+import { AccessError } from '@/platform/http';
+import { setDraftAccessCookie } from '@/lib/submission';
+import { setRegistrationCookie } from '@/lib/registration';
+import { listParticipantWorkRequests } from './worklist';
+
+export async function participantRecords(congressId: string, email: string) {
+  const congress = await prisma.congress.findUniqueOrThrow({ where: { id: congressId }, include: { modules: true } });
+  const rules = effectiveConfiguration(congress.configuration);
+  const modules = { SUBMISSIONS: congress.modules.some(m => m.key === 'SUBMISSIONS' && m.enabled), REGISTRATION: congress.modules.some(m => m.key === 'REGISTRATION' && m.enabled) };
+  const emailMatch: Prisma.StringFilter = { equals: email, mode: 'insensitive' };
+  const [papers, entries, declarations, requests] = await Promise.all([
+    modules.SUBMISSIONS ? prisma.submission.findMany({ where: { congressId, OR: [{ draftOwnerEmail: emailMatch }, { status: { not: 'DRAFT' }, authors: { some: { email: emailMatch } } }] },
+      select: { id: true, titleTr: true, titleEn: true, status: true, draftOwnerEmail: true, submittedAt: true, file: { select: { id: true } }, paperItem: { select: { id: true } }, authors: { where: { email: emailMatch }, select: { isPresenter: true } } }, orderBy: { createdAt: 'desc' }, take: 100 }) : [],
+    modules.REGISTRATION ? prisma.registration.findMany({ where: { congressId, email: emailMatch }, select: { id: true, totalAmount: true, currency: true, paidAt: true, audience: true, createdAt: true, receipt: { select: { id: true } }, studentDocument: { select: { id: true } } }, orderBy: { createdAt: 'desc' }, take: 100 }) : [],
+    prisma.declarationAcceptance.findMany({ where: { congressId, email: emailMatch }, select: { entityType: true, entityId: true, version: true, locale: true, acceptedAt: true } }),
+    listParticipantWorkRequests(prisma, { congressId, email }),
+  ]);
+  function declaration(entityType: string, entityId: string) {
+    const record = declarations.find(d => d.entityType === entityType && d.entityId === entityId);
+    return record ? { recorded: true, version: record.version, locale: record.locale, acceptedAt: record.acceptedAt.toISOString() } : { recorded: false, version: null, locale: null, acceptedAt: null };
+  }
+  return { congress: { id: congress.id, name: congress.name, slug: congress.slug }, email, modules,
+    submissions: papers.map(p => ({ id: p.id, titleTr: p.titleTr, titleEn: p.titleEn, status: p.status, submittedAt: p.submittedAt?.toISOString() ?? null,
+      canWithdraw: p.status !== 'DRAFT' && p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), canOpen: p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), declaration: declaration('SUBMISSION', p.id),
+      missing: submissionTasks({ status: p.status, owner: p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), fileRequired: rules.stages.FULL_TEXT.enabled && rules.fields.file === 'REQUIRED', fileReceived: !!p.file, registrationEnabled: modules.REGISTRATION, registered: !!p.paperItem, presenter: p.authors.some(a => a.isPresenter) }) })),
+    registrations: entries.map(r => ({ id: r.id, totalAmount: r.totalAmount, currency: r.currency, paidAt: r.paidAt?.toISOString() ?? null, createdAt: r.createdAt.toISOString(), receiptReceived: !!r.receipt,
+      paymentState: paymentState({ totalAmount: r.totalAmount, receiptReceived: !!r.receipt, legacyReceiptAt: r.paidAt }), paymentVerificationAvailable: false, declaration: declaration('REGISTRATION', r.id),
+      missing: [...(rules.stages.PAYMENT.enabled && rules.fields.receipt === 'REQUIRED' && r.totalAmount > 0 && !r.receipt ? ['UPLOAD_RECEIPT'] : []), ...(rules.fields.studentDocument === 'REQUIRED' && !r.studentDocument ? ['UPLOAD_STUDENT_DOCUMENT'] : [])] })),
+    requests, unavailable: ['reviews', 'program', 'tasks', 'certificates'] as const };
+}
+export type ParticipantOverview = Awaited<ReturnType<typeof participantRecords>>;
+// An email verified by the participant panel may open only its owner's existing flow.
+export async function openParticipantFlow(identity: { congressId: string; email: string }, input: { sourceType: 'SUBMISSION' | 'REGISTRATION'; sourceId?: string }) {
+  const congress = await prisma.congress.findUniqueOrThrow({ where: { id: identity.congressId }, include: { modules: true } });
+  const key = input.sourceType === 'SUBMISSION' ? 'SUBMISSIONS' : 'REGISTRATION';
+  if (!congress.modules.some(m => m.key === key && m.enabled)) throw new AccessError(403, 'İlgili modül kapalı.');
+  if (input.sourceType === 'REGISTRATION') {
+    await setRegistrationCookie(identity.email, congress.id); return { url: `/${congress.slug}/kayit/panel` };
+  }
+  const paper = input.sourceId ? await prisma.submission.findFirst({ where: { id: input.sourceId, congressId: congress.id, draftOwnerEmail: { equals: identity.email, mode: 'insensitive' } }, select: { id: true } }) : null;
+  if (!paper) throw new AccessError(404, 'Bildiri bulunamadı.');
+  await setDraftAccessCookie(paper.id); return { url: `/${congress.slug}/bildiri-gonder?draft=${paper.id}` };
+}

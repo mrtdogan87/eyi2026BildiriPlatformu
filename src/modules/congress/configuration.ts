@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { defaultStructuredAbstractRules, structuredAbstractRulesSchema, defaultDeclarationTexts, declarationTextsSchema } from '../participation/rules.ts';
 export const fieldKeys = ['abstract', 'keywords', 'file', 'authorTitle', 'authorInstitution', 'authorCountry', 'presentationMode', 'audience', 'receipt', 'studentDocument'] as const;
 export type FieldKey = typeof fieldKeys[number];
 export const fieldLabels: Record<FieldKey, string> = { abstract: 'Özet', keywords: 'Anahtar kelimeler', file: 'Word dosyası', authorTitle: 'Yazar unvanı', authorInstitution: 'Yazar kurumu', authorCountry: 'Yazar ülkesi', presentationMode: 'Sunum şekli', audience: 'Akademik statü', receipt: 'Dekont', studentDocument: 'Öğrenci belgesi' };
@@ -17,6 +18,8 @@ export const configurationSchema = z.object({
   modules: z.object({ SUBMISSIONS: z.boolean(), REGISTRATION: z.boolean() }).strict(),
   stages: z.object({ ABSTRACT: stage, FULL_TEXT: stage, PARTICIPATION: stage, PAYMENT: stage }).strict(),
   fields: z.object(Object.fromEntries(fieldKeys.map(key => [key, mode])) as Record<FieldKey, typeof mode>).strict(),
+  structuredAbstract: structuredAbstractRulesSchema.default(defaultStructuredAbstractRules),
+  declarationTexts: declarationTextsSchema.default(defaultDeclarationTexts),
 }).strict().superRefine((config, ctx) => {
   const error = (message: string) => ctx.addIssue({ code: 'custom', message });
   if (config.modules.SUBMISSIONS && !config.stages.ABSTRACT.enabled && !config.stages.FULL_TEXT.enabled) error('Bildiri modülü en az özet veya tam metin aşaması ister.');
@@ -30,11 +33,12 @@ export const configurationSchema = z.object({
   if (!config.stages.PAYMENT.enabled && config.fields.receipt !== 'HIDDEN') error('Ücretsiz kayıt dekont istemez.');
   if (config.stages.PARTICIPATION.deadline) error('Sunum bilgileri teslim aşamasının tarihini izler; ayrı son tarih kullanmaz.');
   if (stageKeys.some(key => !config.stages[key].enabled && config.stages[key].deadline)) error('Kapalı aşamanın son tarihi olamaz.');
+  if (config.structuredAbstract.enabled && !config.stages[config.structuredAbstract.stage].enabled) error('Yapılandırılmış özetin seçilen teslim aşaması açık olmalı.');
 });
 export type CongressConfiguration = z.infer<typeof configurationSchema>;
 export const profileLabels = { CLASSIC: 'Bildirili kongre', ABSTRACT_ONLY: 'Yalnız özet / ücretsiz', REGISTRATION_ONLY: 'Kayıt odaklı / ücretsiz', CUSTOM: 'Özel yapılandırma' };
 export function profileConfiguration(profile: CongressConfiguration['profile'] = 'CLASSIC'): CongressConfiguration {
-  const classic: CongressConfiguration = { version: 1, profile, languages: ['TR', 'EN'], theme: 'eyi', accent: '#1f4f9d', modules: { SUBMISSIONS: true, REGISTRATION: true },
+  const classic: CongressConfiguration = { version: 1, profile, languages: ['TR', 'EN'], theme: 'eyi', accent: '#1f4f9d', modules: { SUBMISSIONS: true, REGISTRATION: true }, structuredAbstract: defaultStructuredAbstractRules(), declarationTexts: defaultDeclarationTexts(),
     stages: { ABSTRACT: { enabled: true, deadline: null }, FULL_TEXT: { enabled: true, deadline: null }, PARTICIPATION: { enabled: true, deadline: null }, PAYMENT: { enabled: true, deadline: null } },
     fields: { abstract: 'REQUIRED', keywords: 'REQUIRED', file: 'REQUIRED', authorTitle: 'REQUIRED', authorInstitution: 'OPTIONAL', authorCountry: 'OPTIONAL', presentationMode: 'REQUIRED', audience: 'REQUIRED', receipt: 'REQUIRED', studentDocument: 'OPTIONAL' } };
   if (profile === 'ABSTRACT_ONLY') { classic.modules.REGISTRATION = false; classic.stages.FULL_TEXT.enabled = false; classic.stages.PARTICIPATION.enabled = false; classic.stages.PAYMENT.enabled = false; Object.assign(classic.fields, { keywords: 'OPTIONAL', file: 'HIDDEN', authorTitle: 'OPTIONAL', presentationMode: 'HIDDEN', audience: 'HIDDEN', receipt: 'HIDDEN', studentDocument: 'HIDDEN' }); }
@@ -54,6 +58,7 @@ export function setStage(config: CongressConfiguration, key: StageKey, enabled: 
   if (key === 'FULL_TEXT') copy.fields.file = enabled ? 'REQUIRED' : 'HIDDEN';
   if (key === 'PARTICIPATION') { copy.fields.presentationMode = enabled ? 'REQUIRED' : 'HIDDEN'; copy.fields.audience = enabled ? 'REQUIRED' : 'HIDDEN'; }
   if (key === 'PAYMENT') copy.fields.receipt = enabled ? 'REQUIRED' : 'HIDDEN';
+  if (!enabled && copy.structuredAbstract.stage === key) copy.structuredAbstract.enabled = false;
   return copy;
 }
 export const feeSchema = z.object({ presenter: z.number().int().min(0).max(1000000), student: z.number().int().min(0).max(1000000), listener: z.number().int().min(0).max(1000000), currency: z.enum(['TRY', 'EUR', 'USD']) }).strict();
@@ -78,5 +83,7 @@ export function configurationSummary(config: CongressConfiguration) {
     config.modules.SUBMISSIONS ? `Bildiri için asgari bilgi: başlık, yazar adı, e-posta ve tek sunan yazar. Ek zorunlu alanlar: ${requiredSubmission.join(', ') || 'Yok'}` : 'Bildiri başvurusu alınmaz.',
     config.modules.REGISTRATION ? `Kayıt için asgari bilgi: doğrulanmış e-posta, ad ve dinleyici türü/günü veya kabul edilmiş bildiri seçimi. Öğrenci belgesi: ${modeLabels[config.fields.studentDocument]}.` : 'Kayıt alınmaz.',
     config.modules.REGISTRATION && config.stages.PAYMENT.enabled ? `Tarifeler uygulanır. Dekont: ${modeLabels[config.fields.receipt]}; pozitif tutarda bu koşul aranır.` : 'Ücret/dekont aşaması kapalı; kayıt toplamı sıfırdır.',
+    config.structuredAbstract.enabled ? `Yapılandırılmış özet: ${stageLabels[config.structuredAbstract.stage]} aşamasında; Amaç, Yöntem, Bulgular ve Sonuç için TR/EN gereksinimleri uygulanır.` : 'Özet için mevcut serbest metin düzeni korunur.',
+    'Gönderimde görülen beyan metni ve etkin kurallar sürümü saklanır; eski başvurulara onay eklenmez.',
     'Yönetim panelinde seçili kongrenin açık modülleri görünür; yapılandırma ve ekip yönetimi kullanılabilir.' ];
 }

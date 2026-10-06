@@ -5,6 +5,8 @@ import { PrismaClient } from '@prisma/client';
 import { loadEnv } from './load-env.mjs';
 import { assertLocal } from './environment.mjs';
 import { waitForCapturedMail } from './captured-mail.mjs';
+import { effectiveConfiguration } from '../src/modules/congress/configuration.ts';
+import { declarationDocument } from '../src/modules/participation/declarations.ts';
 
 loadEnv(); assertLocal();
 const base = process.env.APP_BASE_URL;
@@ -18,6 +20,11 @@ const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 function ok(condition, label) { assert.ok(condition, label); checks.push(label); }
 function jar() { return new Map(); }
 const participant = jar(); const admin = jar(); const registration = jar();
+async function consent(entityType) {
+  const congress = await prisma.congress.findUniqueOrThrow({ where: { slug: 'eyi-2026' }, select: { configuration: true } });
+  const document = declarationDocument(effectiveConfiguration(congress.configuration), entityType, 'tr');
+  return { declarations: Object.fromEntries(document.items.map(item => [item.key, true])), declarationVersion: document.version, declarationLocale: document.locale };
+}
 async function request(path, { method = 'GET', body, cookies = jar(), status = 200 } = {}) {
   const headers = { cookie: [...cookies].map(([k,v]) => `${k}=${v}`).join(';') };
   if (body && !(body instanceof FormData)) headers['content-type'] = 'application/json';
@@ -62,7 +69,7 @@ try {
   const fileForm = new FormData();
   fileForm.set('file', new File([docx], 'synthetic.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }));
   await request(`/api/submissions/${id}/file`, { method: 'PUT', cookies: participant, body: fileForm });
-  const submit = await (await request(`/api/submissions/${id}/submit`, { method: 'POST', cookies: participant, body: { declarations: { accuracy: true, submissionLimit: true, coauthorApproval: true, personalDataConsent: true, registrationPresentationConsent: true } } })).json();
+  const submit = await (await request(`/api/submissions/${id}/submit`, { method: 'POST', cookies: participant, body: await consent('SUBMISSION') })).json();
   ok(submit.submission.status === 'SUBMITTED', 'Draft, details, authors, participation, DOCX and final submission complete');
   ok(Boolean(await captured(email, 'Alındı')) && Boolean(await captured(coauthorEmail, 'Alındı')), 'Submission notifications captured for both synthetic authors');
   await request('/api/admin/submissions', { status: 401 });
@@ -87,6 +94,7 @@ try {
   registrationForm.set('listenerEnabled', 'false');
   registrationForm.set('receipt', new File([receipt], 'synthetic-receipt.pdf', { type: 'application/pdf' }));
   registrationForm.set('studentDocument', new File([receipt], 'synthetic-student-document.pdf', { type: 'application/pdf' }));
+  for (const [key, value] of Object.entries(await consent('REGISTRATION'))) registrationForm.set(key, typeof value === 'string' ? value : JSON.stringify(value));
   const result = await (await request('/api/registrations', { method: 'POST', cookies: registration, body: registrationForm })).json();
   const saved = await prisma.registration.findUniqueOrThrow({ where: { id: result.registrationId }, include: { receipt: true, studentDocument: true, paperItems: true } });
   ok(saved.totalAmount === 100 && saved.paperItems[0].submissionId === id, 'Accepted paper registration uses synthetic 100 TRY fee');

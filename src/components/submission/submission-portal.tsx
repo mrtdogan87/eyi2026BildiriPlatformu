@@ -27,13 +27,7 @@ const KNOWN_TITLES: readonly string[] = ACADEMIC_TITLES.filter(
   (item) => item !== OTHER_TITLE,
 );
 
-type SubmissionDeclarations = {
-  accuracy: boolean;
-  submissionLimit: boolean;
-  coauthorApproval: boolean;
-  personalDataConsent: boolean;
-  registrationPresentationConsent: boolean;
-};
+type SubmissionDeclarations = Record<string, boolean>;
 
 const emptyDetails: SubmissionDetailsInput = {
   submissionLanguage: "TR",
@@ -59,21 +53,7 @@ const emptyAuthor = (): SubmissionAuthorInput => ({
   isPresenter: false,
 });
 
-const emptyDeclarations: SubmissionDeclarations = {
-  accuracy: false,
-  submissionLimit: false,
-  coauthorApproval: false,
-  personalDataConsent: false,
-  registrationPresentationConsent: false,
-};
-
-const DECLARATION_KEYS: (keyof SubmissionDeclarations)[] = [
-  "accuracy",
-  "submissionLimit",
-  "coauthorApproval",
-  "personalDataConsent",
-  "registrationPresentationConsent",
-];
+const emptyDeclarations: SubmissionDeclarations = {};
 
 function createAuthorDraft(author?: Partial<SubmissionAuthorInput>, isPresenter = false): AuthorDraft {
   const title = author?.title ?? "";
@@ -151,7 +131,8 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
 
   const activeStep = snapshot ? step : 0;
   const hasExistingFile = Boolean(snapshot?.file);
-  const areDeclarationsComplete = Object.values(declarations).every(Boolean);
+  const document = config.declarations[locale];
+  const areDeclarationsComplete = document.items.every(({key}) => declarations[`${document.version}:${key}`] === true);
   const selectedLanguageLabel = useMemo(
     () => (details.submissionLanguage === "TR" ? t("submission.turkce") : t("submission.ingilizce")),
     [details.submissionLanguage, t],
@@ -331,7 +312,7 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
       const response = await fetch(`/api/submissions/${snapshot.id}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ declarations }),
+        body: JSON.stringify({ declarations: Object.fromEntries(document.items.map(({key}) => [key,declarations[`${document.version}:${key}`] === true])), declarationVersion:document.version, declarationLocale:document.locale }),
       });
       const data = await readResponsePayload(response);
       if (!response.ok) {
@@ -819,18 +800,18 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
             </div>
 
             <div className="author-card" style={{ marginBottom: 22 }}>
-              <h3>{t("registration.ethicsHeading")}</h3>
+              <h3>{t("registration.ethicsHeading")}</h3><p className="field-hint">{locale === "en" ? "Declaration version" : "Beyan sürümü"}: {document.version.slice(0,12)}</p>
               <div className="checklist">
-                {DECLARATION_KEYS.map((key) => (
+                {document.items.map(({key,text}) => (
                   <label className="check-item" key={key}>
                     <input
-                      checked={declarations[key]}
+                      checked={declarations[`${document.version}:${key}`] ?? false}
                       onChange={(event) =>
-                        setDeclarations((current) => ({ ...current, [key]: event.target.checked }))
+                        setDeclarations((current) => ({ ...current, [`${document.version}:${key}`]: event.target.checked }))
                       }
                       type="checkbox"
                     />
-                    <span>{t(`registration.decl.${key}`)}</span>
+                    <span>{text}</span>
                   </label>
                 ))}
               </div>

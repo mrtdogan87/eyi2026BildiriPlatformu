@@ -1,5 +1,6 @@
-import { requireEditableDraft, configuredAuthors, submissionRules } from "@/integrations/congress/submission-rules";
-import { apiRoute } from "@/platform/http";
+import { lockEditableSubmission, configuredAuthors } from "@/integrations/congress/submission-rules";
+import { effectiveConfiguration } from "@/modules/congress/configuration";
+import { apiRoute, AccessError } from "@/platform/http";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import {
@@ -19,33 +20,18 @@ async function handlePATCH(request: Request, { params }: RouteProps) {
   if (!(await canAccessDraft(id))) {
     return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
   }
-  await requireEditableDraft(id);
   if (await isSubmissionClosedForDraft(id)) {
     return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
   const body = await request.json();
-  const authors = configuredAuthors(body.authors ?? [], await submissionRules(id));
-
-  await prisma.$transaction([
-    prisma.submissionAuthor.deleteMany({
-      where: {
-        submissionId: id,
-      },
-    }),
-    prisma.submissionAuthor.createMany({
-      data: authors.map((author, index) => ({
-        submissionId: id,
-        fullName: author.fullName.trim(),
-        title: author.title?.trim() || null,
-        email: author.email.trim().toLowerCase(),
-        institution: author.institution.trim(),
-        country: author.country.trim(),
-        isPresenter: author.isPresenter,
-        sortOrder: index,
-      })),
-    }),
-  ]);
+  await prisma.$transaction(async tx => {
+    const submission = await lockEditableSubmission(tx, id);
+    if (await isSubmissionClosedForDraft(id)) throw new AccessError(403, t("api.submissionsClosed"));
+    const authors = configuredAuthors(body.authors ?? [], effectiveConfiguration(submission.congress.configuration));
+    await tx.submissionAuthor.deleteMany({ where: { submissionId: id } });
+    await tx.submissionAuthor.createMany({ data: authors.map((author, index) => ({ submissionId: id, fullName: author.fullName, title: author.title || null, email: author.email, institution: author.institution, country: author.country, isPresenter: author.isPresenter, sortOrder: index })) });
+  });
 
   return NextResponse.json({
     submission: await getSubmissionSnapshot(id),

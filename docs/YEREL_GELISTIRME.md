@@ -327,3 +327,56 @@ Preview Compose'da ayrı `mail-worker` servisi vardır; ileride yetkili
 deneme yayını yapılırken uygulamayla birlikte başlatılmalıdır. Bu Mac'te
 Docker/uzak dağıtım denenmedi. Uzak v2 yayını ve P10 geliştirmesi bu
 yerel doğrulamadan ayrı işlerdir.
+
+## P10 — Katılımcı paneli ve sekreterya iş listesi
+
+P10 tamamlandı; 400 otomatik kontrol, 50 preview kontrolü ve final
+checkpoint kanıtları `docs/P10_KAPANIS.md` içinde kayıtlıdır. Bu bölüm eski paket sonuçlarını yeni
+çalıştırma olarak saymaz.
+
+Yerelde `http://127.0.0.1:3100/eyi-2026/katilimci` üzerinden e-posta adresi
+ile panel bağlantısı istenir. P09 worker çalışıyor olmalı; bağlantı
+`.local/mail` içindeki capture kaydına yazılır, gerçek alıcıya gönderilmez.
+`npm run mail:latest` özel bağlantıyı yerel terminalde açmaya yardımcı olur;
+çıktıyı paylaşılan belgelere veya sohbete kopyalamayın. Doğrulama bağlantısı
+tek kullanımlıdır. Panel `/<kongre>/katilimci/panel`, kişisel hesap karşılığı
+`/admin/kayitlarim` adresindedir.
+
+Paneldeki bildiri/kayıt yalnız doğrulanmış e-postaya aittir. Ortak yazar
+başkasının taslağını açamaz veya bildirisi için geri çekme talebi veremez.
+Geri çekme/iptal başvurusu iş listesine talep ekler; kaydı silmez ve para
+iadesi yapmaz. Sonuç açıklaması katılımcıya gösterilir; ekip iç notları
+katılımcı API'sine çıkmaz. Oturumdan çıkış sunucu oturumunu iptal eder ve
+eski taslak/kayıt köprü çerezlerini temizler.
+
+Köprü çerezleri bağımsız, sunucuda süresi doğrulanan 8 saatlik oturumlardır.
+Çıkış tarayıcıdaki kopyayı temizler; önceden kopyalanmış bir köprü çerezi
+kendi süresinin sonuna kadar eski akışta kullanılabilir. Panel oturumunun
+iptali bu bağımsız çerezi sunucuda iptal etmez; birleşik iptal P11'e kalır.
+
+Yönetimde `/admin/is-listesi`, eksik işlemleri, dekont takibini, CMS geri
+bildirimlerini, teslim sorunlarını ve kalıcı talepleri bir arada gösterir.
+Sorumlu ve durum filtresi, elle alınan e-posta talebi, kongre içi kaynak
+seçicisi ve sürümlü işlem geçmişi bulunur. Kaynak durumları kendi
+modüllerinde yönetilir. "Dekont alındı" ödeme doğrulaması değildir; P12
+ödeme doğrulaması bu pakette açılmaz.
+
+Kongre ayarlarındaki yapılandırılmış özet kuralları TR/EN
+amaç/yöntem/bulgular/sonuç alanlarına ve teslim aşamasına uygulanır.
+Başvuru/kayıt ekranı güncel beyan metni ve sürümünü gönderir. Metin veya
+kurallar değiştiğinde eski ekran 409 alır; güncel metin tekrar okunup
+onaylanmalıdır. Gönderimle aynı transaction içinde saklanan beyan kanıtı
+sonraki metin değişikliğinden etkilenmez. Eski kayıtlara onay üretilmez.
+
+P10'un migration'ı beş tablo ve nullable yapılandırılmış özet alanı ekler.
+Toplam 42 tablo vardır. Yerel migration için mevcut güvenli komut
+`npm run prisma:migrate:deploy` kullanılır; restore edilmiş verinin üzerine
+`db:init` veya seed çalıştırılmaz. Paket kontrolleri `npm run test:participation` ile çalıştırılır. Testler
+sentetik yerel veri kullanır. Final doğrulama sayıları kapanış belgesine
+son çalıştırma kanıtıyla yazılmalıdır.
+
+Final kaynak/DB yedeği `P10-20261006-final` olarak alındı.
+Checkpoint sırasında worker ve web yazıları durduruldu; 42 tablo ayrı geçici
+DB'ye restore edilerek parmak izleri doğrulandı. Yeni checkpoint alınırken
+aynı durdurma ve doğrulama sırası izlenmelidir. Uzak yayın, canlı alıcılara e-posta, P11 düzeltmeleri ve P12 ödeme
+kontrolü ayrı işlerdir.

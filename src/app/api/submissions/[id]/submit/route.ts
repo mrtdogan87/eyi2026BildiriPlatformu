@@ -1,122 +1,49 @@
-import { configuredDetails, configuredAuthors, configuredParticipation, submissionRules } from "@/integrations/congress/submission-rules";
-import { apiRoute } from "@/platform/http";
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import {
-  canAccessDraft,
-  clearDraftAccessCookie,
-  countSubmittedEmailUsage,
-  isSubmissionClosedForDraft,
-  findPresenter,
-  getSubmissionSnapshot,
-} from "@/lib/submission";
-import { getServerT } from "@/lib/i18n/server";
+import { configuredDetails, configuredAuthors, configuredParticipation, lockEditableSubmission } from '@/integrations/congress/submission-rules';
+import { acceptedDeclaration } from '@/integrations/congress/declarations';
+import { effectiveConfiguration } from '@/modules/congress/configuration';
+import { apiRoute, AccessError } from '@/platform/http';
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { canAccessDraft, clearDraftAccessCookie, countSubmittedEmailUsage, isSubmissionClosedForDraft, findPresenter, getSubmissionSnapshot } from '@/lib/submission';
+import { getServerT } from '@/lib/i18n/server';
 import { enqueueNotification } from '@/platform/notifications';
 import { createHash } from 'node:crypto';
-import { AccessError } from '@/platform/http';
 
-type RouteProps = {
-  params: Promise<{ id: string }>;
-};
-
-async function handlePOST(_request: Request, { params }: RouteProps) {
+type RouteProps = { params: Promise<{ id: string }> };
+async function handlePOST(request: Request, { params }: RouteProps) {
   const { t } = await getServerT();
-  const body = (await _request.json()) as {
-    declarations?: {
-      accuracy?: boolean;
-      submissionLimit?: boolean;
-      coauthorApproval?: boolean;
-      personalDataConsent?: boolean;
-      registrationPresentationConsent?: boolean;
-    };
-  };
-
+  const body: unknown = await request.json().catch(() => null);
   const { id } = await params;
-  if (!(await canAccessDraft(id))) {
-    return NextResponse.json({ error: t("api.draftNoAccess") }, { status: 403 });
-  }
-  if (await isSubmissionClosedForDraft(id, "SUBMIT")) {
-    return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
-  }
-
-  const declarations = body.declarations;
-  if (
-    !declarations?.accuracy ||
-    !declarations.submissionLimit ||
-    !declarations.coauthorApproval ||
-    !declarations.personalDataConsent ||
-    !declarations.registrationPresentationConsent
-  ) {
-    return NextResponse.json({ error: t("api.declarationsRequired") }, { status: 400 });
-  }
-
-  const submission = await prisma.submission.findUnique({
-    where: { id },
-    include: { authors: true, file: true, congress: true },
-  });
-
-  if (!submission) {
-    return NextResponse.json({ error: t("api.submissionNotFound") }, { status: 404 });
-  }
-
-  const rules = await submissionRules(id);
-  if (submission.status !== 'DRAFT') return NextResponse.json({ error: 'Bildiri zaten gönderilmiş.' }, { status: 409 });
-  configuredDetails({ submissionLanguage: submission.submissionLanguage, titleTr: submission.titleTr ?? '', titleEn: submission.titleEn ?? '', abstractTr: rules.fields.abstract === 'HIDDEN' ? '' : submission.abstractTr ?? '', abstractEn: rules.fields.abstract === 'HIDDEN' ? '' : submission.abstractEn ?? '', keywordsTr: rules.fields.keywords === 'HIDDEN' ? '' : submission.keywordsTr ?? '', keywordsEn: rules.fields.keywords === 'HIDDEN' ? '' : submission.keywordsEn ?? '' }, rules);
-  configuredAuthors(submission.authors.map(author => ({ fullName: author.fullName, title: rules.fields.authorTitle === 'HIDDEN' ? '' : author.title ?? '', email: author.email, institution: rules.fields.authorInstitution === 'HIDDEN' ? '' : author.institution ?? '', country: rules.fields.authorCountry === 'HIDDEN' ? '' : author.country ?? '', isPresenter: author.isPresenter })), rules);
-  configuredParticipation({ presentationMode: rules.fields.presentationMode === 'HIDDEN' ? null : submission.presentationMode, audience: rules.fields.audience === 'HIDDEN' ? null : submission.audience }, rules);
-  const presenterAuthor = findPresenter(submission.authors);
-
-  if (!presenterAuthor?.fullName.trim()) {
-    return NextResponse.json({ error: t("api.presenterNotFound") }, { status: 400 });
-  }
-
-  if (rules.fields.file === "REQUIRED" && !submission.file) {
-    return NextResponse.json({ error: t("api.docxRequired") }, { status: 400 });
-  }
-
-  const usage = await countSubmittedEmailUsage(
-    submission.congressId,
-    submission.authors.map((author) => author.email),
-  );
-
-  const blockedEmail = submission.authors.find((author) => (usage[author.email] ?? 0) >= 2)?.email;
-  if (blockedEmail) {
-    return NextResponse.json(
-      { error: t("api.emailUsedTwice", { email: blockedEmail }) },
-      { status: 400 },
-    );
-  }
+  if (!(await canAccessDraft(id))) throw new AccessError(403, t('api.draftNoAccess'));
 
   await prisma.$transaction(async tx => {
-    const changed = await tx.submission.updateMany({
-      where: { id, status: 'DRAFT' },
-      data: { status: 'SUBMITTED', submittedAt: new Date() },
-    });
-    if (!changed.count) throw new AccessError(409, 'Bildiri zaten gönderilmiş.');
-    // Durable enqueue is part of submission acceptance; provider delivery is not.
-    const emailLocale: "tr" | "en" = submission.submissionLanguage === "EN" ? "en" : "tr";
-    const paperTitle =
-      submission.submissionLanguage === "EN"
-        ? submission.titleEn || submission.titleTr || "Bildiri"
-        : submission.titleTr || submission.titleEn || "Bildiri";
-    const recipients = [
-      ...new Set(
-        submission.authors.map((author) => author.email.trim().toLowerCase()).filter(Boolean),
-      ),
-    ];
+    const submission = await lockEditableSubmission(tx, id);
+    // The congress lock prevents rule changes while this acceptance commits.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`submission-limit:${submission.congressId}`}))`;
+    if (await isSubmissionClosedForDraft(id, 'SUBMIT')) throw new AccessError(403, t('api.submissionsClosed'));
+    const rules = effectiveConfiguration(submission.congress.configuration);
+    const acceptance = acceptedDeclaration(body, rules, 'SUBMISSION');
+    configuredDetails({ submissionLanguage: submission.submissionLanguage, titleTr: submission.titleTr ?? '', titleEn: submission.titleEn ?? '', abstractTr: rules.fields.abstract === 'HIDDEN' ? '' : submission.abstractTr ?? '', abstractEn: rules.fields.abstract === 'HIDDEN' ? '' : submission.abstractEn ?? '', keywordsTr: rules.fields.keywords === 'HIDDEN' ? '' : submission.keywordsTr ?? '', keywordsEn: rules.fields.keywords === 'HIDDEN' ? '' : submission.keywordsEn ?? '', structuredAbstract: rules.structuredAbstract.enabled ? submission.structuredAbstract ?? undefined : undefined }, rules);
+    configuredAuthors(submission.authors.map(author => ({ fullName: author.fullName, title: rules.fields.authorTitle === 'HIDDEN' ? '' : author.title ?? '', email: author.email, institution: rules.fields.authorInstitution === 'HIDDEN' ? '' : author.institution ?? '', country: rules.fields.authorCountry === 'HIDDEN' ? '' : author.country ?? '', isPresenter: author.isPresenter })), rules);
+    configuredParticipation({ presentationMode: rules.fields.presentationMode === 'HIDDEN' ? null : submission.presentationMode, audience: rules.fields.audience === 'HIDDEN' ? null : submission.audience }, rules);
+    if (!findPresenter(submission.authors)?.fullName.trim()) throw new AccessError(400, t('api.presenterNotFound'));
+    if (rules.fields.file === 'REQUIRED' && !submission.file) throw new AccessError(400, t('api.docxRequired'));
+    const usage = await countSubmittedEmailUsage(submission.congressId, submission.authors.map(author => author.email), tx);
+    const blockedEmail = submission.authors.find(author => (usage[author.email.trim().toLowerCase()] ?? 0) >= 2)?.email;
+    if (blockedEmail) throw new AccessError(400, t('api.emailUsedTwice', { email: blockedEmail }));
+    await tx.submission.update({ where: { id }, data: { status: 'SUBMITTED', submittedAt: new Date() } });
+    await tx.declarationAcceptance.create({ data: { congressId: submission.congressId, entityType: 'SUBMISSION', entityId: id, email: submission.draftOwnerEmail.trim().toLowerCase(), ...acceptance } });
+    const emailLocale = submission.submissionLanguage === 'EN' ? 'en' : 'tr';
+    const paperTitle = submission.submissionLanguage === 'EN' ? submission.titleEn || submission.titleTr || 'Bildiri' : submission.titleTr || submission.titleEn || 'Bildiri';
+    const recipients = [...new Set(submission.authors.map(author => author.email.trim().toLowerCase()).filter(Boolean))];
     for (const recipient of recipients) await enqueueNotification(tx, {
       congressId: submission.congressId, key: 'SUBMISSION_RECEIVED', locale: emailLocale, to: recipient,
       dedupeKey: `submission-received:${id}:${createHash('sha256').update(recipient).digest('hex')}`,
       module: 'SUBMISSIONS', sourceType: 'submission', sourceId: id,
       values: { congressName: submission.congress.name, paperTitle },
     });
-  });
-
+  }, { timeout: 15000 });
   await clearDraftAccessCookie();
-
-  return NextResponse.json({
-    submission: await getSubmissionSnapshot(id),
-  });
+  return NextResponse.json({ submission: await getSubmissionSnapshot(id) });
 }
-
 export const POST = apiRoute(handlePOST);

@@ -1,15 +1,16 @@
 import { z } from 'zod';
 
-export const templateKeys = ['DRAFT_ACCESS', 'REGISTRATION_ACCESS', 'SUBMISSION_RECEIVED', 'SUBMISSION_STATUS', 'ACCOUNT_ACTIVATION', 'GENERAL'] as const;
+export const templateKeys = ['DRAFT_ACCESS', 'REGISTRATION_ACCESS', 'PARTICIPANT_ACCESS', 'SUBMISSION_RECEIVED', 'SUBMISSION_STATUS', 'ACCOUNT_ACTIVATION', 'GENERAL'] as const;
 export type TemplateKey = typeof templateKeys[number];
 export type TemplateLocale = 'tr' | 'en';
 export type TemplateContent = { subject: string; body: string };
 const placeholders: Record<TemplateKey, readonly string[]> = {
   DRAFT_ACCESS: ['congressName', 'accessLink'], REGISTRATION_ACCESS: ['congressName', 'accessLink'],
+  PARTICIPANT_ACCESS: ['congressName', 'accessLink'],
   SUBMISSION_RECEIVED: ['congressName', 'paperTitle'], SUBMISSION_STATUS: ['congressName', 'paperTitle', 'statusLabel', 'registrationUrl'],
   ACCOUNT_ACTIVATION: ['congressName', 'activationLink'], GENERAL: ['congressName', 'recipientName', 'message'],
 };
-const required: Partial<Record<TemplateKey, string>> = { DRAFT_ACCESS: 'accessLink', REGISTRATION_ACCESS: 'accessLink', ACCOUNT_ACTIVATION: 'activationLink' };
+const required: Partial<Record<TemplateKey, string>> = { DRAFT_ACCESS: 'accessLink', REGISTRATION_ACCESS: 'accessLink', PARTICIPANT_ACCESS: 'accessLink', ACCOUNT_ACTIVATION: 'activationLink' };
 const urlFields = new Set(['accessLink', 'activationLink', 'registrationUrl']);
 const placeholderPattern = /\{\{\s*([A-Za-z][A-Za-z0-9]*)\s*\}\}/g;
 // Match existing business input limits: congress/event name and author name 180,
@@ -38,6 +39,10 @@ export function templatePlaceholders(key: TemplateKey): readonly string[] { retu
 export function defaultTemplate(key: TemplateKey, locale: TemplateLocale): TemplateContent {
   const en = locale === 'en';
   const defaults: Record<TemplateKey, TemplateContent> = {
+    PARTICIPANT_ACCESS: {
+      subject: en ? '{{congressName}} - Participant panel access' : '{{congressName}} - Katılımcı paneli erişimi',
+      body: en ? 'View your papers, registration and requests for {{congressName}} using the link below:\n\n{{accessLink}}\n\nThe link is valid for 24 hours and can be used once. If you did not request this message, you can ignore it.' : '{{congressName}} kapsamında bildiri, kayıt ve taleplerinizi aşağıdaki bağlantıdan takip edebilirsiniz:\n\n{{accessLink}}\n\nBağlantı 24 saat geçerlidir ve bir kez kullanılabilir. Bu mesajı talep etmediyseniz yok sayabilirsiniz.',
+    },
     DRAFT_ACCESS: {
       subject: en ? '{{congressName}} - Draft access link' : '{{congressName}} - Taslak erişim bağlantısı',
       body: en ? 'Access your draft for {{congressName}} using the secure link below:\n\n{{accessLink}}\n\nThis link is valid for 24 hours. After verification you can continue in the same browser for 5 minutes. If you did not request this link, you can ignore this email.' : '{{congressName}} bildiri taslağınıza aşağıdaki güvenli bağlantıdan erişebilirsiniz:\n\n{{accessLink}}\n\nBağlantı 24 saat geçerlidir. Doğrulamadan sonra aynı tarayıcıda 5 dakika devam edebilirsiniz. Bu bağlantıyı talep etmediyseniz e-postayı yok sayabilirsiniz.',

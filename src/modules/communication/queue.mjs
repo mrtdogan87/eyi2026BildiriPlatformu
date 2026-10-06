@@ -74,7 +74,7 @@ function clockDate(now) { return now ? new Date(now) : new Date(); }
 async function sourceIsValid(prisma, message, now) {
   // Preview samples never represent live tokens and must never enter a real transport.
   if (message.sourceType === 'TEMPLATE_TEST') return message.provider === 'capture' && message.recipient.endsWith('.invalid');
-  const authSources = { DRAFT_ACCESS: 'submission-access-token', REGISTRATION_ACCESS: 'registration-access-token', ACCOUNT_ACTIVATION: 'activation-token' };
+  const authSources = { DRAFT_ACCESS: 'submission-access-token', REGISTRATION_ACCESS: 'registration-access-token', PARTICIPANT_ACCESS: 'participant-access-token', ACCOUNT_ACTIVATION: 'activation-token' };
   const expectedSource = authSources[message.templateKey];
   if (!expectedSource) return true;
   if (message.sourceType !== expectedSource || !message.sourceId) return false;
@@ -85,6 +85,9 @@ async function sourceIsValid(prisma, message, now) {
   } else if (expectedSource === 'registration-access-token') {
     token = await prisma.registrationAccessToken.findUnique({ where: { id: message.sourceId } });
     if (!token || token.email.toLowerCase() !== message.recipient || token.congressId !== message.congressId) return false;
+  } else if (expectedSource === 'participant-access-token') {
+    token = await prisma.participantAccessToken.findUnique({ where: { id: message.sourceId }, include: { congress: { select: { modules: { where: { key: { in: ['SUBMISSIONS', 'REGISTRATION'] }, enabled: true }, select: { key: true } } } } } });
+    if (!token || token.email.toLowerCase() !== message.recipient || token.congressId !== message.congressId || !token.congress.modules.length) return false;
   } else {
     token = await prisma.activationToken.findUnique({
       where: { id: message.sourceId },

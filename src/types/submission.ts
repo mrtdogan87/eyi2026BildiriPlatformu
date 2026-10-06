@@ -1,4 +1,6 @@
 import type { CongressConfiguration } from "@/modules/congress/configuration";
+import type { StructuredAbstract } from '@/modules/participation/abstract';
+import type { DeclarationDocuments } from '@/modules/participation/declarations';
 export type SubmissionLanguage = "TR" | "EN";
 export type PresentationMode = "ONLINE" | "IN_PERSON";
 export type AudienceType = "ACADEMIC" | "STUDENT";
@@ -25,6 +27,7 @@ export type SubmissionDetailsInput = {
   abstractEn: string;
   keywordsTr: string;
   keywordsEn: string;
+  structuredAbstract?: StructuredAbstract;
 };
 
 export type SubmissionParticipationInput = {
@@ -62,6 +65,7 @@ export type PaymentTierOption = {
 };
 
 export type SubmissionConfig = {
+  declarations: DeclarationDocuments;
   congressName: string;
   congressSlug: string;
   earlyDeadline: string | null;
@@ -74,6 +78,7 @@ export type SubmissionConfig = {
 };
 
 export type SubmissionSnapshot = SubmissionDetailsInput & {
+  declarations: DeclarationDocuments;
   id: string;
   congressSlug: string;
   draftOwnerEmail: string;
@@ -103,6 +108,7 @@ export type RegistrationAcceptedPaper = {
 };
 
 export type RegistrationConfig = {
+  declarations: DeclarationDocuments;
   workflow: CongressConfiguration | null;
   congressName: string;
   congressSlug: string;

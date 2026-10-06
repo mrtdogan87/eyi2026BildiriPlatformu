@@ -1,8 +1,11 @@
 import { effectiveConfiguration } from "@/modules/congress/configuration";
-import { apiRoute } from "@/platform/http";
+import { apiRoute, AccessError } from "@/platform/http";
+import { acceptedDeclaration } from '@/integrations/congress/declarations';
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import type { AudienceType, PresentationMode } from "@prisma/client";
+import { Prisma } from '@prisma/client';
+import { z } from 'zod';
 import {
   calculateRegistration,
   effectivePricingCongress,
@@ -44,7 +47,9 @@ async function handlePOST(request: Request) {
     return NextResponse.json({ error: t("api.nameRequired") }, { status: 400 });
   }
 
-  const paperSubmissionIds = parseJsonField<string[]>(formData.get("paperSubmissionIds"), []);
+  const paperIds = z.array(z.string().min(1).max(128)).max(50).refine(ids => new Set(ids).size === ids.length).safeParse(parseJsonField<unknown>(formData.get('paperSubmissionIds'), []));
+  if (!paperIds.success) throw new AccessError(400, 'Bildiri seçimini kontrol edin.');
+  const paperSubmissionIds = paperIds.data;
   const listenerEnabled = formData.get("listenerEnabled") === "true";
   const listenerPresentationMode = formData.get("listenerPresentationMode") as PresentationMode | null;
   const listenerAudience = formData.get("listenerAudience") as AudienceType | null;
@@ -68,7 +73,10 @@ async function handlePOST(request: Request) {
   }
 
   const congress = effectivePricingCongress(rawCongress);
-  const fields = effectiveConfiguration(congress.configuration).fields;
+  const configuration = effectiveConfiguration(congress.configuration);
+  const fields = configuration.fields;
+  const declarationInput = { declarations: parseJsonField<unknown>(formData.get('declarations'), null), declarationVersion: formData.get('declarationVersion'), declarationLocale: formData.get('declarationLocale') };
+  acceptedDeclaration(declarationInput, configuration, 'REGISTRATION');
   // Kullanıcı yalnızca SUNDUĞU bildirilerin ücretini ödeyebilir (e-posta == sunan yazar).
   const normalizedEmail = session.email.toLowerCase();
   const selectedSubmissions = await prisma.submission.findMany({
@@ -156,6 +164,30 @@ async function handlePOST(request: Request) {
       : null;
 
   const registration = await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${congress.id} FOR UPDATE`;
+    const current = await tx.congress.findUniqueOrThrow({ where: { id: congress.id } });
+    if (current.configVersion !== rawCongress.configVersion) throw new AccessError(409, 'Kayıt kuralları değişti. Sayfayı yenileyip güncel koşulları onaylayın.');
+    const registrationModule = await tx.congressModule.findUnique({ where: { congressId_key: { congressId: congress.id, key: 'REGISTRATION' } } });
+    if (!registrationModule?.enabled) throw new AccessError(403, 'Kayıt modülü kapalı.');
+    const acceptance = acceptedDeclaration(declarationInput, effectiveConfiguration(current.configuration), 'REGISTRATION');
+    if (paperSubmissionIds.length) await tx.$queryRaw(Prisma.sql`SELECT id FROM "Submission" WHERE "congressId" = ${congress.id} AND id IN (${Prisma.join([...paperSubmissionIds].sort())}) ORDER BY id FOR UPDATE`);
+    await tx.$queryRaw`SELECT id FROM "PaymentTier" WHERE "congressId" = ${congress.id} ORDER BY id FOR UPDATE`;
+    const currentPapers = await tx.submission.findMany({
+      where: { id: { in: paperSubmissionIds }, congressId: congress.id, status: 'ACCEPTED', authors: { some: { email: normalizedEmail, isPresenter: true } } },
+      include: { paperItem: true, authors: { select: { fullName: true, isPresenter: true } } },
+      orderBy: [{ submittedAt: 'asc' }, { createdAt: 'asc' }],
+    });
+    if (currentPapers.length !== paperSubmissionIds.length || currentPapers.some(paper => paper.paperItem)) throw new AccessError(409, 'Seçili bildirinin durumu veya kayıt bilgisi değişti. Sayfayı yenileyin.');
+    const currentTiers = await tx.paymentTier.findMany({ where: { congressId: congress.id }, orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] });
+    let currentCalculation;
+    try {
+      currentCalculation = calculateRegistration({
+        email: session.email, presenterName, congress: { ...current, paymentTiers: currentTiers },
+        selectedPapers: currentPapers.map(paper => ({ submissionId: paper.id, title: paper.submissionLanguage === 'EN' ? paper.titleEn || paper.titleTr || 'Bildiri' : paper.titleTr || paper.titleEn || 'Bildiri', audience: paper.audience, presenterName: paper.authors.find(author => author.isPresenter)?.fullName ?? null })),
+        listenerEnabled, listenerPresentationMode, listenerAudience, listenerDayOne, listenerDayTwo, galaAttendance, galaAttendeeCount, tripAttendance, tripAttendeeCount, t,
+      });
+    } catch { throw new AccessError(409, 'Kayıt süresi veya ücret kuralları değişti. Sayfayı yenileyin.'); }
+    if (JSON.stringify(currentCalculation) !== JSON.stringify(calculation)) throw new AccessError(409, 'Ücret veya bildiri bilgisi değişti. Sayfayı yenileyip güncel tutarı doğrulayın.');
     const created = await tx.registration.create({
       data: {
         congressId: congress.id,
@@ -187,6 +219,7 @@ async function handlePOST(request: Request) {
         },
       },
     });
+    await tx.declarationAcceptance.create({ data: { congressId: congress.id, entityType: 'REGISTRATION', entityId: created.id, email: normalizedEmail, ...acceptance, rules: { ...acceptance.rules, quote: currentCalculation.quote, paperAssignments: currentCalculation.paperAssignments, selectedSubmissionIds: paperSubmissionIds } } });
 
     if (buffer && receiptFile instanceof File) {
       await tx.registrationReceipt.create({

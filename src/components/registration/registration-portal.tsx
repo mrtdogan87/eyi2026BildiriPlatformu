@@ -17,29 +17,8 @@ type Props = {
   context: RegistrationContext;
 };
 
-type RegistrationDeclarations = {
-  accuracy: boolean;
-  submissionLimit: boolean;
-  coauthorApproval: boolean;
-  personalDataConsent: boolean;
-  registrationPresentationConsent: boolean;
-};
-
-const emptyDeclarations: RegistrationDeclarations = {
-  accuracy: false,
-  submissionLimit: false,
-  coauthorApproval: false,
-  personalDataConsent: false,
-  registrationPresentationConsent: false,
-};
-
-const DECLARATION_KEYS: (keyof RegistrationDeclarations)[] = [
-  "accuracy",
-  "submissionLimit",
-  "coauthorApproval",
-  "personalDataConsent",
-  "registrationPresentationConsent",
-];
+type RegistrationDeclarations = Record<string, boolean>;
+const emptyDeclarations: RegistrationDeclarations = {};
 
 type ListenerTierKey = "ONLINE" | "IN_PERSON_ACADEMIC" | "IN_PERSON_STUDENT";
 
@@ -118,7 +97,8 @@ export function RegistrationPortal({ context }: Props) {
   const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [copiedDescription, setCopiedDescription] = useState(false);
 
-  const areDeclarationsComplete = Object.values(declarations).every(Boolean);
+  const document = config.declarations[locale];
+  const areDeclarationsComplete = document.items.every(({key}) => declarations[`${document.version}:${key}`] === true);
 
   // Sunduğunuz bildiriler = ödenebilir; ortak yazar olunan bildiriler = yalnızca bilgi.
   const presenterPapers = useMemo(
@@ -399,6 +379,9 @@ export function RegistrationPortal({ context }: Props) {
       : null;
 
     const formData = new FormData();
+    formData.set("declarations", JSON.stringify(Object.fromEntries(document.items.map(({key}) => [key,declarations[`${document.version}:${key}`] === true]))));
+    formData.set("declarationVersion",document.version);
+    formData.set("declarationLocale",document.locale);
     formData.append(
       "presenterName",
       [presenterTitle.trim(), presenterName.trim()].filter(Boolean).join(" "),
@@ -782,18 +765,18 @@ export function RegistrationPortal({ context }: Props) {
       </div>
 
       <div className="author-card" style={{ marginTop: 18 }}>
-        <h3>{t("registration.ethicsHeading")}</h3>
+        <h3>{t("registration.ethicsHeading")}</h3><p className="field-hint">{locale === "en" ? "Declaration version" : "Beyan sürümü"}: {document.version.slice(0,12)}</p>
         <div className="checklist">
-          {DECLARATION_KEYS.map((key) => (
+          {document.items.map(({key,text}) => (
             <label className="check-item" key={key}>
               <input
-                checked={declarations[key]}
+                checked={declarations[`${document.version}:${key}`] ?? false}
                 onChange={(event) =>
-                  setDeclarations((current) => ({ ...current, [key]: event.target.checked }))
+                  setDeclarations((current) => ({ ...current, [`${document.version}:${key}`]: event.target.checked }))
                 }
                 type="checkbox"
               />
-              <span>{t(`registration.decl.${key}`)}</span>
+              <span>{text}</span>
             </label>
           ))}
         </div>

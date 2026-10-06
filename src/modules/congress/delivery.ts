@@ -10,7 +10,8 @@ export async function deliveryAllowed(congressId: string, input: { email?: strin
   if (!congress || !(await moduleEnabled(congressId, 'SUBMISSIONS'))) return false;
   const config = effectiveConfiguration(congress.configuration);
   const first: DeliveryStage = config.stages.ABSTRACT.enabled ? 'ABSTRACT' : 'FULL_TEXT';
-  const stages: DeliveryStage[] = [input.stage === 'SUBMIT' ? (config.stages.FULL_TEXT.enabled && config.fields.file === 'REQUIRED' ? 'FULL_TEXT' : first) : input.stage ?? first];
+  const finalStage = config.stages.FULL_TEXT.enabled && (config.fields.file === 'REQUIRED' || (config.structuredAbstract.enabled && config.structuredAbstract.stage === 'FULL_TEXT')) ? 'FULL_TEXT' : first;
+  const stages: DeliveryStage[] = [input.stage === 'SUBMIT' ? finalStage : input.stage ?? first];
   const now = new Date();
   for (const stage of stages) {
     if (!config.stages[stage].enabled) return false;

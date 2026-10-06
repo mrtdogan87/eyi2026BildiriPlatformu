@@ -218,7 +218,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08 ve P09 uygulaması tamamlandı. P09 doğrulama sonuçları ve kurtarma prosedürü `docs/P09_KAPANIS.md` içinde kayıtlıdır. P10–P22 planlandı. Ayrı test adresi/projesi seçilmediği için uzak deneme yayını bekliyor. Sonraki paket P10 katılımcı paneli ve sekreterya iş listesidir; henüz başlatılmadı. P09 kalıcı e-posta kuyruğu, TR/EN şablonları ve teslim sorunları yönetimi `docs/P09_KAPANIS.md` içinde kayıtlıdır. Kaynak planın kapsam/süre tablosu korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09 ve P10 tamamlandı. P10 katılımcı paneli, sürümlü beyanlar, yapılandırılmış özet ve sekreterya iş listesi; 400 otomatik kontrol, 50 preview kontrolü ve 42 tablonun geri yükleme doğrulamasıyla kapatıldı. P10 kayıtları `docs/P10_KAPANIS.md`, P09 kanıtları `docs/P09_KAPANIS.md` içindedir. P11–P22 planlandı; sıradaki geliştirme P11 gerekçeli düzeltmeler ve sürüm geçmişidir, henüz başlatılmadı. Ayrı test adresi/projesi seçilmediği için uzak deneme yayını bekliyor. Kaynak planın kapsam/süre tablosu korunmuştur.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
