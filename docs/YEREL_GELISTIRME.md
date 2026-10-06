@@ -513,3 +513,10 @@ Panel → **PDF sertifikalar ve alıcılar**. Arka plan PDF ve alan yerleşimi a
 Panel → **Oturum yoklaması** ve **Belge kuralları ve kongre uygunluğu**. Göreve göre ödeme/yoklama şartını açıkça etkinleştirin, uygunluğu kontrol edin, şablona aktarın ve PDF’yi ayrıca üretin. Değişen kaynağı aynı alıcıya yenileyip aynı numarayla yeni PDF ekleyin. Başkan yalnız kabul ettiği oturumları görür; kendi yoklamasını sekreterya verir.
 
 Bağımsız belge için e-posta isteğe bağlıdır. E-postasız Excel örneği indirilebilir; aynı adlı kişileri alıcı referansıyla ayırın. Bildirim/kişisel erişim adres gerektirir. `npm run test:certificates` 24 birim + 47 normal/22 e-postasız HTTP; `npm run test:attendance` 12 birim + 52 HTTP çalıştırır. Kontrollü testlerde worker kapalıdır. Güncel toplam 912 otomatik, 107 preview, 13 tarayıcı; 27 migration/73 tablo. Final kurtarma etiketi `../.recovery/P16B-20261007-final`; tam restore/parmak izi kanıtı manifestte. Ayrıntılar [P16B kapanışında](P16B_KAPANIS.md). Sıradaki P17 ödüllerdir.
+
+
+## P17 ödül başvurusu ve kurul kararı
+
+Panel → **Ödül başvuruları ve kurul kararları**, hakem hesabı → **Ödül jüri görevlerim**, kişisel panel → **Ödül başvurularım**. Kategori/ölçüt/takvimi ayarlayın, bağımsız projeyi veya güncel kabul edilmiş bildiriyi aday yapın, jüri kabulü ve puanlamasını takip edin. Sunum şartı P16B güncel yoklamasına bağlıdır. Sıralama öneridir; kurul aday/dereceyi gerekçe ve açık onayla seçer. Genel sonuç `/<kongre>/oduller` adresindedir; değişen kaynak/puan eski kazananları gizler. Ödül PDF'si kitapta yayın izni vermez.
+
+`npm run test:awards`: 23 birim + 40 HTTP. P17 toplam 975 otomatik, 121 ayrı preview ve 17 tarayıcı kontrolü; 28 migration/81 tablo. Final kurtarma etiketi `../.recovery/P17-20261007-final`; tam restore/parmak izi kanıtı manifestte. Ayrıntılar [P17 kapanışında](P17_KAPANIS.md). Sıradaki P18 davet/afiş; P22 ve P06-E1'e kadar devam edilir.

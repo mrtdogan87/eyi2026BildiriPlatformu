@@ -47,6 +47,7 @@ enum RegistrationKind {
 }
 
 model Congress {
+  awardCategories AwardCategory[]
   certificateRules CertificateRule[]
   certificateTemplates CertificateTemplate[]
   certificateRecipients CertificateRecipient[]
@@ -232,6 +233,7 @@ model PaymentTier {
 }
 
 model Submission {
+  awardEntries AwardEntry[]
   programTalks ProgramTalk[]
   reviewVersion Int @default(0)
   reviewRounds ReviewRound[]
@@ -535,6 +537,7 @@ enum ModuleKey {
   PROGRAM
   ACTIVITIES
   CERTIFICATES
+  AWARDS
 }
 
 model Organization {
@@ -1487,4 +1490,135 @@ model AttendanceEvent {
   snapshot Json
   createdAt DateTime @default(now())
   @@unique([attendanceId, number])
+}
+
+model AwardCategory {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  version Int @default(0)
+  decisionVersion Int @default(0)
+  active Boolean @default(true)
+  settings Json
+  revisions AwardCategoryRevision[]
+  entries AwardEntry[]
+  decisions AwardDecision[]
+  createdAt DateTime @default(now())
+  @@index([congressId, active])
+}
+model AwardCategoryRevision {
+  id String @id @default(uuid())
+  categoryId String
+  category AwardCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  number Int
+  settings Json
+  active Boolean
+  actorId String
+  reason String
+  createdAt DateTime @default(now())
+  @@unique([categoryId, number])
+}
+model AwardEntry {
+  id String @id @default(uuid())
+  categoryId String
+  category AwardCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  key String
+  version Int @default(0)
+  status String @default("ACTIVE")
+  sourceType String
+  submissionId String?
+  submission Submission? @relation(fields: [submissionId], references: [id], onDelete: Restrict)
+  sourceSelection Json
+  sourceSnapshot Json
+  sourceHash String
+  applicantEmail String
+  note String
+  files AwardFile[]
+  assignments AwardAssignment[]
+  events AwardEvent[]
+  createdAt DateTime @default(now())
+  @@unique([categoryId, key])
+  @@index([applicantEmail])
+}
+model AwardFile {
+  id String @id @default(uuid())
+  entryId String
+  entry AwardEntry @relation(fields: [entryId], references: [id], onDelete: Restrict)
+  number Int
+  name String
+  mime String
+  checksum String
+  content Bytes
+  purpose String @default("AWARD_ONLY")
+  actorId String?
+  actorEmail String
+  reason String
+  createdAt DateTime @default(now())
+  @@unique([entryId, number])
+}
+model AwardAssignment {
+  id String @id @default(uuid())
+  entryId String
+  entry AwardEntry @relation(fields: [entryId], references: [id], onDelete: Restrict)
+  juryId String
+  juryName String
+  juryEmail String
+  version Int @default(0)
+  status String @default("INVITED")
+  conflict Boolean @default(false)
+  reason String
+  draft Json?
+  evaluations AwardEvaluation[]
+  events AwardEvent[]
+  createdAt DateTime @default(now())
+  @@unique([entryId, juryId])
+  @@index([juryId])
+}
+model AwardEvaluation {
+  id String @id @default(uuid())
+  assignmentId String
+  assignment AwardAssignment @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
+  number Int
+  categoryVersion Int
+  sourceFingerprint String
+  scores Json
+  summary Json
+  comment String
+  source String
+  actorId String
+  actorName String
+  reason String
+  createdAt DateTime @default(now())
+  @@unique([assignmentId, number])
+}
+model AwardDecision {
+  id String @id @default(uuid())
+  categoryId String
+  category AwardCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  number Int
+  status String
+  categoryVersion Int
+  sourceFingerprint String
+  winners Json
+  snapshot Json
+  published Boolean @default(false)
+  actorId String
+  actorName String
+  reason String
+  createdAt DateTime @default(now())
+  @@unique([categoryId, number])
+}
+model AwardEvent {
+  id String @id @default(uuid())
+  entryId String
+  entry AwardEntry @relation(fields: [entryId], references: [id], onDelete: Restrict)
+  assignmentId String?
+  assignment AwardAssignment? @relation(fields: [assignmentId], references: [id], onDelete: Restrict)
+  action String
+  detail Json
+  actorId String?
+  actorEmail String
+  reason String
+  createdAt DateTime @default(now())
+  @@index([entryId, createdAt])
 }

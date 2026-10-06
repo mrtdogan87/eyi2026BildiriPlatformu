@@ -12,11 +12,14 @@ export default async function PanelPage({ searchParams }: { searchParams: Promis
   let context; try { context = await requireContext(); } catch (error) { if (!(error instanceof AccessError)) throw error; }
   if (!context) return <main className="page-shell"><section className="card platform-card"><h1>Kongre seçin</h1><p>Üst menüden erişiminiz olan kongrelerden birini seçin. Üyeliğiniz kaldırıldıysa kongre yönetimiyle görüşün.</p>{canCreate && <Link className="button primary" href="/admin/kongre-olustur">Yeni kongre oluştur</Link>}<AdminLogoutButton /></section></main>;
   const submissions = await moduleEnabled(context.congress.id, 'SUBMISSIONS'); const registration = await moduleEnabled(context.congress.id, 'REGISTRATION');const cms=await moduleEnabled(context.congress.id,'CMS');
+  const awards=await moduleEnabled(context.congress.id,'AWARDS');
   const certificates = await moduleEnabled(context.congress.id, 'CERTIFICATES');
   const activities = await moduleEnabled(context.congress.id, 'ACTIVITIES');
   const program = await moduleEnabled(context.congress.id, 'PROGRAM');
   const reviews = submissions && await moduleEnabled(context.congress.id, 'REVIEWS');
   const links = [
+    ['awards.read', awards, '/admin/oduller', 'Ödül başvuruları ve kurul kararları'],
+    ['awards.perform', awards, '/admin/oduller/juri', 'Ödül jüri görevlerim'],
     ['certificates.read', certificates, '/admin/belgeler/uygunluk', 'Belge kuralları ve kongre uygunluğu'],
     ['attendance.perform', program, '/admin/yoklama', 'Oturum yoklaması'],
     ['certificates.read', certificates, '/admin/belgeler', 'PDF sertifikalar ve alıcılar'],

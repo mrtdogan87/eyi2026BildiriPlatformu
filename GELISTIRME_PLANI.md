@@ -220,7 +220,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P15 tamamlandı. Güncel P15 kapanışı 755 otomatik kontrol, 92 preview kontrolü, 11 tarayıcı kontrolü ve 63 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P15_KAPANIS.md` içindedir. P16A–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P16A bağımsız PDF sertifikadır. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P17 tamamlandı. Güncel P17 kapanışı 975 otomatik kontrol, 121 preview kontrolü, 17 tarayıcı kontrolü ve 81 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P17_KAPANIS.md` içindedir. P18–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P18 düzenlenebilir davet ve şablonlu afiştir. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
@@ -380,7 +380,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Bağımsız manuel/CSV/XLSX belge üretimi e-postasız da çalışır; aynı adlı kişiler alıcı referansıyla ayrılır. Bildirim için adres gerekir. Plan 14.3 ile uyum P16B’de tamamlandı.
 - 912 otomatik, 107 ayrı preview ve 13 tarayıcı kontrolü; 27 migration/73 tablo. Final kurtarma etiketi `P16B-20261007-final`; ayrıntılar `docs/P16B_KAPANIS.md`.
 
-**P17 — Ödüller**
+**P17 — Ödüller (Yerel kabul tamamlandı; docs/P17_KAPANIS.md)**
 
 - Kategori, jüri, ölçüt ve bilimsel/sunum ağırlıkları ayarlanabiliyor; örnek sıralama hesaplaması doğrulanmış.
 - Eksik değerlendirme veya çatışmalı jüri uyarısı var; nihai ödül kararı yetkili kurulca veriliyor. Sunum koşulu P16B'deki yoklamayla kontrol ediliyor.

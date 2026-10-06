@@ -1,0 +1,27 @@
+# P17 — Ödül başvurusu, jüri ve kurul kararı
+
+**Durum: Yerel kabul tamamlandı. Tarih: 07.10.2026.** Dal: `codex/v2-p17`; başlangıç P16B `5440d3d`. Tüm adaylar, jüri yanıtları ve kurul kararları sentetik test verisidir. Dış yayın veya gerçek e-posta gönderimi yapılmadı.
+
+Panel → **Ödül başvuruları ve kurul kararları** (`/admin/oduller`). Organizatör/sekreterya kategori, takvim, bilimsel/sunum ağırlığı, ölçütlerin kendi boyutundaki ağırlığı, asgari jüri sayısı ve isteğe bağlı tam metin/sunum koşulunu belirler. Ağırlıklar 100'e tamamlanır. Her ayar değişikliği gerekçe, açık onay ve güncel sürüm ile tarihçeye eklenir; eşzamanlı değişikliklerden biri kabul edilir.
+
+Aday güncel kabul edilmiş bildiriden veya açık referanslı bağımsız bilimsel çalışma/projeden oluşturulabilir. Manuel çalışma için başka iş modülleri gerekmez. Bildirili adayın başlığı, yazarları, özet ve sürümleri bilimsel kaynaktan gelir; serbest alanla üzerine yazılamaz. Katılımcı e-posta doğrulamalı panelinden veya kendi hesabından yalnız kendisine ait kabul edilmiş bildiriyi aday gösterebilir, ödül dosyası yükleyebilir ve kendi başvurusunu geri çekebilir. Başvuru ve değerlendirme takvimleri ayrıdır. Geri çekme, dosya veya karar geçmişini silmez.
+
+**Ödül tam metni yayın izni değildir.** Her dosya `AWARD_ONLY` olarak, gerçek PDF kontrolü, SHA-256, gerekçe ve ayrı dosya sürümüyle korunur; yayın izni kaydı oluşturulmaz. Staff geçmiş sürümlere, sahibi kendi sürümlerine erişir. Jüri yalnız kabul ettiği, güncel, çıkar çatışmasız adayın son PDF'sine erişir. Kongre kapsamı, üyelik, kaynak veya başvuru durumu değişince erişim yeniden kontrol edilir. Tarayıcıda bulunan eski bağlantı da yetkiyi aşamaz; geri çekilen/değişen kaynağın özel özet ve bağlantıları jüri DTO'sunda kaldırılır.
+
+Panel → **Ödül jüri görevlerim** (`/admin/oduller/juri`). Aktif hakem hesabı atanmış ödül jürisi olarak kabul/ret/çıkar çatışması yanıtı verir. Başvuran/yazar kendi çalışmasını puanlayamaz. Her ölçüt 0–100 puan gerektirir; eksik/ek ölçüt veya eski kaynak/ölçüt/görev sürümü kabul edilmez. Sekreterya dışarıdan teslim edilen puanı aktarırken jüri kimliği ve kaynağını ayrıca doğrular; kayıt `STAFF_IMPORT` olarak ayrılır. Son tarih yeni puanı durdurur; çıkar çatışması bildirimi yapılabilir.
+
+Boyut içi ölçütler ağırlıklı oranlanır, bilimsel/sunum ağırlıkları uygulanır, jüri toplamlarının ortalaması sıralanır. Örnek: bilimsel 80, sunum 60 ve 70/30 ağırlık → **74**; iki jüri 74/94 → **84**. Eşit sonuçlar aynı sırayı alır (1, 1, 3); eksik değerlendirme sıfır sayılmaz. Çatışmalı, üyeliği kaldırılmış veya eski sürüme ait puanlar hesaba katılmaz. Çatışma sonrası yeniden kabul eski puanı geri getirmez. Uyarılar kurul ekranında görünür.
+
+Sunum koşulu seçilmişse P16B'nin güncel olumlu sunum kaydı ve aynı bildirinin/sunucunun program kaynağı gerekir. Kaynak güncellemesi yoklamayı kendiliğinden güncellemez. Bildiri kabulü, sunum veya zorunlu ödül dosyası eksikliği kurul istisnasıyla aşılamaz. Asgari değerlendirme eksikliği için kurulun açık istisna onayı ve gerekçesi gerekir.
+
+Sıralama öneridir; **nihai aday/derece kararı yetkili kurulun açık onayıdır**. Karar güncel sıralama önizlemesi ve karar sürümüyle saklanır, bütün kaynak/sıralama anlık görüntüsü korunur. Yeni karar ve geri alma eski kararı değiştirmez. İsteğe bağlı yayımlama yalnız `/<kongre>/oduller` sayfasındaki ad, çalışma başlığı, derece ve ödül adını açar. Jüri, puan, e-posta, dosya ve özel kanıt paylaşılmaz. Kaynak/puan/yoklama değişirse eski kararın kazananları kaldırılır ve yeni kurul kararı beklendiği gösterilir.
+
+## Doğrulama ve sınırlar
+
+**975 otomatik kontrol:** 274 birim (23 P17), 701 HTTP (40 P17, 121 P16A/B, 345 P09–P15, 195 temel). Ayrıca **121 preview** ve **17 gerçek tarayıcı kontrolü**. İki kongre, yalnız AWARDS açık bağımsız proje, eşit sıralama, özel dosya/kongre/rol kısıtları, üyelik iptali, kaynağın değişmesi, son tarih, çıkar çatışması, sürüm çakışması, sunum koşulu, kurul kararı/geri alma ve sahip başvurusu/geri çekmesi doğrulandı. Tarayıcıda kategori → bağımsız aday → gerçek PDF yükleme → jüri atama/kabul/84 puan → kurul kararı → genel sonuç çalıştı. Jüri ve sahip gerçek dosyayı indirdi; sağlama toplamları eşleşti. Jüri, genel ve kişisel sayfalar 390 pikselde taşmadı.
+
+Lint, TypeScript, üretim derlemesi temiz. DB/Prisma farkı yok; **28 migration / 81 tablo**, uygulanmış migration sağlama toplamları eşleşir. Kaynak ve istemci çıktılarında özel bilgi taraması temiz; standalone `.env` içermez. `npm run test:awards` 23 birim ve 40 HTTP senaryosunu çalıştırır. Kontrollü testlerde otomatik capture worker kapalıdır; temel e-posta bekleyen regresyonda yalnız capture worker kullanılır.
+
+En fazla 50 kategori, kategori başına 500 aday, aday başına 20 jüri, hesap başına 200 jüri görevi desteklenir. PDF en fazla 10 MB/200 sayfa; ekranlarda son 20 ayar/karar/dosya sürümü gösterilir, daha eski geçmiş DB'de korunur. İlk sürüm otomatik ödül seçmez, gerçek kurul kimliğini dış sistemden doğrulamaz ve elektronik oylama yapmaz; yetkili kullanıcının gerekçeli beyanını kaydeder.
+
+Final kurtarma etiketi `../.recovery/P17-20261007-final`. Temiz kaynak commit'i, bundle, özel ortam/capture/kanıt dosyaları ve DB dump'ı korunur. Web ve worker kapalıyken 81 tablo geçici DB'ye tam restore edilir; satır sayısı ve sıralı SHA-256 parmak izleri karşılaştırılır. Başarı kanıtı yedek manifestindedir. Önceki tamamlanmış yedek P16B'nin 73 tablosudur. Sıradaki P18 davet ve afiş; kullanıcı talimatıyla P22 ve P06-E1'e kadar ardışık devam edilir.
