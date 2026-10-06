@@ -36,7 +36,8 @@
     "test:activities": "node --test scripts/activities.test.mjs && node scripts/activities-check.mjs",
     "test:certificates": "node --test scripts/certificates.test.mjs && node scripts/certificates-check.mjs && node scripts/certificates-offline-check.mjs",
     "test:attendance": "node --test scripts/attendance.test.mjs && node scripts/attendance-check.mjs",
-    "test:awards": "node --test scripts/awards.test.mjs && node scripts/awards-check.mjs"
+    "test:awards": "node --test scripts/awards.test.mjs && node scripts/awards-check.mjs",
+    "test:promotion": "node --test scripts/promotion.test.mjs && node scripts/promotion-check.mjs"
   },
   "keywords": [],
   "author": "",

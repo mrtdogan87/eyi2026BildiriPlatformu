@@ -1,0 +1,7 @@
+import {notFound} from 'next/navigation';
+import {publicPromotion} from '@/integrations/congress/promotion';
+import {publicSite} from '@/integrations/congress/site-data';
+import {getLocale} from '@/lib/i18n/server';
+import {AccessError} from '@/platform/http';
+export const dynamic='force-dynamic';
+export default async function Page({params}:{params:Promise<{congressSlug:string}>}){const {congressSlug}=await params,{workflow}=await publicSite(congressSlug),locale=await getLocale(workflow.languages),en=locale==='en';let data;try{data=await publicPromotion(congressSlug);}catch(e){if(e instanceof AccessError&&[403,404].includes(e.status))notFound();throw e;}const files=data.files.filter(f=>f.locale===locale);return <main id="congress-content" className="site-width program-page" tabIndex={-1}><section className="card platform-card"><h1>{en?'Invitation and poster':'Davet ve afiş'}</h1><p>{data.congressName}</p>{!files.length&&<p>{en?'No current approved promotion output is published in this language.':'Bu dilde güncel onaylı tanıtım çıktısı yayımlanmamış.'}</p>}{files.map(f=><p key={f.id}><a href={'/api/public/congresses/'+congressSlug+'/promotion/'+f.id}>{f.kind==='INVITATION'?(en?'Invitation letter':'Davet mektubu'):(en?'Poster':'Afiş')} · {({PRINT:en?'Print PDF':'Baskı PDF',WEB:en?'Web':'Web',SQUARE:en?'Square':'Kare',STORY:en?'Portrait story':'Dikey hikâye'} as Record<string,string>)[f.format]} · {en?'Version':'Sürüm'} {f.number}</a></p>)}</section></main>;}

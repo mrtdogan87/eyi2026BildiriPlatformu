@@ -47,6 +47,9 @@ enum RegistrationKind {
 }
 
 model Congress {
+  promotionDesign PromotionDesign?
+  promotionImages PromotionImage[]
+  promotionOutputs PromotionOutput[]
   awardCategories AwardCategory[]
   certificateRules CertificateRule[]
   certificateTemplates CertificateTemplate[]
@@ -538,6 +541,7 @@ enum ModuleKey {
   ACTIVITIES
   CERTIFICATES
   AWARDS
+  PROMOTION
 }
 
 model Organization {
@@ -1621,4 +1625,74 @@ model AwardEvent {
   reason String
   createdAt DateTime @default(now())
   @@index([entryId, createdAt])
+}
+
+// P18: source and generated artifacts are separate, immutable revisions.
+model PromotionDesign {
+ id String @id @default(uuid())
+ congressId String @unique
+ congress Congress @relation(fields:[congressId],references:[id],onDelete:Restrict)
+ version Int @default(0)
+ settings Json
+ imageId String?
+ image PromotionImage? @relation(fields:[imageId],references:[id],onDelete:Restrict)
+ revisions PromotionRevision[]
+ outputs PromotionOutput[]
+ createdAt DateTime @default(now())
+}
+model PromotionRevision {
+ id String @id @default(uuid())
+ designId String
+ design PromotionDesign @relation(fields:[designId],references:[id],onDelete:Restrict)
+ number Int
+ settings Json
+ imageId String?
+ imageChecksum String?
+ actorId String
+ actorName String
+ reason String
+ createdAt DateTime @default(now())
+ @@unique([designId,number])
+}
+model PromotionImage {
+ id String @id @default(uuid())
+ congressId String
+ congress Congress @relation(fields:[congressId],references:[id],onDelete:Restrict)
+ name String
+ mime String
+ content Bytes
+ checksum String
+ width Int
+ height Int
+ actorId String
+ reason String
+ designs PromotionDesign[]
+ createdAt DateTime @default(now())
+ @@index([congressId,createdAt])
+}
+model PromotionOutput {
+ id String @id @default(uuid())
+ congressId String
+ congress Congress @relation(fields:[congressId],references:[id],onDelete:Restrict)
+ designId String
+ design PromotionDesign @relation(fields:[designId],references:[id],onDelete:Restrict)
+ number Int
+ designVersion Int
+ kind String
+ format String
+ locale String
+ sourceFingerprint String
+ snapshot Json
+ name String
+ mime String
+ content Bytes
+ checksum String
+ published Boolean @default(false)
+ publicationVersion Int @default(0)
+ actorId String
+ actorName String
+ reason String
+ createdAt DateTime @default(now())
+ @@unique([designId,number])
+ @@index([congressId,published,createdAt])
 }

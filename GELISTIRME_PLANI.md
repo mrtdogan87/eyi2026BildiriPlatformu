@@ -220,7 +220,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P17 tamamlandı. Güncel P17 kapanışı 975 otomatik kontrol, 121 preview kontrolü, 17 tarayıcı kontrolü ve 81 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P17_KAPANIS.md` içindedir. P18–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P18 düzenlenebilir davet ve şablonlu afiştir. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P18 tamamlandı. Güncel P18 kapanışı 1030 otomatik kontrol, 129 preview, 17 tarayıcı kontrolü ve 85 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P18_KAPANIS.md` içindedir. P19–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P19 tam metin, prova ve yayın onayıdır. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
@@ -385,7 +385,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Kategori, jüri, ölçüt ve bilimsel/sunum ağırlıkları ayarlanabiliyor; örnek sıralama hesaplaması doğrulanmış.
 - Eksik değerlendirme veya çatışmalı jüri uyarısı var; nihai ödül kararı yetkili kurulca veriliyor. Sunum koşulu P16B'deki yoklamayla kontrol ediliyor.
 
-**P18 — Davet ve afiş**
+**P18 — Davet ve afiş (Yerel kabul tamamlandı; docs/P18_KAPANIS.md)**
 
 - Kongre bilgileriyle düzenlenebilir davet metni; hazırlanmış görsel yükleme veya bir afiş şablonundan üretim var.
 - Metin/görsel katmanları ayrı; baskı PDF, web ve sınırlı sosyal medya boyutları önizleme sonrası üretilebiliyor. Tam bir grafik tasarım editörü hedeflenmiyor.

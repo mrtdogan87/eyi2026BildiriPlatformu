@@ -520,3 +520,10 @@ Bağımsız belge için e-posta isteğe bağlıdır. E-postasız Excel örneği 
 Panel → **Ödül başvuruları ve kurul kararları**, hakem hesabı → **Ödül jüri görevlerim**, kişisel panel → **Ödül başvurularım**. Kategori/ölçüt/takvimi ayarlayın, bağımsız projeyi veya güncel kabul edilmiş bildiriyi aday yapın, jüri kabulü ve puanlamasını takip edin. Sunum şartı P16B güncel yoklamasına bağlıdır. Sıralama öneridir; kurul aday/dereceyi gerekçe ve açık onayla seçer. Genel sonuç `/<kongre>/oduller` adresindedir; değişen kaynak/puan eski kazananları gizler. Ödül PDF'si kitapta yayın izni vermez.
 
 `npm run test:awards`: 23 birim + 40 HTTP. P17 toplam 975 otomatik, 121 ayrı preview ve 17 tarayıcı kontrolü; 28 migration/81 tablo. Final kurtarma etiketi `../.recovery/P17-20261007-final`; tam restore/parmak izi kanıtı manifestte. Ayrıntılar [P17 kapanışında](P17_KAPANIS.md). Sıradaki P18 davet/afiş; P22 ve P06-E1'e kadar devam edilir.
+
+
+## P18 davet ve afiş
+
+Panel → Davet ve afiş çıktıları (`/admin/tanitim`). İçerik editörü, sekreterya ve organizatör metin/görseli ayrı sürümlerle kaydeder; kaydedilmeyen metin önizlemeyi kapatır. PNG/JPEG kaynak görsel veya akademik şablon; önizleme ve gerekçeli onaydan sonra A4 PDF, web/kare/hikâye PNG. Üretilen dosya özeldir; genel sayfa için ayrı onay gerekir. Kaynak değişince genel eski çıktı kalkar, özel geçmiş kalır. İngilizce çıktı ayrı İngilizce metin ister. Yalnız PROMOTION açık bağımsız örnek çalışır.
+
+`npm run test:promotion`: 23 birim + 32 HTTP. P18 toplam 1030 otomatik, 129 preview ve 17 tarayıcı kontrolü; 29 migration/85 tablo. Final kurtarma etiketi `../.recovery/P18-20261007-final`; gerçek restore kanıtı manifestte. Ayrıntılar [P18 kapanışında](P18_KAPANIS.md). Sıradaki P19 tam metin, prova ve yayın onayı; P22 ve P06-E1'e kadar devam edilir.
