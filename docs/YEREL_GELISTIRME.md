@@ -1,13 +1,30 @@
 # v2 yerel geliştirme
 
-Dizin `/Users/mrt/Documents/Codex/AIBildiriYonetim/v2`, güncel paket dalı `codex/v2-p08`.
+Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p08`.
 Üst checkout korunmuştur. Node.js 22.13+ ve PostgreSQL 16 CLI araçları gerekir.
-Bu makinede Node 25.8.2/PostgreSQL 16.13 ile doğrulandı. Docker gerekmez.
+Mac mini kurulumu 6 Ekim 2026'da Node 24.21.0/PostgreSQL 16.15 ile doğrulandı.
+Docker gerekmez. Taşıma ve doğrulama kaydı: [Mac mini kurulumu](MAC_MINI_KURULUM.md).
 
-İlk kurulum bu makinede tamamlandı. Yeni temiz kurulum:
+Mevcut P08 verisi geri yüklenmiş durumdadır. Yeni terminal oturumunda araç
+yollarını ayarlayın; uygulama zaten 3100'de çalışıyorsa ikinci kez başlatmayın:
 
 ```sh
-cd /Users/mrt/Documents/Codex/AIBildiriYonetim/v2
+cd /Users/dentalai/Documents/AIBildiriYonV2/v2
+export PATH="/opt/homebrew/opt/node@24/bin:/opt/homebrew/opt/postgresql@16/bin:/opt/homebrew/bin:$PATH"
+export PG_BIN="/opt/homebrew/opt/postgresql@16/bin"
+npm run db:start
+npm run dev
+```
+
+`PATH` çocuk süreçler için de gereklidir. `PG_BIN` yalnız checkpoint betiğinin
+araç yoludur; `db:start` araçları `PATH` üzerinden bulur. Global shell ayarları
+değiştirilmedi. Homebrew'nin varsayılan kümesi yerine proje kümesi kullanılır;
+bu proje için `brew services start` çalıştırılmaz.
+
+Aşağıdaki sıra yalnız **boş, yeni çalışma kopyası** içindir. Taşınmış mevcut
+verinin üzerine uygulanmaz; özellikle `db:seed` taşıma doğrulaması değildir:
+
+```sh
 npm ci
 npm run local:setup
 npm run db:init
@@ -17,7 +34,7 @@ npm run db:seed
 npm run dev
 ```
 
-Sonraki çalıştırmalarda `npm run db:start` ve `npm run dev` yeterlidir.
+Araç yolları ayarlandıktan sonra `npm run db:start` ve `npm run dev` yeterlidir.
 Adres `http://127.0.0.1:3100/eyi-2026`, admin `/admin`. Admin parolası
 yalnız v2'nin özel `.env` dosyasında; P03'e kadar eski tek admin akışı kullanılır.
 DB kendi parolası/kümesiyle `127.0.0.1:55432/aibildiri_v2`, dosyaları `.local/postgres`.
