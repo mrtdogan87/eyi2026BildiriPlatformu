@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';import {apiRoute} from '@/platform/http';import {manageRecord} from '@/modules/content/service';type P={params:Promise<{id:string}>};export const POST=apiRoute(async(request,p:P)=>NextResponse.json(await manageRecord((await p.params).id,await request.json())));

@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';import {apiRoute} from '@/platform/http';import {updateFeedback} from '@/modules/content/feedback';type P={params:Promise<{id:string}>};export const PATCH=apiRoute(async(request,p:P)=>NextResponse.json(await updateFeedback((await p.params).id,await request.json())));

@@ -2211,3 +2211,22 @@ textarea {
 .cms-list-tools { display: flex; flex-wrap: wrap; gap: .6rem; align-items: end; }
 .cms-page-list article.is-archived { opacity: .75; }
 @media(max-width: 760px) { .site-submenu-items { position: static; width: 100%; box-shadow: none; } .site-submenu { width: 100%; } }
+
+/* Shared content cards keep people/photos reusable across CMS sections. */
+.content-section { margin: 2.5rem 0; }
+.content-records { display: grid; gap: 1.25rem; }
+.content-record { padding: 1.4rem; border: 1px solid var(--border, #dde2e7); border-radius: 12px; overflow-wrap: anywhere; }
+.content-record h3, .content-people h4 { margin-top: 0; }
+.content-gallery { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(240px,100%),1fr)); gap: 1rem; }
+.content-gallery img { width: 100%; height: auto; max-height: 600px; object-fit: contain; }
+.content-people { list-style: none; padding: 0; display: grid; gap: 1.5rem; }
+.content-people li { display: flex; align-items: start; gap: 1.25rem; }
+.content-people img { width: 120px; height: auto; max-height: 160px; object-fit: cover; border-radius: 8px; }
+.content-feedback fieldset { display: grid; gap: 1rem; padding: 1.25rem; border: 1px solid #d5dce3; border-radius: 12px; }
+.content-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.content-management { display: grid; gap: 1rem; }
+.content-entry { padding: 1rem; border: 1px solid #dce2e8; border-radius: 10px; }
+.content-management details { padding: .5rem 0; }
+.content-management summary { cursor: pointer; font-weight: 600; }
+.content-management textarea { min-height: 90px; }
+@media (max-width: 600px) { .content-people li { flex-direction: column; } .content-record { padding: 1rem; } }

@@ -1,3 +1,4 @@
+import type {DynamicSource} from '../content/configuration.ts';
 import {emptyDocument,type CmsDocument} from './configuration.ts';
 // Generic structure only. Historical EYI dates, people, bank data and promises never enter this catalog.
 export const starterPages=[
@@ -47,5 +48,7 @@ export function starterDocument(entry:typeof starterPages[number],order:number):
  const doc=emptyDocument();doc.showInMenu=false;doc.menuOrder=order;doc.menuParent=entry[3];
  doc.translations.tr.title=entry[1];doc.translations.en.title=entry[2];
  doc.translations.tr.blocks=[{id:'section',type:'heading',level:2,text:entry[4]},{id:'content',type:'paragraph',text:''}];
+ const bindings:Partial<Record<string,DynamicSource[]>>={kurullar:['COMMITTEE'],sekreterya:['TASK'],'davetli-konusmacilar':['SPEAKER'],panel:['PANEL'],'onemli-tarihler':['DATES'],ucretler:['FEES'],'kongre-yeri':['VENUE'],'konaklama-transfer':['HOTEL','TRANSFER'],'gezi-programi':['TRIP'],sponsorluk:['SPONSOR'],galeri:['GALLERY'],iletisim:['FEEDBACK'],duyurular:['ANNOUNCEMENT'],haberler:['NEWS'],etkinlikler:['EVENT']};
+ for(const source of bindings[entry[0]]??[])doc.translations.tr.blocks.push({id:'shared-'+source.toLowerCase(),type:'dynamic',source,recordId:'',label:entry[1]});
  return doc;
 }

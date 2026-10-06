@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';import {apiRoute} from '@/platform/http';import {listRecords,createRecord} from '@/modules/content/service';export const GET=apiRoute(async()=>NextResponse.json(await listRecords()));export const POST=apiRoute(async request=>NextResponse.json(await createRecord(await request.json()),{status:201}));

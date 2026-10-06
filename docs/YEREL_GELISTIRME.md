@@ -1,6 +1,6 @@
 # v2 yerel geliştirme
 
-Dizin `/Users/mrt/Documents/Codex/AIBildiriYonetim/v2`, güncel paket dalı `codex/v2-p07`.
+Dizin `/Users/mrt/Documents/Codex/AIBildiriYonetim/v2`, güncel paket dalı `codex/v2-p08`.
 Üst checkout korunmuştur. Node.js 22.13+ ve PostgreSQL 16 CLI araçları gerekir.
 Bu makinede Node 25.8.2/PostgreSQL 16.13 ile doğrulandı. Docker gerekmez.
 
@@ -185,3 +185,45 @@ kaynak/yerel DB/özel ortam/test kanıtlarını yeni kurtarma klasörüne alır;
 28 tablo ayrı geçici yerel DB'ye tam geri yüklenip parmak izleri eşleştirilir.
 Önceki checkpoint'ler korunur. Kaynak HTML yakalaması Git dışı özel yedektedir;
 uygulamanın dondurulmuş kaynak manifestleri ve doğrulanmış dosyaları Git'tedir.
+
+
+## P08 ortak kayıtlar ve dinamik sayfalar
+
+**Ortak içerik kayıtları** `/admin/icerik` adresindedir. Kişi ve organizasyon
+bilgilerini oluşturun, TR/EN halka açık başlık/biyografi ve kitaplıktan fotoğraf
+seçin. Önce organizasyonu, sonra kişiyi yayımlayın. Kurul, görev, konuşmacı
+ve panel kayıtlarında aynı kişiyi seçin; görev/konuşma ve program sayfası
+bağlantısı ilişki üzerinde tutulur. Bu kayıtlar kullanıcı hesabı/yetkisi vermez.
+Mekân, otel, transfer, gezi, sponsor, duyuru/haber/etkinlik ve galeri aynı
+kayıt akışını kullanır. Görüntüleme sırası ve kişi sırası düzenlenebilir.
+
+CMS editöründe **Ortak kayıt / form** bloğunu seçin. Başlık, ortak kaynak
+ve tek kayıt/tüm yayımlanmış kayıtlar seçilir. Yeni kongre başlangıç taslakları
+ilgili kaynak bloklarını içerir. Mevcut sayfalara blok kullanıcı tarafından
+eklenir; eski içerik değiştirilmez. Taslağı kaydedip özel önizlemeyi açın:
+ortak kayıtların güncel taslakları gösterilir. Halka açık sayfa yalnız
+ortak kayıtların ayrı yayımlanmış sürümlerini kullanır. Yeni ortak kayıt
+Yayımla işlemi onu kullanan bütün sayfalara yansır. Sayfa geçmişini geri
+almak ortak kişi/organizasyon geçmişini geri almaz.
+
+Tarih ve ücret blokları doğrudan kongre işlem ayarları ve aktif kayıt
+tarifelerinden okunur. Kapalı kayıt veya ücretsiz akışta eski ücretler ve
+ücret son tarihleri gösterilmez. Toplam hesaplaması mevcut kayıt sistemindedir;
+CMS ayrı fiyat hesaplama veya rezervasyon motoru oluşturmaz.
+
+İletişim sayfasında **Geri bildirim formu** bloğunu yayımlayın. Ziyaretçi
+bilgi metnini okuyup mesaj gönderir; form yalnız aktif, yayımlanmış sayfa
+varken çalışır. Talep özel olarak saklanır. **Geri bildirim talepleri**
+`/admin/talepler` adresinde organizatör/platform yöneticisi/sekreter tarafından
+görülür; içerik editörü mesajları okuyamaz. Yeni/İnceleniyor/Kapalı ve iç not
+ile takip edilir; e-posta gönderilmez. Daha geniş sekreterya iş listesi P10'dadır.
+
+`npm run test:content` 8 saf doğrulama + 38 sentetik HTTP/DB senaryosudur.
+Diğer DB testleriyle sıralı çalıştırın. Önceki paketlerle toplam 264 kontrol
+ve ayrı preview kapısı doğrulanır. Kanıt `.local/content-check-result.json`
+ve `.local/p08-browser-check-result.json`. Yeni yıl ortak kayıt/talep taşımaz.
+
+Temiz commit sonrası `node scripts/checkpoint.mjs P08-20261006-final`
+kaynak/özel test kanıtı/yerel DB yedeği alır; 32 tabloyu ayrı geçici yerel
+DB'ye tam geri yükleyip parmak izlerini karşılaştırır. Önceki checkpoint'ler
+korunur. Kapsam ve sınırlar [P08 kapanışında](P08_KAPANIS.md).

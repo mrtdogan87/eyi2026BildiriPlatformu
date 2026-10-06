@@ -1,0 +1,1 @@
+import {NextResponse} from 'next/server';import {apiRoute} from '@/platform/http';import {listFeedback} from '@/modules/content/feedback';export const GET=apiRoute(async()=>NextResponse.json(await listFeedback()));

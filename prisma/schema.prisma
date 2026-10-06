@@ -47,6 +47,8 @@ enum RegistrationKind {
 }
 
 model Congress {
+  siteRecords              SiteRecord[]
+  feedbackRequests         FeedbackRequest[]
   cmsAliases               CmsPageAlias[]
   cmsPages                 CmsPage[]
   cmsMedia                 CmsMedia[]
@@ -504,23 +506,24 @@ model CmsRevision {
 }
 
 model CmsMedia {
-  id           String             @id @default(cuid())
-  congressId   String
-  internalName String
-  originalName String
-  kind         CmsMediaKind
-  mimeType     String
-  content      Bytes
-  width        Int?
-  height       Int?
-  byteSize     Int
-  active       Boolean            @default(true)
-  version      Int                @default(1)
-  uploadedById String?
-  uploadedBy   PlatformUser?      @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
-  congress     Congress           @relation(fields: [congressId], references: [id], onDelete: Cascade)
-  createdAt    DateTime           @default(now())
-  references   CmsRevisionMedia[]
+  siteReferences SiteRecordMedia[]
+  id             String             @id @default(cuid())
+  congressId     String
+  internalName   String
+  originalName   String
+  kind           CmsMediaKind
+  mimeType       String
+  content        Bytes
+  width          Int?
+  height         Int?
+  byteSize       Int
+  active         Boolean            @default(true)
+  version        Int                @default(1)
+  uploadedById   String?
+  uploadedBy     PlatformUser?      @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  congress       Congress           @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  createdAt      DateTime           @default(now())
+  references     CmsRevisionMedia[]
 
   @@index([congressId, createdAt])
 }
@@ -544,4 +547,86 @@ model CmsPageAlias {
 
   @@unique([congressId, slug])
   @@index([pageId])
+}
+
+enum SiteRecordKind {
+  PERSON
+  ORGANIZATION
+  COMMITTEE
+  TASK
+  SPEAKER
+  PANEL
+  VENUE
+  HOTEL
+  TRANSFER
+  TRIP
+  SPONSOR
+  ANNOUNCEMENT
+  NEWS
+  EVENT
+  GALLERY
+}
+
+model SiteRecord {
+  id               String               @id @default(cuid())
+  congressId       String
+  congress         Congress             @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  kind             SiteRecordKind
+  internalName     String
+  draft            Json
+  published        Json?
+  publishedVersion Int?
+  version          Int                  @default(1)
+  archived         Boolean              @default(false)
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+  revisions        SiteRecordRevision[]
+
+  @@index([congressId, kind, archived])
+}
+
+model SiteRecordRevision {
+  id        String            @id @default(cuid())
+  recordId  String
+  record    SiteRecord        @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  number    Int
+  kind      CmsRevisionKind
+  content   Json
+  actorId   String?
+  createdAt DateTime          @default(now())
+  mediaRefs SiteRecordMedia[]
+
+  @@unique([recordId, number])
+}
+
+model SiteRecordMedia {
+  revisionId String
+  revision   SiteRecordRevision @relation(fields: [revisionId], references: [id], onDelete: Cascade)
+  mediaId    String
+  media      CmsMedia           @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+
+  @@id([revisionId, mediaId])
+}
+
+model FeedbackRequest {
+  id            String   @id @default(cuid())
+  congressId    String
+  congress      Congress @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  requestKey    String
+  payloadHash   String
+  senderName    String
+  email         String
+  subject       String
+  message       String
+  noticeVersion String
+  locale        String
+  status        String   @default("NEW")
+  version       Int      @default(1)
+  note          String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([congressId, requestKey])
+  @@index([congressId, status, createdAt])
+  @@index([congressId, email, createdAt])
 }
