@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import {linkedRecipientCurrent} from '../certificates/eligibility.mjs';
 
 const MODULES = new Set(['SUBMISSIONS', 'REGISTRATION', 'CMS', 'REVIEWS', 'PROGRAM', 'ACTIVITIES', 'CERTIFICATES']);
 const PROVIDERS = new Set(['capture', 'smtp', 'resend']);
@@ -76,7 +77,7 @@ async function sourceIsValid(prisma, message, now) {
   if (message.sourceType === 'TEMPLATE_TEST') return message.provider === 'capture' && message.recipient.endsWith('.invalid');
   if (message.sourceType === 'certificate-file') {
     const f=await prisma.certificateFile.findUnique({where:{id:message.sourceId},include:{certificate:{include:{recipient:true,files:{orderBy:{number:'desc'},take:1,select:{id:true}}}}}});
-    return !!f && f.certificate.recipient.congressId===message.congressId && f.certificate.recipient.email===message.recipient && f.certificate.status==='READY' && f.certificate.files[0]?.id===f.id && f.recipientVersion===f.certificate.recipient.version;
+    return !!f && f.certificate.recipient.congressId===message.congressId && f.certificate.recipient.email===message.recipient && f.certificate.status==='READY' && f.certificate.files[0]?.id===f.id && f.recipientVersion===f.certificate.recipient.version && await linkedRecipientCurrent(prisma,f.certificate.recipient);
   }
   if (message.sourceType === 'activity-booking') {
     const enabled = await prisma.congressModule.findUnique({where:{congressId_key:{congressId:message.congressId,key:'ACTIVITIES'}}});

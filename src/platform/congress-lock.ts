@@ -11,5 +11,5 @@ export async function lockCongress(tx:Prisma.TransactionClient,c:CongressContext
     tx.congressMembership.findUnique({where:{congressId_userId:{congressId:c.congress.id,userId:c.actor.id}}}),
   ]);
   const role=user?.platformAdmin?'PLATFORM_ADMIN':org?.active&&org.organizer?'ORGANIZER':org?.active&&member?.active?member.role:null;
-  if(!setting?.enabled||!user?.active||!session||session.revokedAt||session.expiresAt<=new Date()||!role||!allows(role,action))throw new AccessError(403,'Modül, kongre yetkiniz veya oturumunuz değişti.');
+  if(!setting?.enabled||!user?.active||!session||session.revokedAt||session.expiresAt<=new Date()||!role||role!==c.role||!allows(role,action))throw new AccessError(403,'Modül, kongre yetkiniz veya oturumunuz değişti.');
 }

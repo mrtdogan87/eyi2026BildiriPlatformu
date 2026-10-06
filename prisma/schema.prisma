@@ -47,6 +47,7 @@ enum RegistrationKind {
 }
 
 model Congress {
+  certificateRules CertificateRule[]
   certificateTemplates CertificateTemplate[]
   certificateRecipients CertificateRecipient[]
   activityEvents ActivityEvent[]
@@ -152,7 +153,9 @@ model CertificateRecipient {
   congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
   templateId String
   template CertificateTemplate @relation(fields: [templateId], references: [id], onDelete: Restrict)
-  email String
+  email String @default("")
+  recipientRef String @default("")
+  identityKey String
   role String
   contextKey String @default("")
   version Int @default(0)
@@ -162,7 +165,7 @@ model CertificateRecipient {
   sourceVersion Json?
   certificate Certificate?
   createdAt DateTime @default(now())
-  @@unique([templateId, email, role, contextKey])
+  @@unique([templateId, identityKey, role, contextKey])
   @@index([congressId, email])
 }
 
@@ -1279,6 +1282,7 @@ model ProgramPerson {
 }
 
 model ProgramSession {
+  attendanceRecords AttendanceRecord[]
   activities ActivityEvent[]
   id String @id @default(uuid())
   congressId String
@@ -1429,4 +1433,58 @@ model ProgramPublication {
   actorName String
   createdAt DateTime @default(now())
   @@unique([congressId, number])
+}
+
+model CertificateRule {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  role String
+  version Int @default(0)
+  settings Json
+  revisions CertificateRuleRevision[]
+  @@unique([congressId, role])
+}
+
+model CertificateRuleRevision {
+  id String @id @default(uuid())
+  ruleId String
+  rule CertificateRule @relation(fields: [ruleId], references: [id], onDelete: Restrict)
+  number Int
+  settings Json
+  reason String
+  actorId String
+  createdAt DateTime @default(now())
+  @@unique([ruleId, number])
+}
+
+model AttendanceRecord {
+  id String @id @default(uuid())
+  sessionId String
+  session ProgramSession @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  email String
+  kind String
+  contextKey String @default("")
+  version Int @default(0)
+  status String
+  sourceFingerprint String
+  snapshot Json
+  events AttendanceEvent[]
+  @@unique([sessionId, email, kind, contextKey])
+  @@index([email])
+}
+
+model AttendanceEvent {
+  id String @id @default(uuid())
+  attendanceId String
+  attendance AttendanceRecord @relation(fields: [attendanceId], references: [id], onDelete: Restrict)
+  number Int
+  status String
+  reason String
+  actorId String
+  actorName String
+  sourceFingerprint String
+  snapshot Json
+  createdAt DateTime @default(now())
+  @@unique([attendanceId, number])
 }

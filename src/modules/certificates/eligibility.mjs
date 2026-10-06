@@ -1,0 +1,67 @@
+import {createHash} from 'node:crypto';
+import {paymentSummary,assertLedger} from '../payments/core.ts';
+
+export const defaultRule={enabled:false,paymentRequired:false,attendanceRequired:false};
+export function fingerprint(value){const sort=v=>Array.isArray(v)?v.map(sort):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b)).map(([k,x])=>[k,sort(x)])):v;return createHash('sha256').update(JSON.stringify(sort(value))).digest('hex');}
+export function evaluateEligibility(rule,facts){const reasons=[...facts.reasons];if(!rule.enabled)reasons.push('Bu görev için kongre belge kuralı etkin değil.');if(rule.paymentRequired&&!facts.paymentSatisfied)reasons.push('Güncel kayıt ödemesi doğrulanmalı veya açık muafiyet olmalı.');if(rule.attendanceRequired&&!facts.attendanceSatisfied)reasons.push('Güncel kaynakla eşleşen katıldı/sundu/görev yaptı yoklaması gerekli.');return {eligible:reasons.length===0,reasons};}
+const email=e=>e.trim().toLowerCase();
+const includeSession={room:true,talks:{where:{active:true},include:{presenter:true,submission:{include:{authors:true}}}},duties:{include:{person:true}}};
+export async function attendanceSubject(db,cid,input){
+  const setting=await db.congressModule.findUnique({where:{congressId_key:{congressId:cid,key:'PROGRAM'}}});
+  const session=setting?.enabled?await db.programSession.findFirst({where:{id:input.sessionId,congressId:cid,active:true},include:includeSession}):null;
+  const reasons=[];if(!session){return {valid:false,reasons:['Aktif program oturumu bulunamadı veya modül kapalı.'],fingerprint:'',snapshot:null,session:null};}
+  let person=null,subject=null;
+  if(input.kind==='PRESENTATION'){
+    const talk=session.talks.find(t=>t.id===input.contextKey&&t.presenter.email===email(input.email)&&t.presenter.active);subject=talk;person=talk?.presenter;
+    if(!talk)reasons.push('Bu kişi/sunum oturumda güncel sunucu değil.');
+    if(talk?.submission){const enabled=await db.congressModule.findUnique({where:{congressId_key:{congressId:cid,key:'SUBMISSIONS'}}});const p=talk.submission;if(!enabled?.enabled||p.status!=='ACCEPTED'||p.correctionVersion!==talk.sourceVersion||p.reviewVersion!==talk.sourceReviewVersion||!p.authors.some(a=>a.isPresenter&&email(a.email)===email(input.email)))reasons.push('Bildiri veya program sunucusu kaynağı değişmiş.');}
+  }else if(input.kind==='DUTY'){
+    const duty=session.duties.find(d=>d.id===input.contextKey&&d.status==='ACCEPTED'&&d.person.active&&d.person.email===email(input.email));subject=duty;person=duty?.person;if(!duty)reasons.push('Bu kişi için kabul edilmiş güncel görev bulunamadı.');
+  }else if(input.kind!=='ATTENDANCE'||input.contextKey)reasons.push('Yoklama bağlamı geçersiz.');
+  const snapshot={session:{id:session.id,version:session.version,titleTr:session.titleTr,titleEn:session.titleEn,startsAt:session.startsAt.toISOString(),endsAt:session.endsAt.toISOString(),room:session.room.name,location:session.room.location,roomActive:session.room.active},kind:input.kind,email:email(input.email),contextKey:input.contextKey,person:person?{id:person.id,name:person.name,institution:person.institution,active:person.active}:null,subject:subject?input.kind==='PRESENTATION'?{id:subject.id,titleTr:subject.titleTr,titleEn:subject.titleEn,presenterId:subject.presenterId,startsAt:subject.startsAt.toISOString(),endsAt:subject.endsAt.toISOString(),submissionId:subject.submissionId,sourceVersion:subject.sourceVersion,sourceReviewVersion:subject.sourceReviewVersion}:{id:subject.id,kind:subject.kind,version:subject.version,status:subject.status}:null};
+  if(!session.room.active)reasons.push('Oturum salonu etkin değil.');
+  return {valid:reasons.length===0,reasons,fingerprint:fingerprint(snapshot),snapshot,session};
+}
+
+export async function congressEligibility(db,cid,selection){
+  const congress=await db.congress.findUnique({where:{id:cid},include:{modules:true}}),open=key=>!!congress?.modules.some(m=>m.key===key&&m.enabled),target=email(selection.email),reasons=[],proof={},data={recipientName:'',title:'',institution:'',eventName:congress?.name??'',datePlace:'',participation:'',talkTitle:''};
+  const stored=await db.certificateRule.findUnique({where:{congressId_role:{congressId:cid,role:selection.role}}}),rule=stored?.settings??defaultRule;
+  proof.rule={id:stored?.id??null,version:stored?.version??0,settings:rule};proof.selection={...selection,email:target};proof.congressName=congress?.name??'';
+  if(!open('CERTIFICATES'))reasons.push('Belge modülü kapalı.');
+  let submission=null,registration=null,session=null,subject=null,attendanceKind='ATTENDANCE',contextKey='';
+  if(['PRESENTER','SPEAKER'].includes(selection.role)){
+    const found=await attendanceSubject(db,cid,{sessionId:selection.sessionId,kind:'PRESENTATION',email:target,contextKey:selection.talkId??''});reasons.push(...found.reasons);session=found.session;proof.program=found.snapshot;subject=session?.talks.find(t=>t.id===selection.talkId);submission=subject?.submission??null;attendanceKind='PRESENTATION';contextKey=selection.talkId??'';
+    if(selection.role==='PRESENTER'&&!submission)reasons.push('Sunucu belgesi kabul edilmiş bildiri sunumuna bağlı olmalı.');if(selection.role==='SPEAKER'&&submission)reasons.push('Bağımsız konuşmacı yerine bildiri sunucusu görevini seçin.');
+    if(subject){data.recipientName=subject.presenter.name;data.institution=subject.presenter.institution;data.talkTitle=subject.titleTr||subject.titleEn;}
+  }else if(selection.role==='DUTY'){
+    const found=await attendanceSubject(db,cid,{sessionId:selection.sessionId,kind:'DUTY',email:target,contextKey:selection.dutyId??''});reasons.push(...found.reasons);session=found.session;proof.program=found.snapshot;subject=session?.duties.find(d=>d.id===selection.dutyId);attendanceKind='DUTY';contextKey=selection.dutyId??'';if(subject){data.recipientName=subject.person.name;data.institution=subject.person.institution;data.participation=subject.kind==='CHAIR'?'Oturum başkanlığı görevi için düzenlenmiştir.':'Teknik destek görevi için düzenlenmiştir.';}
+  }else if(selection.role==='COAUTHOR'){
+    submission=open('SUBMISSIONS')&&selection.submissionId?await db.submission.findFirst({where:{id:selection.submissionId,congressId:cid,status:'ACCEPTED'},include:{authors:true}}):null;const author=submission?.authors.find(a=>email(a.email)===target&&!a.isPresenter);if(!author)reasons.push('Kabul edilmiş bildiride bu e-posta için ortak yazar bulunamadı.');if(author){data.recipientName=author.fullName;data.title=author.title??'';data.institution=author.institution??'';}data.talkTitle=submission?.titleTr||submission?.titleEn||'';
+  }
+  if(['PARTICIPANT','LISTENER'].includes(selection.role)||rule.paymentRequired||selection.registrationId){
+    if(open('REGISTRATION')){
+      if(selection.registrationId)registration=await db.registration.findFirst({where:{id:selection.registrationId,congressId:cid},include:{paymentEvents:{orderBy:{number:'asc'}},receipt:{select:{id:true}},paperItems:{select:{submissionId:true}}}});
+      else if(submission){const item=await db.registrationPaperItem.findUnique({where:{submissionId:submission.id},include:{registration:{include:{paymentEvents:{orderBy:{number:'asc'}},receipt:{select:{id:true}},paperItems:{select:{submissionId:true}}}}}});registration=item?.registration??null;}
+      if(!registration||registration.congressId!==cid||(email(registration.email)!==target&&!registration.paperItems.some(p=>p.submissionId===submission?.id))){registration=null;reasons.push('Kişi/bildiriyle eşleşen kongre kaydı gerekli.');}
+      if(selection.role==='LISTENER'&&registration?.kind!=='LISTENER')reasons.push('Dinleyici kaydı gerekli.');
+    }else reasons.push('Kayıt modülü kapalı.');
+  }
+  if(submission)proof.submission={id:submission.id,status:submission.status,correctionVersion:submission.correctionVersion,reviewVersion:submission.reviewVersion,authors:submission.authors.map(a=>({email:email(a.email),name:a.fullName,presenter:a.isPresenter,institution:a.institution,title:a.title})),titleTr:submission.titleTr,titleEn:submission.titleEn};
+  let paymentSatisfied=false;if(registration){let summary;try{assertLedger(registration.paymentEvents,registration.currency);summary=paymentSummary({...registration,receiptReceived:!!registration.receipt},registration.paymentEvents);paymentSatisfied=['VERIFIED','OVERPAID','EXEMPT','NO_CHARGE'].includes(summary.state);}catch{reasons.push('Ödeme geçmişi çelişkili; sekreterya kontrolü gerekli.');}
+    proof.registration={id:registration.id,version:registration.paymentVersion,kind:registration.kind,email:registration.email,totalAmount:registration.totalAmount,currency:registration.currency,summary};
+    if(!data.recipientName)data.recipientName=selection.recipientName??'';if(!data.institution)data.institution=selection.institution??'';
+  }
+  if(!data.recipientName)reasons.push('Kaynak kişi adı veya kayıt alıcısının onaylanan adı gerekli.');
+  if(!session&&selection.sessionId){const found=await attendanceSubject(db,cid,{sessionId:selection.sessionId,kind:'ATTENDANCE',email:target,contextKey:''});session=found.session;reasons.push(...found.reasons);proof.program=found.snapshot;if(selection.role==='COAUTHOR'&&!session?.talks.some(t=>t.submissionId===submission?.id&&t.submission?.status==='ACCEPTED'&&t.sourceVersion===submission?.correctionVersion&&t.sourceReviewVersion===submission?.reviewVersion))reasons.push('Seçilen oturum güncel ortak yazar bildirisiyle eşleşmiyor.');}
+  let attendanceSatisfied=false;if(session){const found=await attendanceSubject(db,cid,{sessionId:session.id,kind:attendanceKind,email:target,contextKey}),record=await db.attendanceRecord.findUnique({where:{sessionId_email_kind_contextKey:{sessionId:session.id,email:target,kind:attendanceKind,contextKey}}});attendanceSatisfied=found.valid&&record?.status==='PRESENT'&&record.sourceFingerprint===found.fingerprint;
+    // Yoklama sürümü yalnız yoklama şartı varsa belge hakkının kaynağıdır.
+    if(rule.attendanceRequired)proof.attendance=record?{id:record.id,version:record.version,status:record.status,sourceFingerprint:record.sourceFingerprint,currentFingerprint:found.fingerprint}:null;
+    data.datePlace=new Date(session.startsAt).toLocaleDateString('tr-TR',{timeZone:'Europe/Istanbul'})+' / '+[session.room.name,session.room.location].filter(Boolean).join(' · ');if(!data.talkTitle)data.talkTitle=session.titleTr||session.titleEn;
+  }
+  if(rule.attendanceRequired&&!session)reasons.push('Yoklama için uygun program oturumu seçin.');
+  if(!data.participation)data.participation=selection.role==='PRESENTER'?(attendanceSatisfied?'Bildiriyi sunmuştur.':'Bildiri sunucusu olarak programda yer almaktadır.'):selection.role==='SPEAKER'?(attendanceSatisfied?'Konuşmasını gerçekleştirmiştir.':'Konuşmacı olarak programda yer almaktadır.'):selection.role==='COAUTHOR'?'Kabul edilmiş bildirinin ortak yazarıdır.':attendanceSatisfied?'Etkinliğe katılmıştır.':'Kongre kaydı için düzenlenmiştir.';
+  proof.data=data;const result=evaluateEligibility(rule,{reasons,paymentSatisfied,attendanceSatisfied});return {...result,fingerprint:fingerprint(proof),proof,data,paymentSatisfied,attendanceSatisfied,ruleVersion:stored?.version??0};
+}
+
+export function eligibilitySourceId(s){return fingerprint(Object.fromEntries(['email','role','sessionId','talkId','dutyId','submissionId','registrationId'].map(k=>[k,s[k]??null])));}
+export async function linkedRecipientCurrent(db,recipient){if(recipient.source!=='CONGRESS')return true;const saved=recipient.sourceVersion;if(!saved?.selection||typeof saved.fingerprint!=='string')return false;const current=await congressEligibility(db,recipient.congressId,saved.selection);return current.eligible&&current.fingerprint===saved.fingerprint;}

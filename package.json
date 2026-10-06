@@ -34,7 +34,8 @@
     "test:reviews": "node --test scripts/reviews.test.mjs && node scripts/reviews-check.mjs",
     "test:program": "node --test scripts/program.test.mjs && node scripts/program-check.mjs",
     "test:activities": "node --test scripts/activities.test.mjs && node scripts/activities-check.mjs",
-    "test:certificates": "node --test scripts/certificates.test.mjs && node scripts/certificates-check.mjs"
+    "test:certificates": "node --test scripts/certificates.test.mjs && node scripts/certificates-check.mjs && node scripts/certificates-offline-check.mjs",
+    "test:attendance": "node --test scripts/attendance.test.mjs && node scripts/attendance-check.mjs"
   },
   "keywords": [],
   "author": "",

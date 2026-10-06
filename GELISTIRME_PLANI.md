@@ -372,10 +372,13 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 
 - 823 otomatik, 103 ayrı preview ve 12 tarayıcı kontrolü; final 69 tablo restore/parmak iziyle eşleşti. Ayrıntılar `docs/P16A_KAPANIS.md`.
 
-**P16B — Yoklama ve kongre bağlantısı (1–2 iş günü)**
+**P16B — Yoklama ve kongre bağlantısı · yerelde tamamlandı (07.10.2026)**
 
 - Oturum başkanı yoklama verebiliyor; sunucu, ortak yazar, dinleyici, konuşmacı ve görevli belge koşulları kongre ayarına göre uygulanıyor.
 - Sertifika modülüne uygunluk sonucu ve gerekli alanlar aktarılıyor. Yeniden üretim, düzeltme, iptal ve eski belge/sürüm geçmişi örnek üzerinden kontrol edilmiş.
+
+- Bağımsız manuel/CSV/XLSX belge üretimi e-postasız da çalışır; aynı adlı kişiler alıcı referansıyla ayrılır. Bildirim için adres gerekir. Plan 14.3 ile uyum P16B’de tamamlandı.
+- 912 otomatik, 107 ayrı preview ve 13 tarayıcı kontrolü; 27 migration/73 tablo. Final kurtarma etiketi `P16B-20261007-final`; ayrıntılar `docs/P16B_KAPANIS.md`.
 
 **P17 — Ödüller**
 

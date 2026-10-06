@@ -506,3 +506,10 @@ Kullanıcının 06.10.2026 talimatıyla P16A–P22 ve P06-E1 ardışık sürdür
 Panel → **PDF sertifikalar ve alıcılar**. Arka plan PDF ve alan yerleşimi ayrı; önizleme, Excel/CSV eşleştirme, tekli/toplu PDF/ZIP, kişisel indirme ve kod doğrulama hazırdır. Aynı kişi farklı görevlerde belge alabilir. Numara korunarak yeni PDF sürümü, iptal, metin düzeltmesi ve doğrulanmış adres düzeltmesi geçmişte saklanır. Bildirim P09'a isteğe bağlı eklenir; üretim/teslim ayrıdır.
 
 `npm run test:certificates` 21 birim ve 47 HTTP kontrolü; kontrollü testlerde worker kapalı. P16A toplam 823 otomatik, 103 preview ve 12 tarayıcı kontrolünden geçti. 25 migration/69 tablo; `../.recovery/P16A-20261006-final` tam restore/parmak izi doğrulamalı yedektir. Kapsam, lisanslar, ölçü/liste sınırları ve bağımsız altyapı [P16A kapanışında](P16A_KAPANIS.md). Sıradaki P16B yoklama ve kongre uygunluğudur.
+
+
+## P16B yoklama ve belge uygunluğu
+
+Panel → **Oturum yoklaması** ve **Belge kuralları ve kongre uygunluğu**. Göreve göre ödeme/yoklama şartını açıkça etkinleştirin, uygunluğu kontrol edin, şablona aktarın ve PDF’yi ayrıca üretin. Değişen kaynağı aynı alıcıya yenileyip aynı numarayla yeni PDF ekleyin. Başkan yalnız kabul ettiği oturumları görür; kendi yoklamasını sekreterya verir.
+
+Bağımsız belge için e-posta isteğe bağlıdır. E-postasız Excel örneği indirilebilir; aynı adlı kişileri alıcı referansıyla ayırın. Bildirim/kişisel erişim adres gerektirir. `npm run test:certificates` 24 birim + 47 normal/22 e-postasız HTTP; `npm run test:attendance` 12 birim + 52 HTTP çalıştırır. Kontrollü testlerde worker kapalıdır. Güncel toplam 912 otomatik, 107 preview, 13 tarayıcı; 27 migration/73 tablo. Final kurtarma etiketi `../.recovery/P16B-20261007-final`; tam restore/parmak izi kanıtı manifestte. Ayrıntılar [P16B kapanışında](P16B_KAPANIS.md). Sıradaki P17 ödüllerdir.

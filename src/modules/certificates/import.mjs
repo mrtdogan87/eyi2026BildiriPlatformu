@@ -2,6 +2,7 @@ import JSZip from 'jszip';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
 import { createHash } from 'node:crypto';
 import { CertificateError, recipientSchema } from './core.ts';
+import {recipientIdentity} from './identity.mjs';
 const limit=2*1024*1024;
 export function readCsv(text) {
   if(Buffer.byteLength(text,'utf8')>limit)throw new CertificateError('Liste en fazla 2 MB olabilir.');
@@ -32,9 +33,9 @@ export async function readList(bytes,name){if(/\.csv$/i.test(name)){let text;try
 export function mapRows(table,mapping,defaultEvent=''){
   for(const [field,header]of Object.entries(mapping))if(header&&!table.headers.includes(header))throw new CertificateError(`${field}: seçilen sütun bulunamadı.`);
   const seen=new Set(),valid=[],errors=[];for(const row of table.rows){const get=k=>mapping[k]?row.cells[table.headers.indexOf(mapping[k])]??'':'';const data={};for(const k of ['recipientName','title','institution','eventName','datePlace','participation','talkTitle'])data[k]=get(k);if(!data.eventName)data.eventName=defaultEvent;
-    const input={email:get('email'),role:get('role'),contextKey:get('contextKey'),data},result=recipientSchema.safeParse(input);const unsupported=row.cells.some(c=>c==='[UNSUPPORTED_FORMULA_OR_VALUE]');
+    const input={email:get('email'),recipientRef:get('recipientRef'),role:get('role'),contextKey:get('contextKey'),data},result=recipientSchema.safeParse(input);const unsupported=row.cells.some(c=>c==='[UNSUPPORTED_FORMULA_OR_VALUE]');
     if(row.shapeError||unsupported||!result.success){errors.push({line:row.line,message:unsupported?'Formül, boolean veya hata hücresi desteklenmez.':row.shapeError?'Fazladan hücre var.':result.error.issues.map(i=>i.path.join('.')+': '+i.message).join('; ')});continue;}
-    const key=[result.data.email,result.data.role,result.data.contextKey].join('|');if(seen.has(key)){errors.push({line:row.line,message:'Aynı e-posta/görev/bağlam listede tekrar ediyor.'});continue;}seen.add(key);valid.push({line:row.line,...result.data});
+    const key=JSON.stringify([recipientIdentity(result.data),result.data.role,result.data.contextKey]);if(seen.has(key)){errors.push({line:row.line,message:'Aynı alıcı/görev/bağlam listede tekrar ediyor; aynı adlı farklı kişileri alıcı referansıyla ayırın.'});continue;}seen.add(key);valid.push({line:row.line,...result.data});
   }return {valid,errors,total:table.rows.length,headers:table.headers};
 }
 export const importHash=(value)=>createHash('sha256').update(JSON.stringify(value)).digest('hex');

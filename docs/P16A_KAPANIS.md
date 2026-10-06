@@ -31,3 +31,7 @@ CERTIFICATES-only örnek kongre; bildiri, kayıt, ödeme, program ve CMS kapalı
 Additive `20261006250000_p16a_certificates` altı tablo ekler; **25 migration / 69 tablo**. Uygulanmış migration SHA-256 değerleri eşleşir. P16 öncesi yedek 63 tabloyla restore edildi. `../.recovery/P16A-20261006-final` temiz kaynak commit'i, Git bundle, özel yerel ortam/capture dosyaları ve DB dump'ını korur. Web/worker kapalıyken 69 tablo tam restore edilir; tüm satır sayıları ve sıralı içerik SHA-256 değerleri eşleşir. Özel dosyalar 0600, klasör 0700; geçici restore DB'si kaldırılır. Kanıtlar `.local/p16a-*.log`, `.local/p16a-*.json`, `.local/certificates-check-result.json` ve yedek manifestindedir.
 
 İlk sürüm kongre başına 100 şablon/5000 alıcıyla sınırlıdır; yönetim son 500 alıcı, şablon/PDF/işlem geçmişinin son 20 kaydını gösterir, eskileri DB'de korur. Tam bağımsız harici ürün dağıtımı, QR görüntüsü, otomatik görev hakkı ve e-posta eki bu ara teslimde yoktur. P16B ardından P17–P22 ve P06-E1 kullanıcı talimatıyla ardışık sürer.
+
+## 07.10.2026 P16B tamamlayıcı düzeltmesi
+
+P16A ilk teslimindeki e-posta zorunluluğu plan 14.3 ile uyumlu değildi. P16B aynı modülü e-postasız manuel/CSV/XLSX → PDF/ZIP akışıyla tamamladı. Değişmez alıcı kimliği ve isteğe bağlı referans aynı adlı kişileri ayırır; mevcut kayıtlar ve PDF sürümleri korunur. E-posta yalnız bildirim/kişisel doğrulama için gereklidir. Ek 3 birim, 22 HTTP ve gerçek tarayıcı indirme kanıtları güncel [P16B kapanışında](P16B_KAPANIS.md); yukarıdaki 823 kontrol ilk P16A tesliminin tarihsel sayısıdır.
