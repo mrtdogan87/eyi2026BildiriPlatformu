@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import {linkedRecipientCurrent} from '../certificates/eligibility.mjs';
 
-const MODULES = new Set(['SUBMISSIONS', 'REGISTRATION', 'CMS', 'REVIEWS', 'PROGRAM', 'ACTIVITIES', 'CERTIFICATES']);
+const MODULES = new Set(['SUBMISSIONS', 'REGISTRATION', 'CMS', 'REVIEWS', 'PROGRAM', 'ACTIVITIES', 'CERTIFICATES', 'AWARDS', 'PROMOTION', 'PUBLICATIONS']);
 const PROVIDERS = new Set(['capture', 'smtp', 'resend']);
 const SUMMARY = Object.freeze({
   TEMPORARY_FAILURE: 'The provider temporarily refused the message.',
@@ -117,7 +117,7 @@ async function sourceIsValid(prisma, message, now) {
     token = await prisma.registrationAccessToken.findUnique({ where: { id: message.sourceId } });
     if (!token || token.email.toLowerCase() !== message.recipient || token.congressId !== message.congressId) return false;
   } else if (expectedSource === 'participant-access-token') {
-    token = await prisma.participantAccessToken.findUnique({ where: { id: message.sourceId }, include: { congress: { select: { modules: { where: { key: { in: ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM', 'ACTIVITIES', 'CERTIFICATES'] }, enabled: true }, select: { key: true } } } } } });
+    token = await prisma.participantAccessToken.findUnique({ where: { id: message.sourceId }, include: { congress: { select: { modules: { where: { key: { in: ['SUBMISSIONS', 'REGISTRATION', 'PROGRAM', 'ACTIVITIES', 'CERTIFICATES', 'AWARDS', 'PUBLICATIONS'] }, enabled: true }, select: { key: true } } } } } });
     if (!token || token.email.toLowerCase() !== message.recipient || token.congressId !== message.congressId || !token.congress.modules.length) return false;
   } else {
     token = await prisma.activationToken.findUnique({

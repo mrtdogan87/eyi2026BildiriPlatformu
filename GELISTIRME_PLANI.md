@@ -220,7 +220,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P18 tamamlandı. Güncel P18 kapanışı 1030 otomatik kontrol, 129 preview, 17 tarayıcı kontrolü ve 85 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P18_KAPANIS.md` içindedir. P19–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P19 tam metin, prova ve yayın onayıdır. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
+**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P19 tamamlandı. Güncel P19 kapanışı 1087 otomatik kontrol, 139 preview, 18 tarayıcı kontrolü ve 93 tablonun geri yükleme doğrulamasını içerir; ayrıntılar `docs/P19_KAPANIS.md` içindedir. P20–P22 ve P06-E1 ardışık sürdürülür; sıradaki geliştirme P20 kitap/program PDF üretimidir. Uzak deneme yayını ve gerçek üretim açılışı ayrı dağıtım yetkisi bekler. Kaynak planın kapsam/süre tablosu korunmuştur.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
@@ -390,7 +390,7 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Kongre bilgileriyle düzenlenebilir davet metni; hazırlanmış görsel yükleme veya bir afiş şablonundan üretim var.
 - Metin/görsel katmanları ayrı; baskı PDF, web ve sınırlı sosyal medya boyutları önizleme sonrası üretilebiliyor. Tam bir grafik tasarım editörü hedeflenmiyor.
 
-**P19 — Yayına hazırlık**
+**P19 — Yayına hazırlık (Yerel kabul tamamlandı; docs/P19_KAPANIS.md)**
 
 - Tam metin için bağımsız teslim/revizyon süresi; yayın tercihi ve dosya sürümü mevcut bildiriye bağlı.
 - Prova → belirli sürüme yazar onayı → editörün yayına hazır kararı çalışıyor. Dergiye yönlendirme kaydı dergi kabulü anlamına gelmiyor.

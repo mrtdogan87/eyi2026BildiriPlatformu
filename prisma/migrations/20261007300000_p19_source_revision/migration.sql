@@ -1,0 +1,1 @@
+ALTER TABLE "PublicationItem" ADD COLUMN "sourceVersion" INTEGER NOT NULL DEFAULT 0;

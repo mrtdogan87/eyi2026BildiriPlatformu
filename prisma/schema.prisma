@@ -47,6 +47,9 @@ enum RegistrationKind {
 }
 
 model Congress {
+  publicationCalendar PublicationCalendar?
+  publicationItems PublicationItem[]
+  publicationEvents PublicationEvent[]
   promotionDesign PromotionDesign?
   promotionImages PromotionImage[]
   promotionOutputs PromotionOutput[]
@@ -236,6 +239,7 @@ model PaymentTier {
 }
 
 model Submission {
+  publicationItems PublicationItem[]
   awardEntries AwardEntry[]
   programTalks ProgramTalk[]
   reviewVersion Int @default(0)
@@ -542,6 +546,7 @@ enum ModuleKey {
   CERTIFICATES
   AWARDS
   PROMOTION
+  PUBLICATIONS
 }
 
 model Organization {
@@ -1695,4 +1700,138 @@ model PromotionOutput {
  createdAt DateTime @default(now())
  @@unique([designId,number])
  @@index([congressId,published,createdAt])
+}
+
+model PublicationCalendar {
+ id String @id @default(uuid())
+ congressId String @unique
+ congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+ version Int @default(0)
+ calendar Json
+ updatedAt DateTime @updatedAt
+}
+model PublicationItem {
+ sourceVersion Int @default(0)
+ id String @id @default(uuid())
+ congressId String
+ congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+ key String
+ sourceType String
+ submissionId String?
+ submission Submission? @relation(fields: [submissionId], references: [id], onDelete: Restrict)
+ ownerEmail String
+ sourceSelection Json
+ sourceSnapshot Json
+ sourceHash String
+ preferences Json
+ version Int @default(0)
+ status String @default("ACTIVE")
+ files PublicationFile[]
+ proofs PublicationProof[]
+ approvals PublicationApproval[]
+ decisions PublicationDecision[]
+ referrals PublicationReferral[]
+ events PublicationEvent[]
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ @@unique([congressId, key])
+ @@index([congressId, ownerEmail])
+}
+model PublicationFile {
+ id String @id @default(uuid())
+ itemId String
+ item PublicationItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+ number Int
+ kind String
+ name String
+ mime String @default("application/pdf")
+ content Bytes
+ checksum String
+ pages Int
+ actorId String?
+ actorEmail String
+ reason String
+ proofs PublicationProof[]
+ createdAt DateTime @default(now())
+ @@unique([itemId, number])
+}
+model PublicationProof {
+ id String @id @default(uuid())
+ itemId String
+ item PublicationItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+ number Int
+ fileId String
+ file PublicationFile @relation(fields: [fileId], references: [id], onDelete: Restrict)
+ snapshot Json
+ sourceFingerprint String
+ hash String
+ actorId String
+ reason String
+ approvals PublicationApproval[]
+ decisions PublicationDecision[]
+ referrals PublicationReferral[]
+ createdAt DateTime @default(now())
+ @@unique([itemId, number])
+}
+model PublicationApproval {
+ id String @id @default(uuid())
+ itemId String
+ item PublicationItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+ proofId String
+ proof PublicationProof @relation(fields: [proofId], references: [id], onDelete: Restrict)
+ number Int
+ approved Boolean
+ proofHash String
+ ownerEmail String
+ actorId String?
+ parentSessionId String
+ reason String
+ decisions PublicationDecision[]
+ createdAt DateTime @default(now())
+ @@unique([itemId, number])
+}
+model PublicationDecision {
+ id String @id @default(uuid())
+ itemId String
+ item PublicationItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+ proofId String
+ proof PublicationProof @relation(fields: [proofId], references: [id], onDelete: Restrict)
+ approvalId String
+ approval PublicationApproval @relation(fields: [approvalId], references: [id], onDelete: Restrict)
+ number Int
+ ready Boolean
+ sourceFingerprint String
+ snapshot Json
+ actorId String
+ reason String
+ createdAt DateTime @default(now())
+ @@unique([itemId, number])
+}
+model PublicationReferral {
+ id String @id @default(uuid())
+ itemId String
+ item PublicationItem @relation(fields: [itemId], references: [id], onDelete: Restrict)
+ proofId String
+ proof PublicationProof @relation(fields: [proofId], references: [id], onDelete: Restrict)
+ destination String
+ reference String
+ snapshot Json
+ actorId String
+ reason String
+ createdAt DateTime @default(now())
+ @@index([itemId, createdAt])
+}
+model PublicationEvent {
+ id String @id @default(uuid())
+ congressId String
+ congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+ itemId String?
+ item PublicationItem? @relation(fields: [itemId], references: [id], onDelete: Restrict)
+ action String
+ actorId String?
+ actorEmail String
+ reason String
+ detail Json
+ createdAt DateTime @default(now())
+ @@index([congressId, createdAt])
 }

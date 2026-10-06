@@ -527,3 +527,10 @@ Panel → **Ödül başvuruları ve kurul kararları**, hakem hesabı → **Öd�
 Panel → Davet ve afiş çıktıları (`/admin/tanitim`). İçerik editörü, sekreterya ve organizatör metin/görseli ayrı sürümlerle kaydeder; kaydedilmeyen metin önizlemeyi kapatır. PNG/JPEG kaynak görsel veya akademik şablon; önizleme ve gerekçeli onaydan sonra A4 PDF, web/kare/hikâye PNG. Üretilen dosya özeldir; genel sayfa için ayrı onay gerekir. Kaynak değişince genel eski çıktı kalkar, özel geçmiş kalır. İngilizce çıktı ayrı İngilizce metin ister. Yalnız PROMOTION açık bağımsız örnek çalışır.
 
 `npm run test:promotion`: 23 birim + 32 HTTP. P18 toplam 1030 otomatik, 129 preview ve 17 tarayıcı kontrolü; 29 migration/85 tablo. Final kurtarma etiketi `../.recovery/P18-20261007-final`; gerçek restore kanıtı manifestte. Ayrıntılar [P18 kapanışında](P18_KAPANIS.md). Sıradaki P19 tam metin, prova ve yayın onayı; P22 ve P06-E1'e kadar devam edilir.
+
+
+## P19 tam metin, prova ve yayın onayı
+
+Panel → Tam metin, prova ve yayın onayı (`/admin/yayinlar`), yazar → Kendi kayıtlarım / katılımcı paneli. Bağımsız ilk teslim/revizyon takvimi; kabul edilmiş bildiri veya dış bilimsel kaynak. Yayın PDF dosyası ödül dosyasından ayrı ve özeldir. Özet kitabı, tam metin kitabı ve dergi isteği ayrı yazar tercihleridir. Editör prova sürümü açar, doğrulanmış sorumlu yazar tam sürümü onaylar, editör güncel onaya hazır kararı verir. Kaynak/tercih/dosya değişikliği eski izni geçersiz kılar; eski tercihe dönmek izni canlandırmaz. Yazar son tarihten sonra da izni geri alabilir. Dergi kaydı dergi kabulü değildir.
+
+`npm run test:publications`: 20 birim + 37 HTTP. P19 toplam 1087 otomatik, 139 preview ve 18 tarayıcı kontrolü; 31 migration/93 tablo. Final kurtarma etiketi `../.recovery/P19-20261007-final`; gerçek restore kanıtı manifestte. Ayrıntılar [P19 kapanışında](P19_KAPANIS.md). Sıradaki P20 kitap/program PDF; P22 ve P06-E1'e kadar devam edilir.

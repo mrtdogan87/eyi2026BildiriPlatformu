@@ -65,6 +65,7 @@ async function handleDELETE(request: Request, { params }: RouteProps) {
     throw new AccessError(404, "Bildiri bulunamadı.");
   }
 
+  if(await tx.publicationItem.count({where:{submissionId:submission.id}}))throw new AccessError(409,'Yayın kaydı ve onay geçmişi bulunan bildiri silinemez.');
   if(await tx.awardEntry.count({where:{submissionId:submission.id}}))throw new AccessError(409,'Ödül başvurusu ve geçmişi bulunan bildiri silinemez.');
 
   if (await tx.certificateRecipient.count({where:{congressId:context.congress.id,source:'CONGRESS',sourceVersion:{path:['proof','submission','id'],equals:submission.id}}})) {
