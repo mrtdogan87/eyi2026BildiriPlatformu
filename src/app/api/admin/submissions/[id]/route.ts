@@ -65,7 +65,7 @@ async function handleDELETE(request: Request, { params }: RouteProps) {
     throw new AccessError(404, "Bildiri bulunamadı.");
   }
 
-  if (await tx.submissionFileVersion.count({ where: { submissionId: submission.id } }) || await tx.submissionChangeLog.count({ where: { submissionId: submission.id } }) || await tx.submissionRevisionRequest.count({ where: { submissionId: submission.id } })) {
+  if (await tx.reviewRound.count({ where: { submissionId: submission.id } }) || await tx.submissionFileVersion.count({ where: { submissionId: submission.id } }) || await tx.submissionChangeLog.count({ where: { submissionId: submission.id } }) || await tx.submissionRevisionRequest.count({ where: { submissionId: submission.id } })) {
     throw new AccessError(409, 'Sürüm veya düzeltme geçmişi bulunan bildiri silinemez; geçmiş korunmalı.');
   }
 

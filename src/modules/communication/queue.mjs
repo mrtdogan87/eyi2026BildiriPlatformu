@@ -74,6 +74,21 @@ function clockDate(now) { return now ? new Date(now) : new Date(); }
 async function sourceIsValid(prisma, message, now) {
   // Preview samples never represent live tokens and must never enter a real transport.
   if (message.sourceType === 'TEMPLATE_TEST') return message.provider === 'capture' && message.recipient.endsWith('.invalid');
+  if (message.sourceType === 'review-invitation' || message.sourceType === 'review-decision') {
+    const modules = await prisma.congressModule.findMany({ where: { congressId: message.congressId, key: { in: ['REVIEWS', 'SUBMISSIONS'] }, enabled: true } });
+    if (modules.length !== 2) return false;
+    if (message.sourceType === 'review-invitation') {
+      const a = await prisma.reviewAssignment.findUnique({ where: { id: message.sourceId }, include: { reviewer: true, round: { include: { congress: true, submission: { include: { authors: true } } } } } });
+      if (!a || a.round.congressId !== message.congressId || a.status !== 'INVITED' || a.round.status !== 'OPEN' || a.round.deadline <= now || a.round.sourceVersion !== a.round.submission.correctionVersion || !a.reviewer.active || a.reviewer.email.toLowerCase() !== message.recipient) return false;
+      const member = await prisma.congressMembership.findUnique({ where: { congressId_userId: { congressId: message.congressId, userId: a.reviewerId } } });
+      const org = await prisma.organizationMembership.findUnique({ where: { organizationId_userId: { organizationId: a.round.congress.organizationId, userId: a.reviewerId } } });
+      return !!(org?.active && member?.active && member.role === 'REVIEWER') && ![a.round.submission.draftOwnerEmail, ...a.round.submission.authors.map(author => author.email)].some(email => email.toLowerCase() === message.recipient);
+    }
+    const d = await prisma.reviewDecision.findUnique({ where: { id: message.sourceId }, include: { round: { include: { submission: { include: { authors: true } } } } } });
+    if (!d || d.round.congressId !== message.congressId) return false;
+    const latest = await prisma.reviewRound.findFirst({ where: { submissionId: d.round.submissionId }, orderBy: { number: 'desc' }, select: { id: true } });
+    return latest?.id === d.roundId && [d.round.submission.draftOwnerEmail, ...d.round.submission.authors.map(author => author.email)].some(email => email.toLowerCase() === message.recipient);
+  }
   const authSources = { DRAFT_ACCESS: 'submission-access-token', REGISTRATION_ACCESS: 'registration-access-token', PARTICIPANT_ACCESS: 'participant-access-token', ACCOUNT_ACTIVATION: 'activation-token' };
   const expectedSource = authSources[message.templateKey];
   if (!expectedSource) return true;

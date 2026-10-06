@@ -7,6 +7,7 @@ import { submissionTasks } from '@/modules/participation/status';
 import { AccessError } from '@/platform/http';
 import { setDraftAccessCookie } from '@/lib/submission';
 import { setRegistrationCookie } from '@/lib/registration';
+import { authorReviewResults } from './reviews';
 import { listParticipantWorkRequests } from './worklist';
 
 export async function participantRecords(congressId: string, email: string) {
@@ -26,14 +27,16 @@ export async function participantRecords(congressId: string, email: string) {
     const record = declarations.find(d => d.entityType === entityType && d.entityId === entityId);
     return record ? { recorded: true, version: record.version, locale: record.locale, acceptedAt: record.acceptedAt.toISOString() } : { recorded: false, version: null, locale: null, acceptedAt: null };
   }
-  return { congress: { id: congress.id, name: congress.name, slug: congress.slug }, email, modules,
+  const reviewAvailable = modules.SUBMISSIONS && congress.modules.some(m => m.key === 'REVIEWS' && m.enabled);
+  const reviewResults = reviewAvailable ? await authorReviewResults(congressId, papers.map(p => p.id)) : [];
+  return { reviewResults, congress: { id: congress.id, name: congress.name, slug: congress.slug }, email, modules,
     submissions: papers.map(p => ({ id: p.id, titleTr: p.titleTr, titleEn: p.titleEn, status: p.status, submittedAt: p.submittedAt?.toISOString() ?? null,
       canWithdraw: p.status !== 'DRAFT' && p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), canOpen: p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), declaration: declaration('SUBMISSION', p.id),
       missing: submissionTasks({ status: p.status, owner: p.draftOwnerEmail.toLowerCase() === email.toLowerCase(), fileRequired: rules.stages.FULL_TEXT.enabled && rules.fields.file === 'REQUIRED', fileReceived: !!p.file, registrationEnabled: modules.REGISTRATION, registered: !!p.paperItem, presenter: p.authors.some(a => a.isPresenter) }) })),
     registrations: entries.map(r => ({ id: r.id, totalAmount: r.totalAmount, currency: r.currency, paidAt: r.paidAt?.toISOString() ?? null, createdAt: r.createdAt.toISOString(), receiptReceived: !!r.receipt,
       paymentState: paymentSummary({ ...r, receiptReceived: !!r.receipt }, r.paymentEvents).state, payment: paymentSummary({ ...r, receiptReceived: !!r.receipt }, r.paymentEvents), paymentVerificationAvailable: true, declaration: declaration('REGISTRATION', r.id),
       missing: [...(rules.stages.PAYMENT.enabled && rules.fields.receipt === 'REQUIRED' && r.totalAmount > 0 && !r.receipt && !['EXEMPT', 'VERIFIED', 'OVERPAID', 'REFUNDED', 'PARTIALLY_REFUNDED'].includes(paymentSummary({ ...r, receiptReceived: !!r.receipt }, r.paymentEvents).state) ? ['UPLOAD_RECEIPT'] : []), ...(rules.fields.studentDocument === 'REQUIRED' && !r.studentDocument ? ['UPLOAD_STUDENT_DOCUMENT'] : [])] })),
-    requests, revisions: revisions.map(r => ({ ...r, expiresAt: r.expiresAt.toISOString() })), unavailable: ['reviews', 'program', 'tasks', 'certificates'] as const };
+    requests, revisions: revisions.map(r => ({ ...r, expiresAt: r.expiresAt.toISOString() })), unavailable: [...(reviewAvailable ? [] : ['reviews']), 'program', 'tasks', 'certificates'] };
 }
 export type ParticipantOverview = Awaited<ReturnType<typeof participantRecords>>;
 // An email verified by the participant panel may open only its owner's existing flow.

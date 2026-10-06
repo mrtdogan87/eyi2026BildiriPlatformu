@@ -138,6 +138,10 @@ async function missingRecords(c: CongressContext, enabled: Set<string>): Promise
       if (reasons.length) missing.push({ id: `REGISTRATION:${registration.id}`, sourceType: 'REGISTRATION', sourceId: registration.id, subject: 'Kayıt / dekont takibi', email: registration.email, reasons, href: `/admin/kayitlar/${registration.id}` });
     }
   }
+  if (enabled.has('REVIEWS') && enabled.has('SUBMISSIONS')) {
+    const rounds = await prisma.reviewRound.findMany({where:{congressId:c.congress.id,status:'OPEN'},take:200,orderBy:{createdAt:'desc'},select:{id:true,submissionId:true,number:true,deadline:true,sourceVersion:true,submission:{select:{titleTr:true,titleEn:true,draftOwnerEmail:true,correctionVersion:true}},assignments:{select:{status:true}}}});
+    for(const r of rounds){const reasons:string[]=[];if(!r.assignments.length)reasons.push('Hakem ataması bekliyor');if(r.assignments.some(a=>a.status==='INVITED'))reasons.push('Hakem davet yanıtı bekliyor');if(r.assignments.some(a=>['DECLINED','CONFLICT'].includes(a.status)))reasons.push('Ret / çıkar çatışması: yerine hakem kontrolü');if(r.deadline<=new Date())reasons.push('Hakemlik son tarihi geçti');if(r.assignments.some(a=>a.status==='ACCEPTED'))reasons.push('Hakem değerlendirmesi bekliyor');if(r.assignments.some(a=>a.status==='SUBMITTED'))reasons.push('Editör kararı bekliyor');if(r.sourceVersion!==r.submission.correctionVersion)reasons.push('Bildiri sürümü değişti: yeni tur kontrolü');if(reasons.length)missing.push({id:'REVIEW:'+r.id,sourceType:'SUBMISSION',sourceId:r.submissionId,subject:(r.submission.titleTr||r.submission.titleEn||'Bildiri')+' · Tur '+r.number,email:r.submission.draftOwnerEmail,reasons,href:'/admin/hakemlik/bildiriler/'+r.submissionId});}
+  }
   return missing;
 }
 export async function worklistOverview() {

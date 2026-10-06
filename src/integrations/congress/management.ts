@@ -404,6 +404,7 @@ export async function updateAdminSubmissionStatus(input: {
   await prisma.$transaction(async tx => {
     await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${context.congress.id} FOR UPDATE`;
     await tx.$queryRaw`SELECT id FROM "Submission" WHERE id = ${current.id} FOR UPDATE`;
+    if (await tx.reviewRound.count({ where: { submissionId: current.id } })) throw new AccessError(409, 'Hakemlik geçmişi olan bildirinin kararı Hakemlik ekranından verilir.');
     const changed = await tx.submission.updateMany({ where: { id: current.id, congressId: context.congress.id, status: current.status }, data: { status: input.status } });
     if (changed.count !== 1) throw new AccessError(409, 'Bildiri durumu başka bir işlemde değişti. Sayfayı yenileyin.');
     const history = await tx.submissionStatusHistory.create({ data: { submissionId: current.id, fromStatus: current.status, toStatus: input.status, note: note || null } });

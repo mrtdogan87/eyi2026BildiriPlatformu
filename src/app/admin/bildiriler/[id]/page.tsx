@@ -1,3 +1,5 @@
+import { prisma } from '@/lib/prisma';
+import { moduleEnabled } from '@/platform/context';
 import { allows } from "@/platform/policy";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -35,9 +37,12 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
   const isTurkish = submission.submissionLanguage === "TR";
   const revisions = await revisionOverview(id);
+  const reviewHistory = await prisma.reviewRound.count({ where: { submissionId: id } });
+  const reviewsEnabled = await moduleEnabled(context.congress.id, 'REVIEWS');
 
   return (
     <main className="page-shell admin-page-shell">
+      {reviewsEnabled && allows(context.role, "reviews.read") && <p><Link className="button secondary" href={`/admin/hakemlik/bildiriler/${id}`}>Hakemlik turlarını ve editör kararını aç</Link></p>}
       <section className="hero admin-hero">
         <div>
           <Link href="/admin/bildiriler" className="admin-back-link">
@@ -94,7 +99,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
         <div className="admin-detail-block">
           <h2>Durum Yönetimi</h2>
-          {allows(context.role, "submissions.status") ? <AdminStatusForm submissionId={submission.id} currentStatus={submission.status} /> : null}
+          {reviewHistory ? <p>Bilimsel karar Hakemlik ekranından verilir; tur ve karar geçmişi korunur.</p> : allows(context.role, "submissions.status") ? <AdminStatusForm submissionId={submission.id} currentStatus={submission.status} /> : null}
         </div>
 
         <div className="admin-detail-block">
@@ -192,7 +197,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
         <div className="admin-detail-block admin-detail-block-danger">
           <h2>Tehlikeli İşlem · Bildiriyi Sil</h2>
-          {revisions.files.length || revisions.changes.length || revisions.requests.length ? <p className="notice">Bu bildirinin dosya veya düzeltme geçmişi korunur; kalıcı silme kapalıdır.</p> : allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
+          {reviewHistory || revisions.files.length || revisions.changes.length || revisions.requests.length ? <p className="notice">Bu bildirinin dosya veya düzeltme geçmişi korunur; kalıcı silme kapalıdır.</p> : allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
             submissionId={submission.id}
             submissionTitle={isTurkish ? submission.titleTr : submission.titleEn}
           /> : null}

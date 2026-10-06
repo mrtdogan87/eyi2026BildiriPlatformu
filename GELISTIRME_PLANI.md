@@ -1,8 +1,8 @@
 # Bildiri Yönetim Sistemi — v2 Geliştirme Planı
 
-> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10, P11 ve P12 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
+> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12 ve P13 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
 > İlk gerçek kullanım: EYİ 2026 (`eyi-2026`); canlı sistem korunuyor.
-> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`, `docs/P12_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
+> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`, `docs/P12_KAPANIS.md`, `docs/P13_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
 
 ## 1. Hedef
 
@@ -329,12 +329,14 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Elle kanıtlı doğrulama, kısmi/fazla ödeme, muafiyet ve yapılmış iade; değişmez geçmiş ve gerekçeli geçersizleştirme çalışıyor. İlk ekstre biçimi sabit sütunlu UTF-8 CSV; XLSX bu biçime dışa aktarılır.
 - 523 otomatik kontrol ve 62 ayrı preview kontrolü başarılı. Final yedekte 50 tablo restore/parmak iziyle doğrulandı. Kapsam ve CSV/hesap anahtarı sınırı: `docs/P12_KAPANIS.md`.
 
-**P13 — Hakemlik**
+**P13 — Hakemlik · yerelde tamamlandı (06.10.2026)**
 
 - Atama daveti → kabul/ret → değerlendirme → revizyon → yeni tur → editör kararı çalışıyor.
 - Körlük seçeneği, son tarih, yetkili dosya erişimi, çıkar çatışması beyanı ve yazara/hakeme farklı görünürlük kontrol edilmiş.
 - Kör değerlendirmede hakeme verilecek ayrı dosya/sürüm kontrol ediliyor; içerik, dosya adı ve belge özellikleri kimlik barındırabilir. Ekrandaki yazar adını gizlemek dosyanın anonim olduğunu garanti etmez; yazar/editör kontrolü akışta bulunur.
 - Bir hakemin birden fazla bildiri değerlendirmesi ayrı bildiri kimliği, tur ve dosya sürümüne bağlı tutuluyor. Dışarıdan gelen değerlendirme eki elle eşlenirse hedef kayıt ve gerekçe doğrulanıyor; benzer dosya adları tek başına eşleştirme ölçütü değil.
+
+- 592 otomatik kontrol ve 75 ayrı preview kontrolü başarılı. Tarayıcıda davet, taslak, teslim, karar, körlük ve TR/EN yazar sonuçları doğrulandı. Final yedekte 54 tablo restore/parmak iziyle eşleşti. Kullanım, anonimlik ve ilk sürüm sınırları: `docs/P13_KAPANIS.md`.
 
 **P14 — Program**
 

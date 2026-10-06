@@ -431,3 +431,27 @@ P12 üç tablo ekledi; toplam 21 migration/50 tablo. Veri sıfırlamadan
 `../.recovery/P12-20261006-final`; aynı etiketi yeniden kullanmayın.
 Kapsam, CSV biçimi, para/kanıt ve güvenlik sınırları `P12_KAPANIS.md` içindedir.
 Sıradaki geliştirme P13 hakemliktir.
+
+
+## P13 hakemlik
+
+P13 yerelde tamamlandı. Panel → Hakemlik ve editör kararları; hakem hesabında
+Hakem görevlerim bulunur. Hakem Ekip ekranında kongreye aktif hakem olarak
+eklenir. Tur yöntemi varsayılan tek kördür; çift kör için ayrı anonim metin,
+kaynak dosya varsa ayrı PDF/DOCX ve editör kimlik kontrolü gerekir. Sistem
+belgeleri otomatik anonimleştirmez. Formlar bildiri/hakem/tur/kaynak sürümüne
+bağlıdır; teslim ve karar geçmişi değişmez. Revizyon isteği P11 dosya düzeltme
+akışına bağlanabilir. Yazara yalnız yayımlanmış sonuçlar açılır.
+
+`npm run test:reviews` 18 birim ve 51 yerel HTTP senaryosu çalıştırır.
+Kontrollü kuyruk testleri için otomatik worker kapalı tutulur:
+`MAIL_WORKER_AUTOSTART=false npm run start`. Gündelik normal `npm run start`
+capture worker'ı açar. P09 ve önceki HTTP kontrollerinin capture worker
+ihtiyacı vardır; kontrollü testler ile bunları aynı anda çalıştırmayın.
+
+P13 dört tablo ekledi; toplam 22 migration/54 tablo. Mevcut veriyi
+sıfırlamadan `npm run prisma:migrate:deploy` uygulanır. 592 otomatik ve
+75 ayrı preview kontrolü geçti. Restore doğrulanmış final yedek:
+`../.recovery/P13-20261006-final`; aynı etiketi yeniden kullanmayın.
+Kapsam, dosya/anonimlik ve 200 kayıt liste sınırı `P13_KAPANIS.md` içindedir.
+Sıradaki geliştirme P14 program ve oturum yönetimidir.

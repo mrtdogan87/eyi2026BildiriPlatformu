@@ -2237,3 +2237,8 @@ textarea {
 .payment-totals span { font-size: 0.85rem; margin-bottom: 8px; color: #526277; }
 .payment-totals strong { font-size: 1.12rem; }
 .payment-manager fieldset { min-width: 0; }
+
+.review-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.review-round, .review-blind, .review-decision { overflow-wrap: anywhere; min-width: 0; }
+.review-round > summary { font-weight: 700; cursor: pointer; padding: 12px 0; }
+.review-blind, .review-decision { border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 16px 0; }
