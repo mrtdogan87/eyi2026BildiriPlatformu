@@ -23,11 +23,11 @@ export async function attendanceSubject(db,cid,input){
   return {valid:reasons.length===0,reasons,fingerprint:fingerprint(snapshot),snapshot,session};
 }
 
-export async function congressEligibility(db,cid,selection){
+export async function congressEligibility(db,cid,selection,{ignoreCertificateModule=false}={}){
   const congress=await db.congress.findUnique({where:{id:cid},include:{modules:true}}),open=key=>!!congress?.modules.some(m=>m.key===key&&m.enabled),target=email(selection.email),reasons=[],proof={},data={recipientName:'',title:'',institution:'',eventName:congress?.name??'',datePlace:'',participation:'',talkTitle:''};
   const stored=await db.certificateRule.findUnique({where:{congressId_role:{congressId:cid,role:selection.role}}}),rule=stored?.settings??defaultRule;
   proof.rule={id:stored?.id??null,version:stored?.version??0,settings:rule};proof.selection={...selection,email:target};proof.congressName=congress?.name??'';
-  if(!open('CERTIFICATES'))reasons.push('Belge modülü kapalı.');
+  if(!ignoreCertificateModule&&!open('CERTIFICATES'))reasons.push('Belge modülü kapalı.');
   let submission=null,registration=null,session=null,subject=null,attendanceKind='ATTENDANCE',contextKey='';
   if(['PRESENTER','SPEAKER'].includes(selection.role)){
     const found=await attendanceSubject(db,cid,{sessionId:selection.sessionId,kind:'PRESENTATION',email:target,contextKey:selection.talkId??''});reasons.push(...found.reasons);session=found.session;proof.program=found.snapshot;subject=session?.talks.find(t=>t.id===selection.talkId);submission=subject?.submission??null;attendanceKind='PRESENTATION';contextKey=selection.talkId??'';
@@ -64,4 +64,4 @@ export async function congressEligibility(db,cid,selection){
 }
 
 export function eligibilitySourceId(s){return fingerprint(Object.fromEntries(['email','role','sessionId','talkId','dutyId','submissionId','registrationId'].map(k=>[k,s[k]??null])));}
-export async function linkedRecipientCurrent(db,recipient){if(recipient.source!=='CONGRESS')return true;const saved=recipient.sourceVersion;if(!saved?.selection||typeof saved.fingerprint!=='string')return false;const current=await congressEligibility(db,recipient.congressId,saved.selection);return current.eligible&&current.fingerprint===saved.fingerprint;}
+export async function linkedRecipientCurrent(db,recipient,options={}){if(recipient.source!=='CONGRESS')return true;const saved=recipient.sourceVersion;if(!saved?.selection||typeof saved.fingerprint!=='string')return false;const current=await congressEligibility(db,recipient.congressId,saved.selection,options);return current.eligible&&current.fingerprint===saved.fingerprint;}

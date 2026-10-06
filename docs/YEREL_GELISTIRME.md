@@ -1,11 +1,13 @@
 # v2 yerel geliştirme
 
-Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p15`.
+P22 güncel kullanıcı testi ve işletim adımları: [P22 işletim](P22_ISLETIM.md).
+
+Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p22`.
 Üst checkout korunmuştur. Node.js 22.13+ ve PostgreSQL 16 CLI araçları gerekir.
 Mac mini kurulumu 6 Ekim 2026'da Node 24.21.0/PostgreSQL 16.15 ile doğrulandı.
 Docker gerekmez. Taşıma ve doğrulama kaydı: [Mac mini kurulumu](MAC_MINI_KURULUM.md).
 
-Taşınmış mevcut veriler korunmuş, P15 migration'ı uygulanmıştır. Yeni terminal oturumunda araç
+Taşınmış mevcut veriler korunmuştur; P22 yerel kabulünde 33 migration / 97 tablo doğrulanmıştır. Yeni terminal oturumunda araç
 yollarını ayarlayın; uygulama zaten 3100'de çalışıyorsa ikinci kez başlatmayın:
 
 ```sh
@@ -35,8 +37,8 @@ npm run dev
 ```
 
 Araç yolları ayarlandıktan sonra `npm run db:start` ve `npm run dev` yeterlidir.
-Adres `http://127.0.0.1:3100/eyi-2026`, admin `/admin`. Admin parolası
-yalnız v2'nin özel `.env` dosyasında; P03'e kadar eski tek admin akışı kullanılır.
+Adres `http://127.0.0.1:3100/eyi-2026`, admin `/admin`. Kişisel test hesapları
+yalnız Git dışı `.local/p03-accounts.json` dosyasındadır; ortak admin parolası kullanılmaz.
 DB kendi parolası/kümesiyle `127.0.0.1:55432/aibildiri_v2`, dosyaları `.local/postgres`.
 
 ## Ayrım

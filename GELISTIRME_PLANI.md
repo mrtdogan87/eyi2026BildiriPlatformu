@@ -1,10 +1,10 @@
 # Bildiri Yönetim Sistemi — v2 Geliştirme Planı
 
-> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10, P11, P12, P13, P14 ve P15 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
+> Durum: **P01, P02 yerel kapsamı, P03–P21 (P16A/B dahil), P06-E1 ve P22 yerel kullanıcı testi kapsamı tamamlandı; uzak v2 deneme/üretim yayını bekliyor** · Son güncelleme: 07.10.2026
 > İlk gerçek kullanım: EYİ 2026 (`eyi-2026`); canlı sistem korunuyor.
 > Kullanıcının 06.10.2026 devam yetkisi: kalan paketler ve P06-E1 ardışık tamamlanarak P22 dahil yerel kullanıcı testine hazır sürüm hazırlanır. Gerçek yayın/deploy, merge, harici paylaşım ve gerçek e-posta gönderimi ayrı yetki ister.
 
-> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`, `docs/P12_KAPANIS.md`, `docs/P13_KAPANIS.md`, `docs/P14_KAPANIS.md`, `docs/P15_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
+> Bu kopya uygulama takibidir. Üst dizindeki kaynak plan tarihsel planlama referansı olarak korunmuştur; güncel uygulama durumunu bu dosya ve `docs/Pxx_KAPANIS.md` belgeleri gösterir. Son kapanışlar `docs/P21_KAPANIS.md`, `docs/P06_E1_KAPANIS.md`, `docs/P22_KAPANIS.md`; kullanıcı testi/işletim `docs/P22_ISLETIM.md`. Yerel kabul uzak yayına alma kabulü değildir.
 
 ## 1. Hedef
 
@@ -220,7 +220,7 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 ## 11. Geliştirme Paketleri
 
-**Uygulama durumu:** P01, P02 yerel kapsamı ve P03–P21 tamamlandı; P06-E1 yerel İngilizce görünürlük kabulü tamamlandı. P21: 1175 otomatik/155 preview/21 tarayıcı ve 97 tablo restore. P06-E1: 164 odaklı kontrol, içerik kaybı olmadan dil görünürlüğü ve kalıcı PDF izin düzeltmesi. Ayrıntılar `docs/P21_KAPANIS.md` ve `docs/P06_E1_KAPANIS.md`. Sıradaki P22 yerel pilot; uzak deneme/gerçek üretim açılışı ayrı dağıtım yetkisi bekler.
+**Uygulama durumu:** P01, P02 yerel kapsamı, P03–P21 (P16A/B dahil), P06-E1 ve P22 yerel pilot tamamlandı. P22: 1255 otomatik kabul/157 preview/17 gerçek tarayıcı, iki kongrede aynı bilimsel kayıtla uçtan uca akış, 240 istekli yerel yük denemesi, yeni kayıtları koruyan restore provası; 33 migration / 97 tablo. Ayrıntılar `docs/P22_KAPANIS.md` ve `docs/P22_ISLETIM.md`. Yeni alan adı, TLS, gerçek mail ve uzak deneme/üretim dağıtımı uygulanmadı; P22 gerçek yayına açılış adımı ayrı yetki/ortam bekler.
 
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.

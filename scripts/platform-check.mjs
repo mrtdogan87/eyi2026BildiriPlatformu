@@ -159,8 +159,10 @@ try {
   await req('/api/admin/submissions', { jar: jars.reviewer, status: 403 });
   passed('Foreign membership IDs denied; revocations and role changes apply to existing sessions immediately');
   const orgMembership = await prisma.organizationMembership.findUniqueOrThrow({ where: { organizationId_userId: { organizationId: 'local-org-a', userId: 'local-user-secretary' } } });
+  const secretaryContextsBefore = (await req('/api/platform/context', { jar: secretary })).data.contexts;
+  const institutionCongressIds = new Set((await prisma.congress.findMany({ where: { organizationId: orgMembership.organizationId }, select: { id: true } })).map(c => c.id));
   await prisma.organizationMembership.update({ where: { id: orgMembership.id }, data: { active: false } });
-  try { await req('/api/admin/submissions', { jar: secretary, status: 403 }); assert.equal((await req('/api/platform/context', { jar: secretary })).data.contexts.length, 0); }
+  try { await req('/api/admin/submissions', { jar: secretary, status: 403 }); assert.deepEqual((await req('/api/platform/context', { jar: secretary })).data.contexts.map(c => c.id).sort(), secretaryContextsBefore.filter(c => !institutionCongressIds.has(c.id)).map(c => c.id).sort()); }
   finally { await prisma.organizationMembership.update({ where: { id: orgMembership.id }, data: { active: true } }); }
   await prisma.platformUser.update({ where: { id: 'local-user-secretary' }, data: { active: false } });
   try { await req('/api/admin/submissions', { jar: secretary, status: 401 }); }

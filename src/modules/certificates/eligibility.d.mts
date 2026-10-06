@@ -7,5 +7,5 @@ export function fingerprint(value:unknown):string;
 export function evaluateEligibility(rule:typeof defaultRule,facts:{reasons:string[];paymentSatisfied:boolean;attendanceSatisfied:boolean}):{eligible:boolean;reasons:string[]};
 type Db=Prisma.TransactionClient;
 export function attendanceSubject(db:Db,cid:string,input:{sessionId:string;kind:string;contextKey:string;email:string}):Promise<{valid:boolean;reasons:string[];fingerprint:string;snapshot:Record<string,unknown>|null;session:Prisma.ProgramSessionGetPayload<{include:{room:true;talks:{include:{presenter:true;submission:{include:{authors:true}}}};duties:{include:{person:true}}}}> | null}>;
-export function congressEligibility(db:Db,cid:string,selection:Selection):Promise<{eligible:boolean;reasons:string[];fingerprint:string;proof:Record<string,unknown>;data:RecipientData;paymentSatisfied:boolean;attendanceSatisfied:boolean;ruleVersion:number}>;
-export function linkedRecipientCurrent(db:Db,recipient:{source:string;sourceVersion:unknown;congressId:string}):Promise<boolean>;
+export function congressEligibility(db:Db,cid:string,selection:Selection,options?:{ignoreCertificateModule?:boolean}):Promise<{eligible:boolean;reasons:string[];fingerprint:string;proof:Record<string,unknown>;data:RecipientData;paymentSatisfied:boolean;attendanceSatisfied:boolean;ruleVersion:number}>;
+export function linkedRecipientCurrent(db:Db,recipient:{source:string;sourceVersion:unknown;congressId:string},options?:{ignoreCertificateModule?:boolean}):Promise<boolean>;

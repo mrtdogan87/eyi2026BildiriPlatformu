@@ -1,5 +1,7 @@
 # Ortam ve dağıtım — v2
 
+07.10.2026: P22 **yerel kullanıcı testi** kabulü tamamlandı; yeni uzak deneme/üretim dağıtımı yapılmadı. Güncel doğrulama [P22 kapanışı](docs/P22_KAPANIS.md), yerel komutlar ve kayıpsız geri dönüş [P22 işletim](docs/P22_ISLETIM.md) belgesindedir. Aşağıdaki gerçek ortam envanterinin son doğrulama tarihi 05.10.2026 olarak korunur.
+
 05.10.2026 tarihinde gerçek ortam SSH, HTTP/DNS, konteyner ve GitHub kayıtlarıyla doğrulandı.
 
 | Ortam | Uygulama ve veri | Durum |
