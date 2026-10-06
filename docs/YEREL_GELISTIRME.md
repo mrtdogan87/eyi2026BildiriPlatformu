@@ -352,7 +352,7 @@ eski taslak/kayıt köprü çerezlerini temizler.
 Köprü çerezleri bağımsız, sunucuda süresi doğrulanan 8 saatlik oturumlardır.
 Çıkış tarayıcıdaki kopyayı temizler; önceden kopyalanmış bir köprü çerezi
 kendi süresinin sonuna kadar eski akışta kullanılabilir. Panel oturumunun
-iptali bu bağımsız çerezi sunucuda iptal etmez; birleşik iptal P11'e kalır.
+iptali bu bağımsız çerezi sunucuda iptal etmez; birleşik iptal P11'de giderildi; aşağıdaki P11 bölümündeki sunucu oturumları geçerlidir.
 
 Yönetimde `/admin/is-listesi`, eksik işlemleri, dekont takibini, CMS geri
 bildirimlerini, teslim sorunlarını ve kalıcı talepleri bir arada gösterir.
@@ -378,5 +378,38 @@ son çalıştırma kanıtıyla yazılmalıdır.
 Final kaynak/DB yedeği `P10-20261006-final` olarak alındı.
 Checkpoint sırasında worker ve web yazıları durduruldu; 42 tablo ayrı geçici
 DB'ye restore edilerek parmak izleri doğrulandı. Yeni checkpoint alınırken
-aynı durdurma ve doğrulama sırası izlenmelidir. Uzak yayın, canlı alıcılara e-posta, P11 düzeltmeleri ve P12 ödeme
-kontrolü ayrı işlerdir.
+aynı durdurma ve doğrulama sırası izlenmelidir. Uzak yayın, canlı alıcılara e-posta ve P12 ödeme
+kontrolü ayrı işlerdir. P11 artık aşağıdaki kapsamda tamamlandı.
+
+
+## P11 — Gerekçeli düzeltmeler
+
+P11 yerelde tamamlandı. 450 otomatik kontrol, ayrıca 56 preview kontrolü,
+12 tarayıcı kontrolü ve final kurtarma kanıtı `docs/P11_KAPANIS.md` içinde.
+Gönderilmiş bildirinin detayında gerekçeli içerik/yazar düzeltmesi, özel
+kanıt, değişiklik geçmişi, DOCX sürümleri, katılımcı önerisi ve çıktı/kayıt
+takibi bulunur. Katılımcı önerisi yönetici onayından önce güncel dosyayı
+değiştirmez. Eski dosyaya dönüş yeni sürüm ekler.
+
+E-posta değişikliği eski erişim bağlantılarını ve sunucu oturumlarını
+iptal eder. P10'daki bağımsız imzalı köprü çerezlerinin yerine DB'de hash
+ile saklanan 8 saatlik oturumlar kullanılır. Panel/platform çıkışı,
+önceden kopyalanmış bağlı köprü çerezlerini de geçersiz kılar. Güncelleme
+sonrasında eski imzalı çerez kullanan kişi yeniden erişim bağlantısı ister.
+
+`npm run test:revisions` 7 birim ve 43 yerel HTTP senaryosu çalıştırır.
+Kontrollü kuyruk senaryolarını normal worker durdurulmuşken çalıştırın;
+bunun için webi `MAIL_WORKER_AUTOSTART=false npm run start` ile açabilirsiniz.
+Diğer eski HTTP akışları capture worker ister. Gündelik `npm run start`
+kullanımı yerel capture worker'ı otomatik açar.
+
+P11 migration'ı beş tablo ekledi: toplam 20 migration, 47 tablo.
+Mevcut DB'yi sıfırlamadan `npm run prisma:migrate:deploy` kullanılır.
+`P11-20261006-final` yedeğinde kaynak, özel dosyalar, DB ve kanıtlar vardır.
+Yeni checkpoint öncesinde web/worker durdurulur; `node scripts/checkpoint.mjs
+P11-20261006-final` etiketi bu paket kapanışına aittir ve yeniden aynı
+klasöre yazılmaz. Başka paket için yeni, benzersiz etiket kullanın.
+
+Kabul mektubu/listesi ve sonraki program/kitap/belge ihtiyacı takip işi
+olarak kaydedilir; P11 bunların dosyasını üretmez. Sıradaki geliştirme
+P12 ödeme doğrulamasıdır; eski dekont tarihi ödeme onayı sayılmaz.

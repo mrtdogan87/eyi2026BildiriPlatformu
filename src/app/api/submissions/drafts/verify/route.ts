@@ -1,4 +1,5 @@
 import { apiRoute } from "@/platform/http";
+import { createHash } from 'node:crypto';
 import { NextResponse } from "next/server";
 import {
   consumeDraftToken,
@@ -27,7 +28,7 @@ async function handlePOST(request: Request) {
     return NextResponse.json({ error: t("api.submissionsClosed") }, { status: 403 });
   }
 
-  await setDraftAccessCookie(submission.id);
+  await setDraftAccessCookie(submission.id, submission.draftOwnerEmail, undefined, createHash('sha256').update(body.token).digest('hex'));
 
   return NextResponse.json({
     submission: await getSubmissionSnapshot(submission.id),

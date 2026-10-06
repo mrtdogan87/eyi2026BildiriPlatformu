@@ -1,8 +1,7 @@
 import { effectiveConfiguration } from "@/modules/congress/configuration";
 import { declarationDocuments } from '@/modules/participation/declarations';
 import { requireModule } from "@/platform/context";
-import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
-import { cookies } from "next/headers";
+import { createHash, randomBytes } from "crypto";
 import {
   findApplicableTier,
   getCongressBankInfo,
@@ -14,7 +13,7 @@ import {
   tierToOption,
 } from "@/lib/payment";
 import { prisma } from "@/lib/prisma";
-import { sessionCookieName, secureSessionCookie } from "@/lib/environment";
+import { createFlowSession, readFlowSession, clearFlowSession, type FlowParent } from "@/platform/flow-sessions";
 import { getBaseUrl } from "@/lib/submission";
 import { normalizeName } from "@/lib/utils";
 import type { Locale, TFunction } from "@/lib/i18n";
@@ -29,18 +28,8 @@ import type {
 import type { Congress, PaymentTier, Submission } from "@prisma/client";
 import { enqueueNotification } from '@/platform/notifications';
 
-const REGISTRATION_COOKIE = sessionCookieName("registration_access");
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24;
 const TOKEN_GRACE_WINDOW_MS = 5 * 60 * 1000;
-const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
-
-function getSessionSecret() {
-  return process.env.DRAFT_SESSION_SECRET ?? "development-secret";
-}
-
-function signSession(value: string) {
-  return createHmac("sha256", getSessionSecret()).update(value).digest("hex");
-}
 
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
@@ -130,48 +119,15 @@ export async function consumeRegistrationToken(token: string) {
   return record;
 }
 
-function cookieValue(email: string, congressId: string) {
-  const raw = `${email.toLowerCase()}|${congressId}|${Date.now() + SESSION_TTL_MS}`;
-  const signature = signSession(raw);
-  return `${raw}|${signature}`;
+export async function setRegistrationCookie(email: string, congressId: string, parent?: FlowParent, accessTokenId?: string) {
+  await createFlowSession('REGISTRATION', { email, congressId, parent, accessTokenId });
 }
-
-export async function setRegistrationCookie(email: string, congressId: string) {
-  const cookieStore = await cookies();
-  cookieStore.set(REGISTRATION_COOKIE, cookieValue(email, congressId), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: secureSessionCookie(),
-    path: "/",
-    maxAge: 60 * 60 * 8,
-  });
-}
-
-export async function clearRegistrationCookie() {
-  const cookieStore = await cookies();
-  cookieStore.delete(REGISTRATION_COOKIE);
-}
-
-export async function readRegistrationSession(): Promise<{
-  email: string;
-  congressId: string;
-} | null> {
-  const cookieStore = await cookies();
-  const value = cookieStore.get(REGISTRATION_COOKIE)?.value;
-  if (!value) return null;
-
-  const parts = value.split("|");
-  if (parts.length !== 4) return null;
-
-  const [email, congressId, expiry, signature] = parts;
-  const expiresAt = Number(expiry); const now = Date.now();
-  if (!email || !congressId || !/^[a-f0-9]{64}$/.test(signature) || !/^\d{13}$/.test(expiry) || !Number.isSafeInteger(expiresAt) || expiresAt <= now || expiresAt > now + SESSION_TTL_MS) return null;
-  const expected = signSession(`${email}|${congressId}|${expiry}`);
-  if (!signature || Buffer.byteLength(expected) !== Buffer.byteLength(signature)) return null;
-
-  if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
-  await requireModule(congressId, "REGISTRATION");
-  return { email, congressId };
+export async function clearRegistrationCookie() { await clearFlowSession('REGISTRATION'); }
+export async function readRegistrationSession(): Promise<{ email: string; congressId: string } | null> {
+  const session = await readFlowSession('REGISTRATION');
+  if (!session) return null;
+  await requireModule(session.congressId, 'REGISTRATION');
+  return { email: session.email, congressId: session.congressId };
 }
 
 export type CongressWithTiers = Congress & { paymentTiers: PaymentTier[] };

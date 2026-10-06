@@ -1,8 +1,8 @@
 # Bildiri Yönetim Sistemi — v2 Geliştirme Planı
 
-> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08 ve P09 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
+> Durum: **P01, P02 yerel kapsamı, P03, P04, P05, P06, P07, P08, P09, P10 ve P11 tamamlandı; uzak v2 deneme yayını bekliyor** · Son güncelleme: 06.10.2026
 > İlk gerçek kullanım: EYİ 2026 (`eyi-2026`); canlı sistem korunuyor.
-> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
+> Bu kopya uygulama takibidir. Kaynak plan ayrı planlama sohbetindedir ve bu çalışmada değiştirilmedi. Kapanışlar `docs/P01_KAPANIS.md`, `docs/P02_KAPANIS.md`, `docs/P03_KAPANIS.md`, `docs/P04_KAPANIS.md`, `docs/P05_KAPANIS.md`, `docs/P06_KAPANIS.md`, `docs/P07_KAPANIS.md`, `docs/P08_KAPANIS.md`, `docs/P09_KAPANIS.md`, `docs/P10_KAPANIS.md`, `docs/P11_KAPANIS.md`. Henüz geliştirilmemiş modüller tamamlandı sayılmaz.
 
 ## 1. Hedef
 
@@ -314,10 +314,11 @@ Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygul
 - Yapılandırılmış özet gereken kongrede amaç/yöntem/bulgular/sonuç alanları, zorunluluk ve kelime sınırları gönderimde gösterilip kontrol ediliyor; kurallar TR/EN ve aşamaya göre ayarlanabiliyor.
 - E-posta veya panelden gelen talep ilgili başvuru/görev/belgeyle ilişkilendirilebiliyor; sorumlu, durum ve sonuç kaydı var. Tam otomatik posta kutusu eşleme sonraki bağlantı kararıdır.
 
-**P11 — Düzeltmeler**
+**P11 — Düzeltmeler — TAMAMLANDI (06.10.2026, yerel)**
 
 - Bölüm 4'teki gerekçe, kanıt, yazar/e-posta değişikliği, eski erişim iptali ve dosya sürümü kuralları örnek üzerinden doğrulanmış.
 - Önceki metin/dosya kaybolmuyor; değişikliğe bağlı belge/çıktı güncelleme ihtiyacı izleniyor.
+- 450 otomatik kontrol, 56 ayrı preview kontrolü ve tarayıcı kanıtı başarılı. 47 tablo final yedekten restore/parmak iziyle doğrulandı. Kapsam ve manuel çıktı takibi sınırı: `docs/P11_KAPANIS.md`.
 
 **P12 — Ödeme doğrulama**
 

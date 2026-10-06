@@ -27,6 +27,7 @@ export async function requestParticipantAccess(raw: unknown) {
   const congress = await participantCongress(input.data.congressSlug);
   if (!participationEnabled(congress)) throw new AccessError(403, 'Bu kongrede katılımcı işlemleri kapalı.');
   await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${congress.id} FOR UPDATE`;
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`participant-access:${congress.id}`}))`;
     const now = new Date();
     if (await tx.participantAccessToken.count({ where: { congressId: congress.id, email, createdAt: { gt: new Date(now.getTime() - 900000) } } }) >= 3 ||
@@ -45,9 +46,11 @@ export async function verifyParticipantAccess(raw: unknown) {
   if (!input.success) throw new AccessError(400, 'Bağlantı geçersiz.');
   const congress = await participantCongress(input.data.congressSlug);
   if (!participationEnabled(congress)) throw new AccessError(403, 'Katılımcı işlemleri kapalı.');
-  const token = newToken(), now = new Date();
+  const token = newToken();
   const oldToken = (await cookies()).get(cookieName)?.value;
   await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${congress.id} FOR UPDATE`;
+    const now = new Date();
     const access = await tx.participantAccessToken.findUnique({ where: { tokenHash: hashToken(input.data.token) } });
     if (!access || access.congressId !== congress.id || access.usedAt || access.expiresAt <= now) throw new AccessError(400, 'Bağlantının süresi dolmuş veya kullanılmış. Yeni bağlantı isteyin.');
     const claim = await tx.participantAccessToken.updateMany({ where: { id: access.id, usedAt: null, expiresAt: { gt: now } }, data: { usedAt: now } });
@@ -65,7 +68,7 @@ export async function participantIdentity(congressSlug: string) {
   if (!raw || !/^[a-f0-9]{64}$/.test(raw)) throw new AccessError(401, 'Katılımcı paneli için e-posta adresinizi doğrulayın.');
   const session = await prisma.participantSession.findUnique({ where: { tokenHash: hashToken(raw) } });
   if (!session || session.congressId !== congress.id || session.revokedAt || session.expiresAt <= new Date()) throw new AccessError(401, 'Katılımcı oturumunuz sona ermiş. E-posta bağlantısıyla yeniden giriş yapın.');
-  return { congressId: congress.id, email: session.email, congress };
+  return { congressId: congress.id, email: session.email, congress, parentSession: { kind: 'PARTICIPANT' as const, id: session.id } };
 }
 export async function participantLogout() {
   const store = await cookies(), raw = store.get(cookieName)?.value;

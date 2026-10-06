@@ -401,6 +401,8 @@ export async function updateAdminSubmissionStatus(input: {
   }
 
   await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${context.congress.id} FOR UPDATE`;
+    await tx.$queryRaw`SELECT id FROM "Submission" WHERE id = ${current.id} FOR UPDATE`;
     const changed = await tx.submission.updateMany({ where: { id: current.id, congressId: context.congress.id, status: current.status }, data: { status: input.status } });
     if (changed.count !== 1) throw new AccessError(409, 'Bildiri durumu başka bir işlemde değişti. Sayfayı yenileyin.');
     const history = await tx.submissionStatusHistory.create({ data: { submissionId: current.id, fromStatus: current.status, toStatus: input.status, note: note || null } });
@@ -749,14 +751,15 @@ export async function getAdminRegistrationDetail(
 
 export async function deleteAdminRegistration(registrationId: string) {
   const context = await requireContext("registrations.delete", "REGISTRATION");
-  const registration = await prisma.registration.findFirst({
-    where: { id: registrationId, congressId: context.congress.id },
-    select: { id: true },
+  return prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${context.congress.id} FOR UPDATE`;
+    const registration = await tx.registration.findFirst({
+      where: { id: registrationId, congressId: context.congress.id },
+      select: { id: true },
   });
   if (!registration) return false;
-  await prisma.$transaction([
-    prisma.registration.delete({ where: { id: registration.id } }),
-    auditSink(prisma)(context, "registration.delete", registration.id),
-  ]);
+  await tx.registration.delete({ where: { id: registration.id } });
+  await auditSink(tx)(context, "registration.delete", registration.id);
   return true;
+  });
 }

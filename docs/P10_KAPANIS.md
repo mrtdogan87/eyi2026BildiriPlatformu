@@ -3,6 +3,10 @@
 **Durum: Tamamlandı — yerel kabul ve kurtarma doğrulaması.**
 **Tarih: 06.10.2026.** Dal: `codex/v2-p10`. Canlı sistemlere değişiklik yapılmadı.
 
+> P11 tamamlandı: aşağıdaki bağımsız köprü çerezi sınırlaması artık
+> sunucuda iptal edilen bağlı oturumlarla giderildi. Güncel davranış için
+> `docs/P11_KAPANIS.md` esas alınır.
+
 ## Katılımcının görebildiği ve yapabildiği işlemler
 
 Kongreye ait `/<kongre>/katilimci` adresinden e-posta doğrulama bağlantısı

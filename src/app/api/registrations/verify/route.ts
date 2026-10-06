@@ -25,7 +25,7 @@ async function handlePOST(request: Request) {
   }
 
   await requireModule(record.congressId, "REGISTRATION");
-  await setRegistrationCookie(record.email, record.congressId);
+  await setRegistrationCookie(record.email, record.congressId, undefined, record.id);
 
   return NextResponse.json({
     email: record.email,

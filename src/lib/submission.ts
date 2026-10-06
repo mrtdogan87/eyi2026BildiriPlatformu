@@ -1,9 +1,8 @@
 import { deliveryAllowed } from "@/modules/congress/delivery";
 import { effectiveConfiguration } from "@/modules/congress/configuration";
-import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
-import { cookies } from "next/headers";
+import { createHash, randomBytes } from "crypto";
 import { prisma } from "@/lib/prisma";
-import { sessionCookieName, secureSessionCookie } from "@/lib/environment";
+import { createFlowSession, readFlowSession, clearFlowSession, type FlowParent } from "@/platform/flow-sessions";
 import {
   getCongressWithTiers,
   getCurrentPaymentPeriod,
@@ -25,11 +24,9 @@ import { enqueueNotification } from '@/platform/notifications';
 import { declarationDocuments } from '@/modules/participation/declarations';
 import { structuredAbstractSchema, emptyStructuredAbstract } from '@/modules/participation/abstract';
 
-const DRAFT_COOKIE = sessionCookieName("draft_access");
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const DRAFT_TOKEN_GRACE_WINDOW_MS = 5 * 60 * 1000;
-const DRAFT_SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const RECEIPT_ALLOWED_EXTENSIONS = [".pdf", ".jpg", ".jpeg", ".png"];
 const RECEIPT_ALLOWED_MIME_TYPES = new Set([
   "application/pdf",
@@ -40,10 +37,6 @@ const RECEIPT_ALLOWED_MIME_TYPES = new Set([
 
 export function getBaseUrl() {
   return process.env.APP_BASE_URL ?? "http://localhost:3000";
-}
-
-function getSessionSecret() {
-  return process.env.DRAFT_SESSION_SECRET ?? "development-secret";
 }
 
 export function isValidDocx(file: File) {
@@ -70,47 +63,12 @@ export function getDraftTokenWindowMinutes() {
   return DRAFT_TOKEN_GRACE_WINDOW_MS / (60 * 1000);
 }
 
-function signDraftSession(submissionId: string) {
-  return createHmac("sha256", getSessionSecret()).update(submissionId).digest("hex");
+export async function setDraftAccessCookie(submissionId: string, expectedEmail?: string, parent?: FlowParent, accessTokenHash?: string) {
+  const paper = await prisma.submission.findUniqueOrThrow({ where: { id: submissionId }, select: { congressId: true, draftOwnerEmail: true } });
+  await createFlowSession('SUBMISSION', { congressId: paper.congressId, submissionId, email: expectedEmail ?? paper.draftOwnerEmail, parent, accessTokenHash });
 }
-
-export async function setDraftAccessCookie(submissionId: string) {
-  const cookieStore = await cookies();
-  const payload = `${submissionId}.${Date.now() + DRAFT_SESSION_TTL_MS}`;
-  const signature = signDraftSession(payload);
-  cookieStore.set(DRAFT_COOKIE, `${payload}.${signature}`, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: secureSessionCookie(),
-    path: "/",
-    maxAge: 60 * 60 * 8,
-  });
-}
-
-export async function clearDraftAccessCookie() {
-  const cookieStore = await cookies();
-  cookieStore.delete(DRAFT_COOKIE);
-}
-
-export async function canAccessDraft(submissionId: string) {
-  const cookieStore = await cookies();
-  const value = cookieStore.get(DRAFT_COOKIE)?.value;
-  if (!value) {
-    return false;
-  }
-
-  const parts = value.split('.');
-  if (parts.length !== 3) return false;
-  const [cookieSubmissionId, expiry, signature] = parts;
-  const expiresAt = Number(expiry); const now = Date.now();
-  if (!cookieSubmissionId || !/^[a-f0-9]{64}$/.test(signature) || cookieSubmissionId !== submissionId || !/^\d{13}$/.test(expiry) || !Number.isSafeInteger(expiresAt) || expiresAt <= now || expiresAt > now + DRAFT_SESSION_TTL_MS) {
-    return false;
-  }
-
-  const expected = signDraftSession(`${submissionId}.${expiry}`);
-  if (Buffer.byteLength(signature) !== Buffer.byteLength(expected)) return false;
-  return timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
-}
+export async function clearDraftAccessCookie() { await clearFlowSession('SUBMISSION'); }
+export async function canAccessDraft(submissionId: string) { return (await readFlowSession('SUBMISSION'))?.submissionId === submissionId; }
 
 export async function ensureCongress(slug: string) {
   const congress = await prisma.congress.findUnique({ where: { slug } });
@@ -177,7 +135,7 @@ async function findDraftTokenRecord(token: string, now: Date) {
 export async function inspectDraftToken(token: string) {
   const now = new Date();
   const record = await findDraftTokenRecord(token, now);
-  if (!record || !isDraftTokenUsable(record.usedAt, now)) {
+  if (!record || record.email.toLowerCase() !== record.submission.draftOwnerEmail.toLowerCase() || !isDraftTokenUsable(record.usedAt, now)) {
     return null;
   }
 
@@ -188,7 +146,7 @@ export async function consumeDraftToken(token: string) {
   const now = new Date();
   const record = await findDraftTokenRecord(token, now);
 
-  if (!record || !isDraftTokenUsable(record.usedAt, now)) {
+  if (!record || record.email.toLowerCase() !== record.submission.draftOwnerEmail.toLowerCase() || !isDraftTokenUsable(record.usedAt, now)) {
     return null;
   }
 

@@ -1,5 +1,6 @@
 import { requireContext } from "@/platform/context";
 import { auditSink } from "@/platform/audit";
+import { AccessError } from "@/platform/http";
 import { apiRoute } from "@/platform/http";
 import { NextResponse } from "next/server";
 import {
@@ -49,22 +50,28 @@ async function handleDELETE(request: Request, { params }: RouteProps) {
   }
 
   const context = await requireContext("submissions.delete", "SUBMISSIONS");
-  const submission = await prisma.submission.findFirst({
-    where: {
-      id,
-      congressId: context.congress.id,
-    },
-    select: { id: true },
+  await prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM "Congress" WHERE id = ${context.congress.id} FOR UPDATE`;
+    await tx.$queryRaw`SELECT id FROM "Submission" WHERE id = ${id} AND "congressId" = ${context.congress.id} FOR UPDATE`;
+    const submission = await tx.submission.findFirst({
+      where: {
+        id,
+        congressId: context.congress.id,
+      },
+      select: { id: true },
   });
 
   if (!submission) {
-    return NextResponse.json({ error: "Bildiri bulunamadı." }, { status: 404 });
+    throw new AccessError(404, "Bildiri bulunamadı.");
   }
 
-  await prisma.$transaction([
-    prisma.submission.delete({ where: { id: submission.id } }),
-    auditSink(prisma)(context, "submission.delete", submission.id),
-  ]);
+  if (await tx.submissionFileVersion.count({ where: { submissionId: submission.id } }) || await tx.submissionChangeLog.count({ where: { submissionId: submission.id } }) || await tx.submissionRevisionRequest.count({ where: { submissionId: submission.id } })) {
+    throw new AccessError(409, 'Sürüm veya düzeltme geçmişi bulunan bildiri silinemez; geçmiş korunmalı.');
+  }
+
+  await tx.submission.delete({ where: { id: submission.id } });
+  await auditSink(tx)(context, "submission.delete", submission.id);
+  });
 
   return NextResponse.json({ ok: true });
 }

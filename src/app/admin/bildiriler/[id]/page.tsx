@@ -5,6 +5,8 @@ import { AdminDeleteSubmission } from "@/components/admin/admin-delete-submissio
 import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { AdminStatusForm } from "@/components/admin/admin-status-form";
 import { getAdminSubmissionDetail, requireAdminPage } from "@/lib/admin";
+import { revisionOverview } from '@/integrations/congress/revisions';
+import { RevisionManager } from '@/components/revisions/manager';
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +34,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
   if (!submission) notFound();
 
   const isTurkish = submission.submissionLanguage === "TR";
+  const revisions = await revisionOverview(id);
 
   return (
     <main className="page-shell admin-page-shell">
@@ -128,7 +131,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           {submission.registration ? (
             <div className="admin-author-item">
               <p>
-                <strong>Ödenen Tutar:</strong> {submission.registration.amountLabel}
+                <strong>Kayıt Tutarı:</strong> {submission.registration.amountLabel}
               </p>
               <p>
                 <strong>Sıra:</strong>{" "}
@@ -140,7 +143,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
                 <strong>Açıklama:</strong> {submission.registration.description}
               </p>
               <p>
-                <strong>Ödeme Tarihi:</strong> {formatDate(submission.registration.paidAt)}
+                <strong>Dekont Kayıt Tarihi:</strong> {formatDate(submission.registration.paidAt)}
               </p>
               <Link
                 className="button primary"
@@ -152,8 +155,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             </div>
           ) : (
             <div className="notice">
-              Bu bildiri için henüz kayıt ücreti yatırılmamış. Yazar Kayıt Ol sayfasından ödemesini
-              tamamlayabilir.
+              Bu bildiri için henüz ilişkili kayıt yok. Dekont kaydı ödeme doğrulaması değildir.
             </div>
           )}
         </div>
@@ -190,7 +192,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
 
         <div className="admin-detail-block admin-detail-block-danger">
           <h2>Tehlikeli İşlem · Bildiriyi Sil</h2>
-          {allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
+          {revisions.files.length || revisions.changes.length || revisions.requests.length ? <p className="notice">Bu bildirinin dosya veya düzeltme geçmişi korunur; kalıcı silme kapalıdır.</p> : allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
             submissionId={submission.id}
             submissionTitle={isTurkish ? submission.titleTr : submission.titleEn}
           /> : null}
@@ -219,6 +221,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           )}
         </div>
       </section>
+      <RevisionManager initial={revisions} canCorrect={allows(context.role, 'submissions.correct')} />
     </main>
   );
 }
