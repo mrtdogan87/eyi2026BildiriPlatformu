@@ -1,48 +1,30 @@
 import { apiRoute } from "@/platform/http";
 import { requireModule } from "@/platform/context";
 import { NextResponse } from "next/server";
-import { isEmailConfigured, sendRegistrationAccessEmail } from "@/lib/email";
+import { z } from 'zod';
 import { issueRegistrationLink } from "@/lib/registration";
 import { ensureCongress } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
 
 async function handlePOST(request: Request) {
   const { t, locale } = await getServerT();
-  const body = (await request.json()) as { congressSlug?: string; email?: string };
-  const email = body.email?.trim().toLowerCase();
-  const congressSlug = body.congressSlug?.trim();
-
-  if (!email || !congressSlug) {
+  const parsed = z.object({ congressSlug: z.string().trim().min(1).max(160), email: z.string().trim().toLowerCase().email().max(254) }).strict().safeParse(await request.json());
+  if (!parsed.success) {
     return NextResponse.json({ error: t("api.congressEmailRequired") }, { status: 400 });
   }
+  const { email, congressSlug } = parsed.data;
 
   const congress = await ensureCongress(congressSlug);
   await requireModule(congress.id, "REGISTRATION");
-  const magicLink = await issueRegistrationLink({
+  await issueRegistrationLink({
     congressId: congress.id,
     congressSlug: congress.slug,
-    email,
+    congressName: congress.name,
+    email, locale,
   });
 
-  const isDevelopmentPreview = process.env.NODE_ENV !== "production" && !isEmailConfigured();
-  if (isEmailConfigured()) {
-    try {
-      await sendRegistrationAccessEmail({
-        to: email,
-        congressName: congress.name,
-        magicLink,
-        locale,
-      });
-    } catch {
-      return NextResponse.json({ error: t("api.regLinkEmailFailed") }, { status: 500 });
-    }
-  } else if (process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: t("api.regResendMissing") }, { status: 500 });
-  }
-
   return NextResponse.json({
-    message: isDevelopmentPreview ? t("api.regLinkSentDev") : t("api.regLinkSent"),
-    magicLinkPreview: isDevelopmentPreview ? magicLink : undefined,
+    message: locale === 'en' ? 'Your registration link has been queued for email delivery.' : 'Kayıt bağlantınız e-posta gönderim kuyruğuna alındı.',
   });
 }
 

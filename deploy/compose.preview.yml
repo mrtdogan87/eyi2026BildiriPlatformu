@@ -41,6 +41,18 @@ services:
       db-v2-preview:
         condition: service_healthy
     restart: unless-stopped
+  mail-worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.preview
+      target: worker
+    env_file: ../.env.preview
+    volumes:
+      - v2-preview-mail:/app/.preview/mail
+    depends_on:
+      db-v2-preview:
+        condition: service_healthy
+    restart: unless-stopped
 volumes:
   v2-preview-db:
   v2-preview-mail:

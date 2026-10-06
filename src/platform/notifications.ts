@@ -1,2 +1,3 @@
-// Single notification port: the environment-aware adapter captures mail outside production.
-export { isEmailConfigured, sendAccountActivationEmail, sendSubmissionStatusEmail } from '@/lib/email';
+// Single notification port; delivery belongs to the durable queue worker.
+export { enqueueNotification } from '@/lib/email';
+export type { NotificationInput } from '@/lib/email';

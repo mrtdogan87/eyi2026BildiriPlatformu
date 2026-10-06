@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID, createHash, createHmac } from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 import { loadEnv } from './load-env.mjs';
 import { assertLocal } from './environment.mjs';
+import { waitForCapturedMail } from './captured-mail.mjs';
 
 loadEnv(); assertLocal();
 const base = process.env.APP_BASE_URL;
@@ -30,14 +30,7 @@ async function request(path, { method = 'GET', body, cookies = jar(), status = 2
   }
   return response;
 }
-function captured(to, subjectIncludes) {
-  const files = readdirSync('.local/mail').filter(x => x.endsWith('.json')).sort().reverse();
-  for (const file of files) {
-    const mail = JSON.parse(readFileSync(resolve('.local/mail', file), 'utf8'));
-    if (mail.to === to && mail.subject.toLocaleLowerCase('tr').includes(subjectIncludes.toLocaleLowerCase('tr'))) return mail;
-  }
-  throw new Error('Expected captured email is missing');
-}
+const captured = (to, subject) => waitForCapturedMail(to, { subject });
 function tokenFrom(mail) {
   const link = mail.text.split('\n').find(x => x.startsWith(base) && x.includes('?token='));
   assert.ok(link, 'Captured access email contains a local link');
@@ -52,7 +45,7 @@ try {
   checks.push('Closed congress rejects new submissions');
   const draft = await (await request('/api/submissions/drafts', { method: 'POST', cookies: participant, body: { congressSlug: 'eyi-2026', email, submissionLanguage: 'TR' } })).json();
   ok(!draft.submissionId && !draft.submission && !draft.magicLinkPreview && participant.size === 0, 'Draft request exposes no draft data or authenticated cookie');
-  const verified = await (await request('/api/submissions/drafts/verify', { method: 'POST', cookies: participant, body: { token: tokenFrom(captured(email, 'Taslak')) } })).json();
+  const verified = await (await request('/api/submissions/drafts/verify', { method: 'POST', cookies: participant, body: { token: tokenFrom(await captured(email, 'Taslak')) } })).json();
   const id = verified.submission.id;
   ok(participant.has('aibildiri_v2_local_draft_access') && !participant.has('draft_access'), 'Verified draft cookie uses independent namespace');
   checks.push('Captured draft link can be verified');
@@ -71,7 +64,7 @@ try {
   await request(`/api/submissions/${id}/file`, { method: 'PUT', cookies: participant, body: fileForm });
   const submit = await (await request(`/api/submissions/${id}/submit`, { method: 'POST', cookies: participant, body: { declarations: { accuracy: true, submissionLimit: true, coauthorApproval: true, personalDataConsent: true, registrationPresentationConsent: true } } })).json();
   ok(submit.submission.status === 'SUBMITTED', 'Draft, details, authors, participation, DOCX and final submission complete');
-  ok(Boolean(captured(email, 'Alındı')) && Boolean(captured(coauthorEmail, 'Alındı')), 'Submission notifications captured for both synthetic authors');
+  ok(Boolean(await captured(email, 'Alındı')) && Boolean(await captured(coauthorEmail, 'Alındı')), 'Submission notifications captured for both synthetic authors');
   await request('/api/admin/submissions', { status: 401 });
   const legacySignature = createHmac('sha256', 'retired-legacy-test-signing-secret').update('eyi-2026').digest('hex');
   await request('/api/admin/submissions', { cookies: new Map([['admin_session', `eyi-2026.${legacySignature}`]]), status: 401 });
@@ -82,9 +75,9 @@ try {
   const downloaded = Buffer.from(await (await request(`/api/admin/submissions/${id}/file`, { cookies: admin })).arrayBuffer());
   ok(digest(downloaded) === digest(docx), 'Admin DOCX download matches uploaded bytes');
   await request(`/api/admin/submissions/${id}/status`, { method: 'POST', cookies: admin, body: { status: 'ACCEPTED', note: 'P02 sentetik test kabulü' } });
-  ok(Boolean(captured(email, 'Durum')) && Boolean(captured(coauthorEmail, 'Durum')), 'Acceptance emails captured without delivery');
+  ok(Boolean(await captured(email, 'Durum')) && Boolean(await captured(coauthorEmail, 'Durum')), 'Acceptance emails captured without delivery');
   await request('/api/registrations/request', { method: 'POST', body: { congressSlug: 'eyi-2026', email } });
-  await request('/api/registrations/verify', { method: 'POST', cookies: registration, body: { token: tokenFrom(captured(email, 'Kayıt')) } });
+  await request('/api/registrations/verify', { method: 'POST', cookies: registration, body: { token: tokenFrom(await captured(email, 'Kayıt')) } });
   ok(registration.has('aibildiri_v2_local_registration_access'), 'Registration access link and separate cookie work');
   await request('/api/registrations/context', { cookies: registration });
   const receipt = readFileSync(new URL('./fixtures/synthetic-receipt.pdf', import.meta.url));

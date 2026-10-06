@@ -1,6 +1,6 @@
 # v2 yerel geliştirme
 
-Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p08`.
+Dizin `/Users/dentalai/Documents/AIBildiriYonV2/v2`, güncel paket dalı `codex/v2-p09`.
 Üst checkout korunmuştur. Node.js 22.13+ ve PostgreSQL 16 CLI araçları gerekir.
 Mac mini kurulumu 6 Ekim 2026'da Node 24.21.0/PostgreSQL 16.15 ile doğrulandı.
 Docker gerekmez. Taşıma ve doğrulama kaydı: [Mac mini kurulumu](MAC_MINI_KURULUM.md).
@@ -244,3 +244,86 @@ Temiz commit sonrası `node scripts/checkpoint.mjs P08-20261006-final`
 kaynak/özel test kanıtı/yerel DB yedeği alır; 32 tabloyu ayrı geçici yerel
 DB'ye tam geri yükleyip parmak izlerini karşılaştırır. Önceki checkpoint'ler
 korunur. Kapsam ve sınırlar [P08 kapanışında](P08_KAPANIS.md).
+
+
+## P09 iletişim kuyruğu ve worker
+
+Güncel Mac mini checkout'u `/Users/dentalai/Documents/AIBildiriYonV2/v2`,
+dal `codex/v2-p09`'dur. Baştaki temiz kurulum örneği yalnız boş çalışma
+kopyası içindir; taşınmış mevcut DB üzerinde `db:init`/seed tekrarlanmaz.
+Web adresi `http://127.0.0.1:3100`, DB `127.0.0.1:55432/aibildiri_v2` ve
+capture dizini `v2/.local/mail` olarak ayrılmıştır.
+
+`/admin/iletisim` içinden şablonlar, takip edilen Reply-To adresi ve aynı
+kongreye ait iletişim/panel bağlantısı ayarlanır. Genel sekretarya şablonu
+Reply-To ister. Önizleme örnek veriyle çalışır; test alıcısı `.invalid`
+olmalıdır. Kuyruktaki eski iletiler sonradan düzenlenen şablonu almaz.
+Gönderim geçmişi güvenli bağlantıları veya mesaj gövdelerini göstermez.
+
+Web isteği yalnız kuyruğa yazar. `npm run dev` ve `npm run start` yerelde
+capture worker'ı otomatik başlatır ve web kapandığında durdurur. Normal
+kullanımda v2 kökünde aşağıdaki komutlar yeterlidir:
+
+```sh
+npm run db:start
+npm run start
+```
+
+Worker'ı ayrı yönetmek için web'i `MAIL_WORKER_AUTOSTART=false npm run start`
+ile başlatıp diğer terminalde `npm run mail:worker` çalıştırın.
+
+Geliştirme için `start` yerine `dev` kullanılabilir. Değişikliklerden
+sonra production sürümü sınanacaksa çalışan web sürecini durdurup
+`npm run build`, ardından `npm run start` çalıştırın. Worker'ı da kod
+değişikliğinden sonra yeniden başlatın. Web başlatma komutu `V2_LOCAL_ROOT`
+ayarını kurar; standalone sunucuyu doğrudan açmayın. Node ve PostgreSQL
+16 araçları `PATH` içinde bulunmalıdır.
+
+`npm run mail:once` o anda hazır en fazla 20 işi bir tur işler; tüm
+kuyruğu boşalttığı anlamına gelmez. `mail:worker` iki saniyede bir yeni
+tur yapar; Ctrl+C ile kapanır. Worker kapalıyken işler DB'de bekler.
+Geçici hata toplam en fazla 5 denemeye tabidir; kalıcı hata veya belirsiz
+sağlayıcı sonucu panelde inceleme gerektirir. Süresi bitmiş/yenilenmiş
+erişim bağlantısı teslim edilmez. Yerelde SMTP/Resend kullanılmaz.
+
+P09 kuyruk yarışları ve hata simülasyonları test edilirken normal worker
+**kapalı** olmalıdır. Web'i `MAIL_WORKER_AUTOSTART=false npm run start` ile
+açıp `npm run test:communication` çalıştırın; bu test kendi kontrollü
+worker çağrılarını yapar. Sonra ayrı terminalde `npm run mail:worker`
+başlatın ve önceki paketlerin testlerini sırayla çalıştırın:
+
+```sh
+npm run test:smoke
+npm run test:platform
+npm run test:congress
+npm run test:site
+npm run test:cms
+npm run test:cms-starter
+npm run test:content
+npm run test:safety
+npm run test:preview
+```
+
+DB'ye yazan testleri sıralı çalıştırın. Sentetik kongre/ileti ve işlem
+geçmişi bırakırlar; capture kontrolü worker sonucunu bekler. P09 testinin
+SMTP/Resend nesneleri test adaptörleridir ve gerçek ağa gönderim yapmaz.
+Tüm saf testler ayrıca `node --test scripts/*.test.mjs` ile çalışır;
+test komutlarının saf bölümlerini gereksiz yere tekrar etmeyin. Preview
+kontrolü 3102'de ayrı kısa ömürlü uygulama açar; DB'ye bağlanmaz. Lint,
+TypeScript ve production build sonuçları ayrıca doğrulanır.
+
+Son P09 sayıları ve final kabul sonucu [P09 kapanışında](P09_KAPANIS.md)
+kayıtlıdır. HTTP/DB kanıtı `.local/communication-check-result.json`
+dosyasındadır; özel e-posta ve hesap dosyaları konsola yazdırılmaz.
+
+Kontroller bittikten sonra worker'ı durdurun; temiz paket commit'inden
+`node scripts/checkpoint.mjs P09-20261006-final` yeni checkpoint oluşturur.
+37 tablo ayrı geçici yerel DB'ye restore edilip parmak izleri eşleştirilir.
+Worker'ın durması yedek ile karşılaştırma arasında e-posta durumlarının
+değişmesini önler; bu sırada web üzerinden işlem/test yapmayın. PostgreSQL
+araçları farklı konumdaysa checkpoint için `PG_BIN` tanımlanır.
+
+Preview Compose'da ayrı `mail-worker` servisi vardır; ileride yetkili
+deneme yayını yapılırken uygulamayla birlikte başlatılmalıdır. Bu Mac'te
+Docker/uzak dağıtım denenmedi. Uzak v2 yayını ve P10 geliştirmesi bu
+yerel doğrulamadan ayrı işlerdir.

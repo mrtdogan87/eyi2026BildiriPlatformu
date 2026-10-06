@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { PrismaClient } from '@prisma/client';
 import { loadEnv } from './load-env.mjs';
 import { assertLocal } from './environment.mjs';
+import { waitForCapturedMail } from './captured-mail.mjs';
 loadEnv(); assertLocal();
 const db = new PrismaClient(); const base = process.env.APP_BASE_URL; const accounts = JSON.parse(readFileSync('.local/p03-accounts.json','utf8')); const suffix = randomUUID().slice(0,8); const checks = []; const admin = new Map(); const secretary = new Map(); const other = new Map(); const participant = new Map();
 const ok = (condition,label) => { assert.ok(condition,label); checks.push(label); };
@@ -16,9 +17,9 @@ async function req(path,{ method='GET',body,jar=new Map(),status=200 }={}) {
 const json = async (path, options) => (await req(path, options)).json();
 const post = (path,body,jar=admin,status=200) => json(path,{method:'POST',body,jar,status});
 const select = (id,jar=admin) => post('/api/platform/context',{congressId:id},jar);
-async function link(to,subject) {
-  for (const file of readdirSync('.local/mail').filter(f => f.endsWith('.json')).sort().reverse()) { const mail=JSON.parse(readFileSync('.local/mail/'+file,'utf8')); if(mail.to!==to || !mail.subject.includes(subject)) continue; const line = mail.text.split('\n').find(l => l.startsWith(base) && l.includes('?token=')); assert.ok(line);return new URL(line).searchParams.get('token'); }
-  throw new Error('Captured email missing');
+async function link(to,subject,previousToken) {
+  const mail=await waitForCapturedMail(to,{subject,predicate:mail=>!previousToken||!mail.text.includes(previousToken)});
+  const line=mail.text.split('\n').find(l=>l.startsWith(base)&&l.includes('?token='));assert.ok(line);return new URL(line).searchParams.get('token');
 }
 const config = { version:1,profile:'ABSTRACT_ONLY',languages:['TR'],theme:'simple',accent:'#246b46',modules:{SUBMISSIONS:true,REGISTRATION:false},stages:{ABSTRACT:{enabled:true,deadline:null},FULL_TEXT:{enabled:false,deadline:null},PARTICIPATION:{enabled:false,deadline:null},PAYMENT:{enabled:false,deadline:null}},fields:{abstract:'REQUIRED',keywords:'OPTIONAL',file:'HIDDEN',authorTitle:'OPTIONAL',authorInstitution:'OPTIONAL',authorCountry:'HIDDEN',presentationMode:'HIDDEN',audience:'HIDDEN',receipt:'HIDDEN',studentDocument:'HIDDEN'} };
 const settings = {name:`P04 Özet Kongresi ${suffix}`,year:2027,eventStartsAt:'2027-05-05T09:00:00+03:00',eventEndsAt:'2027-05-06T18:00:00+03:00',earlyDeadline:null,lateDeadline:null,bankName:'',bankAccountHolder:'',bankIban:'',bankBranch:'',configuration:config,fees:{presenter:999,student:888,listener:777,currency:'TRY'}};
@@ -105,7 +106,7 @@ try {
   await json('/api/platform/congresses/settings',{method:'PATCH',jar:admin,body:{configVersion:fullCurrent.configVersion,settings:fullSettings}});
   await post('/api/platform/delivery-exceptions',{email:fileOwner,submissionId:fileId,stage:'FULL_TEXT',reason:'Yalnız tam metin teslimi sınaması',expiresAt:'2099-01-01T00:00:00Z'},admin,201);
   await post('/api/submissions/drafts',{email:fileOwner,congressSlug:full.slug,submissionLanguage:'EN'},new Map());ok((await db.submission.findUniqueOrThrow({where:{id:fileId}})).submissionLanguage==='TR','Unauthenticated return request cannot alter saved submission language');
-  fileToken=await link(fileOwner,'Taslak');const continuePage=await (await req(`/${full.slug}/bildiri-gonder/devam?token=${encodeURIComponent(fileToken)}`)).text();ok(continuePage.includes('DraftLinkGate') || continuePage.includes('windowMinutes'),'Full-text-only extension exposes verified return gate after abstract closure');
+  fileToken=await link(fileOwner,'Taslak',fileToken);const continuePage=await (await req(`/${full.slug}/bildiri-gonder/devam?token=${encodeURIComponent(fileToken)}`)).text();ok(continuePage.includes('DraftLinkGate') || continuePage.includes('windowMinutes'),'Full-text-only extension exposes verified return gate after abstract closure');
   fileJar.clear();await post('/api/submissions/drafts/verify',{token:fileToken,congressSlug:full.slug},fileJar);
   await req(`/api/submissions/${fileId}/details`,{method:'PATCH',jar:fileJar,body:details,status:403});await req(`/api/submissions/${fileId}/submit`,{method:'POST',jar:fileJar,body:{declarations},status:400});
   const fileForm=new FormData();fileForm.set('file',new File([readFileSync('scripts/fixtures/synthetic.docx')],'full.docx',{type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'}));await req(`/api/submissions/${fileId}/file`,{method:'PUT',jar:fileJar,body:fileForm});const sent=await post(`/api/submissions/${fileId}/submit`,{declarations},fileJar);ok(sent.submission.status==='SUBMITTED','Full-text extension allows file and final delivery; frozen abstract edits and missing required file rejected');

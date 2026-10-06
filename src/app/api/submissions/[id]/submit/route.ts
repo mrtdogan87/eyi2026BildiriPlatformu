@@ -11,7 +11,9 @@ import {
   getSubmissionSnapshot,
 } from "@/lib/submission";
 import { getServerT } from "@/lib/i18n/server";
-import { isEmailConfigured, sendSubmissionReceivedEmail } from "@/lib/email";
+import { enqueueNotification } from '@/platform/notifications';
+import { createHash } from 'node:crypto';
+import { AccessError } from '@/platform/http';
 
 type RouteProps = {
   params: Promise<{ id: string }>;
@@ -85,14 +87,13 @@ async function handlePOST(_request: Request, { params }: RouteProps) {
     );
   }
 
-  const changed = await prisma.submission.updateMany({
-    where: { id, status:'DRAFT' },
-    data: { status: 'SUBMITTED', submittedAt: new Date() },
-  });
-  if (!changed.count) return NextResponse.json({ error:'Bildiri zaten gönderilmiş.' }, { status:409 });
-
-  // Tüm yazarlara "bildiriniz alındı" bildirimi (bildirinin dilinde). Hata gönderimi engellemez.
-  if (isEmailConfigured()) {
+  await prisma.$transaction(async tx => {
+    const changed = await tx.submission.updateMany({
+      where: { id, status: 'DRAFT' },
+      data: { status: 'SUBMITTED', submittedAt: new Date() },
+    });
+    if (!changed.count) throw new AccessError(409, 'Bildiri zaten gönderilmiş.');
+    // Durable enqueue is part of submission acceptance; provider delivery is not.
     const emailLocale: "tr" | "en" = submission.submissionLanguage === "EN" ? "en" : "tr";
     const paperTitle =
       submission.submissionLanguage === "EN"
@@ -103,21 +104,13 @@ async function handlePOST(_request: Request, { params }: RouteProps) {
         submission.authors.map((author) => author.email.trim().toLowerCase()).filter(Boolean),
       ),
     ];
-    try {
-      await Promise.allSettled(
-        recipients.map((recipient) =>
-          sendSubmissionReceivedEmail({
-            to: recipient,
-            congressName: submission.congress.name,
-            paperTitle,
-            locale: emailLocale,
-          }),
-        ),
-      );
-    } catch {
-      // bildirim hatası bildirinin gönderimini etkilemez
-    }
-  }
+    for (const recipient of recipients) await enqueueNotification(tx, {
+      congressId: submission.congressId, key: 'SUBMISSION_RECEIVED', locale: emailLocale, to: recipient,
+      dedupeKey: `submission-received:${id}:${createHash('sha256').update(recipient).digest('hex')}`,
+      module: 'SUBMISSIONS', sourceType: 'submission', sourceId: id,
+      values: { congressName: submission.congress.name, paperTitle },
+    });
+  });
 
   await clearDraftAccessCookie();
 

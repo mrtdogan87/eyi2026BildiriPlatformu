@@ -47,6 +47,10 @@ enum RegistrationKind {
 }
 
 model Congress {
+  emailSettings            EmailSettings?
+  emailTemplates           EmailTemplate[]
+  emailMessages            EmailMessage[]
+  emailDeliveryIssues      EmailDeliveryIssue[]
   siteRecords              SiteRecord[]
   feedbackRequests         FeedbackRequest[]
   cmsAliases               CmsPageAlias[]
@@ -313,24 +317,25 @@ model Organization {
 }
 
 model PlatformUser {
-  cmsRevisions       CmsRevision[]
-  cmsMedia           CmsMedia[]
-  id                 String                   @id @default(cuid())
-  email              String                   @unique
-  name               String
-  passwordHash       String?
-  platformAdmin      Boolean                  @default(false)
-  active             Boolean                  @default(true)
-  failedLogins       Int                      @default(0)
-  lockedUntil        DateTime?
-  createdAt          DateTime                 @default(now())
-  updatedAt          DateTime                 @updatedAt
-  organizations      OrganizationMembership[]
-  congresses         CongressMembership[]
-  sessions           PlatformSession[]
-  deliveryExceptions DeliveryException[]
-  activationTokens   ActivationToken[]
-  audits             AuditLog[]
+  emailDeliveryIssues EmailDeliveryIssue[]
+  cmsRevisions        CmsRevision[]
+  cmsMedia            CmsMedia[]
+  id                  String                   @id @default(cuid())
+  email               String                   @unique
+  name                String
+  passwordHash        String?
+  platformAdmin       Boolean                  @default(false)
+  active              Boolean                  @default(true)
+  failedLogins        Int                      @default(0)
+  lockedUntil         DateTime?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  organizations       OrganizationMembership[]
+  congresses          CongressMembership[]
+  sessions            PlatformSession[]
+  deliveryExceptions  DeliveryException[]
+  activationTokens    ActivationToken[]
+  audits              AuditLog[]
 }
 
 model OrganizationMembership {
@@ -629,4 +634,118 @@ model FeedbackRequest {
   @@unique([congressId, requestKey])
   @@index([congressId, status, createdAt])
   @@index([congressId, email, createdAt])
+}
+
+enum EmailMessageStatus {
+  PENDING
+  PROCESSING
+  RETRY
+  CAPTURED
+  ACCEPTED
+  PERMANENT_FAILURE
+  UNKNOWN
+  CANCELLED
+}
+
+enum EmailIssueStatus {
+  OPEN
+  RESOLVED
+}
+
+model EmailSettings {
+  congressId String   @id
+  congress   Congress @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  replyTo    String?
+  replyUrl   String?
+  version    Int      @default(1)
+  updatedAt  DateTime @updatedAt
+}
+
+model EmailTemplate {
+  id         String   @id @default(cuid())
+  congressId String
+  congress   Congress @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  key        String
+  locale     String
+  subject    String
+  body       String
+  version    Int      @default(1)
+  updatedAt  DateTime @updatedAt
+
+  @@unique([congressId, key, locale])
+}
+
+model EmailMessage {
+  id              String              @id @default(uuid())
+  congressId      String
+  congress        Congress            @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  dedupeKey       String
+  payloadHash     String
+  module          ModuleKey?
+  templateKey     String
+  templateVersion Int
+  locale          String
+  recipient       String
+  subject         String
+  text            String
+  html            String
+  replyTo         String?
+  sourceType      String?
+  sourceId        String?
+  expiresAt       DateTime?
+  status          EmailMessageStatus  @default(PENDING)
+  version         Int                 @default(1)
+  attempts        Int                 @default(0)
+  nextAttemptAt   DateTime            @default(now())
+  lastAttemptAt   DateTime?
+  leaseToken      String?
+  leaseUntil      DateTime?
+  provider        String?
+  providerId      String?
+  acceptedAt      DateTime?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  history         EmailAttempt[]
+  deliveryIssue   EmailDeliveryIssue?
+
+  @@unique([congressId, dedupeKey])
+  @@index([status, nextAttemptAt])
+  @@index([status, leaseUntil])
+  @@index([congressId, createdAt])
+  @@index([congressId, sourceType, sourceId])
+}
+
+// Append-only delivery audit. No credentials, access links or raw provider responses.
+model EmailAttempt {
+  id           String       @id @default(cuid())
+  messageId    String
+  message      EmailMessage @relation(fields: [messageId], references: [id], onDelete: Restrict)
+  number       Int
+  provider     String
+  outcome      String
+  errorCode    String?
+  errorSummary String?
+  startedAt    DateTime
+  finishedAt   DateTime     @default(now())
+
+  @@unique([messageId, number])
+}
+
+model EmailDeliveryIssue {
+  id          String           @id @default(cuid())
+  congressId  String
+  congress    Congress         @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  messageId   String           @unique
+  message     EmailMessage     @relation(fields: [messageId], references: [id], onDelete: Restrict)
+  status      EmailIssueStatus @default(OPEN)
+  version     Int              @default(1)
+  note        String           @default("")
+  resolution  String?
+  updatedById String?
+  updatedBy   PlatformUser?    @relation(fields: [updatedById], references: [id], onDelete: SetNull)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  resolvedAt  DateTime?
+
+  @@index([congressId, status, createdAt])
 }

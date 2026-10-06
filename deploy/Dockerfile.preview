@@ -28,3 +28,17 @@ RUN mkdir -p /app/.preview/mail && chown -R node:node /app/.preview
 USER node
 EXPOSE 3000
 CMD ["node", "server.js"]
+
+# Durable queue processor, deployed separately from the web process.
+FROM node:22-alpine AS worker
+RUN apk add --no-cache openssl
+WORKDIR /app
+ENV NODE_ENV=production
+COPY package.json package-lock.json ./
+COPY prisma ./prisma
+RUN npm ci --omit=dev
+COPY scripts/mail-worker.mjs scripts/environment.mjs scripts/load-env.mjs ./scripts/
+COPY src/modules/communication/queue.mjs src/modules/communication/transport.mjs ./src/modules/communication/
+RUN mkdir -p /app/.preview/mail && chown -R node:node /app/.preview
+USER node
+CMD ["node", "scripts/mail-worker.mjs", "--watch"]

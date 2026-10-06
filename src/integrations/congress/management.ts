@@ -1,4 +1,6 @@
 import { AccessError } from "@/platform/http";
+import { enqueueNotification } from '@/platform/notifications';
+import { createHash } from 'node:crypto';
 import mammoth from "mammoth";
 import type { PaymentPeriod, SubmissionStatus } from "@prisma/client";
 import {
@@ -401,8 +403,22 @@ export async function updateAdminSubmissionStatus(input: {
   await prisma.$transaction(async tx => {
     const changed = await tx.submission.updateMany({ where: { id: current.id, congressId: context.congress.id, status: current.status }, data: { status: input.status } });
     if (changed.count !== 1) throw new AccessError(409, 'Bildiri durumu başka bir işlemde değişti. Sayfayı yenileyin.');
-    await tx.submissionStatusHistory.create({ data: { submissionId: current.id, fromStatus: current.status, toStatus: input.status, note: note || null } });
+    const history = await tx.submissionStatusHistory.create({ data: { submissionId: current.id, fromStatus: current.status, toStatus: input.status, note: note || null } });
     await auditSink(tx)(context, 'submission.status', current.id, { before: current.status, after: input.status, note });
+    if (input.status === 'ACCEPTED' || input.status === 'REJECTED') {
+      const paper = await tx.submission.findUniqueOrThrow({ where: { id: current.id }, include: { authors: true } });
+      const locale = paper.submissionLanguage === 'EN' ? 'en' : 'tr';
+      const paperTitle = locale === 'en' ? paper.titleEn || paper.titleTr || 'Paper' : paper.titleTr || paper.titleEn || 'Bildiri';
+      const recipients = [...new Set([paper.draftOwnerEmail, ...paper.authors.map(author => author.email)].map(email => email.trim().toLowerCase()).filter(Boolean))];
+      const registration = await tx.congressModule.findUnique({ where: { congressId_key: { congressId: context.congress.id, key: 'REGISTRATION' } } });
+      const registrationUrl = input.status === 'ACCEPTED' && registration?.enabled ? `${process.env.APP_BASE_URL}/${context.congress.slug}/kayit` : '';
+      for (const recipient of recipients) await enqueueNotification(tx, {
+        congressId: context.congress.id, key: 'SUBMISSION_STATUS', locale, to: recipient,
+        dedupeKey: `submission-status:${history.id}:${createHash('sha256').update(recipient).digest('hex')}`,
+        module: 'SUBMISSIONS', sourceType: 'submission-status-history', sourceId: history.id,
+        values: { congressName: context.congress.name, paperTitle, statusLabel: locale === 'en' ? (input.status === 'ACCEPTED' ? 'Accepted' : 'Rejected') : mapSubmissionStatus(input.status), registrationUrl },
+      });
+    }
   });
 
   return {

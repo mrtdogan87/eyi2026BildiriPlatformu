@@ -26,6 +26,7 @@ import type {
   RegistrationQuote,
 } from "@/types/submission";
 import type { Congress, PaymentTier, Submission } from "@prisma/client";
+import { enqueueNotification } from '@/platform/notifications';
 
 const REGISTRATION_COOKIE = sessionCookieName("registration_access");
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 24;
@@ -54,34 +55,43 @@ export function buildRegistrationMagicLink(slug: string, token: string) {
 export async function issueRegistrationLink(input: {
   congressId: string;
   congressSlug: string;
+  congressName: string;
   email: string;
+  locale: Locale;
 }) {
-  const now = new Date();
-  const token = generateAccessToken();
-  const tokenHash = hashToken(token);
-  const expiresAt = new Date(now.getTime() + TOKEN_TTL_MS);
+  return prisma.$transaction(async tx => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`registration-access:${input.congressId}:${input.email}`}))`;
+    const now = new Date();
+    const token = generateAccessToken();
+    const tokenHash = hashToken(token);
+    const expiresAt = new Date(now.getTime() + TOKEN_TTL_MS);
 
-  await prisma.registrationAccessToken.updateMany({
-    where: {
-      congressId: input.congressId,
-      email: input.email,
-      expiresAt: { gt: now },
-    },
-    data: { expiresAt: now },
+    await tx.registrationAccessToken.updateMany({
+      where: {
+        congressId: input.congressId,
+        email: input.email,
+        expiresAt: { gt: now },
+      },
+      data: { expiresAt: now },
+    });
+
+    const record = await tx.registrationAccessToken.create({
+      data: {
+        congressId: input.congressId,
+        email: input.email,
+        tokenHash,
+        expiresAt,
+      },
+    });
+
+    const magicLink = buildRegistrationMagicLink(input.congressSlug, token);
+
+    await enqueueNotification(tx, {
+      congressId: input.congressId, key: 'REGISTRATION_ACCESS', locale: input.locale, to: input.email,
+      dedupeKey: `registration-access:${record.id}`, module: 'REGISTRATION', sourceType: 'registration-access-token', sourceId: record.id, expiresAt,
+      values: { congressName: input.congressName, accessLink: magicLink },
+    });
   });
-
-  await prisma.registrationAccessToken.create({
-    data: {
-      congressId: input.congressId,
-      email: input.email,
-      tokenHash,
-      expiresAt,
-    },
-  });
-
-  const magicLink = buildRegistrationMagicLink(input.congressSlug, token);
-
-  return magicLink;
 }
 
 async function findTokenRecord(token: string, now: Date) {

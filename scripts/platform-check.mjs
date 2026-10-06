@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { PrismaClient } from '@prisma/client';
 import { loadEnv } from './load-env.mjs';
 import { assertLocal } from './environment.mjs';
 import { hashToken } from '../src/platform/password.mjs';
+import { waitForCapturedMail } from './captured-mail.mjs';
 loadEnv(); assertLocal();
 const prisma = new PrismaClient(); const base = process.env.APP_BASE_URL;
 const accounts = JSON.parse(readFileSync('.local/p03-accounts.json', 'utf8'));
@@ -95,15 +96,15 @@ try {
   passed('Status mutation and history have actor/congress audit evidence');
   await req('/api/platform/modules', { method: 'PATCH', body: { key: 'REVIEWS', enabled: true }, jar: organizer, status: 400 });
   const publicEmail = `p03-owner-${Date.now()}@example.invalid`; const draftJar = {}; const regJar = {};
-  function latestMail(to) { return readdirSync('.local/mail').filter(x => x.endsWith('.json')).sort().reverse().map(x => JSON.parse(readFileSync(`.local/mail/${x}`, 'utf8'))).find(m => m.to === to); }
+  const latestMail = (to, subject) => waitForCapturedMail(to, { subject });
   await req('/api/submissions/drafts', { method: 'POST', body: { congressSlug: 'eyi-2026', email: publicEmail } });
-  const draftToken = /token=([a-f0-9]+)/.exec(latestMail(publicEmail).text)[1];
+  const draftToken = /token=([a-f0-9]+)/.exec((await latestMail(publicEmail, 'Taslak')).text)[1];
   await req('/api/submissions/drafts/verify', { method: 'POST', body: { token: draftToken, congressSlug: 'kongre-b-2026' }, status: 400 });
   const draft = (await req('/api/submissions/drafts/verify', { method: 'POST', body: { token: draftToken, congressSlug: 'eyi-2026' }, jar: draftJar })).data.submission;
   const crossDraftPage = (await req(`/kongre-b-2026/bildiri-gonder?draft=${draft.id}`, { jar: draftJar })).data;
   assert(!crossDraftPage.includes(publicEmail));
   await req('/api/registrations/request', { method: 'POST', body: { congressSlug: 'eyi-2026', email: publicEmail } });
-  const regToken = /token=([a-f0-9]+)/.exec(latestMail(publicEmail).text)[1];
+  const regToken = /token=([a-f0-9]+)/.exec((await latestMail(publicEmail, 'Kayıt')).text)[1];
   await req('/api/registrations/verify', { method: 'POST', body: { token: regToken, congressSlug: 'kongre-b-2026' }, status: 400 });
   await req('/api/registrations/verify', { method: 'POST', body: { token: regToken, congressSlug: 'eyi-2026' }, jar: regJar });
   await req('/api/registrations/context', { jar: regJar });
@@ -167,12 +168,11 @@ try {
 
   const email = `invite-${Date.now()}@example.invalid`;
   await req('/api/platform/members', { method: 'POST', body: { email, name: 'P03 Davet Testi', role: 'CONTENT_EDITOR' }, jar: organizer });
-  const mails = readdirSync('.local/mail').filter(x => x.endsWith('.json')).map(x => JSON.parse(readFileSync(`.local/mail/${x}`, 'utf8')));
-  const mail = mails.find(m => m.to === email); assert(mail);
+  const mail = await waitForCapturedMail(email); assert(mail);
   const oldToken = /token=([a-f0-9]{64})/.exec(mail.text)[1];
   const member = (await req('/api/platform/members', { jar: organizer })).data.members.find(m => m.user.email === email);
   await req(`/api/platform/members/${member.id}`, { method: 'POST', body: {}, jar: organizer });
-  const resent = readdirSync('.local/mail').filter(x => x.endsWith('.json')).sort().reverse().map(x => JSON.parse(readFileSync(`.local/mail/${x}`, 'utf8'))).find(m => m.to === email);
+  const resent = await waitForCapturedMail(email, { predicate: message => !message.text.includes(oldToken) });
   const token = /token=([a-f0-9]{64})/.exec(resent.text)[1]; const password = accounts.editor.password;
   assert.notEqual(oldToken, token);
   await req('/api/platform/activate', { method: 'POST', body: { token: oldToken, password }, status: 400 });

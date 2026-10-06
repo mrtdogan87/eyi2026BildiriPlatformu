@@ -26,6 +26,11 @@ try {
   }
   if (!ready) throw new Error('Preview probe server did not start');
   const checks = [];
+  for (const path of ['/admin/iletisim', '/api/platform/communication', '/api/platform/communication/settings', '/api/platform/communication/templates', '/api/platform/communication/preview', '/api/platform/communication/test', '/api/platform/communication/messages/test', '/api/platform/communication/messages/test/retry', '/api/platform/communication/messages/test/cancel', '/api/platform/communication/issues/test']) {
+    const r = await fetch(base + path);
+    if (r.status !== 401 || !r.headers.get('www-authenticate') || r.headers.get('x-robots-tag') !== 'noindex, nofollow') throw new Error('Communication preview access was not blocked');
+    checks.push(`Anonymous ${path}: 401`);
+  }
   for (const path of ['/admin/icerik', '/admin/talepler', '/api/platform/content', '/api/platform/content/test/publication', '/api/platform/feedback', '/api/public/congresses/eyi-2026/feedback', '/admin', '/eyi-2026', '/api/admin/submissions', '/api/registrations/request', '/api/admin/submissions/test/file', '/api/platform/site', '/api/public/congresses/eyi-2026/assets/logo', '/admin/cms', '/admin/cms/test/onizleme', '/api/platform/cms/pages', '/api/platform/cms/templates', '/api/platform/cms/eyi-import', '/api/platform/cms/pages/test/manage', '/admin/cms/aktarim', '/api/platform/cms/media/test/file', '/eyi-2026/sayfalar/rehber', '/api/public/congresses/eyi-2026/media/test']) {
     const r = await fetch(base + path);
     if (r.status !== 401 || !r.headers.get('www-authenticate') || r.headers.get('x-robots-tag') !== 'noindex, nofollow') throw new Error('Preview anonymous request was not blocked');

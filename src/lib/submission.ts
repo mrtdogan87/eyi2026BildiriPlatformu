@@ -20,6 +20,8 @@ import type {
 } from "@/types/submission";
 import { AccessError } from "@/platform/http";
 import type { Locale, TFunction } from "@/lib/i18n";
+import type { Prisma } from '@prisma/client';
+import { enqueueNotification } from '@/platform/notifications';
 
 const DRAFT_COOKIE = sessionCookieName("draft_access");
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -113,13 +115,17 @@ export function buildMagicLink(congressSlug: string, token: string) {
   return `${getBaseUrl()}/${congressSlug}/bildiri-gonder/devam?token=${token}`;
 }
 
-export async function issueDraftLink(submissionId: string, email: string, congressSlug: string) {
+export async function issueDraftLink(tx: Prisma.TransactionClient, input: {
+  submissionId: string; email: string; congressId: string; congressSlug: string; congressName: string; locale: Locale;
+}) {
+  const { submissionId, email, congressSlug } = input;
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`draft-access:${submissionId}`}))`;
   const now = new Date();
   const token = generateAccessToken();
   const tokenHash = hashToken(token);
   const expiresAt = new Date(now.getTime() + 1000 * 60 * 60 * 24);
 
-  await prisma.submissionAccessToken.updateMany({
+  await tx.submissionAccessToken.updateMany({
     where: {
       submissionId,
       expiresAt: { gt: now },
@@ -127,7 +133,7 @@ export async function issueDraftLink(submissionId: string, email: string, congre
     data: { expiresAt: now },
   });
 
-  await prisma.submissionAccessToken.create({
+  const record = await tx.submissionAccessToken.create({
     data: {
       submissionId,
       email,
@@ -137,8 +143,11 @@ export async function issueDraftLink(submissionId: string, email: string, congre
   });
 
   const magicLink = buildMagicLink(congressSlug, token);
-
-  return magicLink;
+  await enqueueNotification(tx, {
+    congressId: input.congressId, key: 'DRAFT_ACCESS', locale: input.locale, to: email,
+    dedupeKey: `draft-access:${record.id}`, module: 'SUBMISSIONS', sourceType: 'submission-access-token', sourceId: record.id, expiresAt,
+    values: { congressName: input.congressName, accessLink: magicLink },
+  });
 }
 
 function isDraftTokenUsable(usedAt: Date | null, now: Date) {
