@@ -16,7 +16,7 @@ export function AdminNavigationGuard({children}:{children:ReactNode}){
     collect();const observer=new MutationObserver(collect);if(root.current)observer.observe(root.current,{childList:true,subtree:true});
     const leaving=(event:BeforeUnloadEvent)=>{if(dirty()){event.preventDefault();event.returnValue='';}};
     const started=(event:Event)=>{const id=(event as CustomEvent<string>).detail,form=submitted.current;if(form?.isConnected)requests.current.set(id,{form,values:snapshot(form)});submitted.current=null;};
-    const saved=(event:Event)=>{const id=(event as CustomEvent<string>).detail,request=requests.current.get(id);if(request)forms.current.set(request.form,request.values);requests.current.delete(id);};
+    const saved=(event:Event)=>{const id=(event as CustomEvent<string>).detail,request=requests.current.get(id);if(request){if(snapshot(request.form)===request.values)requestAnimationFrame(()=>{if(request.form.isConnected)forms.current.set(request.form,snapshot(request.form));});else forms.current.set(request.form,request.values);}requests.current.delete(id);};
     const failed=(event:Event)=>{requests.current.delete((event as CustomEvent<string>).detail);};
     window.addEventListener('beforeunload',leaving);window.addEventListener('admin-ui:request',started);window.addEventListener('admin-ui:saved',saved);window.addEventListener('admin-ui:failed',failed);
     return ()=>{observer.disconnect();window.removeEventListener('beforeunload',leaving);window.removeEventListener('admin-ui:request',started);window.removeEventListener('admin-ui:saved',saved);window.removeEventListener('admin-ui:failed',failed);resolve.current?.(false);};

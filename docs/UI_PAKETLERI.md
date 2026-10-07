@@ -6,8 +6,8 @@ Kök plan Bölüm 17, UI01–UI10. Başlangıç `5c0ef78`. Yerel dal: `codex/adm
 |---|---|---|
 | UI01 | Tamamlandı | Üç örnek ekran, 33 menü hedefi, ortak bileşen ve stil kuralları. 6 rol/modül/menü kontrolü, TypeScript; masaüstü ve 390 px, klavye sekmeleri. Mobil örnekte içerik taşması giderildi. |
 | UI02 | Tamamlandı | Dar çerçeve, gruplanmış menü, aranan kongre seçici, konum yolu, hesap, dört kısa yol. 19 mevcut platform regresyonu, TypeScript/ESLint; masaüstü/390 px, menü Escape dönüşü, taslakta gezinme ve kongre geçişini iptal. |
-| UI03 | Devam ediyor | Platform, kurum, kullanıcı, kongre kurulumu, ayarlar, modüller, ekip. |
-| UI04 | Planlandı | Listeler, kayıt detayları ve günlük operasyon. |
+| UI03 | Tamamlandı | Seçilen kurum/kullanıcı/kongre ayrıntısı, dört adımlı kurulum, gruplanmış modül etkileri, ekip kapsamları. 11 yapılandırma + 29 kongre + 34 yönetim + 4 boş kurulum regresyonu; build, TypeScript, ESLint. Masaüstü/390 px, sentetik kurum+kongre kurulum sonucu ve eksik alanın doğru adıma odağı doğrulandı. |
+| UI04 | Devam ediyor | Listeler, kayıt detayları ve günlük operasyon. |
 | UI05 | Planlandı | CMS, medya, içerik, yayın kontrolleri. |
 | UI06 | Planlandı | Hakemlik, kişisel hakem görevleri ve ödüller. |
 | UI07 | Planlandı | Program, görevler, etkinlik ve yoklama. |
