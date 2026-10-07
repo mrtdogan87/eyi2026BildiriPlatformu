@@ -1,4 +1,5 @@
 'use client';
+import {uiFetch} from '@/components/admin-ui/mutation';
 import type { FormEvent } from 'react';
 import type { z } from 'zod';
 import type { evaluationSchema } from '@/modules/reviews/core';
@@ -17,7 +18,7 @@ export function evaluationOf(f: FormData, version: number, criteria: Array<{ id:
 export async function reviewRequest<T>(url: string, payload: unknown, file?: File | null) {
   const form = file !== undefined ? new FormData() : null;
   if (form) { form.set('payload', JSON.stringify(payload)); if (file?.size) form.set('file', file); }
-  const response = await fetch(url, { method: 'POST', headers: form ? {} : { 'Content-Type': 'application/json' }, body: form ?? JSON.stringify(payload) });
+  const response = await uiFetch(url, { method: 'POST', headers: form ? {} : { 'Content-Type': 'application/json' }, body: form ?? JSON.stringify(payload) });
   const data = await response.json(); if (!response.ok) throw new Error(data.error ?? 'İşlem tamamlanamadı.'); return data as T;
 }
 export async function readReview<T>(url: string) { const r = await fetch(url); const data = await r.json(); if (!r.ok) throw new Error(data.error ?? 'Kayıt okunamadı.'); return data as T; }
