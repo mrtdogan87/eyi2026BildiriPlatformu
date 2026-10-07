@@ -15,3 +15,9 @@
 .admin-ui .cms-media-grid:has(.ui-directory),.admin-ui .cms-page-list:has(.ui-directory),.admin-ui .pricing-tier-grid:has(.ui-directory){display:block}.admin-ui .cms-media-card{grid-template-columns:minmax(0,200px) minmax(0,1fr)}.admin-ui .cms-media-thumb img{width:100%;height:auto}.admin-ui .cms-block-editor .ui-record-list button{min-width:0}.admin-ui .cms-edit-block{border:0;padding:0;margin:0}.admin-ui .cms-editor form>fieldset{margin:16px 0}.admin-ui .cms-editor .ui-workspace>div[role=tabpanel]{padding-top:16px}@media(max-width:760px){.admin-ui .cms-media-card{grid-template-columns:1fr}}
 
 .admin-ui .ui-record-detail{container-type:inline-size}@container(max-width:700px){.admin-ui .ui-directory-selected{grid-template-columns:1fr}}
+.admin-ui .ui-slot-layout { display:grid; grid-template-columns:minmax(220px,1fr) minmax(260px,1fr); gap:20px; align-items:start; }
+.admin-ui .ui-slot-list { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0; }
+.admin-ui .ui-slot-list [aria-pressed="true"] { color:var(--ui-accent); border-color:var(--ui-accent); background:#eef4fc; }
+.admin-ui .ui-recipient-picks { max-height:360px; overflow:auto; padding:8px; border:1px solid var(--ui-line); border-radius:8px; }
+@container (max-width:700px) { .admin-ui .ui-slot-layout { grid-template-columns:1fr; } }
+@media(max-width:760px) { .admin-ui .ui-slot-layout { grid-template-columns:1fr; } }
