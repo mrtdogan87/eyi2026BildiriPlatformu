@@ -1,6 +1,6 @@
 # P22 — Yerel pilot işletimi
 
-Bu belge 07.10.2026 tarihinde bu Mac mini üzerindeki **yerel, sentetik v2** için hazırlanmıştır. Uzak dağıtım veya gerçek kurum verisi aktarımı yapılmadı. Uygulama `/Users/dentalai/Documents/AIBildiriYonV2/v2`, dal `codex/v2-p22`; Node 24 ve PostgreSQL 16 kullanılır.
+Bu belge 07.10.2026 tarihinde bu Mac mini üzerindeki **yerel, sentetik v2** için hazırlanmıştır. Uzak dağıtım veya gerçek kurum verisi aktarımı yapılmadı. Uygulama `/Users/dentalai/Documents/AIBildiriYonV2/v2`, dal `codex/acceptance-fixes-20261007`; Node 24 ve PostgreSQL 16 kullanılır.
 
 ## Açma ve durdurma
 
@@ -12,7 +12,7 @@ npm run db:start
 npm run start
 ```
 
-Son üretim derlemesi hazırdır. Kod değişirse uygulamayı Ctrl+C ile durdurup `npm run build`, sonra `npm run start` çalıştırın. Geliştirme için `npm run dev` kullanılabilir. Aynı portta ikinci sunucu açmayın. `start` ve `dev`, varsayılan olarak yerel capture işçisini de başlatır. İşçiyi ayrı çalıştırmak için `MAIL_WORKER_AUTOSTART=false npm run start` ve başka terminalde `npm run mail:worker` kullanın. `false` yerine `0` yazmak işçiyi kapatmaz.
+Son üretim derlemesi hazırdır. Kod değişirse uygulamayı Ctrl+C ile durdurup `npm run build`, sonra `npm run start` çalıştırın. Geliştirme için `npm run dev` kullanılabilir. Aynı portta ikinci sunucu açmayın. `start` ve `dev`, varsayılan olarak yerel capture ve CMS zamanlanmış yayın işçilerini de başlatır. CMS için `CMS_WORKER_AUTOSTART=false` otomatik başlatmayı kapatır; ayrı süreç `npm run cms:worker`, tek tarama `npm run cms:once` ile çalışır. `.env` aynı anahtarı içeriyorsa yükleyici bu değeri kullanır; kontrollü testte iki işçinin de kapalı olduğunu doğrulayın. İşçiyi ayrı çalıştırmak için `MAIL_WORKER_AUTOSTART=false npm run start` ve başka terminalde `npm run mail:worker` kullanın. `false` yerine `0` yazmak işçiyi kapatmaz.
 
 DB `127.0.0.1:55432/aibildiri_v2`, uygulama `127.0.0.1:3100` ile sınırlıdır. `npm run db:stop` DB'yi kapatır; önce uygulama ve işçiyi durdurun. Makine uyurken uygulama veya otomasyonun işlemeye devam ettiği varsayılmaz.
 
@@ -25,6 +25,12 @@ DB `127.0.0.1:55432/aibildiri_v2`, uygulama `127.0.0.1:3100` ile sınırlıdır.
 5. **P22 B Birleşik Pilot 8856bb15 (sentetik)** ücretsiz ve kapalıdır. [Kalıcı arşiv](http://127.0.0.1:3100/p22-pilot-b-8856bb15/arsiv?lang=tr) aynı PDF ve yayımlanmış programı korur. Yeni iş işlemleri kapalıdır; katılımcı ve canlı oturum eylemleri gösterilmez. Verilmiş belgenin doğrulanması açık kalır.
 6. Pilot rehberi Türkçe yayımlanmıştır; İngilizce adresi 404 döner. CMS → EN → **Bu sayfanın İngilizce sürümünü etkinleştir**, gerekli İngilizce metinleri gir, taslak kaydet ve ayrı yayımla. Kapatmak kaydedilmiş çeviriyi silmez. Gerçek yayın metinleri kullanıcının içerik çalışmasıdır.
 
+## Kabul düzeltmeleri ve zamanlanmış CMS
+
+Özel belge türleri `/admin/belgeler`, bağımsız oturum yoklaması `/admin/moduller`, davet tema/katılım/başkan kaynakları `/admin/tanitim` ekranındadır. Kabul ölçütleri ve yerel kanıtlar [düzeltme kaydında](KABUL_DUZELTMELERI_20261007.md).
+
+CMS sayfa editöründe önce içeriği kaydedin, ardından **Zamanlanmış yayın** bölümünde İstanbul saatini, gerekçeyi ve sürüm onayını girin. Sayfanın son kaydedilmiş sürümü yayımlanır. Taslak veya kaynak değişirse, yetki kaldırılırsa ya da CMS/kongre kapanırsa eski onayla yayın yapılmaz; ekranda engel görülür. Düzelttikten sonra yeniden zamanlayın. Yerel makine ve işçi çalışmadığı sürede tam zamanında yayın taahhüdü yoktur; sonraki çalışmada zamanı gelen kayıtlar denetlenir.
+
 ## Sağlık, hata ve e-posta
 
 `GET /api/health` DB bağlantısını denetler: başarılıysa `200 {"status":"ok"}`, DB erişilemiyorsa `503 {"status":"unavailable"}`; yapılandırma ve hata ayrıntısı yayımlanmaz, önbellek kapalıdır. Preview ortamında bu adres de Basic erişim kapısına tabidir.
@@ -35,11 +41,11 @@ Yerel başlatma terminali hata çıktısını gösterir; bu teslimin sunucu kayd
 
 ## Veri koruyan geçiş ve geri dönüş
 
-P22 şema değiştirmedi: **33 uygulanmış migration / 97 tablo**. `npm run prisma:migrate:deploy` mevcut yerelde yeniden çalıştırıldı; iki pilotun tüm bağlantıları ve PDF byte'ları aynı kaldı. Migration derleme/başlatma sırasında otomatik uygulanmaz. Mevcut veride kurulum/seed/reset çalıştırmayın.
+P22 tarihsel kapanışı 33 migration / 97 tabloydu. Kabul düzeltmeleri iki belge/yoklama migration'ı ve bir CMS zamanlama migration'ı ekler: **36 migration / 99 tablo**. Önceki kayıtlar korunur; iki yeni tablo `CertificateType` ve `CmsPublicationSchedule` olur. Migration derleme/başlatma sırasında otomatik uygulanmaz. Mevcut veride kurulum/seed/reset çalıştırmayın.
 
-Paket kontrol noktası `../.recovery/P22-20261007-final` kaynak bundle/arşivi, tam `local.dump`, özel ortam/hesap/capture dosyaları ve kanıtları içerir. Ayrı geçici DB'ye restore sonrası her tablonun satır sayısı ve sıralanmış SHA-256 değeri eşleşir; sonucu `manifest.json` doğrular. Bu klasör özel veri içerir; erişimini koruyun.
+Paket kontrol noktası `../.recovery/P22A-20261007-final` kaynak bundle/arşivi, tam `local.dump`, özel ortam/hesap/capture dosyaları ve kanıtları içerir. Ayrı geçici DB'ye restore sonrası her tablonun satır sayısı ve sıralanmış SHA-256 değeri eşleşir; sonucu `manifest.json` doğrular. Bu klasör özel veri içerir; erişimini koruyun.
 
-P22 öncesi `P06E-20261007-final` yedeği yeni pilot kayıtlarını içermez. Geri dönmek için önce **en güncel DB ve dosya yedeğini** alın; yalnız eski dump'a dönmek yeni başvuruları kaybettirir. Dosyalar DB byte alanlarında olduğundan güncel dump hem kayıtları hem PDF'leri korumalıdır. Uygulama kaynak geri dönüşünde güncel DB'yi koruyun; önceki `1e311a8` ile şema eşitliği doğrulanmıştır, ancak bu sürüm P22 sertifika düzeltmesini içermez ve üretim geri dönüş adayı olarak onaylanmış değildir.
+P22 öncesi `P06E-20261007-final` yedeği yeni pilot kayıtlarını içermez. Geri dönmek için önce **en güncel DB ve dosya yedeğini** alın; yalnız eski dump'a dönmek yeni başvuruları kaybettirir. Dosyalar DB byte alanlarında olduğundan güncel dump hem kayıtları hem PDF'leri korumalıdır. Kabul geçişinden önceki uygulama yeni enum/model değerlerini bilmez; **yalnız kaynak kodunu geri alma desteklenmez**. İleri migration ve aynı kaynak sürümüne ait güncel, tam geri yüklenerek doğrulanmış DB yedeği birlikte değerlendirilir. Eski bir dump güncel verinin yerine konmaz. `test:pilot-preflight -- --checkpoint ../.recovery/P22A-20261007-final/manifest.json` commit, dump SHA-256 ve tüm canlı tablo özetlerini kontrol eder; checkpoint verilmezse kurtarma durumu açıkça bekliyor görünür.
 
 Yerel kayıpsız prova `npm run test:pilot-recovery` ile yapılır: additive migration, güncel dump, eski ve güncel dump'ın **ayrı geçici DB'lerde** restore edilmesi, pilot bağlantıları/sertifika sürümleri/PDF checksum karşılaştırması ve asıl DB'nin değişmediği kontrolü. Betik geçici DB'leri temizler; uygulamanın DB'sini eski dump ile değiştirmez. İşçi ve sunucu duruyken çalıştırın. Kongreye özel ZIP dışa aktarımı tam DB yedeği yerine geçmez.
 
@@ -50,7 +56,7 @@ Gerçek dağıtımda önce ayrı deneme ortamında bu yöntem prova edilmeli; g�
 ```sh
 npm run lint
 npm run build
-# Üretim uygulaması açık, arka plan capture işçisi kapalıyken:
+# Yerel üretim derlemesi açık, arka plan capture ve CMS işçileri kapalıyken:
 npm run test:pilot-regression
 npm run test:pilot-load
 npm run test:pilot-preflight

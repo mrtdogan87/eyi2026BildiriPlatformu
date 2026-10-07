@@ -29,6 +29,7 @@ export const moduleCatalog = {
   CMS: { label: 'Sayfalar ve medya (CMS)', implemented: true },
   REVIEWS: { label: 'Hakem değerlendirmesi', implemented: true },
   PROGRAM: { label: 'Bilimsel program', implemented: true },
+  ATTENDANCE: { label: 'Oturum yoklaması', implemented: true },
   ACTIVITIES: { label: 'Workshop ve sosyal katılım', implemented: true },
   CERTIFICATES: { label: 'Belgeler', implemented: true },
   PUBLICATIONS: {label:'Tam metin ve yayın onayları',implemented:true},

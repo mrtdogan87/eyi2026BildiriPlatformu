@@ -47,6 +47,7 @@ enum RegistrationKind {
 }
 
 model Congress {
+  cmsPublicationSchedules CmsPublicationSchedule[]
   closedAt DateTime?
   archiveSettings ArchiveSettings?
   archivePublications ArchivePublication[]
@@ -60,6 +61,7 @@ model Congress {
   promotionOutputs PromotionOutput[]
   awardCategories AwardCategory[]
   certificateRules CertificateRule[]
+  certificateTypes CertificateType[]
   certificateTemplates CertificateTemplate[]
   certificateRecipients CertificateRecipient[]
   activityEvents ActivityEvent[]
@@ -126,6 +128,19 @@ model Congress {
   registrationAccessTokens RegistrationAccessToken[]
 
   @@index([organizationId])
+}
+
+model CertificateType {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  key String
+  name String
+  baseRole String
+  actorId String
+  createdAt DateTime @default(now())
+  @@unique([congressId, key])
+  @@unique([congressId, name])
 }
 
 model CertificateTemplate {
@@ -548,6 +563,7 @@ enum ModuleKey {
   CMS
   REVIEWS
   PROGRAM
+  ATTENDANCE
   ACTIVITIES
   CERTIFICATES
   AWARDS
@@ -565,6 +581,7 @@ model Organization {
 }
 
 model PlatformUser {
+  cmsPublicationSchedules CmsPublicationSchedule[]
   reviewAssignments ReviewAssignment[]
   assignedWorkRequests  WorkRequest[]            @relation("WorkAssignee")
   createdWorkRequests   WorkRequest[]            @relation("WorkCreator")
@@ -728,6 +745,7 @@ enum CmsMediaKind {
 }
 
 model CmsPage {
+  publicationSchedules CmsPublicationSchedule[]
   archived            Boolean        @default(false)
   templateKey         String?
   aliases             CmsPageAlias[]
@@ -749,6 +767,8 @@ model CmsPage {
 }
 
 model CmsRevision {
+  scheduledSources CmsPublicationSchedule[] @relation("CmsScheduledSource")
+  scheduledPublication CmsPublicationSchedule? @relation("CmsScheduledResult")
   id          String             @id @default(cuid())
   pageId      String
   number      Int
@@ -762,6 +782,41 @@ model CmsRevision {
   mediaRefs   CmsRevisionMedia[]
 
   @@unique([pageId, number])
+}
+
+enum CmsPublicationScheduleStatus {
+  PENDING
+  PUBLISHED
+  CANCELLED
+  BLOCKED
+}
+
+model CmsPublicationSchedule {
+  id String @id @default(uuid())
+  congressId String
+  congress Congress @relation(fields: [congressId], references: [id], onDelete: Cascade)
+  pageId String
+  page CmsPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  sourceRevisionId String
+  sourceRevision CmsRevision @relation("CmsScheduledSource", fields: [sourceRevisionId], references: [id], onDelete: Restrict)
+  sourceVersion Int
+  sourceHash String
+  dueAt DateTime
+  status CmsPublicationScheduleStatus @default(PENDING)
+  actorId String
+  actor PlatformUser @relation(fields: [actorId], references: [id], onDelete: Restrict)
+  reason String
+  outcomeReason String?
+  finishedAt DateTime?
+  publishedRevisionId String? @unique
+  publishedRevision CmsRevision? @relation("CmsScheduledResult", fields: [publishedRevisionId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // A partial unique index in the migration permits only one PENDING row per page.
+  @@index([status, dueAt])
+  @@index([pageId, createdAt])
+  @@index([congressId, status])
 }
 
 model CmsMedia {

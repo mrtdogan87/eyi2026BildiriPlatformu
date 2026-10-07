@@ -47,6 +47,7 @@ try {
   for (const c of [congress, second, { id: 'local-closed' }]) for (const key of ['SUBMISSIONS', 'REGISTRATION']) {
     await prisma.congressModule.upsert({ where: { congressId_key: { congressId: c.id, key } }, update: {}, create: { congressId: c.id, key, enabled: true } });
   }
+  for (const c of [congress, second, { id: 'local-closed' }]) await prisma.congressModule.upsert({where:{congressId_key:{congressId:c.id,key:'ATTENDANCE'}},update:{},create:{congressId:c.id,key:'ATTENDANCE',enabled:false}});
   await prisma.submission.upsert({ where: { id: 'local-paper-b' }, update: {}, create: {
     id: 'local-paper-b', congressId: second.id, status: 'SUBMITTED', submissionLanguage: 'TR', titleTr: 'Yalnız B kurumunun bildirisi', draftOwnerEmail: 'presenter@example.invalid', submittedAt: new Date(),
     authors: { create: { fullName: 'B Test Sunucu', email: 'presenter@example.invalid', isPresenter: true, sortOrder: 0 } },

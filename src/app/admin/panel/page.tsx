@@ -19,6 +19,7 @@ export default async function PanelPage({ searchParams }: { searchParams: Promis
   const certificates = await moduleEnabled(context.congress.id, 'CERTIFICATES');
   const activities = await moduleEnabled(context.congress.id, 'ACTIVITIES');
   const program = await moduleEnabled(context.congress.id, 'PROGRAM');
+  const attendance = program && await moduleEnabled(context.congress.id, 'ATTENDANCE');
   const reviews = submissions && await moduleEnabled(context.congress.id, 'REVIEWS');
   const links = [
     ['archive.read', archive, '/admin/arsiv', 'Kongre kapanışı ve kalıcı arşiv'],
@@ -28,7 +29,7 @@ export default async function PanelPage({ searchParams }: { searchParams: Promis
     ['awards.read', awards, '/admin/oduller', 'Ödül başvuruları ve kurul kararları'],
     ['awards.perform', awards, '/admin/oduller/juri', 'Ödül jüri görevlerim'],
     ['certificates.read', certificates, '/admin/belgeler/uygunluk', 'Belge kuralları ve kongre uygunluğu'],
-    ['attendance.perform', program, '/admin/yoklama', 'Oturum yoklaması'],
+    ['attendance.perform', attendance, '/admin/yoklama', 'Oturum yoklaması'],
     ['certificates.read', certificates, '/admin/belgeler', 'PDF sertifikalar ve alıcılar'],
     ['activities.read', activities, '/admin/etkinlikler', 'Workshop ve sosyal katılım'],
     ['program.read', program, '/admin/program', 'Program ve oturumlar'],

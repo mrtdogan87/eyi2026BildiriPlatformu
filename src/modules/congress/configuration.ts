@@ -11,10 +11,23 @@ export const modeLabels: Record<FieldMode, string> = { HIDDEN: 'Gizli', OPTIONAL
 const date = z.string().datetime({ offset: true }).nullable();
 const stage = z.object({ enabled: z.boolean(), deadline: date }).strict();
 const mode = z.enum(['HIDDEN', 'OPTIONAL', 'REQUIRED']);
+const invitationText = z.string().trim().max(300).refine(value => !/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(value), 'Kontrol karakteri kullanmayın.');
+export const emptyInvitationFacts = () => ({ theme: { tr: '', en: '' }, participationMode: '' as const });
+export const invitationFactsSchema = z.object({
+  theme: z.object({ tr: invitationText, en: invitationText }).strict(),
+  participationMode: z.enum(['', 'ONSITE', 'ONLINE', 'HYBRID']),
+}).strict();
+export type InvitationFacts = z.infer<typeof invitationFactsSchema>;
+export const participationModeLabels = {
+  ONSITE: { tr: 'Yüz yüze', en: 'In person' },
+  ONLINE: { tr: 'Çevrim içi', en: 'Online' },
+  HYBRID: { tr: 'Hibrit (yüz yüze ve çevrim içi)', en: 'Hybrid (in person and online)' },
+} as const;
 export const configurationSchema = z.object({
   version: z.literal(1), profile: z.enum(['CLASSIC', 'ABSTRACT_ONLY', 'REGISTRATION_ONLY', 'CUSTOM']),
   languages: z.array(z.enum(['TR', 'EN'])).min(1).max(2).refine(v => new Set(v).size === v.length, 'Diller tekrar edemez.'),
   theme: z.enum(['eyi', 'simple']), accent: z.string().regex(/^#[a-fA-F0-9]{6}$/, 'Renk #RRGGBB biçiminde olmalı.'),
+  invitationFacts: invitationFactsSchema.default(emptyInvitationFacts),
   modules: z.object({ SUBMISSIONS: z.boolean(), REGISTRATION: z.boolean() }).strict(),
   stages: z.object({ ABSTRACT: stage, FULL_TEXT: stage, PARTICIPATION: stage, PAYMENT: stage }).strict(),
   fields: z.object(Object.fromEntries(fieldKeys.map(key => [key, mode])) as Record<FieldKey, typeof mode>).strict(),
@@ -38,7 +51,7 @@ export const configurationSchema = z.object({
 export type CongressConfiguration = z.infer<typeof configurationSchema>;
 export const profileLabels = { CLASSIC: 'Bildirili kongre', ABSTRACT_ONLY: 'Yalnız özet / ücretsiz', REGISTRATION_ONLY: 'Kayıt odaklı / ücretsiz', CUSTOM: 'Özel yapılandırma' };
 export function profileConfiguration(profile: CongressConfiguration['profile'] = 'CLASSIC'): CongressConfiguration {
-  const classic: CongressConfiguration = { version: 1, profile, languages: ['TR', 'EN'], theme: 'eyi', accent: '#1f4f9d', modules: { SUBMISSIONS: true, REGISTRATION: true }, structuredAbstract: defaultStructuredAbstractRules(), declarationTexts: defaultDeclarationTexts(),
+  const classic: CongressConfiguration = { version: 1, profile, languages: ['TR', 'EN'], theme: 'eyi', accent: '#1f4f9d', invitationFacts: emptyInvitationFacts(), modules: { SUBMISSIONS: true, REGISTRATION: true }, structuredAbstract: defaultStructuredAbstractRules(), declarationTexts: defaultDeclarationTexts(),
     stages: { ABSTRACT: { enabled: true, deadline: null }, FULL_TEXT: { enabled: true, deadline: null }, PARTICIPATION: { enabled: true, deadline: null }, PAYMENT: { enabled: true, deadline: null } },
     fields: { abstract: 'REQUIRED', keywords: 'REQUIRED', file: 'REQUIRED', authorTitle: 'REQUIRED', authorInstitution: 'OPTIONAL', authorCountry: 'OPTIONAL', presentationMode: 'REQUIRED', audience: 'REQUIRED', receipt: 'REQUIRED', studentDocument: 'OPTIONAL' } };
   if (profile === 'ABSTRACT_ONLY') { classic.modules.REGISTRATION = false; classic.stages.FULL_TEXT.enabled = false; classic.stages.PARTICIPATION.enabled = false; classic.stages.PAYMENT.enabled = false; Object.assign(classic.fields, { keywords: 'OPTIONAL', file: 'HIDDEN', authorTitle: 'OPTIONAL', presentationMode: 'HIDDEN', audience: 'HIDDEN', receipt: 'HIDDEN', studentDocument: 'HIDDEN' }); }
@@ -84,6 +97,7 @@ export function configurationSummary(config: CongressConfiguration) {
     config.modules.REGISTRATION ? `Kayıt için asgari bilgi: doğrulanmış e-posta, ad ve dinleyici türü/günü veya kabul edilmiş bildiri seçimi. Öğrenci belgesi: ${modeLabels[config.fields.studentDocument]}.` : 'Kayıt alınmaz.',
     config.modules.REGISTRATION && config.stages.PAYMENT.enabled ? `Tarifeler uygulanır. Dekont: ${modeLabels[config.fields.receipt]}; pozitif tutarda bu koşul aranır.` : 'Ücret/dekont aşaması kapalı; kayıt toplamı sıfırdır.',
     config.structuredAbstract.enabled ? `Yapılandırılmış özet: ${stageLabels[config.structuredAbstract.stage]} aşamasında; Amaç, Yöntem, Bulgular ve Sonuç için TR/EN gereksinimleri uygulanır.` : 'Özet için mevcut serbest metin düzeni korunur.',
+    `Bilimsel tema (TR / EN): ${config.invitationFacts.theme.tr || 'Belirtilmemiş'} / ${config.invitationFacts.theme.en || 'Not specified'}. Katılım biçimi: ${config.invitationFacts.participationMode ? participationModeLabels[config.invitationFacts.participationMode].tr : 'Belirtilmemiş'}.`,
     'Gönderimde görülen beyan metni ve etkin kurallar sürümü saklanır; eski başvurulara onay eklenmez.',
     'Yönetim panelinde seçili kongrenin açık modülleri görünür; yapılandırma ve ekip yönetimi kullanılabilir.' ];
 }

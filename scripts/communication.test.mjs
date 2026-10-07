@@ -161,8 +161,13 @@ test('SMTP retryable refusal differs from permanent recipient rejection', () => 
   assert.deepEqual(classifySmtpFailure({ code: 'EAUTH' }), { kind: 'permanent', errorCode: 'PROVIDER_CONFIGURATION' });
 });
 
-test('SMTP pre-connection failures can retry, DATA ambiguity cannot', () => {
-  assert.deepEqual(classifySmtpFailure({ code: 'ETIMEDOUT', command: 'CONN' }), { kind: 'retry', errorCode: 'TEMPORARY_FAILURE' });
-  assert.deepEqual(classifySmtpFailure({ code: 'ETIMEDOUT', command: 'DATA' }), { kind: 'unknown', errorCode: 'DELIVERY_UNKNOWN' });
-  assert.deepEqual(classifySmtpFailure({ code: 'ECONNRESET' }), { kind: 'unknown', errorCode: 'DELIVERY_UNKNOWN' });
+test('SMTP DNS failures can retry; generic connection metadata cannot rule out accepted DATA', () => {
+  assert.deepEqual(classifySmtpFailure({ code: 'EDNS', command: 'CONN' }), { kind: 'retry', errorCode: 'TEMPORARY_FAILURE' });
+  for (const failure of [
+    { code: 'ECONNECTION', command: 'CONN' },
+    { code: 'ETIMEDOUT', command: 'CONN' },
+    { code: 'ESOCKET', command: 'CONN' },
+    { code: 'ETIMEDOUT', command: 'DATA' },
+    { code: 'ECONNRESET' },
+  ]) assert.deepEqual(classifySmtpFailure(failure), { kind: 'unknown', errorCode: 'DELIVERY_UNKNOWN' });
 });

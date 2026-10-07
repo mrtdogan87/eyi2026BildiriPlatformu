@@ -43,8 +43,9 @@ export function classifySmtpFailure(error) {
   if (status >= 500 && status <= 599) {
     return { kind: 'permanent', errorCode: String(error?.command ?? '').startsWith('RCPT') ? 'RECIPIENT_REJECTED' : 'PROVIDER_REJECTED' };
   }
-  // Connection failures are safe only when Nodemailer reports that no SMTP transaction started.
-  if (['ECONNECTION', 'EDNS'].includes(error?.code) || (error?.command === 'CONN' && ['ETIMEDOUT', 'ESOCKET'].includes(error?.code))) {
+  // DNS resolution fails before SMTP starts. Generic connection errors can be
+  // labelled CONN even after DATA, so they cannot safely trigger another send.
+  if (error?.code === 'EDNS') {
     return { kind: 'retry', errorCode: 'TEMPORARY_FAILURE' };
   }
   return { kind: 'unknown', errorCode: 'DELIVERY_UNKNOWN' };

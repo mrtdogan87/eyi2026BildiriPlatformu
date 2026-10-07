@@ -222,6 +222,9 @@ Dental projesindeki kapsamı belirli, doğrulanabilir sonuç ve kısa kapanış 
 
 **Uygulama durumu:** P01, P02 yerel kapsamı, P03–P21 (P16A/B dahil), P06-E1 ve P22 yerel pilot tamamlandı. P22: 1255 otomatik kabul/157 preview/17 gerçek tarayıcı, iki kongrede aynı bilimsel kayıtla uçtan uca akış, 240 istekli yerel yük denemesi, yeni kayıtları koruyan restore provası; 33 migration / 97 tablo. Ayrıntılar `docs/P22_KAPANIS.md` ve `docs/P22_ISLETIM.md`. Yeni alan adı, TLS, gerçek mail ve uzak deneme/üretim dağıtımı uygulanmadı; P22 gerçek yayına açılış adımı ayrı yetki/ortam bekler.
 
+**7 Ekim yerel kabul düzeltmesi:** P16A özel belge türü, P16B bağımsız yoklama ve P18 gerçek kongre kaynaklarından davet tamamlandı; plan 5.2 zamanlanmış CMS yayını eklendi. Güncel şema 36 migration / 99 tablo. Son regresyon 1.317 otomatik + 157 preview; 24 tarayıcı kabul kontrolü. Bağımlılık yamaları ve kalan güvenlik bulguları [kabul kaydı](docs/KABUL_DUZELTMELERI_20261007.md) ile [güvenlik incelemesinde](docs/BAGIMLILIK_GUVENLIK_20261007.md). Önceki paket kapanış sayıları tarihsel kanıt olarak korunur. Uzak yayın ve gerçek kurum içerikleri ayrıca bekler.
+
+
 
 Bu tablo paket kapsamlarını ve ilk süre tahminlerini gösterir. P01/P02 uygulaması ayrı sohbette başlatıldı; tamamlanma durumları uygulama kapanış kayıtlarıyla güncellenir. Süreler P01/P02 sonunda yeniden değerlendirilecek. Bağımlılık sütununda belirtilen paketlerin kendi ön koşulları da geçerlidir. Modül sınırları P02/P03'te tasarlanır; P16 iki orta büyüklükte alt pakete ayrılmıştır.
 

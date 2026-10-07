@@ -45,6 +45,8 @@ export async function createCongress(raw: unknown) {
       const settings = input.settings;
       const congress = await tx.congress.create({ data: { organizationId: input.organizationId, slug: input.slug, name: settings.name, year: settings.year, eventStartsAt: settings.eventStartsAt, eventEndsAt: settings.eventEndsAt, earlyDeadline: settings.earlyDeadline, lateDeadline: settings.lateDeadline, bankName: settings.bankName || null, bankAccountHolder: settings.bankAccountHolder || null, bankIban: settings.bankIban || null, bankBranch: settings.bankBranch || null, configuration: settings.configuration, configVersion: 1 } });
       await writeModuleSettings(tx, congress.id, settings.configuration.modules);
+      // Attendance is opt-in from the module controls, independently of programme use.
+      await tx.congressModule.create({data:{congressId:congress.id,key:'ATTENDANCE',enabled:false}});
       await initializeCmsTemplates(tx, congress.id, session.userId);
       if (input.copyFees && source) await copyFeeSchedule(tx, source.id, congress.id); else await createFeeSchedule(tx, congress.id, settings.fees);
       await tx.organizationMembership.upsert({ where: { organizationId_userId: { organizationId: input.organizationId, userId: session.userId } }, update: {}, create: { organizationId: input.organizationId, userId: session.userId } });

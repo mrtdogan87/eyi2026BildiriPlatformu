@@ -2,13 +2,16 @@ import { z } from 'zod';
 export class CertificateError extends Error { status: number; constructor(message: string, status=400) { super(message); this.status=status; } }
 export const fields = ['recipientName','title','institution','eventName','datePlace','participation','talkTitle','role','number','verificationCode'] as const;
 export const roles = ['PARTICIPANT','PRESENTER','COAUTHOR','LISTENER','SPEAKER','DUTY'] as const;
+// Custom keys are only syntax here; server-side congress lookup remains mandatory.
+export const certificateRoleSchema = z.union([z.enum(roles),z.string().regex(/^CUSTOM_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/, 'Kayıtlı bir belge türü seçin.')]);
 export const roleLabels: Record<string,string> = {PARTICIPANT:'Katılımcı',PRESENTER:'Sunucu',COAUTHOR:'Ortak yazar',LISTENER:'Dinleyici',SPEAKER:'Konuşmacı',DUTY:'Görevli'};
 const text = (max:number) => z.string().trim().max(max).refine(s=>!/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(s),'Kontrol karakteri kullanılamaz.');
 export const recipientDataSchema = z.object({recipientName:text(300).min(2),title:text(100).default(''),institution:text(600).default(''),eventName:text(600).default(''),datePlace:text(300).default(''),participation:text(1200).default(''),talkTitle:text(1200).default('')}).strict();
-export const recipientSchema = z.object({email:z.union([z.string().trim().toLowerCase().email().max(254),z.literal('')]).default(''),recipientRef:text(120).default(''),role:z.enum(roles),contextKey:text(120).default(''),data:recipientDataSchema}).strict();
+export const recipientSchema = z.object({email:z.union([z.string().trim().toLowerCase().email().max(254),z.literal('')]).default(''),recipientRef:text(120).default(''),role:certificateRoleSchema,contextKey:text(120).default(''),data:recipientDataSchema}).strict();
 export const slotSchema = z.object({field:z.enum(fields),x:z.number().min(0).max(1440),y:z.number().min(0).max(1440),width:z.number().min(20).max(1440),height:z.number().min(12).max(1440),font:z.enum(['SANS','SERIF']),size:z.number().min(6).max(72),minSize:z.number().min(6).max(72),align:z.enum(['LEFT','CENTER','RIGHT']),overflow:z.enum(['WRAP','SHRINK','ERROR']),color:z.string().regex(/^#[a-fA-F0-9]{6}$/)}).strict().refine(s=>s.minSize<=s.size,'En küçük boyut ana boyutu aşamaz.');
 export const layoutSchema = z.array(slotSchema).min(1).max(16).refine(s=>s.some(p=>p.field==='recipientName'),'Ad soyad alanı gerekli.');
 export const confirmation = {reason:text(2000).min(8),confirmed:z.literal(true)};
+export const certificateTypeSchema = z.object({...confirmation,name:text(200).min(2).transform(v=>v.normalize('NFC').replace(/\s+/g,' ')),baseRole:z.enum(roles)}).strict();
 export const templateSchema = z.object({...confirmation,id:z.string().uuid().optional(),version:z.number().int().min(0),name:text(200).min(2),layout:layoutSchema}).strict();
 export const manualSchema = z.object({...confirmation,templateId:z.string().uuid(),templateVersion:z.number().int().min(0),recipient:recipientSchema}).strict();
 export const generateSchema = z.object({...confirmation,templateId:z.string().uuid(),templateVersion:z.number().int().min(0),recipients:z.array(z.object({id:z.string().uuid(),version:z.number().int().min(0),certificateVersion:z.number().int().min(0).optional()}).strict()).min(1).max(50),regenerate:z.boolean().default(false)}).strict();
