@@ -1,4 +1,5 @@
 'use client';
+import {DetailSection} from '@/components/admin-ui/workspace';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -37,7 +38,7 @@ export function PaymentManager({ initial, canManage }: { initial: PaymentOvervie
       <label className="field">Banka kanıtı / destekleyici belge<input name="evidence" type="file" accept=".pdf,.jpg,.jpeg,.png" required={monetary}/><span>En fazla 2 MB PDF/JPG/PNG. Elle doğrulama ve iade için bankadan doğrulanmış kanıt gerekir. Yalnız yetkili ekip indirebilir.</span></label>
       <label className="check-item"><input name="confirmed" type="checkbox" required/>Kayıt, gerekçe, tutar ve kanıtı inceledim; bu işlemi kaydetmeyi onaylıyorum.</label><button className="button primary">Ödeme işlemini kaydet</button>
     </fieldset></form>}
-    <h3>Ödeme işlem geçmişi</h3>{!data.events.length && <p>Henüz doğrulama kaydı yok. Eski dekont tarihinden ödeme onayı üretilmez.</p>}
-    {[...data.events].reverse().map(e => <article className="content-entry" key={e.id}><h4>{e.number} · {eventLabels[e.kind]}{voided.has(e.id) ? ' · geçersizleştirildi' : ''}</h4><p>{e.actorName} · {date(e.createdAt)}</p><p>{e.reason}</p>{e.amountMinor > 0 && <p>{money(e.amountMinor, e.currency)} · Banka tarihi: {bankDate(e.occurredAt)} · Referans: {e.reference}</p>}{e.targetId && <p>Düzeltme, işlem {data.events.find(x => x.id === e.targetId)?.number ?? '—'} ile bağlı.</p>}{e.evidenceName && <p><a href={`${endpoint}/${e.id}`}>Kanıtı indir: {e.evidenceName}</a></p>}{e.bankTransactionId && <p><Link href="/admin/odemeler">Onaylanmış ekstre hareketi</Link></p>}</article>)}
+    <DetailSection title="Ödeme işlem geçmişi"><h3>Ödeme işlem geçmişi</h3>{!data.events.length && <p>Henüz doğrulama kaydı yok. Eski dekont tarihinden ödeme onayı üretilmez.</p>}
+    {[...data.events].reverse().map(e => <article className="content-entry" key={e.id}><h4>{e.number} · {eventLabels[e.kind]}{voided.has(e.id) ? ' · geçersizleştirildi' : ''}</h4><p>{e.actorName} · {date(e.createdAt)}</p><p>{e.reason}</p>{e.amountMinor > 0 && <p>{money(e.amountMinor, e.currency)} · Banka tarihi: {bankDate(e.occurredAt)} · Referans: {e.reference}</p>}{e.targetId && <p>Düzeltme, işlem {data.events.find(x => x.id === e.targetId)?.number ?? '—'} ile bağlı.</p>}{e.evidenceName && <p><a href={`${endpoint}/${e.id}`}>Kanıtı indir: {e.evidenceName}</a></p>}{e.bankTransactionId && <p><Link href="/admin/odemeler">Onaylanmış ekstre hareketi</Link></p>}</article>)}</DetailSection>
   </section>;
 }

@@ -1,10 +1,12 @@
+import {DetailSection} from '@/components/admin-ui/workspace';
+import {ListReturnLink} from '@/components/admin-ui/list-navigation';
+import {Workspace,WorkspacePanel} from '@/components/admin-ui/workspace';
 import { prisma } from '@/lib/prisma';
 import { moduleEnabled } from '@/platform/context';
 import { allows } from "@/platform/policy";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminDeleteSubmission } from "@/components/admin/admin-delete-submission";
-import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { AdminStatusForm } from "@/components/admin/admin-status-form";
 import { getAdminSubmissionDetail, requireAdminPage } from "@/lib/admin";
 import { revisionOverview } from '@/integrations/congress/revisions';
@@ -46,17 +48,16 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
       {reviewsEnabled && allows(context.role, "reviews.read") && <p><Link className="button secondary" href={`/admin/hakemlik/bildiriler/${id}`}>Hakemlik turlarını ve editör kararını aç</Link></p>}
       <section className="hero admin-hero">
         <div>
-          <Link href="/admin/bildiriler" className="admin-back-link">
+          <ListReturnLink base="/admin/bildiriler" scope={context.congress.id} className="admin-back-link">
             ← Bildiri listesine dön
-          </Link>
+          </ListReturnLink>
           <h1>Bildiri Detayı</h1>
           <p>Gönderilen bildirinin tüm içerik, yazar ve katılım bilgileri aşağıdadır.</p>
         </div>
-        <AdminLogoutButton />
+
       </section>
 
-      <section className="card admin-panel-card admin-detail-grid">
-        <div className="admin-detail-block">
+      <Workspace label="Kayıt bölümleri"><WorkspacePanel id="summary" label="Özet"><div className="ui-record-body"><div className="admin-detail-block">
           <h2>Bildiri Bilgileri</h2>
           <dl className="admin-definition-list">
             <div>
@@ -97,13 +98,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             </div>
           </dl>
         </div>
-
-        <div className="admin-detail-block">
-          <h2>Durum Yönetimi</h2>
-          {reviewHistory ? <p>Bilimsel karar Hakemlik ekranından verilir; tur ve karar geçmişi korunur.</p> : allows(context.role, "submissions.status") ? <AdminStatusForm submissionId={submission.id} currentStatus={submission.status} /> : null}
-        </div>
-
-        <div className="admin-detail-block">
+<div className="admin-detail-block">
           <h2>Yazarlar</h2>
           <div className="admin-author-list">
             {submission.authors.map((author, index) => (
@@ -131,8 +126,7 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
             ))}
           </div>
         </div>
-
-        <div className="admin-detail-block">
+<div className="admin-detail-block">
           <h2>Kayıt Durumu</h2>
           {submission.registration ? (
             <div className="admin-author-item">
@@ -164,9 +158,19 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
               Bu bildiri için henüz ilişkili kayıt yok. Dekont kaydı ödeme doğrulaması değildir.
             </div>
           )}
+        </div></div></WorkspacePanel>
+<WorkspacePanel id="actions" label="Durum ve işlemler"><div className="ui-record-body"><div className="admin-detail-block">
+          <h2>Durum Yönetimi</h2>
+          {reviewHistory ? <p>Bilimsel karar Hakemlik ekranından verilir; tur ve karar geçmişi korunur.</p> : allows(context.role, "submissions.status") ? <AdminStatusForm submissionId={submission.id} currentStatus={submission.status} /> : null}
         </div>
-
-        <div className="admin-detail-block">
+<DetailSection title="Diğer işlemler"><div className="admin-detail-block admin-detail-block-danger">
+          <h2>Tehlikeli İşlem · Bildiriyi Sil</h2>
+          {programHistory || reviewHistory || revisions.files.length || revisions.changes.length || revisions.requests.length ? <p className="notice">Bu bildirinin dosya veya düzeltme geçmişi korunur; kalıcı silme kapalıdır.</p> : allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
+            submissionId={submission.id}
+            submissionTitle={isTurkish ? submission.titleTr : submission.titleEn}
+          /> : null}
+        </div></DetailSection></div></WorkspacePanel>
+<WorkspacePanel id="files" label="Dosyalar"><div className="ui-record-body"><div className="admin-detail-block">
           <h2>Dosya</h2>
           {submission.file ? (
             <div className="admin-file-box">
@@ -194,17 +198,8 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           ) : (
             <div className="notice">Bu bildiri için dosya bulunamadı.</div>
           )}
-        </div>
-
-        <div className="admin-detail-block admin-detail-block-danger">
-          <h2>Tehlikeli İşlem · Bildiriyi Sil</h2>
-          {programHistory || reviewHistory || revisions.files.length || revisions.changes.length || revisions.requests.length ? <p className="notice">Bu bildirinin dosya veya düzeltme geçmişi korunur; kalıcı silme kapalıdır.</p> : allows(context.role, "submissions.delete") ? <AdminDeleteSubmission
-            submissionId={submission.id}
-            submissionTitle={isTurkish ? submission.titleTr : submission.titleEn}
-          /> : null}
-        </div>
-
-        <div className="admin-detail-block">
+        </div></div></WorkspacePanel>
+<WorkspacePanel id="history" label="Geçmiş"><div className="ui-record-body"><div className="admin-detail-block">
           <h2>Durum Geçmişi</h2>
           {submission.statusHistory.length ? (
             <div className="admin-history-list">
@@ -225,9 +220,9 @@ export default async function AdminSubmissionDetailPage({ params }: PageProps) {
           ) : (
             <div className="notice">Henüz durum geçmişi kaydı bulunmuyor.</div>
           )}
-        </div>
-      </section>
-      <RevisionManager initial={revisions} canCorrect={allows(context.role, 'submissions.correct')} />
+        </div></div></WorkspacePanel>
+<WorkspacePanel id="revisions" label="Düzeltmeler"><div className="ui-record-body"><RevisionManager initial={revisions} canCorrect={allows(context.role, 'submissions.correct')} /></div></WorkspacePanel></Workspace>
+
     </main>
   );
 }

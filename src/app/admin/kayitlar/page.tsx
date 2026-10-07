@@ -1,6 +1,6 @@
-import { allows } from "@/platform/policy";
+import {ListPosition,ListRecordLink} from '@/components/admin-ui/list-navigation';
+import {DetailSection} from '@/components/admin-ui/workspace';
 import Link from "next/link";
-import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import {
   getAdminRegistrationList,
   normalizeAdminRegistrationFilters,
@@ -38,21 +38,7 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
 
   return (
     <main data-congress={context.congress.id} className="page-shell admin-page-shell">
-      <section className="hero admin-hero">
-        <div>
-          <h1>Kayıtlar</h1>
-          <p>Kongre kayıt ödemelerini ve dinleyici başvurularını görüntüleyin, yönetin.</p>
-        </div>
-        <div className="admin-hero-actions">
-          <Link className="button ghost" href="/admin/bildiriler">
-            Bildiriler
-          </Link>
-          {allows(context.role, "settings") ? <Link className="button ghost" href="/admin/ucretler">
-            Ücret ve Ayarlar
-          </Link> : null}
-          <AdminLogoutButton />
-        </div>
-      </section>
+      <ListPosition base="/admin/kayitlar" scope={context.congress.id}/><section className="hero admin-hero"><h1>Kayıtlar</h1><p>{context.congress.name} · Sunucu filtreleri bütün erişilebilir kayıtları sorgular.</p></section>
 
       <section className="card admin-panel-card">
         <div className="admin-table-head">
@@ -62,8 +48,7 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
           </div>
         </div>
 
-        <form className="admin-filter-grid" method="GET">
-          <div className="field">
+        <form className="ui-list-filters" method="GET"><div className="admin-filter-grid"><div className="field">
             <label htmlFor="q">Arama</label>
             <input
               id="q"
@@ -72,7 +57,7 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
               placeholder="E-posta, açıklama, bildiri başlığı"
             />
           </div>
-          <div className="field">
+<div className="field">
             <label htmlFor="kind">Kategori</label>
             <select id="kind" name="kind" defaultValue={filters.kind}>
               <option value="ALL">Tümü</option>
@@ -80,7 +65,14 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
               <option value="LISTENER">Dinleyici</option>
             </select>
           </div>
-          <div className="field">
+<div className="admin-filter-actions">
+            <button className="button primary" type="submit">
+              Filtrele
+            </button>
+            <Link className="button secondary" href="/admin/kayitlar">
+              Temizle
+            </Link>
+          </div></div><DetailSection title="Gelişmiş filtreler"><div className="admin-filter-grid"><div className="field">
             <label htmlFor="status">Eski Dekont Tarihi Filtresi</label>
             <select id="status" name="status" defaultValue={filters.status}>
               <option value="ALL">Tümü</option>
@@ -88,26 +80,17 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
               <option value="PENDING">Dekont tarihi yok</option>
             </select>
           </div>
-          <div className="field">
+<div className="field">
             <label htmlFor="period">Dönem</label>
             <select id="period" name="period" defaultValue={filters.period}>
               <option value="ALL">Tümü</option>
               <option value="EARLY">Erken Kayıt</option>
               <option value="LATE">Geç Kayıt</option>
             </select>
-          </div>
-          <div className="admin-filter-actions">
-            <button className="button primary" type="submit">
-              Filtrele
-            </button>
-            <Link className="button secondary" href="/admin/kayitlar">
-              Temizle
-            </Link>
-          </div>
-        </form>
+          </div></div></DetailSection></form>
 
         {registrations.length ? (
-          <div className="admin-table-wrap">
+          <div><p className="ui-table-hint">Küçük ekranda diğer sütunlar için tabloyu yatay kaydırın.</p><div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Kayıt tablosu">
             <table className="admin-table">
               <thead>
                 <tr>
@@ -125,9 +108,9 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
                 {registrations.map((registration) => (
                   <tr key={registration.id}>
                     <td>
-                      <Link className="admin-link-cell" href={`/admin/kayitlar/${registration.id}`}>
+                      <ListRecordLink base="/admin/kayitlar" scope={context.congress.id} className="admin-link-cell" href={`/admin/kayitlar/${registration.id}`}>
                         {registration.email}
-                      </Link>
+                      </ListRecordLink>
                     </td>
                     <td>{registration.kindLabel}</td>
                     <td>{registration.paperCount}</td>
@@ -140,7 +123,7 @@ export default async function AdminRegistrationsPage({ searchParams }: PageProps
                 ))}
               </tbody>
             </table>
-          </div>
+          </div></div>
         ) : (
           <div className="notice">Kayıt bulunamadı.</div>
         )}

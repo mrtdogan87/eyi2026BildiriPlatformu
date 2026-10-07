@@ -1,4 +1,5 @@
 "use client";
+import {uiFetch} from '@/components/admin-ui/mutation';
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -22,7 +23,7 @@ export function AdminStatusForm({ submissionId, currentStatus }: Props) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/admin/submissions/${submissionId}/status`, {
+      const response = await uiFetch(`/api/admin/submissions/${submissionId}/status`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,0 +1,7 @@
+'use client';
+import Link from 'next/link';
+import {useEffect,useState,type ReactNode} from 'react';
+const key=(scope:string,base:string)=>`admin-ui:list:${scope}:${base}`;
+export function ListRecordLink({href,base,scope,children,className}:{href:string;base:string;scope:string;children:ReactNode;className?:string}){return <Link className={className} href={href} onClick={()=>{sessionStorage.setItem(key(scope,base),JSON.stringify({href:location.pathname+location.search,y:scrollY}));}}>{children}</Link>;}
+export function ListReturnLink({base,scope,children,className}:{base:string;scope:string;children:ReactNode;className?:string}){const [href,setHref]=useState(base);useEffect(()=>{try{const stored=JSON.parse(sessionStorage.getItem(key(scope,base))||'null');if(stored?.href===base||stored?.href?.startsWith(base+'?'))requestAnimationFrame(()=>setHref(stored.href));}catch{}},[base,scope]);return <Link href={href} className={className} onClick={()=>sessionStorage.setItem(key(scope,base)+':return','1')}>{children}</Link>;}
+export function ListPosition({base,scope}:{base:string;scope:string}){useEffect(()=>{try{if(sessionStorage.getItem(key(scope,base)+':return')!=='1')return;sessionStorage.removeItem(key(scope,base)+':return');const stored=JSON.parse(sessionStorage.getItem(key(scope,base))||'null');if(stored?.href===location.pathname+location.search)requestAnimationFrame(()=>window.scrollTo({top:Number(stored.y)||0}));}catch{}},[base,scope]);return null;}

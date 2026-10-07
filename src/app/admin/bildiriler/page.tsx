@@ -1,6 +1,6 @@
-import { allows } from "@/platform/policy";
+import {ListPosition,ListRecordLink} from '@/components/admin-ui/list-navigation';
+import {DetailSection} from '@/components/admin-ui/workspace';
 import Link from "next/link";
-import { AdminLogoutButton } from "@/components/admin/admin-logout-button";
 import { getAdminSubmissionList, normalizeAdminSubmissionFilters, requireAdminPage } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
@@ -38,21 +38,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
 
   return (
     <main data-congress={context.congress.id} className="page-shell admin-page-shell">
-      <section className="hero admin-hero">
-        <div>
-          <h1>Yönetim Paneli</h1>
-          <p>{context.congress.name} başvuruları ve kayıtları.</p>
-        </div>
-        <div className="admin-hero-actions">
-          <Link className="button ghost" href="/admin/kayitlar">
-            Kayıtlar
-          </Link>
-          {allows(context.role, "settings") ? <Link className="button ghost" href="/admin/ucretler">
-            Ücret ve Ayarlar
-          </Link> : null}
-          <AdminLogoutButton />
-        </div>
-      </section>
+      <ListPosition base="/admin/bildiriler" scope={context.congress.id}/><section className="hero admin-hero"><h1>Bildiriler</h1><p>{context.congress.name} · Sunucu filtreleri bütün erişilebilir kayıtları sorgular.</p></section>
 
       <section className="card admin-panel-card">
         <div className="admin-table-head">
@@ -65,8 +51,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
           </a>
         </div>
 
-        <form className="admin-filter-grid" method="GET">
-          <div className="field">
+        <form className="ui-list-filters" method="GET"><div className="admin-filter-grid"><div className="field">
             <label htmlFor="status">Durum</label>
             <select id="status" name="status" defaultValue={filters.status}>
               <option value="ALL">Tümü</option>
@@ -76,7 +61,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
               <option value="REJECTED">Reddedildi</option>
             </select>
           </div>
-          <div className="field">
+<div className="field">
             <label htmlFor="q">Arama</label>
             <input
               id="q"
@@ -85,7 +70,14 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
               placeholder="Başlık, yazar veya e-posta"
             />
           </div>
-          <div className="field">
+<div className="admin-filter-actions">
+            <button className="button primary" type="submit">
+              Filtrele
+            </button>
+            <Link className="button secondary" href="/admin/bildiriler">
+              Temizle
+            </Link>
+          </div></div><DetailSection title="Gelişmiş filtreler"><div className="admin-filter-grid"><div className="field">
             <label htmlFor="language">Dil</label>
             <select id="language" name="language" defaultValue={filters.language}>
               <option value="ALL">Tümü</option>
@@ -93,7 +85,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
               <option value="EN">İngilizce</option>
             </select>
           </div>
-          <div className="field">
+<div className="field">
             <label htmlFor="presentationMode">Sunum</label>
             <select
               id="presentationMode"
@@ -105,26 +97,17 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
               <option value="ONLINE">Çevrim İçi</option>
             </select>
           </div>
-          <div className="field">
+<div className="field">
             <label htmlFor="registration">Kayıt</label>
             <select id="registration" name="registration" defaultValue={filters.registration}>
               <option value="ALL">Tümü</option>
               <option value="PAID">Dekont tarihi var</option>
               <option value="PENDING">Bekleniyor</option>
             </select>
-          </div>
-          <div className="admin-filter-actions">
-            <button className="button primary" type="submit">
-              Filtrele
-            </button>
-            <Link className="button secondary" href="/admin/bildiriler">
-              Temizle
-            </Link>
-          </div>
-        </form>
+          </div></div></DetailSection></form>
 
         {submissions.length ? (
-          <div className="admin-table-wrap">
+          <div><p className="ui-table-hint">Küçük ekranda diğer sütunlar için tabloyu yatay kaydırın.</p><div className="admin-table-wrap" tabIndex={0} role="region" aria-label="Bildiri tablosu">
             <table className="admin-table">
               <thead>
                 <tr>
@@ -143,9 +126,9 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                 {submissions.map((submission) => (
                   <tr key={submission.id}>
                     <td>
-                      <Link href={`/admin/bildiriler/${submission.id}`} className="admin-link-cell">
+                      <ListRecordLink base="/admin/bildiriler" scope={context.congress.id} href={`/admin/bildiriler/${submission.id}`} className="admin-link-cell">
                         {submission.title}
-                      </Link>
+                      </ListRecordLink>
                     </td>
                     <td>{submission.presenterName}</td>
                     <td>{submission.presenterEmail}</td>
@@ -159,7 +142,7 @@ export default async function AdminSubmissionsPage({ searchParams }: PageProps) 
                 ))}
               </tbody>
             </table>
-          </div>
+          </div></div>
         ) : (
           <div className="notice">Henüz gönderilmiş bildiri bulunmuyor.</div>
         )}

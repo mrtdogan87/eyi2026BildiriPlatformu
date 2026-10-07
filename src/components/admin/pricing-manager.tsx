@@ -1,6 +1,10 @@
-"use client";
+'use client';
+import {useUnsavedChanges} from '@/components/admin-ui/navigation-guard';
+import {uiFetch} from '@/components/admin-ui/mutation';
+import {RecordDirectory} from '@/components/admin-ui/record-directory';
+import {Workspace,WorkspacePanel} from '@/components/admin-ui/workspace';
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type {
   AdminCongressSettings,
   AdminPaymentTier,
@@ -174,26 +178,9 @@ export function PricingManager({ initialPayload }: Props) {
   const [settingsMessage, setSettingsMessage] = useState("");
   const [settingsError, setSettingsError] = useState("");
 
-  useEffect(() => {
-    setSettingsDraft(settingsToDraft(payload.congress));
-    setTierDrafts((prev) => {
-      const next: Record<string, TierDraft> = {};
-      for (const tier of payload.tiers) {
-        const existing = prev[tier.id];
-        next[tier.id] = existing
-          ? {
-              ...existing,
-              amount: String(tier.amount),
-              currency: tier.currency,
-              active: tier.active,
-              saving: false,
-            }
-          : tierToDraft(tier);
-      }
-      return next;
-    });
-  }, [payload]);
 
+
+  useUnsavedChanges(payload.tiers.some(tier=>{const draft=tierDrafts[tier.id];return draft&&(draft.amount!==String(tier.amount)||draft.currency!==tier.currency||draft.active!==tier.active);}));
   const tierGroups = useMemo(() => buildGroups(payload.tiers), [payload.tiers]);
 
   function updateTierDraft(id: string, patch: Partial<TierDraft>) {
@@ -216,7 +203,7 @@ export function PricingManager({ initialPayload }: Props) {
     updateTierDraft(tier.id, { saving: true, error: "", message: "" });
 
     try {
-      const response = await fetch(`/api/admin/payment-tiers/${tier.id}`, {
+      const response = await uiFetch(`/api/admin/payment-tiers/${tier.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -234,7 +221,7 @@ export function PricingManager({ initialPayload }: Props) {
       if (data.pricing) {
         setPayload(data.pricing);
       }
-      updateTierDraft(tier.id, { saving: false, message: "Kaydedildi", error: "" });
+      updateTierDraft(tier.id, { amount: String(numericAmount),currency:draft.currency,active:draft.active,saving: false, message: "Kaydedildi", error: "" });
     } catch (error) {
       updateTierDraft(tier.id, {
         saving: false,
@@ -256,7 +243,7 @@ export function PricingManager({ initialPayload }: Props) {
         throw new Error("Gala ücreti 0 ve üzeri bir sayı olmalıdır.");
       }
 
-      const response = await fetch("/api/admin/congress", {
+      const response = await uiFetch("/api/admin/congress", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -281,6 +268,7 @@ export function PricingManager({ initialPayload }: Props) {
       if (data.pricing) {
         setPayload(data.pricing);
       }
+      if(data.pricing)setSettingsDraft(settingsToDraft(data.pricing.congress));
       setSettingsMessage("Ayarlar kaydedildi.");
     } catch (error) {
       setSettingsError(error instanceof Error ? error.message : "Bilinmeyen bir hata oluştu.");
@@ -290,8 +278,7 @@ export function PricingManager({ initialPayload }: Props) {
   }
 
   return (
-    <div className="pricing-manager">
-      <section className="pricing-section">
+    <div className="pricing-manager"><Workspace label="Ücret ayarları"><WorkspacePanel id="settings" label="Dönem ve banka"><section className="pricing-section">
         <header className="pricing-section-head">
           <div>
             <h2>Kayıt Dönemleri ve Banka Bilgileri</h2>
@@ -515,9 +502,8 @@ export function PricingManager({ initialPayload }: Props) {
             </button>
           </div>
         </form>
-      </section>
-
-      <section className="pricing-section">
+      </section></WorkspacePanel>
+<WorkspacePanel id="fees" label="Tarifeler"><section className="pricing-section">
         <header className="pricing-section-head">
           <div>
             <h2>Ücret Tarifesi</h2>
@@ -529,7 +515,7 @@ export function PricingManager({ initialPayload }: Props) {
         </header>
 
         <div className="pricing-tier-grid">
-          {tierGroups.map((group) => (
+          {<RecordDirectory label="Tarife grubu" records={tierGroups.map(group=>({id:group.key,title:group.title,subtitle:group.description,detail:(
             <article key={group.key} className="pricing-tier-card">
               <header>
                 <h3>{group.title}</h3>
@@ -601,9 +587,8 @@ export function PricingManager({ initialPayload }: Props) {
                 })}
               </div>
             </article>
-          ))}
+          )}))}/>}
         </div>
-      </section>
-    </div>
+      </section></WorkspacePanel></Workspace></div>
   );
 }

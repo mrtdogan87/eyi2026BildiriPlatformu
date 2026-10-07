@@ -1,4 +1,7 @@
 'use client';
+import {useAdminNavigation} from '@/components/admin-ui/navigation-guard';
+import {RecordDirectory} from '@/components/admin-ui/record-directory';
+import {Workspace,WorkspacePanel} from '@/components/admin-ui/workspace';
 import Link from 'next/link';
 import { useState } from 'react';
 import { cmsRequest } from '@/components/cms/admin-shared';
@@ -51,6 +54,7 @@ export function WorklistManager({ initial }: { initial: Overview }) {
   const [statusFilter, setStatusFilter] = useState('OPEN'), [assigneeFilter, setAssigneeFilter] = useState('');
   const [history, setHistory] = useState<Detail | null>(null), [requestKey, setRequestKey] = useState('');
   const [newSource, setNewSource] = useState(''), [newFormVersion, setNewFormVersion] = useState(0);
+  const {confirmLeave}=useAdminNavigation();
   const filtered = data.requests.filter(row => (statusFilter === 'OPEN' ? row.status !== 'RESOLVED' : !statusFilter || row.status === statusFilter) && (!assigneeFilter || (assigneeFilter === 'UNASSIGNED' ? !row.assigneeId : row.assigneeId === assigneeFilter)));
   async function refresh() { setData(await cmsRequest(endpoint)); }
   async function act(work: () => Promise<unknown>, success: string, reload = true) {
@@ -61,25 +65,30 @@ export function WorklistManager({ initial }: { initial: Overview }) {
   }
   const activeFeedback = data.sources.feedback.filter(item => item.status !== 'CLOSED');
   const activeIssues = data.sources.deliveryIssues.filter(item => item.status === 'OPEN');
-  return <div className="content-management">
-    <section className="card platform-card">
+  return <div className="content-management">{message && <p role="status" aria-live="polite" style={{ overflowWrap: 'anywhere' }}>{message}</p>}<Workspace initial="requests" label="Sekreterya işleri"><WorkspacePanel id="requests" label="Talepler"><section className="card platform-card"><h2>Talepler</h2>
+      <div className="cms-fields"><label className="field">Durum filtresi<select value={statusFilter} onChange={async event => {const value=event.target.value;if(await confirmLeave()){setStatusFilter(value);setHistory(null);}}}><option value="OPEN">Açık talepler</option><option value="">Tüm talepler</option>{Object.entries(statuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
+        <label className="field">Sorumlu filtresi<select value={assigneeFilter} onChange={async event => {const value=event.target.value;if(await confirmLeave()){setAssigneeFilter(value);setHistory(null);}}}><option value="">Tüm sorumlular</option><option value="UNASSIGNED">Atanmamış</option>{data.assignees.map(person => <option key={person.id} value={person.id}>{person.name}</option>)}</select></label></div>
+      <div className="content-management">{<RecordDirectory label="Talep" onSelect={()=>setHistory(null)} search records={filtered.map(row=>({id:row.id,title:row.subject,subtitle:row.requesterEmail,state:statuses[row.status],detail:<RequestEditor key={`${row.id}:${row.version}`} row={row} data={data} busy={busy}
+        onSave={(id, value) => { void act(async () => { await cmsRequest(`${endpoint}/${id}`, 'PATCH', value); if (history?.request.id === id) setHistory(await cmsRequest(`${endpoint}/${id}`)); }, 'Talep güncellendi.'); }}
+        onHistory={id => { void act(async () => setHistory(await cmsRequest(`${endpoint}/${id}`)), 'Talep geçmişi açıldı.', false); }} />}))} />}</div>
+      {!filtered.length && <p>Bu filtreye uygun talep yok.</p>}
+      {history && <section className="content-entry" aria-label="Talep işlem geçmişi" style={{ marginTop: 20 }}><h3>İşlem geçmişi: {history.request.subject}</h3>{history.events.map(event => <article className="content-entry" key={event.id}><p><strong>{event.number}. kayıt</strong> · {event.actorName} · {date(event.createdAt)}</p><p>{event.fromStatus ? `${statuses[event.fromStatus]} → ` : ''}{statuses[event.toStatus]} · Sorumlu: {data.assignees.find(person => person.id === event.assigneeId)?.name ?? (event.assigneeId ? 'Önceki ekip üyesi' : 'Atanmamış')}</p>{event.publicResult && <><strong>Katılımcıya açık sonuç</strong><p style={textStyle}>{event.publicResult}</p></>}{event.internalNote && <><strong>Yalnız ekip için iç not</strong><p style={textStyle}>{event.internalNote}</p></>}</article>)}<button className="button secondary" onClick={() => setHistory(null)}>Geçmişi kapat</button></section>}
+    </section></WorkspacePanel>
+<WorkspacePanel id="summary" label="Takip özeti"><section className="card platform-card">
       <h2>Takip özeti</h2>
       <p>{data.requests.filter(row => row.status !== 'RESOLVED').length} açık talep · {data.sources.missing.length} takip işlemi · {activeFeedback.length} açık geri bildirim · {activeIssues.length} teslim sorunu</p>
       <p>Talep, e-posta, ödeme ve bildiri durumları ayrı izlenir. Ekranda en son {data.limits.requests} talep gösterilir.</p>
       <button className="button secondary" disabled={busy} onClick={() => void act(async () => { await refresh(); if (history) setHistory(await cmsRequest(`${endpoint}/${history.request.id}`)); }, 'Listeler güncellendi.', false)}>Listeyi yenile</button>
-      {message && <p role="status" aria-live="polite" style={{ overflowWrap: 'anywhere' }}>{message}</p>}
-    </section>
 
-    <section className="card platform-card"><h2>Eksik işlemler ve dekont takibi</h2><p>Açık modüllerin mevcut kurallarına göre hazırlanır. Dekontun alınması ödeme doğrulaması değildir. Ödeme doğrulaması, program yerleşimi, görev yanıtı ve belge hakkı ayrı süreçlerdir.</p>
+    </section></WorkspacePanel>
+<WorkspacePanel id="missing" label="Eksik işlemler"><section className="card platform-card"><h2>Eksik işlemler ve dekont takibi</h2><p>Açık modüllerin mevcut kurallarına göre hazırlanır. Dekontun alınması ödeme doğrulaması değildir. Ödeme doğrulaması, program yerleşimi, görev yanıtı ve belge hakkı ayrı süreçlerdir.</p>
       {data.sources.missing.length ? <div className="content-management">{data.sources.missing.map(item => <article className="content-entry" key={item.id} style={{ overflowWrap: 'anywhere' }}><h3><Link href={item.href}>{item.subject}</Link></h3><p>{item.email}</p><ul>{item.reasons.map(reason => <li key={reason}>{reason}</li>)}</ul></article>)}</div> : <p>Gösterilecek eksik işlem yok.</p>}
-    </section>
-
-    <section className="card platform-card"><h2>Geri bildirim ve teslim sorunları</h2><p>Bu kayıtların durumları kendi ekranlarından yönetilir. Talep sonucunu kaydetmek kaynak kaydın durumunu değiştirmez.</p>
+    </section></WorkspacePanel>
+<WorkspacePanel id="sources" label="Geri bildirim ve teslim"><section className="card platform-card"><h2>Geri bildirim ve teslim sorunları</h2><p>Bu kayıtların durumları kendi ekranlarından yönetilir. Talep sonucunu kaydetmek kaynak kaydın durumunu değiştirmez.</p>
       <div className="content-gallery"><section><h3>Açık geri bildirimler</h3>{activeFeedback.length ? activeFeedback.map(item => <article className="content-entry" key={item.id}><h4><Link href={item.href}>{item.subject}</Link></h4><p>{item.senderName} · {item.email}</p><p>{item.status === 'IN_PROGRESS' ? 'İnceleniyor' : 'Yeni'} · {date(item.createdAt)}</p></article>) : <p>Açık geri bildirim yok.</p>}</section>
         <section><h3>Açık teslim sorunları</h3>{activeIssues.length ? activeIssues.map(item => <article className="content-entry" key={item.id} style={{ overflowWrap: 'anywhere' }}><h4><Link href={item.href}>{item.subject}</Link></h4><p>{item.recipient} · {deliveryStatuses[item.messageStatus] ?? item.messageStatus}</p><p>{date(item.createdAt)}</p></article>) : <p>Açık teslim sorunu yok.</p>}</section></div>
-    </section>
-
-    <section className="card platform-card"><h2>E-postadan veya görüşmeden talep ekle</h2><p>Gelen kutusu otomatik içe aktarılmaz. İlgili mesajı özetleyin ve bu kongredeki kayda bağlayın. Bu işlem e-posta göndermez.</p>
+    </section></WorkspacePanel>
+<WorkspacePanel id="create" label="Yeni talep"><section className="card platform-card"><h2>E-postadan veya görüşmeden talep ekle</h2><p>Gelen kutusu otomatik içe aktarılmaz. İlgili mesajı özetleyin ve bu kongredeki kayda bağlayın. Bu işlem e-posta göndermez.</p>
       <form key={newFormVersion} onChange={() => setRequestKey('')} onSubmit={event => {
         event.preventDefault(); const form = event.currentTarget; const fields = new FormData(form); const key = requestKey || crypto.randomUUID(); setRequestKey(key);
         const source = data.sourceOptions.find(option => `${option.type}:${option.id}` === newSource);
@@ -96,16 +105,5 @@ export function WorklistManager({ initial }: { initial: Overview }) {
         <label className="field">Talebin açıklaması<textarea name="description" required minLength={8} maxLength={6000} rows={4} /></label>
         <button className="button primary">Talebi oluştur</button>
       </fieldset></form>
-    </section>
-
-    <section className="card platform-card"><h2>Talepler</h2>
-      <div className="cms-fields"><label className="field">Durum filtresi<select value={statusFilter} onChange={event => setStatusFilter(event.target.value)}><option value="OPEN">Açık talepler</option><option value="">Tüm talepler</option>{Object.entries(statuses).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
-        <label className="field">Sorumlu filtresi<select value={assigneeFilter} onChange={event => setAssigneeFilter(event.target.value)}><option value="">Tüm sorumlular</option><option value="UNASSIGNED">Atanmamış</option>{data.assignees.map(person => <option key={person.id} value={person.id}>{person.name}</option>)}</select></label></div>
-      <div className="content-management">{filtered.map(row => <RequestEditor key={`${row.id}:${row.version}`} row={row} data={data} busy={busy}
-        onSave={(id, value) => { void act(async () => { await cmsRequest(`${endpoint}/${id}`, 'PATCH', value); if (history?.request.id === id) setHistory(await cmsRequest(`${endpoint}/${id}`)); }, 'Talep güncellendi.'); }}
-        onHistory={id => { void act(async () => setHistory(await cmsRequest(`${endpoint}/${id}`)), 'Talep geçmişi açıldı.', false); }} />)}</div>
-      {!filtered.length && <p>Bu filtreye uygun talep yok.</p>}
-      {history && <section className="content-entry" aria-label="Talep işlem geçmişi" style={{ marginTop: 20 }}><h3>İşlem geçmişi: {history.request.subject}</h3>{history.events.map(event => <article className="content-entry" key={event.id}><p><strong>{event.number}. kayıt</strong> · {event.actorName} · {date(event.createdAt)}</p><p>{event.fromStatus ? `${statuses[event.fromStatus]} → ` : ''}{statuses[event.toStatus]} · Sorumlu: {data.assignees.find(person => person.id === event.assigneeId)?.name ?? (event.assigneeId ? 'Önceki ekip üyesi' : 'Atanmamış')}</p>{event.publicResult && <><strong>Katılımcıya açık sonuç</strong><p style={textStyle}>{event.publicResult}</p></>}{event.internalNote && <><strong>Yalnız ekip için iç not</strong><p style={textStyle}>{event.internalNote}</p></>}</article>)}<button className="button secondary" onClick={() => setHistory(null)}>Geçmişi kapat</button></section>}
-    </section>
-  </div>;
+    </section></WorkspacePanel></Workspace></div>;
 }
