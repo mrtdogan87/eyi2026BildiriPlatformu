@@ -8,8 +8,8 @@ Kök plan Bölüm 17, UI01–UI10. Başlangıç `5c0ef78`. Yerel dal: `codex/adm
 | UI02 | Tamamlandı | Dar çerçeve, gruplanmış menü, aranan kongre seçici, konum yolu, hesap, dört kısa yol. 19 mevcut platform regresyonu, TypeScript/ESLint; masaüstü/390 px, menü Escape dönüşü, taslakta gezinme ve kongre geçişini iptal. |
 | UI03 | Tamamlandı | Seçilen kurum/kullanıcı/kongre ayrıntısı, dört adımlı kurulum, gruplanmış modül etkileri, ekip kapsamları. 11 yapılandırma + 29 kongre + 34 yönetim + 4 boş kurulum regresyonu; build, TypeScript, ESLint. Masaüstü/390 px, sentetik kurum+kongre kurulum sonucu ve eksik alanın doğru adıma odağı doğrulandı. |
 | UI04 | Tamamlandı | Liste filtreleri ve dönüş konumu, özet/dosya/işlem/geçmiş sekmeleri; seçilen banka hareketi, ileti, talep, istisna ve audit detayı. Ekstre yükleme ve şablonlar ayrı çalışma alanlarında. 213 HTTP regresyonu ve ilgili birim testleri; TypeScript/ESLint. Masaüstü ve 390 px, tablo kaydırması, filtre dönüşü, taslak iptali, boş gerekçe ve işaretlenmemiş belirsiz eşleştirme onayı doğrulandı. |
-| UI05 | Devam ediyor | CMS, medya, içerik, yayın kontrolleri. |
-| UI06 | Planlandı | Hakemlik, kişisel hakem görevleri ve ödüller. |
+| UI05 | Tamamlandı | Seçilen CMS bloğu ve medya, ayrı içerik/önizleme/yayın/zamanlama/geçmiş alanları; ortak kayıt seçimi, dille sınırlı ana sayfa formu. 175 HTTP + 74 birim regresyonu, build/TypeScript/ESLint. Masaüstü ve 390 px envanteri, klavye geçmişi, yayımlanmadan v2 taslak kaydı, TR/EN koruması, özel önizlemede admin dekoru olmaması doğrulandı. |
+| UI06 | Devam ediyor | Hakemlik, kişisel hakem görevleri ve ödüller. |
 | UI07 | Planlandı | Program, görevler, etkinlik ve yoklama. |
 | UI08 | Planlandı | Sertifika ve tanıtım çalışma alanları. |
 | UI09 | Planlandı | Yayın, kitap, arşiv, kişisel kayıt. |

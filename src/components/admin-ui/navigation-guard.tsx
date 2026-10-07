@@ -12,7 +12,7 @@ export function AdminNavigationGuard({children}:{children:ReactNode}){
   async function confirmLeave(){if(!dirty())return true;if(resolve.current)return false;lastFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;dialog.current?.showModal();return new Promise<boolean>(done=>{resolve.current=done;});}
   function register(id:string,read:()=>boolean){readers.current.set(id,read);return ()=>{readers.current.delete(id);};}
   useEffect(()=>{
-    const collect=()=>root.current?.querySelectorAll('form').forEach(form=>{if(form.getAttribute('method')?.toLowerCase()!=='get'&&!forms.current.has(form))forms.current.set(form,snapshot(form));});
+    const collect=()=>root.current?.querySelectorAll('form').forEach(form=>{if(!form.hasAttribute('data-ui-managed')&&form.getAttribute('method')?.toLowerCase()!=='get'&&!forms.current.has(form))forms.current.set(form,snapshot(form));});
     collect();const observer=new MutationObserver(collect);if(root.current)observer.observe(root.current,{childList:true,subtree:true});
     const leaving=(event:BeforeUnloadEvent)=>{if(dirty()){event.preventDefault();event.returnValue='';}};
     const started=(event:Event)=>{const id=(event as CustomEvent<string>).detail,form=submitted.current;if(form?.isConnected)requests.current.set(id,{form,values:snapshot(form)});submitted.current=null;};
@@ -21,7 +21,7 @@ export function AdminNavigationGuard({children}:{children:ReactNode}){
     window.addEventListener('beforeunload',leaving);window.addEventListener('admin-ui:request',started);window.addEventListener('admin-ui:saved',saved);window.addEventListener('admin-ui:failed',failed);
     return ()=>{observer.disconnect();window.removeEventListener('beforeunload',leaving);window.removeEventListener('admin-ui:request',started);window.removeEventListener('admin-ui:saved',saved);window.removeEventListener('admin-ui:failed',failed);resolve.current?.(false);};
   },[]);
-  return <Context.Provider value={{confirmLeave,register}}><div ref={root} onSubmitCapture={event=>{const form=event.target;if(form instanceof HTMLFormElement&&form.getAttribute('method')?.toLowerCase()!=='get')submitted.current=form;}} onClickCapture={event=>{
+  return <Context.Provider value={{confirmLeave,register}}><div ref={root} onSubmitCapture={event=>{const form=event.target;submitted.current=form instanceof HTMLFormElement&&!form.hasAttribute('data-ui-managed')&&form.getAttribute('method')?.toLowerCase()!=='get'?form:null;}} onClickCapture={event=>{
     if(event.defaultPrevented||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
     const link=(event.target as HTMLElement).closest('a');if(!link||link.hasAttribute('download')||link.target==='_blank')return;const target=new URL(link.href,location.href);
     if(target.origin!==location.origin||target.pathname.startsWith('/api/')||(target.pathname===location.pathname&&target.search===location.search))return;
