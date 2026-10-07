@@ -2,12 +2,15 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import {useAdminNavigation} from '@/components/admin-ui/navigation-guard';
 
 export function AdminLogoutButton() {
   const router = useRouter();
+  const {confirmLeave}=useAdminNavigation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleLogout() {
+    if(!await confirmLeave())return;
     setIsSubmitting(true);
 
     try {

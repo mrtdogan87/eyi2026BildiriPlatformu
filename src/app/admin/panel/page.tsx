@@ -1,49 +1,20 @@
-import {congressDashboard} from '@/integrations/congress/dashboard';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
-import { actorSession, requireContext, moduleEnabled } from '@/platform/context';
-import { AccessError } from '@/platform/http';
-import { allows, roleLabels } from '@/platform/policy';
-import { creationOrganizations } from '@/modules/congress/service';
-import { AdminLogoutButton } from '@/components/admin/admin-logout-button';
-export const dynamic = 'force-dynamic';
-export default async function PanelPage({ searchParams }: { searchParams: Promise<{ denied?: string }> }) {
+import {redirect} from 'next/navigation';
+import {prisma} from '@/lib/prisma';
+import {actorSession,requireContext} from '@/platform/context';
+import {AccessError} from '@/platform/http';
+import {allows,type Action} from '@/platform/policy';
+import {congressDashboard} from '@/integrations/congress/dashboard';
+import {creationOrganizations} from '@/modules/congress/service';
+import {congressNavigation,visibleNavigation} from '@/components/admin-ui/navigation.mjs';
+import {EmptyState} from '@/components/admin-ui/workspace';
+export const dynamic='force-dynamic';
+export default async function Page({searchParams}:{searchParams:Promise<{denied?:string}>}){
   const session=await actorSession();if(!session)redirect('/admin');if(session.user.platformAdmin&&!session.congressId)redirect('/admin/platform');
-  const canCreate = session.user.platformAdmin||(await creationOrganizations()).length > 0;
-  let context; try { context = await requireContext(); } catch (error) { if (!(error instanceof AccessError)) throw error; }
-  if (!context) return <main className="page-shell"><section className="card platform-card"><h1>Kongre seçin</h1><p>Üst menüden erişiminiz olan kongrelerden birini seçin. Üyeliğiniz kaldırıldıysa kongre yönetimiyle görüşün.</p>{canCreate && <Link className="button primary" href="/admin/kongre-olustur">Yeni kongre oluştur</Link>}<AdminLogoutButton /></section></main>;
-  const submissions = await moduleEnabled(context.congress.id, 'SUBMISSIONS'); const registration = await moduleEnabled(context.congress.id, 'REGISTRATION');const cms=await moduleEnabled(context.congress.id,'CMS');
-  const archive=await moduleEnabled(context.congress.id,'ARCHIVE');
-  const publications=await moduleEnabled(context.congress.id,'PUBLICATIONS');
-  const promotion=await moduleEnabled(context.congress.id,'PROMOTION');
-  const awards=await moduleEnabled(context.congress.id,'AWARDS');
-  const certificates = await moduleEnabled(context.congress.id, 'CERTIFICATES');
-  const activities = await moduleEnabled(context.congress.id, 'ACTIVITIES');
-  const program = await moduleEnabled(context.congress.id, 'PROGRAM');
-  const attendance = program && await moduleEnabled(context.congress.id, 'ATTENDANCE');
-  const reviews = submissions && await moduleEnabled(context.congress.id, 'REVIEWS');
-  const links = [
-    ['archive.read', archive, '/admin/arsiv', 'Kongre kapanışı ve kalıcı arşiv'],
-    ['publications.read', publications, '/admin/kitaplar', 'Kitap ve program PDF'],
-    ['publications.read', publications, '/admin/yayinlar', 'Tam metin, prova ve yayın onayı'],
-    ['promotion.read', promotion, '/admin/tanitim', 'Davet ve afiş çıktıları'],
-    ['awards.read', awards, '/admin/oduller', 'Ödül başvuruları ve kurul kararları'],
-    ['awards.perform', awards, '/admin/oduller/juri', 'Ödül jüri görevlerim'],
-    ['certificates.read', certificates, '/admin/belgeler/uygunluk', 'Belge kuralları ve kongre uygunluğu'],
-    ['attendance.perform', attendance, '/admin/yoklama', 'Oturum yoklaması'],
-    ['certificates.read', certificates, '/admin/belgeler', 'PDF sertifikalar ve alıcılar'],
-    ['activities.read', activities, '/admin/etkinlikler', 'Workshop ve sosyal katılım'],
-    ['program.read', program, '/admin/program', 'Program ve oturumlar'],
-    ['program.perform', program, '/admin/program/gorevler', 'Program görevlerim'],
-    ['reviews.read', reviews, '/admin/hakemlik', 'Hakemlik ve editör kararları'],
-    ['reviews.perform', reviews, '/admin/hakemlik/gorevler', 'Hakem görevlerim'],
-    ['payments.read', registration, '/admin/odemeler', 'Ödeme doğrulama ve banka ekstresi'],
-    ['worklist', true, '/admin/is-listesi', 'Sekreterya iş listesi'],
-    ['communications', true, '/admin/iletisim', 'E-posta ve teslim sorunları'],
-    ['submissions.read', submissions, '/admin/bildiriler', 'Bildiriler'], ['registrations.read', registration, '/admin/kayitlar', 'Kayıtlar'],
-    ['cms', cms, '/admin/icerik', 'Ortak içerik kayıtları'], ['feedback', cms, '/admin/talepler', 'Geri bildirim talepleri'], ['cms', cms, '/admin/cms', 'CMS sayfaları'], ['cms', cms, '/admin/cms/medya', 'Medya kitaplığı'], ['settings', true, '/admin/site-gorunumu', 'Site görünümü'], ['settings', true, '/admin/kongre-ayarlari', 'Kongre yapılandırması'], ['settings', true, '/admin/teslim-istisnalari', 'Teslim istisnaları'], ['settings', registration, '/admin/ucretler', 'Ücretler'], ['members', true, '/admin/ekip', 'Ekip ve roller'],
-    ['modules', true, '/admin/moduller', 'Modüller'], ['audit', true, '/admin/islem-gecmisi', 'İşlem geçmişi'], ['own', true, '/admin/kayitlarim', 'Kendi kayıtlarım'],
-  ] as const;
-  const tasks=await congressDashboard(context);
-  return <main className="page-shell admin-page-shell"><section className="hero admin-hero"><div><p>{context.congress.organization.name}</p><h1>{context.congress.name}</h1><p>Görevleriniz: {context.roles.map(r=>r==='PLATFORM_ADMIN'?'Platform yöneticisi':roleLabels[r]).join(', ')}</p><p>Yetki kaynağı: {context.accessSource==='PLATFORM'?'Platform':context.accessSource==='ORGANIZATION'?'Kurum yöneticiliği':'Kongre üyeliği'}</p></div><AdminLogoutButton /></section>{(await searchParams).denied && <p className="error" role="alert">İstediğiniz işlem için yetkiniz yok veya ilgili modül kapalı.</p>}{canCreate && <p><Link className="button primary" href="/admin/kongre-olustur">Yeni kongre oluştur</Link></p>}<section className="platform-grid" aria-label="Bekleyen işler">{tasks.map(t=><Link className="card platform-tile" href={t.href} key={t.label}><h2>{t.label}</h2><strong>{t.count}</strong></Link>)}</section><h2>Çalışma alanlarınız</h2><section className="platform-grid">{links.filter(([action, enabled]) => enabled && allows(context.roles, action)).map(([, , href, label]) => <Link className="card platform-tile" href={href} key={href}><h2>{label}</h2><span>Aç →</span></Link>)}</section>{!cms&&context.roles.includes('CONTENT_EDITOR')&&<p>CMS modülü kapalı. Kongre organizatörü Modüller ekranından açabilir.</p>}<p><Link href={`/${context.congress.slug}`}>Katılımcı sayfasını aç</Link></p></main>;
+  let context;try{context=await requireContext();}catch(error){if(!(error instanceof AccessError))throw error;}
+  if(!context)return <main className="page-shell"><h1>Kongre seçin</h1><EmptyState title="Önce çalışma kongrenizi seçin">Üst alandaki Kongre seç düğmesiyle erişiminiz olan kongreyi açın. Erişiminiz kaldırıldıysa kongre ekibiyle görüşün.</EmptyState><p><Link className="button primary" href="/admin/kongreler">Kongrelerimi aç</Link></p></main>;
+  const enabled=await prisma.congressModule.findMany({where:{congressId:context.congress.id,enabled:true},select:{key:true}}),actions=[...new Set(congressNavigation.flatMap(g=>g.items.map(i=>i[2])))].filter(action=>allows(context.roles,action as Action)),groups=visibleNavigation(actions,enabled.map(m=>m.key),Boolean(context.congress.closedAt)),links=groups.flatMap(g=>g.items);
+  const priority=['hakemlik/gorevler','program/gorevler','oduller/juri','is-listesi','bildiriler','kayitlar','cms','belgeler','kayitlarim'],shortcuts=priority.map(path=>links.find(link=>link[0]===path)).filter((link):link is readonly string[]=>Boolean(link)).slice(0,4),tasks=await congressDashboard(context);
+  const canCreate=session.user.platformAdmin||(await creationOrganizations()).length>0;
+  return <main className="page-shell admin-page-shell"><header className="hero"><h1>Genel bakış</h1><p>{context.congress.name} · Yetki kaynağı: {context.accessSource==='PLATFORM'?'Platform':context.accessSource==='ORGANIZATION'?'Kurum yöneticiliği':'Kongre üyeliği'}</p></header>{(await searchParams).denied&&<p role="alert" className="error">İstediğiniz işlem için yetkiniz yok veya ilgili modül kapalı.</p>}<section className="card platform-card"><h2>Bugün ilgilenmeniz gerekenler</h2>{context.congress.closedAt?<p>Kongre kapalı. Arşivdeki kayıtları inceleyebilir; yetkiniz varsa arşiv ekranından yeniden açabilirsiniz.</p>:tasks.length?<div className="ui-task-list">{tasks.map(task=><Link href={task.href} key={task.href}><span>{task.label}</span><strong>{task.count}</strong><span aria-hidden="true">→</span></Link>)}</div>:<EmptyState title="Bu kapsamda bekleyen iş özeti yok">Görevlerinize aşağıdaki kısa yollardan veya menüden ulaşabilirsiniz.</EmptyState>}</section><section className="ui-shortcuts"><h2>Hızlı erişim</h2><div className="ui-actions">{shortcuts.map(([path,label],index)=><Link key={path} className={`button ${index===0?'primary':'secondary'}`} href={'/admin/'+path}>{label}</Link>)}</div></section><details className="ui-detail"><summary>Kongre ve erişim bilgileri</summary><div><p>{context.congress.organization.name} / {context.congress.name}</p><p>Diğer yetkili çalışma alanları soldaki menüde bulunur. Kapalı modüller menüde görünmez; yetkili yönetici Modüller ekranından durumlarını inceleyebilir.</p><div className="ui-actions"><Link className="button secondary" href={`/${context.congress.slug}`}>Katılımcı sayfasını aç</Link>{canCreate&&<Link href="/admin/kongre-olustur">Yeni kongre oluştur</Link>}</div></div></details></main>;
 }
