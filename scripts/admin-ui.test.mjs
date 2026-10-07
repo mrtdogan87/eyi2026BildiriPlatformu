@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {congressNavigation,visibleNavigation,routeInfo} from '../src/components/admin-ui/navigation.mjs';
+import {allows} from '../src/platform/policy.ts';
+const actions=[...new Set(congressNavigation.flatMap(g=>g.items.map(i=>i[2])))];
+const allModules=[...new Set(congressNavigation.flatMap(g=>g.items.map(i=>i[3]).filter(Boolean)))];
+const menu=(roles,modules=allModules,closed=false)=>visibleNavigation(actions.filter(action=>allows(roles,action)),modules,closed).flatMap(g=>g.items.map(i=>i[0]));
+test('Combined secretary and reviewer retain both work areas without management access',()=>{const paths=menu(['SECRETARY','REVIEWER']);assert.ok(paths.includes('bildiriler'));assert.ok(paths.includes('hakemlik/gorevler'));assert.ok(!paths.includes('ekip'));assert.ok(!paths.includes('moduller'));});
+test('Reviewer and chair see their own tasks without administrative lists',()=>{assert.ok(menu(['REVIEWER']).includes('hakemlik/gorevler'));assert.ok(!menu(['REVIEWER']).includes('hakemlik'));assert.ok(menu(['SESSION_CHAIR']).includes('program/gorevler'));assert.ok(!menu(['SESSION_CHAIR']).includes('program'));});
+test('Closed modules are absent without hiding the organizer module management',()=>{const paths=menu(['ORGANIZER'],[]);assert.ok(paths.includes('moduller'));assert.ok(!paths.includes('belgeler'));assert.ok(!paths.includes('cms'));});
+test('Congress closure retains archive and excludes operational modules',()=>{const paths=menu(['ORGANIZER'],allModules,true);assert.ok(paths.includes('arsiv'));assert.ok(!paths.includes('bildiriler'));assert.ok(!paths.includes('belgeler'));});
+test('Nested record and personal task breadcrumbs match the most specific area',()=>{assert.equal(routeInfo('/admin/hakemlik/gorevler/assignment').route,'hakemlik/gorevler');assert.equal(routeInfo('/admin/cms/medya').route,'cms/medya');assert.equal(routeInfo('/admin/platform/gecmis').route,'platform/gecmis');});
+test('Existing menu destinations remain unique and every daily destination takes at most two selections',()=>{const routes=congressNavigation.flatMap(g=>g.items.map(i=>i[0]));assert.equal(new Set(routes).size,routes.length);assert.equal(routes.length,33);assert.ok(congressNavigation.every(g=>g.items.length<=6));});
