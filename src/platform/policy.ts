@@ -1,10 +1,11 @@
 import type { CongressRole } from '@prisma/client';
 export type Action = 'archive.read' | 'archive.manage' | 'archive.export' | 'context' | 'submissions.read' | 'submissions.status' | 'submissions.delete' | 'registrations.read' | 'registrations.delete' | 'settings' | 'members' | 'modules' | 'audit' | 'own' | 'cms' | 'feedback' | 'communications' | 'communication.manage' | 'worklist' | 'submissions.correct' | 'payments.read' | 'payments.manage' | 'reviews.read' | 'reviews.manage' | 'reviews.perform' | 'program.read' | 'program.manage' | 'program.perform' | 'activities.read' | 'activities.manage' | 'certificates.read' | 'certificates.manage' | 'attendance.perform' | 'awards.read' | 'awards.manage' | 'awards.perform' | 'promotion.read' | 'promotion.manage' | 'publications.read' | 'publications.manage';
 export const roleLabels: Record<CongressRole, string> = {
-  ORGANIZER: 'Organizatör', SECRETARY: 'Sekreter', CONTENT_EDITOR: 'İçerik editörü',
+  ORGANIZER: 'Kongre yöneticisi', SECRETARY: 'Sekreter', CONTENT_EDITOR: 'İçerik editörü',
   REVIEWER: 'Hakem', SESSION_CHAIR: 'Oturum başkanı', PARTICIPANT: 'Katılımcı',
 };
-export function allows(role: CongressRole | 'PLATFORM_ADMIN', action: Action) {
+export function allows(role: CongressRole | 'PLATFORM_ADMIN' | readonly (CongressRole | 'PLATFORM_ADMIN')[], action: Action): boolean {
+  if (Array.isArray(role)) return role.some(r => allows(r, action));
   if (role === 'PLATFORM_ADMIN' || role === 'ORGANIZER') return true;
   if (action === 'context' || action === 'own') return true;
   if (action === 'archive.read') return role === 'CONTENT_EDITOR' || role === 'SECRETARY';

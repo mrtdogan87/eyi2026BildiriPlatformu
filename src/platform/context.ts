@@ -4,6 +4,7 @@ import type { ModuleKey } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { sessionCookieName, secureSessionCookie } from '@/lib/environment';
 import { hashToken } from './password.mjs';
+import { effectiveRoles } from './roles.mjs';
 import { AccessError } from './http';
 import { allows, type Action } from './policy';
 const cookieName = sessionCookieName('platform_session');
@@ -39,10 +40,11 @@ export async function authorizeCongress(congressId: string, action: Action = 'co
   if (!congress) throw new AccessError(403, 'Kongre erişimi kaldırılmış.');
   const org = await prisma.organizationMembership.findUnique({ where: { organizationId_userId: { organizationId: congress.organizationId, userId: session.userId } } });
   const membership = await prisma.congressMembership.findUnique({ where: { congressId_userId: { congressId: congress.id, userId: session.userId } } });
-  const role = session.user.platformAdmin ? 'PLATFORM_ADMIN' as const : org?.active && org.organizer ? 'ORGANIZER' as const : org?.active && membership?.active ? membership.role : null;
+  const roles = effectiveRoles(session.user.platformAdmin, org, membership);
+  const role = roles.find(r => allows(r, action));
   if (!role || !allows(role, action)) throw new AccessError(403, 'Bu işlem için kongre yetkiniz yok.');
   if (module) await requireModule(congress.id, module);
-  return { actor: session.user, sessionId: session.id, congress, role };
+  return { actor: session.user, sessionId: session.id, congress, role, roles, accessSource: session.user.platformAdmin ? 'PLATFORM' as const : org?.active && org.organizer ? 'ORGANIZATION' as const : 'CONGRESS' as const };
 }
 export type CongressContext = Awaited<ReturnType<typeof requireContext>>;
 export async function requireModule(congressId: string, key: ModuleKey) {

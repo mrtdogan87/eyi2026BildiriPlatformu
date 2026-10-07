@@ -627,6 +627,7 @@ model CongressMembership {
   congressId String
   userId     String
   role       CongressRole
+  roles      CongressRole[] @default([])
   active     Boolean      @default(true)
   congress   Congress     @relation(fields: [congressId], references: [id], onDelete: Cascade)
   user       PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -986,8 +987,8 @@ model EmailTemplate {
 
 model EmailMessage {
   id              String              @id @default(uuid())
-  congressId      String
-  congress        Congress            @relation(fields: [congressId], references: [id], onDelete: Restrict)
+  congressId      String?
+  congress        Congress?           @relation(fields: [congressId], references: [id], onDelete: Restrict)
   dedupeKey       String
   payloadHash     String
   module          ModuleKey?
@@ -1960,4 +1961,10 @@ model ArchiveEvent {
   detail Json
   createdAt DateTime @default(now())
   @@index([congressId, createdAt])
+}
+
+model PlatformSettings {
+ id String @id @default("platform")
+ displayName String @default("Kongre Yönetim Platformu")
+ updatedAt DateTime @updatedAt
 }

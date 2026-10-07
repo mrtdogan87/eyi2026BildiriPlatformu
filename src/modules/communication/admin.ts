@@ -49,7 +49,7 @@ export async function communicationOverview() {
     return { key, locale, ...defaultTemplate(key, locale), ...(row ? { subject: row.subject, body: row.body } : {}), version: row?.version ?? 0 };
   }));
   return { congress: { name: c.congress.name, slug: c.congress.slug }, mode: getEnvironment().mode,
-    canManage: allows(c.role, 'communication.manage'), settings, templates,
+    canManage: allows(c.roles, 'communication.manage'), settings, templates,
     messages: messages.map(publicMessage), issues: issues.map(i => ({ id: i.id, messageId: i.messageId, status: i.status, version: i.version, note: i.note, resolution: i.resolution,
       createdAt: i.createdAt.toISOString(), resolvedAt: i.resolvedAt?.toISOString() ?? null, message: publicMessage(i.message) })) };
 }

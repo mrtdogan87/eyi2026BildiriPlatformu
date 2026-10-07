@@ -1,3 +1,4 @@
+import { effectiveRoles } from '@/platform/roles.mjs';
 import type { ProgramSnapshot } from '@/modules/program/core';
 import { Prisma, type ActivityEvent, type ActivityBooking } from '@prisma/client';
 import { z } from 'zod';
@@ -27,8 +28,8 @@ async function lock(tx: Tx, congressId: string, c?: CongressContext, action: Act
     tx.organizationMembership.findUnique({ where: { organizationId_userId: { organizationId: c.congress.organizationId, userId: c.actor.id } } }),
     tx.congressMembership.findUnique({ where: { congressId_userId: { congressId, userId: c.actor.id } } }),
   ]);
-  const role = user?.platformAdmin ? 'PLATFORM_ADMIN' : org?.active && org.organizer ? 'ORGANIZER' : org?.active && member?.active ? member.role : null;
-  if (!user?.active || !session || session.revokedAt || session.expiresAt <= new Date() || !role || !allows(role, action)) throw new AccessError(403, 'Kongre yetkiniz veya oturumunuz değişti.');
+  const roles = effectiveRoles(user?.platformAdmin, org, member);
+  if (!user?.active || !session || session.revokedAt || session.expiresAt <= new Date() || !roles.includes(c.role) || !allows(roles, action)) throw new AccessError(403, 'Kongre yetkiniz veya oturumunuz değişti.');
 }
 async function eventIn(tx: Tx, congressId: string, id: string) {
   const e = await tx.activityEvent.findFirst({ where: { id, congressId }, include: eventInclude });

@@ -1,12 +1,13 @@
 import { redirect } from "next/navigation";
 import { AdminLoginForm } from "@/components/admin/admin-login-form";
-import { isAdminAuthenticated } from "@/lib/admin";
+import { actorSession } from "@/platform/context";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminLoginPage() {
-  if (await isAdminAuthenticated()) {
-    redirect("/admin/panel");
+  const session=await actorSession();
+  if (session) {
+    redirect(session.user.platformAdmin ? "/admin/platform" : "/admin/panel");
   }
 
   return (

@@ -1,3 +1,4 @@
+import { membershipRoles } from '@/platform/roles.mjs';
 import { createHash } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
@@ -28,7 +29,7 @@ async function lock(tx: Prisma.TransactionClient, c: CongressContext) {
   const actor = await tx.platformUser.findUnique({ where: { id: c.actor.id } });
   const org = await tx.organizationMembership.findUnique({ where: { organizationId_userId: { organizationId: c.congress.organizationId, userId: c.actor.id } } });
   const member = await tx.congressMembership.findUnique({ where: { congressId_userId: { congressId: c.congress.id, userId: c.actor.id } } });
-  if (!actor?.active || (!actor.platformAdmin && !(org?.active && (org.organizer || (member?.active && member.role === c.role))))) throw new AccessError(403, 'Kongre yetkiniz değişti; tekrar giriş yapın.');
+  if (!actor?.active || (!actor.platformAdmin && !(org?.active && (org.organizer || (member?.active && membershipRoles(member).includes(c.role as import('@prisma/client').CongressRole)))))) throw new AccessError(403, 'Kongre yetkiniz değişti; tekrar giriş yapın.');
 }
 async function paperIn(tx: Prisma.TransactionClient, c: CongressContext, id: string) { const p = await tx.submission.findFirst({ where: { id, congressId: c.congress.id, status: { not: 'DRAFT' } }, include: paperInclude }); if (!p) throw new AccessError(404, 'Gönderilmiş bildiri bulunamadı.'); return p; }
 async function roundIn(tx: Prisma.TransactionClient, c: CongressContext, id: string) { const r = await tx.reviewRound.findFirst({ where: { id, congressId: c.congress.id }, select: roundSelect }); if (!r) throw new AccessError(404, 'Tur bulunamadı.'); return r; }
@@ -42,7 +43,7 @@ export async function reviewList() {
 export async function reviewDetail(id: string) {
   const c = await context('reviews.read'); const p = await paperIn(prisma, c, id);
   const rounds = await prisma.reviewRound.findMany({ where: { submissionId: p.id }, orderBy: { number: 'desc' }, select: roundSelect });
-  const reviewers = await prisma.congressMembership.findMany({ where: { congressId: c.congress.id, active: true, role: 'REVIEWER', user: { active: true, organizations: { some: { organizationId: c.congress.organizationId, active: true } } } }, select: { user: { select: { id: true, name: true, email: true } } }, orderBy: { user: { name: 'asc' } } });
+  const reviewers = await prisma.congressMembership.findMany({ where: { congressId: c.congress.id, active: true, OR: [{roles:{has:'REVIEWER'}},{roles:{isEmpty:true},role:'REVIEWER'}], user: { active: true, organizations: { some: { organizationId: c.congress.organizationId, active: true } } } }, select: { user: { select: { id: true, name: true, email: true } } }, orderBy: { user: { name: 'asc' } } });
   return { paper: { id: p.id, titleTr: p.titleTr, titleEn: p.titleEn, reviewVersion: p.reviewVersion, correctionVersion: p.correctionVersion, content: content(p), status: p.status, fileAvailable: !!p.file }, reviewers: reviewers.map(r => r.user), rounds: rounds.map(r => ({ ...roundView(r), sourceCurrent: currentSource(p, r) })) };
 }
 export type ReviewDetail = Awaited<ReturnType<typeof reviewDetail>>;
@@ -72,7 +73,7 @@ export async function inviteReviewer(id: string, raw: unknown) {
   return reviewAction(() => prisma.$transaction(async tx => {
     await lock(tx, c); const r = await roundIn(tx, c, id); assertCurrent(input.version, r.version); assertOpen(r.status, r.deadline);
     const p = await paperIn(tx, c, r.submissionId); if (!currentSource(p, r)) throw new AccessError(409, 'Bildiri değişti; bu turu kapatıp yeni sürümle tur açın.');
-    const member = await tx.congressMembership.findFirst({ where: { congressId: c.congress.id, userId: input.reviewerId, active: true, role: 'REVIEWER', user: { active: true, organizations: { some: { organizationId: c.congress.organizationId, active: true } } } }, include: { user: true } });
+    const member = await tx.congressMembership.findFirst({ where: { congressId: c.congress.id, userId: input.reviewerId, active: true, OR: [{roles:{has:'REVIEWER'}},{roles:{isEmpty:true},role:'REVIEWER'}], user: { active: true, organizations: { some: { organizationId: c.congress.organizationId, active: true } } } }, include: { user: true } });
     if (!member) throw new AccessError(400, 'Bu kongrenin aktif hakem hesabını seçin; yeni hakemi önce Ekip ekranından davet edin.');
     if (isAuthor(member.user.email, p.draftOwnerEmail, p.authors)) throw new AccessError(409, 'Bildiri sahibi veya yazar kendi bildirisinin hakemi olamaz.');
     if (r.assignments.some(a => a.reviewerId === input.reviewerId)) throw new AccessError(409, 'Hakem bu turda zaten atanmış; yeni hakem seçin.');
@@ -128,7 +129,7 @@ export async function saveEvaluation(id: string, raw: unknown, evidence: ReviewB
     const reviewer = await tx.platformUser.findUniqueOrThrow({ where: { id: a.reviewerId } });
     const membership = await tx.congressMembership.findUnique({ where: { congressId_userId: { congressId: c.congress.id, userId: a.reviewerId } } });
     const organization = await tx.organizationMembership.findUnique({ where: { organizationId_userId: { organizationId: c.congress.organizationId, userId: a.reviewerId } } });
-    if (!reviewer.active || !membership?.active || membership.role !== 'REVIEWER' || !organization?.active || isAuthor(reviewer.email, p.draftOwnerEmail, p.authors)) throw new AccessError(403, 'Hakem yetkisi veya çıkar çatışması durumu değişti.');
+    if (!reviewer.active || !membership?.active || !membershipRoles(membership).includes('REVIEWER') || !organization?.active || isAuthor(reviewer.email, p.draftOwnerEmail, p.authors)) throw new AccessError(403, 'Hakem yetkisi veya çıkar çatışması durumu değişti.');
     validateScores(criteriaSchema.parse(a.round.criteria), input);
     if (imported && (!evidence || !input.submit)) throw new AccessError(400, 'Dış form eşleştirmesinde kanıt dosyası ve tamamlanmış değerlendirme gerekli.');
     if (input.submit) await tx.reviewEvaluation.create({ data: { assignmentId: id, scores: jsonValue(input.scores), recommendation: input.recommendation, authorComment: input.authorComment, internalComment: input.internalComment, submittedById: c.actor.id, submittedByName: c.actor.name, source: imported ? 'MANUAL_IMPORT' : 'REVIEWER', reason: importReason, ...(evidence ? { evidenceName: evidence.name, evidenceMime: evidence.mime, evidenceHash: evidence.hash, evidence: evidence.content } : {}) } });

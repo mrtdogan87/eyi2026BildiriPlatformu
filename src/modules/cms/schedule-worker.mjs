@@ -1,3 +1,4 @@
+import {effectiveRoles} from '../../platform/roles.mjs';
 import {createHash} from 'node:crypto';
 import {documentSchema} from './configuration.ts';
 import {allows} from '../../platform/policy.ts';
@@ -6,8 +7,8 @@ const canonical=value=>Array.isArray(value)?value.map(canonical):value&&typeof v
 export const cmsSourceHash=value=>createHash('sha256').update(JSON.stringify(canonical(value))).digest('hex');
 export function scheduledActorRole(user,org,member){
  if(!user?.active)return null;
- const role=user.platformAdmin?'PLATFORM_ADMIN':org?.active&&org.organizer?'ORGANIZER':org?.active&&member?.active?member.role:null;
- return role&&allows(role,'cms')?role:null;
+ const roles=effectiveRoles(user.platformAdmin,org,member);
+ return roles.find(role=>allows(role,'cms'))??null;
 }
 export function scheduledSourceCurrent(schedule,page,source){return !!page&&page.id===schedule.pageId&&!page.archived&&page.congressId===schedule.congressId&&page.version===schedule.sourceVersion&&source?.id===schedule.sourceRevisionId&&source.pageId===page.id&&source.number===schedule.sourceVersion&&cmsSourceHash(source.content)===schedule.sourceHash&&cmsSourceHash(page.draft)===schedule.sourceHash;}
 export async function invalidateCmsSchedules(tx,{pageId,actorId,congressId,organizationId,reason,now=new Date()}){

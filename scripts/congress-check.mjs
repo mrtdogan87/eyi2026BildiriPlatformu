@@ -30,7 +30,7 @@ const settings = {name:`P04 Özet Kongresi ${suffix}`,year:2027,eventStartsAt:'2
 let created, copy, registrationOnly;
 const owner=`p04-${suffix}@example.invalid`;
 try {
-  await post('/api/admin/login',accounts.organizer);await select('local-eyi-2026');
+  await post('/api/admin/login',accounts.institution);await select('local-eyi-2026');
   await post('/api/admin/login',accounts.secretary,secretary);await select('local-eyi-2026',secretary);
   await post('/api/admin/login',accounts.organizerB,other);await select('local-congress-b',other);
   await req('/api/platform/congresses',{status:401});

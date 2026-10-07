@@ -25,12 +25,12 @@ export function AdminLoginForm() {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = (await response.json()) as { error?: string };
+      const data = (await response.json()) as { error?: string; redirectTo?:string };
       if (!response.ok) {
         throw new Error(data.error ?? "Giriş başarısız.");
       }
 
-      router.push("/admin/panel");
+      router.push(data.redirectTo ?? "/admin/panel");
       router.refresh();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Giriş başarısız.");

@@ -6,6 +6,8 @@
 
 > Bu kopya uygulama takibidir. Üst dizindeki kaynak plan tarihsel planlama referansı olarak korunmuştur; güncel uygulama durumunu bu dosya ve `docs/Pxx_KAPANIS.md` belgeleri gösterir. Son kapanışlar `docs/P21_KAPANIS.md`, `docs/P06_E1_KAPANIS.md`, `docs/P22_KAPANIS.md`; kullanıcı testi/işletim `docs/P22_ISLETIM.md`. Yerel kabul uzak yayına alma kabulü değildir.
 
+> 07.10.2026 kullanıcı testinden gelen yönetim düzeltmesi: kongreden bağımsız platform girişi, kurum oluşturma ve üç kapsamda yetki dağıtımı, çoklu kongre görevi tamamlandı. Teknik kontroller başarılı; **kullanıcının adım adım manuel kabulü bekliyor**. Ayrıntı `docs/PLATFORM_YONETIMI_DUZELTMESI.md`; test sırası `docs/PLATFORM_YONETIMI_KABUL_TESTI.md`.
+
 ## 1. Hedef
 
 Sistemi tek kongrelik bir araçtan, her yıl tekrar kullanılabilen bir **kongre platformuna** dönüştürmek:

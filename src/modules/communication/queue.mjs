@@ -1,3 +1,4 @@
+import {membershipRoles} from '../../platform/roles.mjs';
 import { createHash, randomUUID } from 'node:crypto';
 import {linkedRecipientCurrent} from '../certificates/eligibility.mjs';
 
@@ -74,6 +75,12 @@ function clockDate(now) { return now ? new Date(now) : new Date(); }
 
 async function sourceIsValid(prisma, message, now) {
   // Preview samples never represent live tokens and must never enter a real transport.
+  if (!message.congressId) {
+    if (message.templateKey !== 'ACCOUNT_ACTIVATION' || message.sourceType !== 'platform-activation') return false;
+    const token = await prisma.activationToken.findUnique({where:{id:message.sourceId},include:{user:{include:{organizations:{where:{active:true}},congresses:{where:{active:true},include:{congress:true}}}}}});
+    const user=token?.user;
+    return !!token && !token.usedAt && token.expiresAt>now && user.active && !user.passwordHash && user.email===message.recipient && (user.platformAdmin || user.organizations.some(o=>o.organizer) || user.congresses.some(m=>user.organizations.some(o=>o.organizationId===m.congress.organizationId)));
+  }
   if (message.sourceType === 'TEMPLATE_TEST') return message.provider === 'capture' && message.recipient.endsWith('.invalid');
   if (message.sourceType === 'certificate-file') {
     const f=await prisma.certificateFile.findUnique({where:{id:message.sourceId},include:{certificate:{include:{recipient:true,files:{orderBy:{number:'desc'},take:1,select:{id:true}}}}}});
@@ -98,7 +105,7 @@ async function sourceIsValid(prisma, message, now) {
       if (!a || a.round.congressId !== message.congressId || a.status !== 'INVITED' || a.round.status !== 'OPEN' || a.round.deadline <= now || a.round.sourceVersion !== a.round.submission.correctionVersion || !a.reviewer.active || a.reviewer.email.toLowerCase() !== message.recipient) return false;
       const member = await prisma.congressMembership.findUnique({ where: { congressId_userId: { congressId: message.congressId, userId: a.reviewerId } } });
       const org = await prisma.organizationMembership.findUnique({ where: { organizationId_userId: { organizationId: a.round.congress.organizationId, userId: a.reviewerId } } });
-      return !!(org?.active && member?.active && member.role === 'REVIEWER') && ![a.round.submission.draftOwnerEmail, ...a.round.submission.authors.map(author => author.email)].some(email => email.toLowerCase() === message.recipient);
+      return !!(org?.active && member?.active && membershipRoles(member).includes('REVIEWER')) && ![a.round.submission.draftOwnerEmail, ...a.round.submission.authors.map(author => author.email)].some(email => email.toLowerCase() === message.recipient);
     }
     const d = await prisma.reviewDecision.findUnique({ where: { id: message.sourceId }, include: { round: { include: { submission: { include: { authors: true } } } } } });
     if (!d || d.round.congressId !== message.congressId) return false;
@@ -153,7 +160,7 @@ async function finish(prisma, message, leaseToken, status, now, details = {}) {
       errorCode: details.errorCode ?? null,
       errorSummary: details.errorCode ? SUMMARY[details.errorCode] : null,
     } });
-    if (['PERMANENT_FAILURE', 'UNKNOWN'].includes(status)) {
+    if (message.congressId && ['PERMANENT_FAILURE', 'UNKNOWN'].includes(status)) {
       await tx.emailDeliveryIssue.upsert({
         where: { messageId: message.id },
         create: { congressId: message.congressId, messageId: message.id }, update: {},
@@ -196,8 +203,10 @@ export async function processEmailQueue({ prisma, transport, now, batchSize = 20
     const startedAt = clockDate(now);
     const leaseToken = randomUUID();
     const acquired = await prisma.$transaction(async tx => {
-      await tx.$queryRaw`SELECT id FROM "Congress" WHERE id=${candidate.congressId} FOR UPDATE`;
-      if((await tx.congress.findUnique({where:{id:candidate.congressId},select:{closedAt:true}}))?.closedAt)return {count:0};
+      if(candidate.congressId){
+        await tx.$queryRaw`SELECT id FROM "Congress" WHERE id=${candidate.congressId} FOR UPDATE`;
+        if((await tx.congress.findUnique({where:{id:candidate.congressId},select:{closedAt:true}}))?.closedAt)return {count:0};
+      }
       return tx.emailMessage.updateMany({
       where: { id: candidate.id, status: { in: ['PENDING', 'RETRY'] }, attempts: candidate.attempts, nextAttemptAt: { lte: startedAt } },
       data: { status: 'PROCESSING', leaseToken, leaseUntil: new Date(startedAt.getTime() + leaseMs),
