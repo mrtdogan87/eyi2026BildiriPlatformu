@@ -10,8 +10,8 @@ Kök plan Bölüm 17, UI01–UI10. Başlangıç `5c0ef78`. Yerel dal: `codex/adm
 | UI04 | Tamamlandı | Liste filtreleri ve dönüş konumu, özet/dosya/işlem/geçmiş sekmeleri; seçilen banka hareketi, ileti, talep, istisna ve audit detayı. Ekstre yükleme ve şablonlar ayrı çalışma alanlarında. 213 HTTP regresyonu ve ilgili birim testleri; TypeScript/ESLint. Masaüstü ve 390 px, tablo kaydırması, filtre dönüşü, taslak iptali, boş gerekçe ve işaretlenmemiş belirsiz eşleştirme onayı doğrulandı. |
 | UI05 | Tamamlandı | Seçilen CMS bloğu ve medya, ayrı içerik/önizleme/yayın/zamanlama/geçmiş alanları; ortak kayıt seçimi, dille sınırlı ana sayfa formu. 175 HTTP + 74 birim regresyonu, build/TypeScript/ESLint. Masaüstü ve 390 px envanteri, klavye geçmişi, yayımlanmadan v2 taslak kaydı, TR/EN koruması, özel önizlemede admin dekoru olmaması doğrulandı. |
 | UI06 | Tamamlandı | Seçilen bildiri/tur/atama, hakem görevleri, ödül adayı ve jüri; taslak/teslim, sıralama/kurul kararı, sabit dosya/güncel sürüm ayrımı. 93 HTTP + 41 birim regresyonu, build/TypeScript/ESLint. Masaüstü ve 390 px, eski tur uyarısı, kişisel görevler, eksik jüri puanı ve boş gerekçe/işaretlenmemiş kurul onayları doğrulandı. |
-| UI07 | Devam ediyor | Program, görevler, etkinlik ve yoklama. |
-| UI08 | Planlandı | Sertifika ve tanıtım çalışma alanları. |
+| UI07 | Tamamlandı | Seçilen program oturumu, etkinlik/katılım ve yoklama kişisi; yayın kontrolleri, kişiler ve geçmiş ayrı alanlarda. Kişisel görev düzeni yalnız admin kullanımına uygulanır. 180 HTTP + 65 birim regresyonu, TypeScript/ESLint. Masaüstü/390 px, eksik başkan uyarısı, katılım durumu ve kaydedilmemiş yoklamada oturum değişimini iptal doğrulandı. |
+| UI08 | Devam ediyor | Sertifika ve tanıtım çalışma alanları. |
 | UI09 | Planlandı | Yayın, kitap, arşiv, kişisel kayıt. |
 | UI10 | Planlandı | Tam ekran envanteri, %200/klavye/mobil, son regresyon, yedekli manuel test sürümü. |
 
