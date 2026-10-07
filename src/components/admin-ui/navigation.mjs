@@ -10,9 +10,10 @@ export const congressNavigation = [
 ];
 export const platformNavigation = [{label:'Platform',items:[['platform','Genel bakış'],['kongreler','Kongreler'],['kurumlar','Kurumlar'],['kullanicilar','Kullanıcılar ve yetkiler'],['sistem','Sistem ayarları'],['platform/gecmis','İşlem geçmişi']]}];
 export const platformPaths = new Set(['platform','platform/gecmis','kongreler','kurumlar','kullanicilar','sistem','kongre-olustur','arayuz-ornekleri']);
+const requiredModules={REVIEWS:['REVIEWS','SUBMISSIONS'],ATTENDANCE:['ATTENDANCE','PROGRAM']};
 export function visibleNavigation(actions,modules,closed=false) {
   const allowed=new Set(actions), enabled=new Set(modules);
-  return congressNavigation.map(group=>({label:group.label,items:group.items.filter(([, ,action,module])=>allowed.has(action)&&(!module||(enabled.has(module)&&(!closed||module==='ARCHIVE'))))})).filter(group=>group.items.length);
+  return congressNavigation.map(group=>({label:group.label,items:group.items.filter(([, ,action,module])=>allowed.has(action)&&(!module||((requiredModules[module]??[module]).every(required=>enabled.has(required))&&(!closed||module==='ARCHIVE'))))})).filter(group=>group.items.length);
 }
 export function routeInfo(pathname) {
   const path=pathname.replace(/^\/admin\/?/,'');
