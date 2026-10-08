@@ -1,6 +1,6 @@
 # Admin arayüzü paketleri — teknik uygulama kaydı
 
-Kök plan Bölüm 17, UI01–UI10. Başlangıç `5c0ef78`. Yerel dal: `codex/admin-ui-ui01-ui10`. Gerçek kullanıcı kabulü bekler; otomatik kontroller kullanıcı testi değildir. Canlıya yayın yapılmaz. P01–P22 ve uzak yayın kabulü bu kayıtla kapanmaz.
+Kök plan Bölüm 17, UI01–UI10 ve Bölüm 18, UI11. Başlangıç `5c0ef78`. Yerel dal: `codex/admin-ui-ui01-ui10`. Gerçek kullanıcı kabulü bekler; otomatik kontroller kullanıcı testi değildir. Canlıya yayın yapılmaz. P01–P22 ve uzak yayın kabulü bu kayıtla kapanmaz.
 
 | Paket | Teknik durum | Gösterilebilir sonuç ve kontrol |
 |---|---|---|
@@ -14,6 +14,7 @@ Kök plan Bölüm 17, UI01–UI10. Başlangıç `5c0ef78`. Yerel dal: `codex/adm
 | UI08 | Tamamlandı | Şablon → Alıcılar → Önizleme ve üretim → Belgeler; seçili PDF alanı, ayrı tür/uygunluk ve bildirim. Tanıtımda metin/kaynak/tasarım adımları, görsel, önizleme ve yayın ayrı. 129 HTTP + 61 birim regresyonu, TypeScript/ESLint. Masaüstü/390 px, CSV satır hatası, e-postasız sentetik alıcı/PDF v1, özel afiş önizlemesi ve taslak uyarısı doğrulandı. UI10’da e-postasız PDF tarayıcı bağlantısından indirildi ve bir sayfalık dosya doğrulandı. |
 | UI09 | Tamamlandı | Seçilen yayın kaydı, ayrı prova/yazar onayı/editör işlemleri; kitapta kaynak → önizleme → özel üretim → yayın; arşivde durum/erişim/kapanış ayrımı. Admin kişisel kayıtları alanlara ayrıldı; düzeltme sekmeleri ve diğer işlem taslakları korunur. 181 HTTP + 75 birim regresyonu, TypeScript/ESLint. Masaüstü/390 px, eski kaynakta kitap seçiminin engeli, dört sayfalı özel önizleme, boş kapanış onayı ve kişisel boş kayıt görünümü doğrulandı. |
 | UI10 | Teknik tamamlandı; kullanıcı/%200 bekler | 49 yol masaüstü/390/640 px; klavye, filtre/odak/taslak koruması, gerçek PDF indirme. Son build/ESLint/TypeScript; 1.324 regresyon + 157 önizleme, ek 38 yönetim ve 37 birleşik pilot. [Son rapor](UI10_DOGRULAMA.md), [manuel test](UI10_MANUEL_TEST.md). |
+| UI11 | Teknik tamamlandı; kullanıcı kabulü bekler | Platform → kurum → kongre; üç yönetici kapsamı; gerekçeli hedef müdahalesi, gerçek aktör kaydı ve çıkış. 27 UI11, 38 yönetim/ilk kurulum; 1.332 regresyon + 157 önizleme. Gerçek CSS 390 px/1280 px, klavye ve taslak koruması; ayrı yedek geri yüklemesiyle özgün kurum/hesap/üyelik ve kongre sahipliği doğrulandı. [Doğrulama](UI11_DOGRULAMA.md). |
 
 Her paketin ekranları ve komut çıktıları özel `.local/ui/uiNN-*` dosyalarında tutulur. Geri dönüş noktaları paket başına Git commitleridir. Başlangıç yedeği `.recovery/P22M-20261007-final` içindedir; kaynak ve 100 tablo geri yüklemesi doğrulanmıştı. Nihai kapanış yedeği `.recovery/P22U-20261008-final`; doğrulama sonucu kendi manifestinde saklanır.
 

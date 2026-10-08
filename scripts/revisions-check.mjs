@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -23,7 +24,7 @@ async function docx(label) { const zip = await JSZip.loadAsync(original); zip.fi
 const second = await docx('Second synthetic version'), proposal = await docx('Participant proposed version');
 let demo, paper, foreign, foreignPaper, registration, requestId;
 async function request(path, { method = 'GET', body, jar = staff.platform, status = 200, origin } = {}) {
-  const response = await fetch(base + path, { method, redirect: 'manual', headers: { cookie: [...jar].map(([k,v]) => `${k}=${v}`).join(';'), ...(body !== undefined && !(body instanceof FormData) ? { 'content-type': 'application/json' } : {}), ...(origin ? { origin } : {}) }, body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body) });
+  const response = await fetch(base + path, { method, redirect: 'manual', headers: { cookie: [...jar].map(([k,v]) => `${k}=${v}`).join(';'), ...(body !== undefined && !(body instanceof FormData) ? { 'content-type': 'application/json' } : {}), ...(origin ? { origin } : {}) }, body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(contextRequestBody(path,body)) });
   const expected = (Array.isArray(status) ? status : [status]).includes(response.status);
   let diagnostic = ''; if (!expected) { const fail = await response.clone().json().catch(() => null); if (typeof fail?.error === 'string') diagnostic = fail.error.replace(/https?:\/\/\S+/gi,'[url]').replace(/\b[^\s@]+@[^\s@]+\b/g,'[email]').replace(/\b[A-Za-z0-9_-]{24,}\b/g,'[redacted]').slice(0,500); }
   assert.ok(expected, `${method} ${path}: expected ${status}, received ${response.status}; ${diagnostic}`);

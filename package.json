@@ -52,7 +52,8 @@
     "test:pilot-preflight": "node scripts/pilot-preflight.mjs",
     "test:pilot-recovery": "node scripts/pilot-recovery-check.mjs",
     "test:promotion-sources": "node scripts/promotion-source-check.mjs",
-    "test:platform-management": "node scripts/platform-management-check.mjs && node scripts/empty-platform-check.mjs"
+    "test:platform-management": "node scripts/platform-management-check.mjs && node scripts/empty-platform-check.mjs",
+    "test:ui11": "node scripts/ui11-check.mjs"
   },
   "keywords": [],
   "author": "",

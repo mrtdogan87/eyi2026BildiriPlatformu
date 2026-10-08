@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
@@ -11,7 +12,7 @@ loadEnv(); assertLocal();
 const db = new PrismaClient(); const base = process.env.APP_BASE_URL; const accounts = JSON.parse(readFileSync('.local/p03-accounts.json','utf8')); const suffix = randomUUID().slice(0,8); const checks = []; const admin = new Map(); const secretary = new Map(); const other = new Map(); const participant = new Map();
 const ok = (condition,label) => { assert.ok(condition,label); checks.push(label); };
 async function req(path,{ method='GET',body,jar=new Map(),status=200 }={}) {
-  const response = await fetch(base+path,{ method, headers:{ cookie:[...jar].map(([k,v]) => `${k}=${v}`).join(';'), ...(body && !(body instanceof FormData) ? {'content-type':'application/json'} : {}) }, body:body instanceof FormData ? body : body ? JSON.stringify(body) : undefined });
+  const response = await fetch(base+path,{ method, headers:{ cookie:[...jar].map(([k,v]) => `${k}=${v}`).join(';'), ...(body && !(body instanceof FormData) ? {'content-type':'application/json'} : {}) }, body:body instanceof FormData ? body : body ? JSON.stringify(contextRequestBody(path,body)) : undefined });
   assert.equal(response.status,status,`${method} ${path}: expected ${status}, got ${response.status}`);
   for (const cookie of response.headers.getSetCookie()) { const [name,...rest] = cookie.split(';')[0].split('='); const value=rest.join('='); if(value) jar.set(name,value);else jar.delete(name); }
   return response;

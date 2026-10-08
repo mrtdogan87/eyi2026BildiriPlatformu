@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { randomUUID, createHash, createHmac } from 'node:crypto';
@@ -28,7 +29,7 @@ async function consent(entityType) {
 async function request(path, { method = 'GET', body, cookies = jar(), status = 200 } = {}) {
   const headers = { cookie: [...cookies].map(([k,v]) => `${k}=${v}`).join(';') };
   if (body && !(body instanceof FormData)) headers['content-type'] = 'application/json';
-  const response = await fetch(`${base}${path}`, { method, headers, body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined });
+  const response = await fetch(`${base}${path}`, { method, headers, body: body instanceof FormData ? body : body ? JSON.stringify(contextRequestBody(path,body)) : undefined });
   assert.equal(response.status, status, `${method} ${path} HTTP status`);
   for (const cookie of response.headers.getSetCookie()) {
     const part = cookie.split(';')[0]; const i = part.indexOf('=');

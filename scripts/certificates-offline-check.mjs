@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import {randomUUID,createHash} from 'node:crypto';
 import {readFileSync,writeFileSync} from 'node:fs';
@@ -9,7 +10,7 @@ import {defaultLayout} from '../src/modules/certificates/core.ts';
 import {sampleBackground} from '../src/modules/certificates/pdf.mjs';
 loadEnv();assertLocal();const db=new PrismaClient(),base=process.env.APP_BASE_URL,accounts=JSON.parse(readFileSync('.local/p03-accounts.json','utf8')),suffix=randomUUID().slice(0,8),checks=[],jar=new Map(),path='/api/platform/certificates',common={reason:'Synthetic offline PDF acceptance and operator approval.',confirmed:true};
 const ok=(v,s)=>{assert.ok(v,s);checks.push(s);};
-async function req(p,{method='GET',body,status=200,anonymous=false}={}){const form=body instanceof FormData,r=await fetch(base+p,{method,redirect:'manual',headers:{cookie:anonymous?'':[...jar].map(([k,v])=>k+'='+v).join(';'),...(!form&&body!==undefined?{'content-type':'application/json'}:{})},body:body===undefined?undefined:form?body:JSON.stringify(body)});assert.equal(r.status,status,`${method} ${p}`);for(const c of r.headers.getSetCookie()){const[k,...v]=c.split(';')[0].split('=');if(v.join('='))jar.set(k,v.join('='));else jar.delete(k);}return r;}
+async function req(p,{method='GET',body,status=200,anonymous=false}={}){const form=body instanceof FormData,r=await fetch(base+p,{method,redirect:'manual',headers:{cookie:anonymous?'':[...jar].map(([k,v])=>k+'='+v).join(';'),...(!form&&body!==undefined?{'content-type':'application/json'}:{})},body:body===undefined?undefined:form?body:JSON.stringify(contextRequestBody(p,body))});assert.equal(r.status,status,`${method} ${p}`);for(const c of r.headers.getSetCookie()){const[k,...v]=c.split(';')[0].split('=');if(v.join('='))jar.set(k,v.join('='));else jar.delete(k);}return r;}
 const post=async(p,body,status)=>(await req(p,{method:'POST',body,status})).json(),action=(action,input,status)=>post(path,{action,input:{...common,...input}},status),view=async()=>(await req(path)).json();
 async function upload(input,bytes,name,status){const f=new FormData();f.set('input',JSON.stringify(input));f.set('file',new Blob([bytes]),name);return post(path+(name.endsWith('.pdf')?'/templates':'/import'),f,status);}
 try{

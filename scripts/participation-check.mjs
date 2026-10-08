@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import { createHash, createHmac, randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -34,7 +35,7 @@ async function request(path, { method = 'GET', body, jar = new Map(), status = 2
     cookie: [...jar].map(([key, value]) => `${key}=${value}`).join(';'),
     ...(body !== undefined && !(body instanceof FormData) ? { 'content-type': 'application/json' } : {}),
     ...(origin ? { origin } : {}),
-  }, body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(body) });
+  }, body: body instanceof FormData ? body : body === undefined ? undefined : JSON.stringify(contextRequestBody(path,body)) });
   const expectedStatus = (Array.isArray(status) ? status : [status]).includes(response.status);
   let diagnostic = '';
   if (!expectedStatus) {

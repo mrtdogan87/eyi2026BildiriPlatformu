@@ -651,6 +651,8 @@ model PlatformSession {
   tokenHash  String       @unique
   userId     String
   congressId String?
+  interventionReason String?
+  interventionStartedAt DateTime?
   expiresAt  DateTime
   revokedAt  DateTime?
   createdAt  DateTime     @default(now())

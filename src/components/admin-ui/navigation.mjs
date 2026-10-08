@@ -8,17 +8,19 @@ export const congressNavigation = [
   {label:'Yönetim',items:[['kongre-ayarlari','Kongre ayarları','settings'],['moduller','Modüller','modules'],['ekip','Ekip ve yetkiler','members'],['teslim-istisnalari','Teslim istisnaları','settings'],['islem-gecmisi','İşlem geçmişi','audit']]},
   {label:'Görevlerim',items:[['hakemlik/gorevler','Hakem görevlerim','reviews.perform','REVIEWS'],['oduller/juri','Jüri görevlerim','awards.perform','AWARDS'],['program/gorevler','Başkan görevlerim','program.perform','PROGRAM'],['kayitlarim','Kendi kayıtlarım','own']]},
 ];
-export const platformNavigation = [{label:'Platform',items:[['platform','Genel bakış'],['kongreler','Kongreler'],['kurumlar','Kurumlar'],['kullanicilar','Kullanıcılar ve yetkiler'],['sistem','Sistem ayarları'],['platform/gecmis','İşlem geçmişi']]}];
+export const platformNavigation = [{label:'Platform',items:[['platform','Genel bakış'],['kurumlar','Kurumlar'],['kullanicilar','Kullanıcılar ve yetkiler'],['sistem','Sistem ayarları'],['platform/gecmis','İşlem geçmişi']]}];
 export const platformPaths = new Set(['platform','platform/gecmis','kongreler','kurumlar','kullanicilar','sistem','kongre-olustur','arayuz-ornekleri']);
 const requiredModules={REVIEWS:['REVIEWS','SUBMISSIONS'],ATTENDANCE:['ATTENDANCE','PROGRAM']};
-export function visibleNavigation(actions,modules,closed=false) {
+export function visibleNavigation(actions,modules,closed=false,personalRoles) {
   const allowed=new Set(actions), enabled=new Set(modules);
-  return congressNavigation.map(group=>({label:group.label,items:group.items.filter(([, ,action,module])=>allowed.has(action)&&(!module||((requiredModules[module]??[module]).every(required=>enabled.has(required))&&(!closed||module==='ARCHIVE'))))})).filter(group=>group.items.length);
+  return congressNavigation.map(group=>({label:group.label,items:group.items.filter(([, ,action,module])=>allowed.has(action)&&(!personalRoles||!['reviews.perform','awards.perform','program.perform'].includes(action)||personalRoles.includes(action==='program.perform'?'SESSION_CHAIR':'REVIEWER'))&&(!module||((requiredModules[module]??[module]).every(required=>enabled.has(required))&&(!closed||module==='ARCHIVE'))))})).filter(group=>group.items.length);
 }
 export function routeInfo(pathname) {
   const path=pathname.replace(/^\/admin\/?/,'');
   const items=[...platformNavigation,...congressNavigation].flatMap(group=>group.items.map(([route,label])=>({route,label,group:group.label})));
   const match=items.filter(item=>path===item.route||path.startsWith(item.route+'/')).sort((a,b)=>b.route.length-a.route.length)[0];
+  if(/^kurumlar\/[^/]+\/mudahele$/.test(path))return {route:'kurumlar',label:'Kurumlar',group:'Platform'};
+  if(path==='kongreler')return {route:'kongreler',label:'Kongreler',group:'Kurum yönetimi'};
   if(path==='kongre-olustur')return {route:'kongre-olustur',label:'Yeni kongre',group:'Platform'};
   if(path==='arayuz-ornekleri')return {route:path,label:'Arayüz örnekleri',group:'Tasarım'};
   return match??{route:'',label:'Giriş',group:'Hesap'};

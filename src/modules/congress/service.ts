@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { actorSession, authorizeCongress, requireContext } from '@/platform/context';
+import {hasIntervention} from '@/platform/intervention.mjs';
 import { AccessError } from '@/platform/http';
 import { auditData } from '@/platform/audit';
 import { clearTemplateDates, effectiveConfiguration, eventSettingsSchema } from './configuration';
@@ -26,7 +27,7 @@ export async function creationOptions() {
 }
 export async function creationTemplates() {
   const session = await actorSession(); if (!session) throw new AccessError(401, 'Giriş yapın.');
-  return prisma.congress.findMany({where:session.user.platformAdmin?{}:{organization:{memberships:{some:{userId:session.userId,active:true,organizer:true}}}},select:{id:true,name:true,organizationId:true},orderBy:{name:'asc'}});
+  return prisma.congress.findMany({where:session.user.platformAdmin?{id:hasIntervention(session)?session.congressId!:'__no_intervention__'}:{organization:{memberships:{some:{userId:session.userId,active:true,organizer:true}}}},select:{id:true,name:true,organizationId:true},orderBy:{name:'asc'}});
 }
 export async function templatePreview(id: string) {
   let context; try { context = await authorizeCongress(id, 'settings'); } catch (error) { if (error instanceof AccessError && error.status === 403) throw new AccessError(404, 'Şablon bulunamadı.'); throw error; }
@@ -42,6 +43,7 @@ export async function createCongress(raw: unknown) {
   if (input.newOrganization && !session.user.platformAdmin) throw new AccessError(403, 'Yeni kurum yalnız platform yöneticisi tarafından oluşturulabilir.');
   if (input.newOrganization && input.sourceId) throw new AccessError(403, 'Yeni kurumda sıfırdan başlayın; yıl kopyası aynı kurum içinde oluşturulur.');
   if (!input.newOrganization && !(await creationOrganizations()).some(org => org.id === input.organizationId)) throw new AccessError(403, 'Bu kurumda kongre oluşturamazsınız.');
+  if(input.sourceId){const sourceOrganization=await prisma.congress.findUnique({where:{id:input.sourceId},select:{organizationId:true}});if(sourceOrganization&&sourceOrganization.organizationId!==input.organizationId)throw new AccessError(403,'Yıl kopyası aynı kurum içinde oluşturulur.');}
   const source = input.sourceId ? await templatePreview(input.sourceId) : null;
   if (source && source.organizationId !== input.organizationId) throw new AccessError(403, 'Yıl kopyası aynı kurum içinde oluşturulur.');
   try {
@@ -78,7 +80,8 @@ export async function createCongress(raw: unknown) {
       await tx.congressMembership.create({ data: { congressId: congress.id, userId: session.userId, role: 'ORGANIZER', roles: ['ORGANIZER'] } });
       const copied = source ? await copyCongressTeam(tx, source.id, congress.id, organization.id, session.userId, input.memberIds) : [];
       if(input.responsible)await assignInitialOrganizer(tx,session.userId,congress,input.responsible);
-      await tx.platformSession.update({ where: { id: session.id }, data: { congressId: congress.id } });
+      if(hasIntervention(current))await tx.auditLog.create({data:{actorId:current.userId,congressId:current.congressId,action:'intervention.end',detail:{reason:current.interventionReason,exit:'creation'}}});
+      await tx.platformSession.update({ where: { id: session.id }, data: { congressId:current.user.platformAdmin?null:congress.id,interventionReason:null,interventionStartedAt:null } });
       if (input.newOrganization) await tx.auditLog.create({ data: { actorId: session.userId, organizationId: organization.id, congressId: congress.id, action: 'organization.create', targetId: organization.id, detail: { name: organization.name } } });
       await tx.auditLog.create({ data: { actorId: session.userId, organizationId: congress.organizationId, congressId: congress.id, action: source ? 'congress.year.copy' : 'congress.create', targetId: congress.id, detail: { organizationCreated: !!input.newOrganization, sourceId: source?.id ?? null, profile: settings.configuration.profile, copiedFees: input.copyFees, selectedMembers: copied, cleared: ['sourceDates', 'sourceBank', 'submissions', 'registrations', 'files', 'tokens', 'exceptions', 'auditHistory'] } } });
       return { id: congress.id, slug: congress.slug, organizationId: organization.id };

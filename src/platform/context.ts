@@ -4,9 +4,10 @@ import type { ModuleKey } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { sessionCookieName, secureSessionCookie } from '@/lib/environment';
 import { hashToken } from './password.mjs';
-import { effectiveRoles } from './roles.mjs';
+import { effectiveRoles,membershipRoles } from './roles.mjs';
 import { AccessError } from './http';
 import { allows, type Action } from './policy';
+import { hasIntervention } from './intervention.mjs';
 const cookieName = sessionCookieName('platform_session');
 export async function actorSession() {
   const raw = (await cookies()).get(cookieName)?.value;
@@ -19,10 +20,11 @@ export async function setSessionCookie(token: string) {
   (await cookies()).set(cookieName, token, { httpOnly: true, secure: secureSessionCookie(), sameSite: 'lax', path: '/', maxAge: 8 * 3600 });
 }
 export async function clearSessionCookie() { (await cookies()).delete(cookieName); }
-export async function availableContexts(userId: string) {
+export async function availableContexts(userId: string, interventionCongressId?: string) {
   const user = await prisma.platformUser.findUniqueOrThrow({ where: { id: userId } });
   if (!user.active) return [];
-  return prisma.congress.findMany({ where: user.platformAdmin ? {} : { OR: [
+  if (user.platformAdmin && !interventionCongressId) return [];
+  return prisma.congress.findMany({ where: user.platformAdmin ? {id:interventionCongressId} : { OR: [
     { memberships: { some: { userId, active: true } }, organization: { memberships: { some: { userId, active: true } } } },
     { organization: { memberships: { some: { userId, active: true, organizer: true } } } },
   ] }, include: { organization: true }, orderBy: [{ organizationId: 'asc' }, { name: 'asc' }] });
@@ -36,6 +38,7 @@ export async function requireContext(action: Action = 'context', module?: Module
 export async function authorizeCongress(congressId: string, action: Action = 'context', module?: ModuleKey) {
   const session = await actorSession();
   if (!session) throw new AccessError(401, 'Kişisel hesabınızla giriş yapın.');
+  if (session.user.platformAdmin && !hasIntervention(session,congressId)) throw new AccessError(403, 'Kurum kaydından hedef kongre için gerekçeli müdahale başlatın.');
   const congress = await prisma.congress.findUnique({ where: { id: congressId }, include: { organization: true } });
   if (!congress) throw new AccessError(403, 'Kongre erişimi kaldırılmış.');
   const org = await prisma.organizationMembership.findUnique({ where: { organizationId_userId: { organizationId: congress.organizationId, userId: session.userId } } });
@@ -44,7 +47,7 @@ export async function authorizeCongress(congressId: string, action: Action = 'co
   const role = roles.find(r => allows(r, action));
   if (!role || !allows(role, action)) throw new AccessError(403, 'Bu işlem için kongre yetkiniz yok.');
   if (module) await requireModule(congress.id, module);
-  return { actor: session.user, sessionId: session.id, congress, role, roles, accessSource: session.user.platformAdmin ? 'PLATFORM' as const : org?.active && org.organizer ? 'ORGANIZATION' as const : 'CONGRESS' as const };
+  return { personalRoles:org?.active&&membership?.active?membershipRoles(membership):[],actor: session.user, sessionId: session.id, congress, role, roles, accessSource: session.user.platformAdmin ? 'PLATFORM' as const : org?.active && org.organizer ? 'ORGANIZATION' as const : 'CONGRESS' as const };
 }
 export type CongressContext = Awaited<ReturnType<typeof requireContext>>;
 export async function requireModule(congressId: string, key: ModuleKey) {

@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {hasIntervention} from '../src/platform/intervention.mjs';
+const session=()=>({user:{platformAdmin:true},congressId:'a',interventionReason:'Kullanıcı erişim sorunu için destek',interventionStartedAt:new Date(),expiresAt:new Date(Date.now()+60000),revokedAt:null});
+test('A legacy platform context has no implicit support authority',()=>{const s=session();delete s.interventionReason;delete s.interventionStartedAt;assert.equal(hasIntervention(s,'a'),false);});
+test('Support is limited to its explicitly selected congress',()=>{assert.equal(hasIntervention(session(),'a'),true);assert.equal(hasIntervention(session(),'b'),false);});
+test('Expired or revoked support sessions cannot grant congress access',()=>{assert.equal(hasIntervention({...session(),expiresAt:new Date(0)}),false);assert.equal(hasIntervention({...session(),revokedAt:new Date()}),false);});
+test('Removing platform authority invalidates support metadata',()=>{assert.equal(hasIntervention({...session(),user:{platformAdmin:false}}),false);});
+test('Incomplete reason or missing entry time does not activate support',()=>{assert.equal(hasIntervention({...session(),interventionReason:'short'}),false);assert.equal(hasIntervention({...session(),interventionStartedAt:null}),false);});
+test('Missing session or cleared congress selection grants no support',()=>{assert.equal(hasIntervention(null),false);assert.equal(hasIntervention({...session(),congressId:null}),false);});

@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {readFileSync,writeFileSync} from 'node:fs';
@@ -13,7 +14,7 @@ loadEnv();assertLocal();
 const db=new PrismaClient(),base=process.env.APP_BASE_URL,accounts=JSON.parse(readFileSync('.local/p03-accounts.json','utf8')),jar=new Map(),checks=[],suffix=randomUUID().slice(0,8),ap='/api/platform/promotion',common={reason:'Synthetic invitation source acceptance check.',confirmed:true};
 const ok=(value,label)=>{assert.ok(value,label);checks.push(label);};
 async function req(path,{method='GET',body,status=200,anonymous=false}={}){
- const r=await fetch(base+path,{method,redirect:'manual',headers:{...(!anonymous?{cookie:[...jar].map(([k,v])=>k+'='+v).join(';')}:{}),...(body?{'content-type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});
+ const r=await fetch(base+path,{method,redirect:'manual',headers:{...(!anonymous?{cookie:[...jar].map(([k,v])=>k+'='+v).join(';')}:{}),...(body?{'content-type':'application/json'}:{})},body:body?JSON.stringify(contextRequestBody(path,body)):undefined});
  assert.equal(r.status,status,method+' '+path+': '+await(r.status===status?Promise.resolve(''):r.clone().text()));
  if(!anonymous)for(const c of r.headers.getSetCookie()){const [k,...v]=c.split(';')[0].split('=');if(v.join('='))jar.set(k,v.join('='));else jar.delete(k);}
  return r;

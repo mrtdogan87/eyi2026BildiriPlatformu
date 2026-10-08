@@ -1,0 +1,1 @@
+export function hasIntervention(session: {user?:{platformAdmin:boolean};congressId:string|null;interventionReason?:string|null;interventionStartedAt?:Date|null;revokedAt?:Date|null;expiresAt:Date}|null|undefined, congressId?:string|null):boolean;

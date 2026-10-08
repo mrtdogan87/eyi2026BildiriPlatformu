@@ -21,3 +21,8 @@
 .admin-ui .ui-recipient-picks { max-height:360px; overflow:auto; padding:8px; border:1px solid var(--ui-line); border-radius:8px; }
 @container (max-width:700px) { .admin-ui .ui-slot-layout { grid-template-columns:1fr; } }
 @media(max-width:760px) { .admin-ui .ui-slot-layout { grid-template-columns:1fr; } }
+
+/* The active platform intervention remains visible across every admin area. */
+.admin-ui .ui-intervention-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.5rem;background:#fff5dc;border-bottom:1px solid #e5cc8e;overflow-wrap:anywhere}
+.admin-ui .ui-intervention-bar p{margin:.3rem 0 0;font-size:.875rem}
+@media(max-width:640px){.admin-ui .ui-intervention-bar{align-items:flex-start;flex-direction:column;padding:1rem}}

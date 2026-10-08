@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
@@ -16,7 +17,7 @@ const future=new Date(Date.now()+24*60*60*1000),afterDue=new Date(future.getTime
 let demo,user,counter=0;
 const ok=(value,label)=>{assert.ok(value,label);checks.push(label);};
 async function req(path,{method='GET',body,jar=admin,status=200,headers={}}={}){
- const form=body instanceof FormData,r=await fetch(base+path,{method,redirect:'manual',headers:{cookie:[...jar].map(([k,v])=>k+'='+v).join(';'),...(!form&&body?{'content-type':'application/json'}:{}),...headers},body:body?(form?body:JSON.stringify(body)):undefined});
+ const form=body instanceof FormData,r=await fetch(base+path,{method,redirect:'manual',headers:{cookie:[...jar].map(([k,v])=>k+'='+v).join(';'),...(!form&&body?{'content-type':'application/json'}:{}),...headers},body:body?(form?body:JSON.stringify(contextRequestBody(path,body))):undefined});
  assert.ok([].concat(status).includes(r.status),method+' '+path+': expected '+status+', received '+r.status);
  for(const c of r.headers.getSetCookie()){const[k,...v]=c.split(';')[0].split('=');if(v.join('='))jar.set(k,v.join('='));else jar.delete(k);}
  return r;

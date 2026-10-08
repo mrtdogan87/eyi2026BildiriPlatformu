@@ -5,6 +5,8 @@ import { actorSession, availableContexts, clearSessionCookie, requireContext, se
 import { hashPassword, verifyPassword, newToken, hashToken } from '@/platform/password.mjs';
 import { AccessError } from '@/platform/http';
 import type { CongressRole } from '@prisma/client';
+import { hasIntervention } from '@/platform/intervention.mjs';
+import { effectiveRoles } from '@/platform/roles.mjs';
 export async function login(email: string, password: string) {
   if (!email || !password || password.length > 256) throw new AccessError(400, 'E-posta ve parola gerekli.');
   const user = await prisma.platformUser.findUnique({ where: { email: email.trim().toLowerCase() } });
@@ -32,20 +34,39 @@ export async function login(email: string, password: string) {
 export async function logout() {
   const session = await actorSession();
   if (session) await prisma.$transaction([
+    ...(hasIntervention(session)?[prisma.auditLog.create({data:{actorId:session.userId,congressId:session.congressId,action:'intervention.end',detail:{reason:session.interventionReason,exit:'logout'}}})]:[]),
     prisma.platformSession.update({ where: { id: session.id }, data: { revokedAt: new Date() } }),
     prisma.auditLog.create({ data: { actorId: session.userId, action: 'session.logout' } }),
   ]);
   await clearSessionCookie();
 }
-export async function selectContext(id: string) {
+export async function selectContext(id: string, reason?: string) {
   const session = await actorSession();
   if (!session) throw new AccessError(401, 'Giriş yapın.');
-  const congress = (await availableContexts(session.userId)).find(c => c.id === id);
+  const normalized=typeof reason==='string'?reason.trim():'';
+  if(session.user.platformAdmin&&(normalized.length<10||normalized.length>500||/[\u0000-\u001f\u007f]/.test(normalized)))throw new AccessError(400,'Müdahale gerekçesi 10–500 karakter ve tek satır olmalı.');
+  const congress = session.user.platformAdmin?await prisma.congress.findUnique({where:{id}}):(await availableContexts(session.userId)).find(c => c.id === id);
   if (!congress) throw new AccessError(403, 'Bu kongreyi seçemezsiniz.');
-  await prisma.$transaction([
-    prisma.platformSession.update({ where: { id: session.id }, data: { congressId: congress.id } }),
-    prisma.auditLog.create({ data: { actorId: session.userId, organizationId: congress.organizationId, congressId: congress.id, action: 'context.select' } }),
-  ]);
+  await prisma.$transaction(async tx=>{
+    await tx.$queryRaw`SELECT id FROM "PlatformSession" WHERE id=${session.id} FOR UPDATE`;
+    const current=await tx.platformSession.findUnique({where:{id:session.id},include:{user:true}});
+    if(!current||current.revokedAt||current.expiresAt<=new Date()||!current.user.active)throw new AccessError(401,'Oturumunuz sona ermiş.');
+    if(current.user.platformAdmin!==session.user.platformAdmin)throw new AccessError(409,'Yetkiniz değişti; ekranı yenileyin.');
+    if(!current.user.platformAdmin){const org=await tx.organizationMembership.findUnique({where:{organizationId_userId:{organizationId:congress.organizationId,userId:current.userId}}}),member=await tx.congressMembership.findUnique({where:{congressId_userId:{congressId:congress.id,userId:current.userId}}});if(!effectiveRoles(false,org,member).length)throw new AccessError(403,'Kongre erişiminiz kaldırılmış.');}
+    if(hasIntervention(current))await tx.auditLog.create({data:{actorId:current.userId,congressId:current.congressId,action:'intervention.end',detail:{reason:current.interventionReason,exit:'switch'}}});
+    await tx.platformSession.update({where:{id:session.id},data:{congressId:congress.id,interventionReason:current.user.platformAdmin?normalized:null,interventionStartedAt:current.user.platformAdmin?new Date():null}});
+    await tx.auditLog.create({data:{actorId:session.userId,organizationId:congress.organizationId,congressId:congress.id,action:current.user.platformAdmin?'intervention.start':'context.select',detail:current.user.platformAdmin?{reason:normalized}:undefined}});
+  });
+}
+export async function clearContext(){
+  const session=await actorSession();if(!session)throw new AccessError(401,'Giriş yapın.');
+  await prisma.$transaction(async tx=>{
+    await tx.$queryRaw`SELECT id FROM "PlatformSession" WHERE id=${session.id} FOR UPDATE`;
+    const current=await tx.platformSession.findUnique({where:{id:session.id},include:{user:true}});
+    if(!current||current.revokedAt||current.expiresAt<=new Date()||!current.user.active)throw new AccessError(401,'Oturumunuz sona ermiş.');
+    if(hasIntervention(current))await tx.auditLog.create({data:{actorId:current.userId,congressId:current.congressId,action:'intervention.end',detail:{reason:current.interventionReason,exit:'return'}}});
+    await tx.platformSession.update({where:{id:current.id},data:{congressId:null,interventionReason:null,interventionStartedAt:null}});
+  });
 }
 export async function listMembers() {
   const context = await requireContext('members');

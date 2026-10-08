@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { PrismaClient } from '@prisma/client';
@@ -13,7 +14,7 @@ const jars = {};
 async function req(path, { method = 'GET', body, jar, status = 200, origin } = {}) {
   const headers = {}; if (jar?.cookie) headers.cookie = jar.cookie;
   if (body !== undefined) headers['content-type'] = 'application/json'; if (origin) headers.origin = origin;
-  const response = await fetch(base + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body), redirect: 'manual' });
+  const response = await fetch(base + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(contextRequestBody(path,body)), redirect: 'manual' });
   if (jar) for (const cookie of response.headers.getSetCookie()) {
     const values = new Map((jar.cookie ?? '').split('; ').filter(Boolean).map(pair => [pair.slice(0, pair.indexOf('=')), pair.slice(pair.indexOf('=') + 1)]));
     const pair = cookie.split(';')[0]; const index = pair.indexOf('='); const name = pair.slice(0, index); const value = pair.slice(index + 1);
@@ -61,7 +62,7 @@ try {
   await req('/api/admin/submissions/local-paper-b/file', { jar: b });
   passed('B congress has only B records and files');
   const platformContexts = (await req('/api/platform/context', { jar: jars.platform })).data.contexts;
-  assert(platformContexts.some(c => c.id === 'local-congress-b'));
+  assert.deepEqual(platformContexts.map(c=>c.id),['local-eyi-2026']);
   await req('/api/platform/context', { method: 'POST', body: { congressId: 'local-congress-b' }, jar: jars.platform });
   await req('/api/admin/submissions/local-paper-b', { jar: jars.platform });
   await req('/api/admin/submissions/local-paper-submitted', { jar: jars.platform, status: 404 });

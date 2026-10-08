@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import { randomUUID, createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -13,7 +14,7 @@ const jars=Object.fromEntries(['platform','secretary','editor','participant','or
 const pdf=readFileSync('scripts/fixtures/synthetic-receipt.pdf'), sha=v=>createHash('sha256').update(v).digest('hex');
 const ok=(v,label)=>{assert.ok(v,label);checks.push(label);};
 async function req(path,{method='GET',body,jar=jars.platform,status=200,origin}={}) {
- const response=await fetch(base+path,{method,redirect:'manual',headers:{cookie:[...jar].map(([k,v])=>`${k}=${v}`).join(';'),...(body!==undefined&&!(body instanceof FormData)?{'content-type':'application/json'}:{}),...(origin?{origin}:{})},body:body instanceof FormData?body:body===undefined?undefined:JSON.stringify(body)});
+ const response=await fetch(base+path,{method,redirect:'manual',headers:{cookie:[...jar].map(([k,v])=>`${k}=${v}`).join(';'),...(body!==undefined&&!(body instanceof FormData)?{'content-type':'application/json'}:{}),...(origin?{origin}:{})},body:body instanceof FormData?body:body===undefined?undefined:JSON.stringify(contextRequestBody(path,body))});
  let diagnostic=''; if(![].concat(status).includes(response.status)){const error=await response.clone().json().catch(()=>null);if(typeof error?.error==='string')diagnostic=error.error.replace(/https?:\/\/\S+/gi,'[url]').replace(/\b[^\s@]+@[^\s@]+\b/g,'[email]').replace(/\b[A-Za-z0-9_-]{24,}\b/g,'[redacted]').slice(0,300);}
  assert.ok([].concat(status).includes(response.status),`${method} ${path}: expected ${status}, received ${response.status}; ${diagnostic}`);
  for(const c of response.headers.getSetCookie()){const [k,...p]=c.split(';')[0].split('=');if(p.join('='))jar.set(k,p.join('='));else jar.delete(k);}

@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -13,7 +14,7 @@ const db=new PrismaClient(), base=process.env.APP_BASE_URL, accounts=JSON.parse(
 const jars=Object.fromEntries(['platform','secretary','editor','reviewer','chair','participant','public','foreign'].map(k=>[k,new Map()]));
 const ok=(v,s)=>{assert.ok(v,s);checks.push(s);}, path='/api/platform/activities', own='/api/platform/own/activities';
 async function req(p,{method='GET',body,jar=jars.platform,status=200,origin}={}) {
- const r=await fetch(base+p,{method,redirect:'manual',headers:{cookie:[...jar].map(([k,v])=>k+'='+v).join(';'),...(body!==undefined?{'content-type':'application/json'}:{}),...(origin?{origin}:{})},body:body===undefined?undefined:JSON.stringify(body)});
+ const r=await fetch(base+p,{method,redirect:'manual',headers:{cookie:[...jar].map(([k,v])=>k+'='+v).join(';'),...(body!==undefined?{'content-type':'application/json'}:{}),...(origin?{origin}:{})},body:body===undefined?undefined:JSON.stringify(contextRequestBody(p,body))});
  if(![].concat(status).includes(r.status)){const e=await r.clone().json().catch(()=>null);throw new Error(`${method} ${p}: expected ${status}, got ${r.status}; ${(e?.error??'').replace(/https?:\/\/\S+/g,'[url]').replace(/\b[^\s@]+@[^\s@]+\b/g,'[email]').slice(0,300)}`);}
  for(const c of r.headers.getSetCookie()){const[k,...v]=c.split(';')[0].split('=');if(v.join('='))jar.set(k,v.join('='));else jar.delete(k);}return r;
 }

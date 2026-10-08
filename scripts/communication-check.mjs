@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -29,7 +30,7 @@ async function request(path, { method = 'GET', body, jar = new Map(), status = 2
     method, redirect: 'manual', headers: {
       cookie: [...jar].map(([key, value]) => `${key}=${value}`).join(';'),
       ...(body === undefined ? {} : { 'content-type': 'application/json' }),
-    }, body: body === undefined ? undefined : JSON.stringify(body),
+    }, body: body === undefined ? undefined : JSON.stringify(contextRequestBody(path,body)),
   });
   assert.equal(response.status, status, `${method} ${path}: expected ${status}, received ${response.status}`);
   for (const cookie of response.headers.getSetCookie()) {

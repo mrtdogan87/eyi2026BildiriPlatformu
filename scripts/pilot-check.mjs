@@ -1,3 +1,4 @@
+import {contextRequestBody} from './intervention-test-requests.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
 import {randomUUID,createHash} from 'node:crypto';
@@ -18,7 +19,7 @@ loadEnv();assertLocal();assert.equal(process.env.MAIL_MODE,'capture');
 const db=new PrismaClient(),base=process.env.APP_BASE_URL,accounts=JSON.parse(readFileSync('.local/p03-accounts.json')),suffix=randomUUID().slice(0,8),checks=[],fixtures=[],jars=Object.fromEntries(['platform','participant','reviewer','editor','secretary','organizerB','anonymous'].map(k=>[k,new Map()]));
 const common={reason:'P22 local synthetic end-to-end explicit review and approval.',confirmed:true},sha=b=>createHash('sha256').update(b).digest('hex'),ok=(v,label)=>{assert.ok(v,label);checks.push(label);};
 async function req(path,{method='GET',body,jar=jars.platform,status=200}={}) {
- const form=body instanceof FormData,r=await fetch(base+path,{method,redirect:'manual',headers:{cookie:[...jar].map(([k,v])=>k+'='+v).join(';'),...(body!==undefined&&!form?{'content-type':'application/json'}:{})},body:body===undefined?undefined:form?body:JSON.stringify(body)});
+ const form=body instanceof FormData,r=await fetch(base+path,{method,redirect:'manual',headers:{cookie:[...jar].map(([k,v])=>k+'='+v).join(';'),...(body!==undefined&&!form?{'content-type':'application/json'}:{})},body:body===undefined?undefined:form?body:JSON.stringify(contextRequestBody(path,body))});
  if(![].concat(status).includes(r.status)){const e=await r.clone().json().catch(()=>null);throw new Error(`${method} ${path.split('?')[0]} expected ${status}, got ${r.status}: ${(e?.error??'').replace(/\b[^\s@]+@[^\s@]+\b/g,'[email]').slice(0,220)}`);}
  for(const c of r.headers.getSetCookie()){const[k,...v]=c.split(';')[0].split('=');if(v.join('='))jar.set(k,v.join('='));else jar.delete(k);}return r;
 }
