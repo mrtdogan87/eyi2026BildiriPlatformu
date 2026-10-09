@@ -13,7 +13,7 @@ const version = z.number().int().min(0);
 const email = z.string().trim().toLowerCase().email().max(254);
 const keyLocale = z.object({ key: z.enum(templateKeys), locale: z.enum(['tr', 'en']) });
 const messageAction = z.object({ version: version.min(1) }).strict();
-const authTemplates = new Set(['DRAFT_ACCESS', 'REGISTRATION_ACCESS', 'PARTICIPANT_ACCESS', 'ACCOUNT_ACTIVATION']);
+const authTemplates = new Set(['DRAFT_ACCESS', 'REGISTRATION_ACCESS', 'PARTICIPANT_ACCESS', 'ACCOUNT_ACTIVATION', 'ACCOUNT_PASSWORD_RECOVERY']);
 function parsed<T>(schema: z.ZodType<T>, raw: unknown): T {
   const result = schema.safeParse(raw);
   if (!result.success) throw new AccessError(400, result.error.issues[0]?.message || 'Alanları kontrol edin.');

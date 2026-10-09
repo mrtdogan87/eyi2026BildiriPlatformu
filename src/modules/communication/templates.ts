@@ -2,22 +2,28 @@ import { z } from 'zod';
 
 export const templateKeys = ['DRAFT_ACCESS', 'REGISTRATION_ACCESS', 'PARTICIPANT_ACCESS', 'SUBMISSION_RECEIVED', 'SUBMISSION_STATUS', 'ACCOUNT_ACTIVATION', 'GENERAL'] as const;
 export type TemplateKey = typeof templateKeys[number];
+// Personal-account recovery is independent of a congress and cannot be edited
+// or sent as a sample from a congress's communication administration.
+export const platformTemplateKeys = ['ACCOUNT_PASSWORD_RECOVERY'] as const;
+export type RenderableTemplateKey = TemplateKey | typeof platformTemplateKeys[number];
+const renderableTemplateKeys: readonly string[] = [...templateKeys, ...platformTemplateKeys];
 export type TemplateLocale = 'tr' | 'en';
 export type TemplateContent = { subject: string; body: string };
-const placeholders: Record<TemplateKey, readonly string[]> = {
+const placeholders: Record<RenderableTemplateKey, readonly string[]> = {
   DRAFT_ACCESS: ['congressName', 'accessLink'], REGISTRATION_ACCESS: ['congressName', 'accessLink'],
   PARTICIPANT_ACCESS: ['congressName', 'accessLink'],
   SUBMISSION_RECEIVED: ['congressName', 'paperTitle'], SUBMISSION_STATUS: ['congressName', 'paperTitle', 'statusLabel', 'registrationUrl'],
   ACCOUNT_ACTIVATION: ['congressName', 'activationLink'], GENERAL: ['congressName', 'recipientName', 'message'],
+  ACCOUNT_PASSWORD_RECOVERY: ['platformName', 'recoveryLink'],
 };
-const required: Partial<Record<TemplateKey, string>> = { DRAFT_ACCESS: 'accessLink', REGISTRATION_ACCESS: 'accessLink', PARTICIPANT_ACCESS: 'accessLink', ACCOUNT_ACTIVATION: 'activationLink' };
-const urlFields = new Set(['accessLink', 'activationLink', 'registrationUrl']);
+const required: Partial<Record<RenderableTemplateKey, string>> = { DRAFT_ACCESS: 'accessLink', REGISTRATION_ACCESS: 'accessLink', PARTICIPANT_ACCESS: 'accessLink', ACCOUNT_ACTIVATION: 'activationLink', ACCOUNT_PASSWORD_RECOVERY: 'recoveryLink' };
+const urlFields = new Set(['accessLink', 'activationLink', 'registrationUrl', 'recoveryLink']);
 const placeholderPattern = /\{\{\s*([A-Za-z][A-Za-z0-9]*)\s*\}\}/g;
 // Match existing business input limits: congress/event name and author name 180,
 // configured submission titles 50,000. General messages have their own 12,000 cap.
 const fieldLimits: Record<string, number> = {
-  congressName: 180, paperTitle: 50000, recipientName: 180, message: 12000,
-  statusLabel: 120, accessLink: 2048, activationLink: 2048, registrationUrl: 2048,
+  congressName: 180, platformName: 180, paperTitle: 50000, recipientName: 180, message: 12000,
+  statusLabel: 120, accessLink: 2048, activationLink: 2048, registrationUrl: 2048, recoveryLink: 2048,
 };
 const maxTextLength = 64000, maxHtmlLength = 400000;
 function expansionBudget(body: string): { text: number; html: number } {
@@ -34,11 +40,11 @@ function expansionBudget(body: string): { text: number; html: number } {
   }
   return { text, html };
 }
-export function templatePlaceholders(key: TemplateKey): readonly string[] { return placeholders[key]; }
+export function templatePlaceholders(key: RenderableTemplateKey): readonly string[] { return placeholders[key]; }
 
-export function defaultTemplate(key: TemplateKey, locale: TemplateLocale): TemplateContent {
+export function defaultTemplate(key: RenderableTemplateKey, locale: TemplateLocale): TemplateContent {
   const en = locale === 'en';
-  const defaults: Record<TemplateKey, TemplateContent> = {
+  const defaults: Record<RenderableTemplateKey, TemplateContent> = {
     PARTICIPANT_ACCESS: {
       subject: en ? '{{congressName}} - Participant panel access' : '{{congressName}} - Katılımcı paneli erişimi',
       body: en ? 'View your papers, registration and requests for {{congressName}} using the link below:\n\n{{accessLink}}\n\nThe link is valid for 24 hours and can be used once. If you did not request this message, you can ignore it.' : '{{congressName}} kapsamında bildiri, kayıt ve taleplerinizi aşağıdaki bağlantıdan takip edebilirsiniz:\n\n{{accessLink}}\n\nBağlantı 24 saat geçerlidir ve bir kez kullanılabilir. Bu mesajı talep etmediyseniz yok sayabilirsiniz.',
@@ -63,6 +69,10 @@ export function defaultTemplate(key: TemplateKey, locale: TemplateLocale): Templ
       subject: en ? '{{congressName}} - Activate your personal account' : '{{congressName}} - Kişisel hesabınızı etkinleştirin',
       body: en ? 'You have been invited to the {{congressName}} team. Set your personal password within 24 hours using the secure link below:\n\n{{activationLink}}\n\nIf you were not expecting this invitation, you can ignore this email.' : '{{congressName}} ekibine davet edildiniz. Aşağıdaki güvenli bağlantıyla 24 saat içinde kişisel parolanızı oluşturun:\n\n{{activationLink}}\n\nBu daveti beklemiyorsanız e-postayı yok sayabilirsiniz.',
     },
+    ACCOUNT_PASSWORD_RECOVERY: {
+      subject: en ? '{{platformName}} - Reset your password' : '{{platformName}} - Parolanızı yenileyin',
+      body: en ? 'A password reset was requested for your personal account on {{platformName}}. Choose a new password using the secure link below:\n\n{{recoveryLink}}\n\nThis link is valid for 30 minutes and can be used once. Requesting another link invalidates this one. If you did not request this reset, you can ignore this email; your password remains unchanged.' : '{{platformName}} kişisel hesabınız için parola yenileme isteği alındı. Aşağıdaki güvenli bağlantıyla yeni parolanızı belirleyin:\n\n{{recoveryLink}}\n\nBağlantı 30 dakika geçerlidir ve bir kez kullanılabilir. Yeni bağlantı istemeniz bu bağlantıyı geçersizleştirir. Bu isteği siz yapmadıysanız e-postayı yok sayabilirsiniz; parolanız değişmez.',
+    },
     GENERAL: {
       subject: en ? '{{congressName}} - Message from the secretariat' : '{{congressName}} - Sekretaryadan mesaj',
       body: en ? 'Hello {{recipientName}},\n\n{{message}}' : 'Merhaba {{recipientName}},\n\n{{message}}',
@@ -80,9 +90,9 @@ export function isSafeEmailUrl(value: string): boolean {
 }
 export function isSafeReplyTo(value: string): boolean { return value.length <= 254 && !/[\r\n]/.test(value) && z.string().email().safeParse(value).success; }
 
-export function templateProblems(key: TemplateKey, content: TemplateContent): string[] {
+export function templateProblems(key: RenderableTemplateKey, content: TemplateContent): string[] {
   const problems: string[] = [];
-  if (!templateKeys.includes(key)) return ['Geçersiz e-posta şablonu.'];
+  if (!renderableTemplateKeys.includes(key)) return ['Geçersiz e-posta şablonu.'];
   if (!content.subject.trim() || content.subject.length > 200 || /[\r\n\u0000]/.test(content.subject)) problems.push('Konu tek satır ve 1–200 karakter olmalı.');
   if (!content.body.trim() || content.body.length > 12000 || /\u0000/.test(content.body)) problems.push('Mesaj 1–12000 karakter olmalı.');
   for (const text of [content.subject, content.body]) {
@@ -105,7 +115,7 @@ export const templateInputSchema = z.object({ key: z.enum(templateKeys), locale:
 });
 export function escapeEmailHtml(value: string): string { return value.replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]!)); }
 
-export function renderTemplate(input: TemplateContent & { key: TemplateKey; locale: TemplateLocale; values: Record<string, string>; replyTo?: string | null; replyUrl?: string | null }): { subject: string; text: string; html: string } {
+export function renderTemplate(input: TemplateContent & { key: RenderableTemplateKey; locale: TemplateLocale; values: Record<string, string>; replyTo?: string | null; replyUrl?: string | null }): { subject: string; text: string; html: string } {
   const problems = templateProblems(input.key, input);
   if (problems.length) throw new Error(problems[0]);
   if (input.locale !== 'tr' && input.locale !== 'en') throw new Error('Geçersiz e-posta dili.');
@@ -144,9 +154,10 @@ export function renderTemplate(input: TemplateContent & { key: TemplateKey; loca
   if (html.length > maxHtmlLength) throw new Error('Oluşturulan e-posta çok uzun.');
   return { subject, text, html };
 }
-export function sampleTemplateValues(key: TemplateKey, locale: TemplateLocale): Record<string, string> {
+export function sampleTemplateValues(key: RenderableTemplateKey, locale: TemplateLocale): Record<string, string> {
   const all: Record<string, string> = {
     congressName: locale === 'en' ? 'Example Congress' : 'Örnek Kongre', accessLink: 'https://example.invalid/congress/access?token=preview', activationLink: 'https://example.invalid/account/activate?token=preview',
+    platformName: locale === 'en' ? 'Congress Management Platform' : 'Kongre Yönetim Platformu', recoveryLink: 'https://example.invalid/hesap/parola-yenile#token=preview',
     paperTitle: locale === 'en' ? 'Example paper' : 'Örnek bildiri', statusLabel: locale === 'en' ? 'Accepted' : 'Kabul edildi', registrationUrl: 'https://example.invalid/congress/registration',
     recipientName: locale === 'en' ? 'Example participant' : 'Örnek katılımcı', message: locale === 'en' ? 'This is a template preview.' : 'Bu bir şablon önizlemesidir.',
   };

@@ -606,6 +606,7 @@ model PlatformUser {
   sessions              PlatformSession[]
   deliveryExceptions    DeliveryException[]
   activationTokens      ActivationToken[]
+  passwordRecoveryTokens PasswordRecoveryToken[]
   audits                AuditLog[]
 }
 
@@ -671,6 +672,27 @@ model ActivationToken {
   user      PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model PasswordRecoveryToken {
+  id        String       @id @default(cuid())
+  tokenHash String       @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  revokedAt DateTime?
+  createdAt DateTime     @default(now())
+  user      PlatformUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model RecoveryRateLimit {
+  key             String   @id
+  windowStartedAt DateTime
+  attempts        Int      @default(0)
+  updatedAt       DateTime @updatedAt
 }
 
 model AuditLog {

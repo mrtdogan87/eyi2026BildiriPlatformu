@@ -74,6 +74,17 @@ function safeCode(code, fallback) { return typeof code === 'string' && Object.ha
 function clockDate(now) { return now ? new Date(now) : new Date(); }
 
 async function sourceIsValid(prisma, message, now) {
+  // Recovery belongs to an existing personal account, never to a congress or
+  // an activation invitation. A retry must recheck the current token/account.
+  if (message.templateKey === 'ACCOUNT_PASSWORD_RECOVERY' || message.sourceType === 'platform-password-recovery') {
+    if (message.congressId || message.module || message.templateKey !== 'ACCOUNT_PASSWORD_RECOVERY' || message.sourceType !== 'platform-password-recovery' || !message.sourceId) return false;
+    const token = await prisma.passwordRecoveryToken.findUnique({
+      where: { id: message.sourceId },
+      include: { user: { select: { active: true, passwordHash: true, email: true } } },
+    });
+    return !!token && !token.usedAt && !token.revokedAt && new Date(token.expiresAt) > now &&
+      !!token.user?.active && !!token.user.passwordHash && token.user.email.toLowerCase() === message.recipient;
+  }
   // Preview samples never represent live tokens and must never enter a real transport.
   if (!message.congressId) {
     if (message.templateKey !== 'ACCOUNT_ACTIVATION' || message.sourceType !== 'platform-activation') return false;

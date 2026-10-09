@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useState } from "react";
 import type { FormEvent } from "react";
 
@@ -60,6 +61,7 @@ export function AdminLoginForm() {
         <button className="button primary" type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Giriş yapılıyor..." : "Panele Gir"}
         </button>
+        <Link href="/hesap/parolami-unuttum">Parolamı unuttum</Link>
       </div>
     </form>
   );

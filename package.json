@@ -53,7 +53,8 @@
     "test:pilot-recovery": "node scripts/pilot-recovery-check.mjs",
     "test:promotion-sources": "node scripts/promotion-source-check.mjs",
     "test:platform-management": "node scripts/platform-management-check.mjs && node scripts/empty-platform-check.mjs",
-    "test:ui11": "node scripts/ui11-check.mjs"
+    "test:ui11": "node scripts/ui11-check.mjs",
+    "test:ui12": "node --test scripts/password-recovery.test.mjs scripts/ui12-account-state.test.mjs && node scripts/ui12-recovery-check.mjs && node scripts/communication-recovery-check.mjs && node scripts/ui12-managers-check.mjs"
   },
   "keywords": [],
   "author": "",

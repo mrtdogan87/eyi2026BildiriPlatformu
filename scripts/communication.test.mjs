@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { normalizeRecipient, retryDelay, enqueueMessage, processEmailQueue } from '../src/modules/communication/queue.mjs';
 import { classifySmtpFailure } from '../src/modules/communication/transport.mjs';
-import { templateKeys, templatePlaceholders, defaultTemplate, templateProblems, templateInputSchema, renderTemplate, sampleTemplateValues, isSafeEmailUrl } from '../src/modules/communication/templates.ts';
+import { templateKeys, platformTemplateKeys, templatePlaceholders, defaultTemplate, templateProblems, templateInputSchema, renderTemplate, sampleTemplateValues, isSafeEmailUrl } from '../src/modules/communication/templates.ts';
 
 test('one normalized mailbox is required; headers, lists and display names are rejected', () => {
   assert.equal(normalizeRecipient(' Synthetic@Example.Invalid '), 'synthetic@example.invalid');
@@ -34,7 +34,127 @@ test('invalid transport and worker bounds are rejected before storage is accesse
   }
 });
 
-for (const key of templateKeys) for (const locale of ['tr', 'en']) {
+// The worker's state changes are exercised without a database or transport.
+// Model fixtures contain only the fields it uses; failed checks cannot send.
+function recoveryQueueFixture({ message: messagePatch = {}, token: tokenPatch = {}, user: userPatch = {}, missingToken = false } = {}) {
+  const now = new Date('2037-01-01T10:00:00Z');
+  const recipient = 'recovery@example.invalid';
+  const message = {
+    id: 'recovery-message', congressId: null, module: null, templateKey: 'ACCOUNT_PASSWORD_RECOVERY', sourceType: 'platform-password-recovery',
+    sourceId: 'recovery-token', recipient, subject: 'Personal account password reset', text: 'PRIVATE_BODY', html: '<p>PRIVATE_BODY</p>',
+    expiresAt: new Date(now.getTime() + 30 * 60000), nextAttemptAt: now, createdAt: now,
+    status: 'PENDING', provider: null, attempts: 0, version: 1, leaseToken: null, leaseUntil: null, ...messagePatch,
+  };
+  const token = missingToken ? null : { id: 'recovery-token', expiresAt: new Date(now.getTime() + 30 * 60000), usedAt: null, revokedAt: null,
+    ...tokenPatch, user: { active: true, passwordHash: 'synthetic-hash', email: recipient, ...userPatch } };
+  const history = [];
+  let deliveryIssues = 0, recoveryReads = 0;
+  function matches(where) {
+    for (const [key, expected] of Object.entries(where)) {
+      if (expected && typeof expected === 'object' && !(expected instanceof Date)) {
+        if (expected.in && !expected.in.includes(message[key])) return false;
+        if (expected.lte && (!message[key] || message[key] > expected.lte)) return false;
+      } else if (message[key] !== expected) return false;
+    }
+    return true;
+  }
+  const db = {
+    $transaction: async callback => callback(db), $queryRaw: async () => [],
+    congress: { findUnique: async () => ({ closedAt: null }) },
+    emailMessage: {
+      findMany: async ({ where }) => matches(where) ? [{ ...message }] : [],
+      updateMany: async ({ where, data }) => {
+        if (!matches(where)) return { count: 0 };
+        for (const [key, value] of Object.entries(data)) message[key] = value?.increment ? message[key] + value.increment : value;
+        return { count: 1 };
+      },
+    },
+    passwordRecoveryToken: { findUnique: async ({ where }) => { recoveryReads += 1; return where.id === token?.id ? token : null; } },
+    emailAttempt: { create: async ({ data }) => { history.push(data); return data; } },
+    emailDeliveryIssue: { upsert: async () => { deliveryIssues += 1; } },
+  };
+  return { db, now, message, token, history, get deliveryIssues() { return deliveryIssues; }, get recoveryReads() { return recoveryReads; } };
+}
+
+test('a valid personal recovery message is captured without a congress or delivery claim', async () => {
+  const f = recoveryQueueFixture(); let sent = 0;
+  const result = await processEmailQueue({ prisma: f.db, now: f.now, transport: { provider: 'capture', send: async message => {
+    sent += 1; assert.equal(message.congressId, null); return { kind: 'captured', providerId: message.id };
+  } } });
+  assert.equal(sent, 1);
+  assert.equal(f.message.status, 'CAPTURED');
+  assert.equal(f.message.acceptedAt, undefined);
+  assert.equal(f.history[0].outcome, 'CAPTURED');
+  assert.equal(f.deliveryIssues, 0);
+  assert.deepEqual(result.results, [{ id: f.message.id, status: 'CAPTURED' }]);
+  assert.ok(!JSON.stringify([f.history, result]).includes('PRIVATE_BODY'));
+});
+
+for (const [label, options, code = 'SOURCE_INVALID'] of [
+  ['used token', { token: { usedAt: new Date('2037-01-01T09:59:00Z') } }],
+  ['superseded or revoked token', { token: { revokedAt: new Date('2037-01-01T09:59:00Z') } }],
+  ['expired token despite an unexpired message', { token: { expiresAt: new Date('2037-01-01T10:00:00Z') } }],
+  ['removed token', { missingToken: true }],
+  ['closed account', { user: { active: false } }],
+  ['unactivated account', { user: { passwordHash: null } }],
+  ['changed account address', { user: { email: 'different@example.invalid' } }],
+  ['wrong source type', { message: { sourceType: 'platform-activation' } }],
+  ['wrong template', { message: { templateKey: 'ACCOUNT_ACTIVATION' } }],
+  ['congress-scoped recovery', { message: { congressId: 'foreign-congress' } }],
+  ['module-scoped recovery', { message: { module: 'CMS' } }],
+  ['missing source id', { message: { sourceId: null } }],
+  ['expired message', { message: { expiresAt: new Date('2037-01-01T10:00:00Z') } }, 'MESSAGE_EXPIRED'],
+]) test(`personal recovery cancels ${label} before reaching the transport`, async () => {
+  const f = recoveryQueueFixture(options);
+  await processEmailQueue({ prisma: f.db, now: f.now, transport: { provider: 'capture', send: async () => assert.fail('invalid recovery reached transport') } });
+  assert.equal(f.message.status, 'CANCELLED');
+  assert.equal(f.history.length, 1);
+  assert.equal(f.history[0].errorCode, code);
+  assert.equal(f.deliveryIssues, 0);
+});
+
+for (const [label, revoke] of [
+  ['new request invalidates the token', f => { f.token.revokedAt = f.now; }],
+  ['account is closed', f => { f.token.user.active = false; }],
+  ['password has been reset', f => { f.token.usedAt = f.now; }],
+]) test(`a recovery retry rechecks its source when ${label}`, async () => {
+  const f = recoveryQueueFixture(); let calls = 0;
+  const transport = { provider: 'capture', send: async () => { calls += 1; return { kind: 'retry', errorCode: 'CAPTURE_IO' }; } };
+  await processEmailQueue({ prisma: f.db, now: f.now, transport });
+  assert.equal(f.message.status, 'RETRY');
+  revoke(f);
+  await processEmailQueue({ prisma: f.db, now: f.message.nextAttemptAt, transport });
+  assert.equal(calls, 1);
+  assert.equal(f.message.status, 'CANCELLED');
+  assert.equal(f.history[1].errorCode, 'SOURCE_INVALID');
+});
+
+test('congressless recovery retries terminate durably without inventing a congress delivery issue', async () => {
+  const f = recoveryQueueFixture(); let calls = 0;
+  const transport = { provider: 'capture', send: async () => { calls += 1; return { kind: 'retry', errorCode: 'CAPTURE_IO' }; } };
+  await processEmailQueue({ prisma: f.db, now: f.now, maxAttempts: 2, transport });
+  assert.equal(f.message.status, 'RETRY');
+  await processEmailQueue({ prisma: f.db, now: f.message.nextAttemptAt, maxAttempts: 2, transport });
+  assert.equal(f.message.status, 'PERMANENT_FAILURE');
+  assert.equal(f.history.length, 2);
+  assert.equal(f.history[1].errorCode, 'RETRY_LIMIT');
+  assert.equal(f.deliveryIssues, 0);
+  await processEmailQueue({ prisma: f.db, now: new Date(f.now.getTime() + 10 * 60000), maxAttempts: 2, transport });
+  assert.equal(calls, 2);
+});
+
+test('unknown congressless provider outcome remains terminal and cannot automatically resend a recovery link', async () => {
+  const f = recoveryQueueFixture(); let calls = 0;
+  const transport = { provider: 'smtp', send: async () => { calls += 1; throw new Error('provider response with PRIVATE_BODY'); } };
+  await processEmailQueue({ prisma: f.db, now: f.now, transport });
+  assert.equal(f.message.status, 'UNKNOWN');
+  assert.equal(f.history[0].errorCode, 'DELIVERY_UNKNOWN');
+  assert.ok(!JSON.stringify(f.history).includes('PRIVATE_BODY'));
+  await processEmailQueue({ prisma: f.db, now: new Date(f.now.getTime() + 60000), transport });
+  assert.equal(calls, 1);
+});
+
+for (const key of [...templateKeys, ...platformTemplateKeys]) for (const locale of ['tr', 'en']) {
   test(`${key} has a valid ${locale} default and self-contained sample preview`, () => {
     const content = defaultTemplate(key, locale);
     const values = sampleTemplateValues(key, locale);
@@ -59,12 +179,24 @@ test('template input accepts only supported languages, keys, variables and exact
 });
 
 test('access link remains mandatory in auth bodies and forbidden in email subjects', () => {
-  for (const [key, field] of [['DRAFT_ACCESS', 'accessLink'], ['REGISTRATION_ACCESS', 'accessLink'], ['ACCOUNT_ACTIVATION', 'activationLink']]) {
+  for (const [key, field] of [['DRAFT_ACCESS', 'accessLink'], ['REGISTRATION_ACCESS', 'accessLink'], ['ACCOUNT_ACTIVATION', 'activationLink'], ['ACCOUNT_PASSWORD_RECOVERY', 'recoveryLink']]) {
     const content = defaultTemplate(key, 'en');
     assert.ok(templateProblems(key, { ...content, body: 'No link' }).length);
     assert.ok(templateProblems(key, { ...content, subject: `Subject {{${field}}}` }).length);
     assert.ok(templateProblems(key, { ...content, body: `https://foreign.example.invalid/?secret={{${field}}}` }).length);
   }
+});
+
+test('personal recovery template cannot be edited or sampled through congress template input', () => {
+  const key = 'ACCOUNT_PASSWORD_RECOVERY';
+  assert.equal(templateKeys.includes(key), false);
+  assert.equal(templateInputSchema.safeParse({ key, locale: 'tr', ...defaultTemplate(key, 'tr') }).success, false);
+  const values = sampleTemplateValues(key, 'tr');
+  const rendered = renderTemplate({ key, locale: 'tr', ...defaultTemplate(key, 'tr'), values });
+  assert.ok(rendered.text.includes('30 dakika') && rendered.text.includes('bir kez'));
+  assert.ok(rendered.text.includes(values.recoveryLink));
+  assert.ok(!rendered.subject.includes('token='));
+  assert.throws(() => renderTemplate({ key, locale: 'tr', ...defaultTemplate(key, 'tr'), values: { ...values, recoveryLink: 'javascript:alert(1)' } }));
 });
 
 test('HTML previews escape literal markup and values while retaining plain text', () => {

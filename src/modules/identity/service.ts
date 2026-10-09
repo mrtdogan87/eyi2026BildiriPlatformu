@@ -9,27 +9,33 @@ import { hasIntervention } from '@/platform/intervention.mjs';
 import { effectiveRoles } from '@/platform/roles.mjs';
 export async function login(email: string, password: string) {
   if (!email || !password || password.length > 256) throw new AccessError(400, 'E-posta ve parola gerekli.');
-  const user = await prisma.platformUser.findUnique({ where: { email: email.trim().toLowerCase() } });
-  const valid = verifyPassword(password, user?.passwordHash ?? null);
-  if (!user?.active || !valid || (user.lockedUntil && user.lockedUntil > new Date())) {
-    if (user) await prisma.$transaction(async tx => {
-      const updated = await tx.platformUser.update({ where: { id: user.id }, data: { failedLogins: { increment: 1 } } });
-      if (updated.failedLogins >= 5 && (!user.lockedUntil || user.lockedUntil <= new Date())) {
-        await tx.platformUser.update({ where: { id: user.id }, data: { lockedUntil: new Date(Date.now() + 10 * 60000) } });
-      }
-    });
-    throw new AccessError(401, 'E-posta veya parola doğrulanamadı.');
-  }
-  const contexts = await availableContexts(user.id);
-  const institutionManager=!!await prisma.organizationMembership.count({where:{userId:user.id,active:true,organizer:true}});
+  const existing = await prisma.platformUser.findUnique({ where: { email: email.trim().toLowerCase() }, select: { id: true } });
+  if (!existing) { verifyPassword(password, null); throw new AccessError(401, 'E-posta veya parola doğrulanamadı.'); }
   const token = newToken();
-  await prisma.$transaction([
-    prisma.platformUser.update({ where: { id: user.id }, data: { failedLogins: 0, lockedUntil: null } }),
-    prisma.platformSession.create({ data: { userId: user.id, tokenHash: hashToken(token), congressId: user.platformAdmin || contexts.length !== 1 || institutionManager ? null : contexts[0]?.id, expiresAt: new Date(Date.now() + 8 * 3600000) } }),
-    prisma.auditLog.create({ data: { actorId: user.id, action: 'session.login' } }),
-  ]);
+  const result = await prisma.$transaction(async tx => {
+    // A login using an old password cannot create a session after a concurrent reset.
+    await tx.$queryRaw`SELECT id FROM "PlatformUser" WHERE id=${existing.id} FOR UPDATE`;
+    const user = await tx.platformUser.findUnique({ where: { id: existing.id } });
+    const valid = verifyPassword(password, user?.passwordHash ?? null);
+    if (!user?.active || !valid || (user.lockedUntil && user.lockedUntil > new Date())) {
+      if (user) {
+        const updated = await tx.platformUser.update({ where: { id: user.id }, data: { failedLogins: { increment: 1 } } });
+        if (updated.failedLogins >= 5 && (!user.lockedUntil || user.lockedUntil <= new Date())) {
+          await tx.platformUser.update({ where: { id: user.id }, data: { lockedUntil: new Date(Date.now() + 10 * 60000) } });
+        }
+      }
+      return null; // Commit failed-attempt counters before returning the generic error.
+    }
+    const contexts = await availableContexts(user.id);
+    const institutionManager = !!await tx.organizationMembership.count({ where: { userId: user.id, active: true, organizer: true } });
+    await tx.platformUser.update({ where: { id: user.id }, data: { failedLogins: 0, lockedUntil: null } });
+    await tx.platformSession.create({ data: { userId: user.id, tokenHash: hashToken(token), congressId: user.platformAdmin || contexts.length !== 1 || institutionManager ? null : contexts[0]?.id, expiresAt: new Date(Date.now() + 8 * 3600000) } });
+    await tx.auditLog.create({ data: { actorId: user.id, action: 'session.login' } });
+    return { redirectTo: user.platformAdmin ? '/admin/platform' : institutionManager ? '/admin/kurumlar' : contexts.length !== 1 ? '/admin/kongreler' : '/admin/panel' };
+  });
+  if (!result) throw new AccessError(401, 'E-posta veya parola doğrulanamadı.');
   await setSessionCookie(token);
-  return {redirectTo:user.platformAdmin?'/admin/platform':institutionManager?'/admin/kurumlar':contexts.length!==1?'/admin/kongreler':'/admin/panel'};
+  return result;
 }
 export async function logout() {
   const session = await actorSession();
