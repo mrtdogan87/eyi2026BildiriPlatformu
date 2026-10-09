@@ -27,7 +27,6 @@ switch (action) {
   case 'smoke':
     assertLocal(); command = 'node'; args = ['scripts/smoke.mjs']; break;
   case 'cms-worker': {
-    assertLocal();
     const workerArgs = process.argv.slice(3);
     if (workerArgs.length > 1 || workerArgs.some(arg => !['--once', '--watch'].includes(arg))) throw new Error('Usage: run.mjs cms-worker [--once|--watch]');
     command = process.execPath; args = ['scripts/cms-worker.mjs', ...workerArgs]; break;

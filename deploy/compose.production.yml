@@ -1,0 +1,149 @@
+name: aibildiri-v2-production
+
+# Coolify supplies these variables at runtime. With Docker Compose, pass a
+# protected env file with --env-file; never mount/copy it into the containers.
+x-runtime-environment: &runtime-environment
+  APP_ENV: production
+  APP_BASE_URL: https://kongre.stativera.store
+  V2_DB_HOST: db-v2-production
+  DATABASE_URL: postgresql://aibildiri_v2_production:${V2_PRODUCTION_DB_PASSWORD:?Set a fresh URI-safe v2 DB password}@db-v2-production:5432/aibildiri_v2_production
+  DIRECT_URL: postgresql://aibildiri_v2_production:${V2_PRODUCTION_DB_PASSWORD:?Set a fresh URI-safe v2 DB password}@db-v2-production:5432/aibildiri_v2_production
+  SESSION_COOKIE_NAMESPACE: aibildiri_v2_production
+  DRAFT_SESSION_SECRET: ${DRAFT_SESSION_SECRET:?Set a fresh session secret}
+  FILE_STORAGE: database
+  MAIL_MODE: delivery
+  EMAIL_DELIVERY_ENABLED: ${EMAIL_DELIVERY_ENABLED:?Explicit production email activation is required}
+  MAIL_PROVIDER: ${MAIL_PROVIDER:-smtp}
+  SMTP_HOST: ${SMTP_HOST:-}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_SECURE: ${SMTP_SECURE:-false}
+  SMTP_USER: ${SMTP_USER:-}
+  SMTP_PASS: ${SMTP_PASS:-}
+  SMTP_FROM: ${SMTP_FROM:-}
+  SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Stativera Kongre}
+  RESEND_API_KEY: ${RESEND_API_KEY:-}
+  RESEND_SENDER_EMAIL: ${RESEND_SENDER_EMAIL:-}
+  RESEND_SENDER_NAME: ${RESEND_SENDER_NAME:-Stativera Kongre}
+
+x-tools-build: &tools-build
+  context: ..
+  dockerfile: deploy/Dockerfile.production
+  target: tools
+
+x-runtime-service: &runtime-service
+  init: true
+  restart: unless-stopped
+  stop_grace_period: 45s
+  security_opt:
+    - no-new-privileges:true
+  depends_on:
+    db-v2-production:
+      condition: service_healthy
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '3'
+
+services:
+  db-v2-production:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aibildiri_v2_production
+      POSTGRES_USER: aibildiri_v2_production
+      POSTGRES_PASSWORD: ${V2_PRODUCTION_DB_PASSWORD:?Set a fresh URI-safe v2 DB password}
+    volumes:
+      - v2-production-db:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U aibildiri_v2_production -d aibildiri_v2_production']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    restart: unless-stopped
+    stop_grace_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+
+  app:
+    <<: *runtime-service
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.production
+      target: runner
+    environment:
+      <<: *runtime-environment
+      HOSTNAME: 0.0.0.0
+      PORT: '3000'
+    # In Coolify, route only app to https://kongre.stativera.store:3000.
+    # The proxy connects over the stack network; no host ports are published.
+    expose: ['3000']
+    healthcheck:
+      test: [CMD, node, deploy/web-healthcheck.mjs]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+
+  mail-worker:
+    <<: *runtime-service
+    build: *tools-build
+    environment:
+      <<: *runtime-environment
+      MAIL_WORKER_HEARTBEAT_FILE: /tmp/mail-worker-heartbeat
+    command: [node, scripts/mail-worker.mjs, '--watch']
+    healthcheck:
+      # Up to 20 deliveries can each wait 30 seconds within one batch.
+      test: [CMD, node, deploy/worker-healthcheck.mjs, /tmp/mail-worker-heartbeat, '900']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 900s
+
+  cms-worker:
+    <<: *runtime-service
+    build: *tools-build
+    environment:
+      <<: *runtime-environment
+      CMS_WORKER_HEARTBEAT_FILE: /tmp/cms-worker-heartbeat
+    command: [node, scripts/cms-worker.mjs, '--watch']
+    healthcheck:
+      test: [CMD, node, deploy/worker-healthcheck.mjs, /tmp/cms-worker-heartbeat, '120']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+  # Explicit one-off operations; neither runs with the default app deployment.
+  migrate:
+    profiles: [migration]
+    build: *tools-build
+    init: true
+    environment:
+      <<: *runtime-environment
+      V2_PRODUCTION_MIGRATION_CONFIRM: ${V2_PRODUCTION_MIGRATION_CONFIRM:-}
+    command: [node, scripts/run.mjs, migrate]
+    depends_on:
+      db-v2-production:
+        condition: service_healthy
+    restart: 'no'
+
+  bootstrap:
+    profiles: [bootstrap]
+    build: *tools-build
+    init: true
+    stdin_open: true
+    environment:
+      <<: *runtime-environment
+      V2_BOOTSTRAP_CONFIRM: ${V2_BOOTSTRAP_CONFIRM:-}
+    command: [node, scripts/bootstrap-production.mjs, '--stdin']
+    depends_on:
+      db-v2-production:
+        condition: service_healthy
+    restart: 'no'
+
+volumes:
+  v2-production-db:

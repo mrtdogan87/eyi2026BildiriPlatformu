@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 RUN apk add --no-cache openssl
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -17,7 +17,7 @@ ENV APP_ENV=preview APP_BASE_URL=https://v2-preview.example.invalid V2_DB_HOST=d
     FILE_STORAGE=database MAIL_MODE=capture MAIL_CAPTURE_DIR=/app/.preview/mail
 RUN npm run build
 
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 RUN apk add --no-cache openssl
 WORKDIR /app
 ENV NODE_ENV=production HOSTNAME=0.0.0.0 PORT=3000
@@ -30,15 +30,17 @@ EXPOSE 3000
 CMD ["node", "server.js"]
 
 # Durable queue processor, deployed separately from the web process.
-FROM node:22-alpine AS worker
+FROM node:24-alpine AS worker
 RUN apk add --no-cache openssl
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
 RUN npm ci --omit=dev
-COPY scripts/mail-worker.mjs scripts/environment.mjs scripts/load-env.mjs ./scripts/
-COPY src/modules/communication/queue.mjs src/modules/communication/transport.mjs ./src/modules/communication/
+COPY scripts ./scripts
+# Queue imports role, payment and certificate modules, including TypeScript.
+# Node 24 strips the supported TS syntax; keep the entire local import graph.
+COPY src ./src
 RUN mkdir -p /app/.preview/mail && chown -R node:node /app/.preview
 USER node
 CMD ["node", "scripts/mail-worker.mjs", "--watch"]

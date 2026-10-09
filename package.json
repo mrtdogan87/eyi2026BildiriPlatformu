@@ -54,7 +54,11 @@
     "test:promotion-sources": "node scripts/promotion-source-check.mjs",
     "test:platform-management": "node scripts/platform-management-check.mjs && node scripts/empty-platform-check.mjs",
     "test:ui11": "node scripts/ui11-check.mjs",
-    "test:ui12": "node --test scripts/password-recovery.test.mjs scripts/ui12-account-state.test.mjs && node scripts/ui12-recovery-check.mjs && node scripts/communication-recovery-check.mjs && node scripts/ui12-managers-check.mjs"
+    "test:ui12": "node --test scripts/password-recovery.test.mjs scripts/ui12-account-state.test.mjs && node scripts/ui12-recovery-check.mjs && node scripts/communication-recovery-check.mjs && node scripts/ui12-managers-check.mjs",
+    "production:export-admin": "node scripts/export-production-admin.mjs",
+    "production:bootstrap": "node scripts/bootstrap-production.mjs --stdin",
+    "test:production": "node --test scripts/environment.test.mjs scripts/runtime-launchers.test.mjs scripts/bootstrap-production.test.mjs scripts/production-container.test.mjs",
+    "test:production-database": "node scripts/production-database-check.mjs"
   },
   "keywords": [],
   "author": "",

@@ -1,0 +1,50 @@
+# Build on the target architecture: npm and Prisma select the Linux ARM64/AMD64
+# native modules there. Never copy the Mac's node_modules into an image.
+FROM node:24-bookworm-slim AS base
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates openssl \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+
+FROM base AS builder
+COPY package.json package-lock.json ./
+COPY prisma ./prisma
+RUN npm ci --include=optional
+COPY . .
+# Offline build-only settings. Real deployment secrets are runtime variables;
+# no build ARG, env file, migration or seed is used during image construction.
+RUN APP_ENV=preview APP_BASE_URL=https://build.example.invalid V2_DB_HOST=db-build-only \
+    DATABASE_URL=postgresql://aibildiri_v2_preview:build-only@db-build-only:5432/aibildiri_v2_preview \
+    DIRECT_URL=postgresql://aibildiri_v2_preview:build-only@db-build-only:5432/aibildiri_v2_preview \
+    SESSION_COOKIE_NAMESPACE=aibildiri_v2_preview \
+    DRAFT_SESSION_SECRET=build-only-draft-secret-not-used-at-runtime-123 \
+    PREVIEW_ACCESS_USER=build-only PREVIEW_ACCESS_PASSWORD=build-only-preview-password-123 \
+    FILE_STORAGE=database MAIL_MODE=capture MAIL_CAPTURE_DIR=/app/.preview/mail \
+    npm run build
+
+FROM base AS runner
+ENV NODE_ENV=production HOSTNAME=0.0.0.0 PORT=3000
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
+# Keep bundled PDF fonts/templates even if a future tracing change misses them.
+COPY --from=builder --chown=node:node /app/data ./data
+COPY --chown=node:node scripts/environment.mjs ./scripts/environment.mjs
+COPY --chown=node:node deploy/start-production.mjs deploy/web-healthcheck.mjs ./deploy/
+USER node
+EXPOSE 3000
+CMD ["node", "deploy/start-production.mjs"]
+
+# The worker, migration and bootstrap image has the complete source import graph
+# and generated native Prisma client. It has no web process or automatic DB job.
+FROM base AS tools
+ENV NODE_ENV=production
+COPY package.json package-lock.json ./
+COPY prisma ./prisma
+RUN npm ci --omit=dev --include=optional
+COPY scripts ./scripts
+COPY src ./src
+COPY data ./data
+COPY deploy ./deploy
+USER node
+CMD ["node", "scripts/mail-worker.mjs", "--watch"]

@@ -48,6 +48,10 @@ export function assertLocal(env = process.env) {
 
 export function assertMigrationTarget(env = process.env) {
   const config = assertEnvironment(env);
-  if (config.mode === 'production') throw new Error('Production migrations are outside P02');
+  // The regular runtime environment must not authorize schema changes. Supply
+  // this confirmation only to the separate, explicitly invoked migration job.
+  if (config.mode === 'production' && env.V2_PRODUCTION_MIGRATION_CONFIRM !== 'aibildiri_v2_production') {
+    throw new Error('Production migrations require V2_PRODUCTION_MIGRATION_CONFIRM=aibildiri_v2_production');
+  }
   return config;
 }
