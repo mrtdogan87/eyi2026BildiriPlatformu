@@ -1,5 +1,10 @@
 # Kongre canlı yayın hazırlığı — 9 Ekim 2026
 
+**10 Ekim güncel durum:** canlı kurulum tamamlandı. Sonuçlar ve işletim
+bilgileri [canlı yayın kaydındadır](KONGRE_CANLI_YAYIN.md). Aşağıdaki metin,
+hazırlık sırasında tutulan tarihsel kontrol noktalarını içerir; eski
+"henüz yapılmadı" ifadeleri güncel kurulum durumunu anlatmaz.
+
 Hedef `https://kongre.stativera.store`. Kullanıcı ayrı uzak deneme ortamı
 istemiyor. `https://bildiriyonetim.stativera.store/eyi-2026`, eski uygulama ve
 veritabanı korunacak. Hazırlık `codex/kongre-production` dalında, UI12 kapanışı
