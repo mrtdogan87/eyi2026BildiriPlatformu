@@ -116,3 +116,29 @@ Kurulum adımları: [üretim rehberi](../deploy/README.production.md).
   imajlarını atlıyor. Yeni kaynağın üretilmiş Compose'u ayrıca incelenecek.
 - Eski EYİ adresi 10 Ekim kontrolünde tekrar HTTP 200 döndü. Uzak kurulum,
   gerçek yönetici aktarımı, HTTPS ve yeni DB yedekleme kabulü henüz yapılmadı.
+
+### Yayın öncesi bağımlılık düzeltmesi
+
+İmaj kontrolünden sonraki npm audit, Next.js 16.3.6 için düzeltilmiş sürüm
+gerektiren güvenlik duyuruları bildirdi. Bu nedenle yukarıdaki `d068a47cd90f`
+etiketli imajlar **canlıya yüklenmeyecek**. Next.js ve eşleşen ESLint paketi
+16.3.8 sürümüne sabitlendi; düzeltme sonrası imaj/çalışma kontrolleri
+yenilenecek. Yalnız package/lock dosyaları güncellendi: çalışan yerel
+`node_modules`, `.next` ve DB değiştirilmedi. DOCX/SMTP regresyonlarının
+sekizi de geçti.
+
+Yeni lock audit'inde Next uyarısı kalmadı. Yedi paket kaydı (dört high,
+üç moderate) hâlâ mevcut: Prisma CLI yapılandırmasının effect/deepmerge-ts
+zinciri ve Mammoth CLI'ın argparse/sprintf-js zinciri. Kaynak incelemesinde
+bu uyarıların gerektirdiği HTTP çağrı yolu bulunmadı. Prisma migration işleri
+depo içindeki güvenilen şemayı kullanır; uygulama Prisma Client ve Mammoth'un
+`extractRawText` kütüphane arayüzünü çağırır. Deepmerge için düzeltme major
+davranış değişikliği içeriyor; sprintf için yayımlanmış düzeltme bulunmuyor.
+Audit'in Prisma/Mammoth geriye sürüm geçişi önerileri uygulanmadı. Bu kayıt
+sıfır audit uyarısı iddiası değildir. Kanıtlar `.local/kongre-npm-audit.json`
+ve `.local/kongre-production-npm-audit-next1638.json` içinde.
+
+Resmî kaynaklar: [Next 16.3.8 sürüm notu](https://github.com/vercel/next.js/releases/tag/v16.3.8),
+[Effect duyurusu](https://github.com/Effect-TS/effect/security/advisories/GHSA-38f7-945m-qr2g),
+[Deepmerge duyurusu](https://github.com/RebeccaStevens/deepmerge-ts/security/advisories/GHSA-ggr8-5vv4-36mx),
+[sprintf üretici bildirimi](https://github.com/alexei/sprintf.js/issues/237).
