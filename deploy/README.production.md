@@ -65,13 +65,15 @@ Generate the image-only Compose from this checkout's production source:
 
 ```sh
 node scripts/generate-prebuilt-compose.mjs \
-  --web-image stativera/kongre-web:prod-d068a47cd90f-arm64 \
-  --tools-image stativera/kongre-tools:prod-d068a47cd90f-arm64
+  --web-image stativera/kongre-web:prod-c0c12764b973-arm64 \
+  --tools-image stativera/kongre-tools:prod-c0c12764b973-arm64
 node --test scripts/prebuilt-compose.test.mjs
 ```
 
 The refs above identify this release; supply the refs actually built for each
-future release. Both arguments are required. The generator writes
+future release. The earlier `d068a47cd90f` images were superseded by the Next.js
+16.3.8 security patch and must not be used for this deployment.
+Both arguments are required. The generator writes
 `.local/compose.production.prebuilt.yml` with 0600 permissions, removes all build
 blocks, and sets `pull_policy: never` on the web, workers and one-off jobs. It does
 not read environment files or resolve runtime placeholders. The source Compose,

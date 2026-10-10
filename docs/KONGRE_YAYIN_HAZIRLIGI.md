@@ -90,7 +90,8 @@ Kurulum adımları: [üretim rehberi](../deploy/README.production.md).
   Yerel hesaptaki parola özeti korunuyor; yerel DB değişmedi. Aktarım dosyası
   Git dışında, yalnız sahibi tarafından okunabilir izinlerle saklanıyor.
 - Yereldeki `codex/kongre-production` dalı henüz GitHub'a gönderilmedi.
-  GitHub CLI oturum açma akışı başlatıldı. Dosya aktarımı için hazırlanan
+  GitHub CLI oturum açma akışı henüz tamamlanmadı; ilk tek kullanımlık kodun
+  süresi doldu. Dosya aktarımı için hazırlanan
   geçici SSH anahtarı sunucuya henüz eklenmedi; erişim onayı bekleniyor.
   Canlı sunucunun SSH kimliği, kimliği doğrulanmış Coolify terminalinden
   okunarak yerel bağlantı için sabitlendi.
@@ -123,7 +124,7 @@ Kurulum adımları: [üretim rehberi](../deploy/README.production.md).
 gerektiren güvenlik duyuruları bildirdi. Bu nedenle yukarıdaki `d068a47cd90f`
 etiketli imajlar **canlıya yüklenmeyecek**. Next.js ve eşleşen ESLint paketi
 16.3.8 sürümüne sabitlendi; düzeltme sonrası imaj/çalışma kontrolleri
-yenilenecek. Yalnız package/lock dosyaları güncellendi: çalışan yerel
+yenilendi. Yalnız package/lock dosyaları güncellendi: çalışan yerel
 `node_modules`, `.next` ve DB değiştirilmedi. DOCX/SMTP regresyonlarının
 sekizi de geçti.
 
@@ -142,3 +143,17 @@ Resmî kaynaklar: [Next 16.3.8 sürüm notu](https://github.com/vercel/next.js/r
 [Effect duyurusu](https://github.com/Effect-TS/effect/security/advisories/GHSA-38f7-945m-qr2g),
 [Deepmerge duyurusu](https://github.com/RebeccaStevens/deepmerge-ts/security/advisories/GHSA-ggr8-5vv4-36mx),
 [sprintf üretici bildirimi](https://github.com/alexei/sprintf.js/issues/237).
+
+### Güncellenmiş yayın adayı
+
+Güncel imaj kaynağı `c0c12764b973`, iki imaj etiketi
+`stativera/kongre-web:prod-c0c12764b973-arm64` ve
+`stativera/kongre-tools:prod-c0c12764b973-arm64`.
+Her iki imajda Next 16.3.8 doğrulandı. Native kontroller ve gerçek Docker
+imajlarıyla **13/13 entegrasyon kontrolü geçti**. Önceki kapsama ek olarak
+sentetik yöneticinin gerçek giriş isteği HTTP 200 döndürdü, oturum cookie'si
+oluştu ve platform yönetim sayfası açıldı. Testin DB/ağ/container kaynakları
+temizlendi; gerçek hesap, çalışma DB'si ve e-posta kullanılmadı.
+
+Güncel kanıt `.local/kongre-image-e2e-result.json` içinde; önceki imajın
+kanıtları `.local/kongre-evidence-d068a47cd90f/` altında ayrı saklanıyor.
