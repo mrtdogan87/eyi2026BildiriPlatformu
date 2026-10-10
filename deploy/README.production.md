@@ -51,6 +51,62 @@ Official references: [Compose builds](https://coolify.io/docs/applications/build
 [domains](https://coolify.io/docs/applications/configuration/domains), and
 [Compose networking](https://coolify.io/docs/services/configuration/networking).
 
+## Prebuilt images without a registry
+
+Build the web (`runner`) and worker/job (`tools`) targets on a capable Linux
+builder for the server's architecture. Transfer the resulting `docker save`
+archive through an authenticated channel, verify its checksum, then `docker load`
+it into the same Docker daemon that Coolify uses. Record and compare both image
+IDs and architecture before starting services. A versioned tag is a chosen
+reference, not proof that an image is immutable; keep the original archive for
+rollback and for restoring a replacement host.
+
+Generate the image-only Compose from this checkout's production source:
+
+```sh
+node scripts/generate-prebuilt-compose.mjs \
+  --web-image stativera/kongre-web:prod-d068a47cd90f-arm64 \
+  --tools-image stativera/kongre-tools:prod-d068a47cd90f-arm64
+node --test scripts/prebuilt-compose.test.mjs
+```
+
+The refs above identify this release; supply the refs actually built for each
+future release. Both arguments are required. The generator writes
+`.local/compose.production.prebuilt.yml` with 0600 permissions, removes all build
+blocks, and sets `pull_policy: never` on the web, workers and one-off jobs. It does
+not read environment files or resolve runtime placeholders. The source Compose,
+dedicated DB/volume, profiles, job confirmations and healthchecks are preserved.
+The official PostgreSQL image retains its original image/pull behavior.
+
+For a new Coolify **Docker Compose Empty** service, paste the generated YAML and
+configure only this resource's runtime variables and `app` domain. Inspect its
+deployable Compose before starting it. In Coolify `v4.0.0-beta.470`, the
+[service parser](https://github.com/coollabsio/coolify/blob/v4.0.0-beta.470/bootstrap/helpers/parsers.php#L2492)
+retains service fields including profiles and pull policy, and excludes
+`restart: 'no'` jobs from status. It also injects the resource's `.env` into every
+service. Keep migration/bootstrap confirmation values out of persistent Coolify
+variables; supply them only to the explicit one-off command.
+
+The beta.470
+[UI start action](https://github.com/coollabsio/coolify/blob/v4.0.0-beta.470/app/Livewire/Project/Service/Heading.php)
+requests a pull on normal Deploy; Restart omits that request. Its
+[service start action](https://github.com/coollabsio/coolify/blob/v4.0.0-beta.470/app/Actions/Service/StartService.php)
+runs plain `docker compose pull` and adds `--build` to `up` (there are no builds
+left). The server's verified Compose `5.1.1`
+[skips services with pull policy never](https://github.com/docker/compose/blob/v5.1.1/pkg/compose/pull.go#L73),
+including explicit pull commands. The
+[CLI overrides this policy only when --policy is supplied](https://github.com/docker/compose/blob/v5.1.1/cmd/compose/pull.go),
+which this Coolify action does not do. Confirm that all five application/job
+services retain `pull_policy: never` in the deployable Compose; PostgreSQL can
+still be pulled. Recheck these behaviors after a Coolify/Compose upgrade.
+
+For direct Compose commands below, replace `-f deploy/compose.production.yml`
+with `-f .local/compose.production.prebuilt.yml` and omit the build command.
+When Coolify manages the stack, execute one-off jobs against its generated
+Compose, protected env and project name; using a second project name would
+create another DB volume. Start only the new DB until migration/bootstrap finish.
+Never substitute the old EYI resource's Compose, environment, network or volume.
+
 ## Explicit first-deployment sequence
 
 Run from the root of the dedicated deployment checkout (the local `v2` folder). Replace `/secure/kongre.env`

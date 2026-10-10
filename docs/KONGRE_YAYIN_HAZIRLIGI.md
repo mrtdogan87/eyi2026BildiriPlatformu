@@ -71,3 +71,48 @@ derleme sonucu bunun yerine geçmez.
    edilecek. Push, yayın veya yeni sunucu alımı henüz yapılmadı.
 
 Kurulum adımları: [üretim rehberi](../deploy/README.production.md).
+
+## 10 Ekim 2026 erişim ve sunucu kontrolü
+
+- Kullanıcı Coolify oturumunu açtı. Eski `AIBildiriYonetim` kaynağının aynı
+  GitHub deposundaki `main` dalını izlediği ekrandan doğrulandı; ayarı değişmedi.
+- Canlı sunucu ARM64, 2 CPU ve 3,7 GiB RAM: ölçüm sırasında yaklaşık 1,4 GiB
+  kullanılabilir RAM, 17 GiB boş disk vardı. Swap kullanımı 2,2 GiB idi.
+  Derleme için bu Mac'te ayrı `kongre-build` Colima profili seçildi; sunucuda
+  build başlatılmadı. Yerel Linux ARM64 imajları oluşturuldu ve doğrulandı.
+- Eski DB'nin 10 Ekim 03:00 UTC tarihli yedek dosyası 69.556.301 bayt;
+  önceki günlük dosyalar da mevcut. Bu kontrol güncel dosyanın varlığını
+  doğrular; bu yedeğe yeni bir restore denemesi yapılmadı.
+- Eski uygulamada `smtp.gmail.com:587`, `SMTP_SECURE=false` ve gerekli
+  kullanıcı/parola/gönderen alanları tanımlı. Sır değerleri günlüğe alınmadı;
+  bu kontrol e-posta teslimatını kanıtlamaz.
+- Kullanıcının doğruladığı gerçek e-posta ile özel yönetici aktarımı hazır.
+  Yerel hesaptaki parola özeti korunuyor; yerel DB değişmedi. Aktarım dosyası
+  Git dışında, yalnız sahibi tarafından okunabilir izinlerle saklanıyor.
+- Yereldeki `codex/kongre-production` dalı henüz GitHub'a gönderilmedi.
+  GitHub CLI oturum açma akışı başlatıldı. Dosya aktarımı için hazırlanan
+  geçici SSH anahtarı sunucuya henüz eklenmedi; erişim onayı bekleniyor.
+  Canlı sunucunun SSH kimliği, kimliği doğrulanmış Coolify terminalinden
+  okunarak yerel bağlantı için sabitlendi.
+
+### Gerçek Linux ARM64 imajı doğrulaması
+
+- `stativera/kongre-web:prod-d068a47cd90f-arm64` ve
+  `stativera/kongre-tools:prod-d068a47cd90f-arm64` imajları hazır.
+- Native sharp görsel dönüşümü, Prisma motoru, Türkçe PDF/fontlar ve
+  işçilerin modül yüklemeleri geçti. Gerçek çalışma DB'si kullanılmadı.
+- Docker içindeki ayrı, dış erişimi olmayan ağ ve geçici PostgreSQL 16 ile
+  **12/12 kontrol geçti**: 39 migration, kurulum onayı kontrolleri, stdin ile
+  sentetik yönetici/audit oluşturma, tekrar kurulumun reddi, web sağlık
+  isteğinde HTTP 200, mail/CMS taramaları ve heartbeat kontrolleri.
+- E-posta kuyruğu boş kaldı; gerçek e-posta gönderilmedi. Denemenin bütün
+  container, ağ ve volume kaynakları temizlendi. Kanıt:
+  `.local/kongre-image-e2e-result.json`.
+- `scripts/generate-prebuilt-compose.mjs`, sırları okumadan ve runtime
+  değişkenlerini çözmeden hazır imajlara göre Compose üretiyor. Dört yeni
+  kontrol ve sekiz container kontrolü geçti; kaynak Compose korunuyor.
+- Coolify beta.470 / sunucudaki Compose 5.1.1 davranışı resmî kaynak kodundan
+  doğrulandı: normal Deploy'daki pull, `pull_policy: never` tanımlı uygulama
+  imajlarını atlıyor. Yeni kaynağın üretilmiş Compose'u ayrıca incelenecek.
+- Eski EYİ adresi 10 Ekim kontrolünde tekrar HTTP 200 döndü. Uzak kurulum,
+  gerçek yönetici aktarımı, HTTPS ve yeni DB yedekleme kabulü henüz yapılmadı.
