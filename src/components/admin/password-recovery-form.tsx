@@ -28,7 +28,7 @@ export function PasswordRecoveryRequestForm() {
     <h1>Parolamı unuttum</h1>
     <p>Kişisel hesabınızın e-posta adresini yazın. Parola yenileme bağlantısı 30 dakika geçerlidir ve bir kez kullanılabilir.</p>
     <p>Henüz parola oluşturmadıysanız size gönderilen daveti kullanın veya yöneticinizden yeni davet isteyin.</p>
-    <div className="field"><label htmlFor="recovery-email">E-posta</label><input id="recovery-email" name="email" type="email" autoComplete="username" maxLength={254} required disabled={busy} /></div>
+    <div className="field"><label htmlFor="recovery-email">E-posta</label><input id="recovery-email" name="email" type="email" autoComplete="username" inputMode="email" spellCheck={false} placeholder="ad.soyad@example.com" aria-describedby="recovery-email-hint" maxLength={254} required disabled={busy} /><span id="recovery-email-hint" className="field-hint">Hesabınıza kayıtlı e-posta adresini kullanın.</span></div>
     <div className="form-actions"><button className="button primary" disabled={busy}>{busy ? 'İstek alınıyor…' : 'Parola yenileme bağlantısı iste'}</button><Link href="/admin">Girişe dön</Link></div>
     <p ref={feedback} tabIndex={-1} role={error ? 'alert' : 'status'} className={error ? 'error' : undefined}>{error || message}</p>
   </form>;

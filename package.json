@@ -26,7 +26,7 @@
     "test:preview": "node scripts/preview-check.mjs",
     "postinstall": "prisma generate",
     "test:platform": "node scripts/platform-check.mjs",
-    "test:congress": "node --test scripts/configuration.test.mjs && node scripts/congress-check.mjs",
+    "test:congress": "node --test scripts/configuration.test.mjs scripts/congress-dates.test.mjs && node scripts/congress-check.mjs",
     "test:site": "node --test scripts/site-configuration.test.mjs && node scripts/site-check.mjs",
     "test:cms": "node --test scripts/cms-configuration.test.mjs && node scripts/cms-check.mjs",
     "test:cms-schedule": "node --test scripts/cms-schedule.test.mjs && node scripts/cms-schedule-check.mjs",
@@ -58,7 +58,9 @@
     "production:export-admin": "node scripts/export-production-admin.mjs",
     "production:bootstrap": "node scripts/bootstrap-production.mjs --stdin",
     "test:production": "node --test scripts/environment.test.mjs scripts/runtime-launchers.test.mjs scripts/bootstrap-production.test.mjs scripts/production-container.test.mjs",
-    "test:production-database": "node scripts/production-database-check.mjs"
+    "test:production-database": "node scripts/production-database-check.mjs",
+    "test:translations": "node --test scripts/translations.test.mjs",
+    "test:account-ui": "node --test scripts/admin-account-avatar.test.mjs scripts/login-policy.test.mjs"
   },
   "keywords": [],
   "author": "",

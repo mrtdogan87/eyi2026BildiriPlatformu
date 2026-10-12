@@ -14,7 +14,7 @@ export default async function CongressLayout({children,params}:{children:React.R
   const cmsPrefix=`/${congressSlug}/sayfalar/`;
   const pageLanguages=pathname.startsWith(cmsPrefix)?await cmsPageLanguages(congressSlug,decodeURIComponent(pathname.slice(cmsPrefix.length))):undefined;
   return <LanguageProvider key={locale} initialLocale={locale}><div className="congress-site" lang={locale} data-congress-theme={workflow.theme} style={{'--primary':primary,'--primary-soft':primary,'--primary-strong':primary,'--accent':workflow.accent} as CSSProperties}>
-    <SiteHeader pageLanguages={pageLanguages} pages={cmsNavigation(congressSlug,pages)} slug={congressSlug} name={name} organization={congress.organization.name} locale={locale} languages={workflow.languages} modules={modules} contact={!!site.contactEmail} logo={assets.LOGO} logoAlt={localized(site.logoAlt,locale)}/>
+    <SiteHeader pageLanguages={pageLanguages} pages={cmsNavigation(congressSlug,pages)} slug={congressSlug} name={name} congressName={localized(site.fullName,locale,congress.name)} organization={congress.organization.name} locale={locale} languages={workflow.languages} modules={modules} contact={!!site.contactEmail} logo={assets.LOGO} logoAlt={localized(site.logoAlt,locale)}/>
     {children}
     <footer className="site-footer"><div className="site-width"><div><Link href={`/${congressSlug}?lang=${locale}`}><strong>{name}</strong></Link><p>{congress.organization.name}</p></div><div>{site.contactEmail&&<a href={`mailto:${site.contactEmail}`}>{site.contactEmail}</a>}<p>{locale==='en'?'Submission & participation services':'Başvuru ve katılım hizmetleri'}</p></div></div></footer>
   </div></LanguageProvider>;

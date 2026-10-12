@@ -1,0 +1,8 @@
+.root { min-width: 0; }
+.columns { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.5rem; margin-block: 1rem; }
+.column { min-width: 0; padding: 1rem; border: 1px solid var(--line,#d8e0e9); border-radius: .7rem; }
+.column h2 { margin-top: 0; }
+.column :global(.field) { margin-block: 1rem; }
+.column input,.column textarea { width: 100%; min-width: 0; }
+.notice { padding: 1rem; border-radius: .6rem; background: #f2f6fb; }
+@media(max-width: 900px) { .columns { grid-template-columns: 1fr; } }

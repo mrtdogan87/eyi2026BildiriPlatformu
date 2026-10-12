@@ -84,7 +84,7 @@ export const eventSettingsSchema = z.object({
 }).strict().superRefine((input, ctx) => {
   const error = (message: string) => ctx.addIssue({ code: 'custom', message });
   if (Boolean(input.eventStartsAt) !== Boolean(input.eventEndsAt) || (input.eventStartsAt && input.eventEndsAt && new Date(input.eventEndsAt) < new Date(input.eventStartsAt))) error('Etkinlik başlangıç ve bitiş tarihlerini sıralı girin.');
-  if (input.earlyDeadline && input.lateDeadline && new Date(input.earlyDeadline) > new Date(input.lateDeadline)) error('Erken kayıt tarihi son kayıt tarihinden sonra olamaz.');
+  if (input.earlyDeadline && input.lateDeadline && new Date(input.earlyDeadline) > new Date(input.lateDeadline)) error('Erken kayıt son tarihi, geç kayıt son tarihinden sonra olamaz.');
   if (input.configuration.modules.REGISTRATION && input.configuration.stages.PAYMENT.enabled && (!input.bankName || !input.bankAccountHolder || !input.bankIban)) error('Ücretli kayıt için banka, hesap sahibi ve IBAN bilgisi gerekli.');
 });
 export type EventSettings = z.infer<typeof eventSettingsSchema>;

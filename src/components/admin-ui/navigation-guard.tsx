@@ -1,15 +1,16 @@
 'use client';
-import {createContext,useContext,useEffect,useId,useRef,type ReactNode} from 'react';
+import {createContext,useCallback,useContext,useEffect,useId,useRef,type ReactNode} from 'react';
 import {useRouter} from 'next/navigation';
+import {guardHistoryNavigation} from './history-navigation';
 const Context=createContext<{scope:string;confirmLeave:()=>Promise<boolean>;register:(id:string,read:()=>boolean)=>()=>void}>({scope:'',confirmLeave:async()=>true,register:()=>()=>{}});
 const snapshot=(form:HTMLFormElement)=>JSON.stringify([...form.elements].filter((el):el is HTMLInputElement|HTMLTextAreaElement|HTMLSelectElement=>el instanceof HTMLInputElement||el instanceof HTMLTextAreaElement||el instanceof HTMLSelectElement).map((el,index)=>[index,el.name,el instanceof HTMLInputElement&&(el.type==='checkbox'||el.type==='radio')?el.checked:el instanceof HTMLInputElement&&el.type==='file'?[...(el.files??[])].map(f=>[f.name,f.size,f.lastModified]):el.value]));
 export function useAdminNavigation(){return useContext(Context);}
 export function useUnsavedChanges(dirty:boolean){const context=useContext(Context),id=useId();useEffect(()=>context.register(id,()=>dirty),[context,id,dirty]);}
 export function AdminNavigationGuard({children,scope}:{children:ReactNode;scope:string}){
   const router=useRouter(),root=useRef<HTMLDivElement>(null),dialog=useRef<HTMLDialogElement>(null),resolve=useRef<((value:boolean)=>void)|null>(null),lastFocus=useRef<HTMLElement|null>(null),touched=useRef(new Set<HTMLFormElement>()),forms=useRef(new Map<HTMLFormElement,string>()),submitted=useRef<HTMLFormElement|null>(null),requests=useRef(new Map<string,{form:HTMLFormElement;values:string}>()),readers=useRef(new Map<string,()=>boolean>());
-  const dirty=()=>[...forms.current].some(([form,before])=>form.isConnected&&touched.current.has(form)&&snapshot(form)!==before)||[...readers.current.values()].some(read=>read());
+  const dirty=useCallback(()=>[...forms.current].some(([form,before])=>form.isConnected&&touched.current.has(form)&&snapshot(form)!==before)||[...readers.current.values()].some(read=>read()),[]);
   function finish(value:boolean){dialog.current?.close();const done=resolve.current;resolve.current=null;lastFocus.current?.focus();done?.(value);}
-  async function confirmLeave(){if(!dirty())return true;if(resolve.current)return false;lastFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;dialog.current?.showModal();return new Promise<boolean>(done=>{resolve.current=done;});}
+  const confirmLeave=useCallback(async()=>{if(!dirty())return true;if(resolve.current)return false;lastFocus.current=document.activeElement instanceof HTMLElement?document.activeElement:null;dialog.current?.showModal();return new Promise<boolean>(done=>{resolve.current=done;});},[dirty]);
   function register(id:string,read:()=>boolean){readers.current.set(id,read);return ()=>{readers.current.delete(id);};}
   useEffect(()=>{
     const collect=()=>root.current?.querySelectorAll('form').forEach(form=>{if(!form.hasAttribute('data-ui-managed')&&form.getAttribute('method')?.toLowerCase()!=='get'&&!forms.current.has(form))forms.current.set(form,snapshot(form));});
@@ -18,9 +19,10 @@ export function AdminNavigationGuard({children,scope}:{children:ReactNode;scope:
     const started=(event:Event)=>{const id=(event as CustomEvent<string>).detail,form=submitted.current;if(form?.isConnected)requests.current.set(id,{form,values:snapshot(form)});submitted.current=null;};
     const saved=(event:Event)=>{const id=(event as CustomEvent<string>).detail,request=requests.current.get(id);if(request){if(snapshot(request.form)===request.values)requestAnimationFrame(()=>{if(request.form.isConnected)forms.current.set(request.form,snapshot(request.form));});else forms.current.set(request.form,request.values);}requests.current.delete(id);};
     const failed=(event:Event)=>{requests.current.delete((event as CustomEvent<string>).detail);};
+    const stopHistoryGuard=guardHistoryNavigation(window,dirty,confirmLeave);
     window.addEventListener('beforeunload',leaving);window.addEventListener('admin-ui:request',started);window.addEventListener('admin-ui:saved',saved);window.addEventListener('admin-ui:failed',failed);
-    return ()=>{observer.disconnect();window.removeEventListener('beforeunload',leaving);window.removeEventListener('admin-ui:request',started);window.removeEventListener('admin-ui:saved',saved);window.removeEventListener('admin-ui:failed',failed);resolve.current?.(false);};
-  },[]);
+    return ()=>{stopHistoryGuard();observer.disconnect();window.removeEventListener('beforeunload',leaving);window.removeEventListener('admin-ui:request',started);window.removeEventListener('admin-ui:saved',saved);window.removeEventListener('admin-ui:failed',failed);resolve.current?.(false);};
+  },[dirty,confirmLeave]);
   return <Context.Provider value={{scope,confirmLeave,register}}><div ref={root} onChangeCapture={event=>{const form=(event.target as HTMLElement).closest('form');if(form)touched.current.add(form);}} onSubmitCapture={event=>{const form=event.target;submitted.current=form instanceof HTMLFormElement&&!form.hasAttribute('data-ui-managed')&&form.getAttribute('method')?.toLowerCase()!=='get'?form:null;}} onClickCapture={event=>{
     if(event.defaultPrevented||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
     const link=(event.target as HTMLElement).closest('a');if(!link||link.hasAttribute('download')||link.target==='_blank')return;const target=new URL(link.href,location.href);

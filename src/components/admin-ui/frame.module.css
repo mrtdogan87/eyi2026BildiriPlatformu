@@ -1,0 +1,76 @@
+.frame:global(.admin-ui.ui-frame){grid-template-columns:250px minmax(0,1fr);grid-template-rows:94px auto}
+.frame:global(.admin-ui) .topbar{display:grid;grid-template-columns:minmax(130px,1fr) minmax(180px,1fr) minmax(230px,auto);gap:20px;min-height:94px}
+.frame:global(.admin-ui) .sidebar{top:94px;height:calc(100dvh - 94px);padding:16px 12px}
+.activeContext{display:grid;gap:5px;min-width:0;font-size:12px}
+.activeContext strong{font-size:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.layerBadge,.roleBadge{display:inline-flex;align-items:center;gap:6px;width:fit-content;max-width:100%;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:650;line-height:1.4;overflow-wrap:anywhere}
+.layerBadge[data-layer=PLATFORM],.roleBadge[data-layer=PLATFORM]{background:#f0e8fc;color:#6823a8}
+.layerBadge[data-layer=ORGANIZATION],.roleBadge[data-layer=ORGANIZATION]{background:#e0f3ee;color:#0c6656}
+.layerBadge[data-layer=CONGRESS],.roleBadge[data-layer=CONGRESS]{background:#e7effc;color:#2459a6}
+.frame:global(.admin-ui) .accountTrigger{display:flex;gap:10px;align-items:center;min-width:0;max-width:380px;border:1px solid #dfe3e9;border-radius:10px;padding:8px 12px;background:#fff;color:#202631;text-align:left;cursor:pointer}
+.accountSummary{display:grid;gap:3px;min-width:0}
+.accountSummary strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.accountSummary .roleBadge{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.accountSummary small{font-size:11px;color:#596575}
+.avatar{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;border-radius:50%;font-size:16px;font-weight:700;letter-spacing:.02em}
+.largeAvatar{width:64px;height:64px;font-size:23px}
+.frame:global(.admin-ui) .scopeSection{border:1px solid #dfe3e9;border-radius:10px;margin:0 0 12px;padding:2px 0;background:#fff;overflow:hidden}
+.frame:global(.admin-ui) .scopeSection[data-active=true]{border-color:#90b2df;box-shadow:inset 3px 0 #2459a6}
+.frame:global(.admin-ui) .scopeSection>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px;font-size:13px;list-style:none;cursor:pointer;color:#25364f}
+.scopeSection>summary::-webkit-details-marker{display:none}
+.scopeSection>summary::after{content:'+';font-size:16px;flex-shrink:0}
+.scopeSection[open]>summary::after{content:'−'}
+.scopeHeading{display:grid;gap:4px;min-width:0}
+.scopeHeading strong{font-weight:700}
+.currentMarker{font-size:10px;color:#2459a6;font-weight:600}
+.frame:global(.admin-ui) .scopeName{font-size:12px;line-height:1.45;color:#596575;padding:0 12px;margin:0 0 10px;overflow-wrap:anywhere}
+.frame:global(.admin-ui) .scopeSection nav{padding:0 5px 5px}
+.frame:global(.admin-ui) .scopeSection nav a{padding:9px 10px;font-size:12px;overflow-wrap:anywhere}
+.frame:global(.admin-ui) .scopeSection nav details>summary{font-size:12px;padding:8px 10px}
+.frame:global(.admin-ui) .scopeSection nav details a{padding-left:20px}
+.frame:global(.admin-ui) .scopeSection[data-unavailable=true]{background:#f7f8fa;border-color:#e8ebf0}
+.unavailableHeading{padding:10px 12px;margin:0;font-size:13px!important;color:#687383!important}
+.frame:global(.admin-ui) .sidebar :global(.ui-context-button){max-width:100%;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;margin:8px 0}
+.frame:global(.admin-ui) .sidebar :global(.ui-context-button) strong{max-width:100%;white-space:normal;overflow-wrap:anywhere;grid-column:1}
+.frame:global(.admin-ui) .sidebar :global(.ui-context-button) :global(.ui-muted){display:block;font-size:11px}
+.frame:global(.admin-ui) .sidebar :global(.ui-context-button)>span:last-child{grid-column:2;grid-row:1/3}
+.contextTools{padding:0 10px 10px}
+.contextTools:empty{display:none}
+.contextTools :global(.button){font-size:12px;width:100%;white-space:normal}
+.frame:global(.admin-ui) .contextStrip{align-items:flex-start}
+.frame:global(.admin-ui) .contextStrip>div{display:grid;gap:5px;min-width:0}
+.frame:global(.admin-ui) .contextStrip strong{overflow-wrap:anywhere}
+.frame:global(.admin-ui) .contextStrip .layerBadge[data-layer=PLATFORM]{color:#6823a8}
+.frame:global(.admin-ui) .contextStrip .layerBadge[data-layer=ORGANIZATION]{color:#0c6656}
+.frame:global(.admin-ui) .contextStrip .layerBadge[data-layer=CONGRESS]{color:#2459a6}
+.contextDetail{max-width:460px;overflow-wrap:anywhere;font-size:12px;color:#596575}
+.frame:global(.admin-ui) .accountDialog{width:min(480px,calc(100vw - 32px))}
+.dialogHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+.dialogHeading h2{margin:0!important}
+.profileHeading{display:flex;gap:14px;align-items:center;min-width:0;margin-bottom:20px}
+.profileHeading>div{min-width:0;overflow-wrap:anywhere}
+.profileHeading p{margin:3px 0;color:#596575;font-size:13px}
+.accountFacts{margin:0 0 24px;display:grid;gap:12px}
+.accountFacts>div{display:grid;grid-template-columns:145px minmax(0,1fr);gap:12px}
+.accountFacts dt{font-size:12px;color:#596575}
+.accountFacts dd{margin:0;font-size:13px;overflow-wrap:anywhere}
+.interventionNote{color:#805019;background:#fff5e6;border:1px solid #f0d2a5;border-radius:8px;padding:12px;font-size:13px}
+.colorChoices{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 18px}
+.frame:global(.admin-ui) .colorChoice{display:grid;place-content:center;position:relative;width:46px;height:46px;min-height:46px;border:3px solid transparent;border-radius:50%;color:#fff;cursor:pointer;font-size:20px}
+.frame:global(.admin-ui) .colorChoice[aria-pressed=true]{outline:2px solid #202631;outline-offset:2px}
+.colorName{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.accountActions{border-top:1px solid #dfe3e9;padding-top:18px;margin-top:20px}
+@media(max-width:1100px){.frame:global(.admin-ui) .topbar{grid-template-columns:minmax(90px,.8fr) minmax(140px,1fr) minmax(200px,1fr);gap:12px}.frame:global(.admin-ui) .accountTrigger{padding:8px}.accountSummary .roleBadge{font-size:10px}}
+@media(max-width:760px){
+  .frame:global(.admin-ui.ui-frame){grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto}
+  .frame:global(.admin-ui) .topbar{position:relative;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:12px 16px;min-height:0}
+  .frame:global(.admin-ui) .topbar :global(.ui-brand){grid-column:2;grid-row:1}
+  .activeContext{grid-column:1/-1;grid-row:2}
+  .activeContext strong{white-space:normal;overflow-wrap:anywhere}
+  .frame:global(.admin-ui) .accountTrigger{grid-column:1/-1;grid-row:3;width:100%;max-width:none;padding:10px 12px}
+  .frame:global(.admin-ui) .sidebar{position:static;height:auto;max-height:65dvh;padding:12px}
+  .accountSummary strong{white-space:normal;overflow-wrap:anywhere}
+  .accountFacts>div{grid-template-columns:1fr;gap:4px}
+  .frame:global(.admin-ui) .accountDialog{padding:20px}
+  .contextDetail{max-width:100%}
+}

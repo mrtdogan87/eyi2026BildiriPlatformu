@@ -367,11 +367,21 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
               <input
                 id="draft-email"
                 type="email"
+                autoComplete="email"
+                inputMode="email"
+                spellCheck={false}
+                maxLength={254}
+                aria-describedby="draft-email-hint"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder={t("submission.emailPlaceholder")}
                 required
               />
+              <span className="field-hint" id="draft-email-hint">
+                {locale === "en"
+                  ? "Enter an email address you can access. Your draft link will be sent here."
+                  : "Erişebildiğiniz bir e-posta adresi girin. Taslağınıza giriş bağlantısı bu adrese gönderilir."}
+              </span>
             </div>
             <div className="field">
               <label htmlFor="draft-language">
@@ -621,11 +631,17 @@ export function SubmissionPortal({ congressSlug, initialSnapshot, config }: Prop
                       ) : null}
                     </div>
                     <div className="field">
-                      <label>
+                      <label htmlFor={`author-email-${author.localId}`}>
                         {t("common.email")} <span className="required">*</span>
                       </label>
                       <input
+                        id={`author-email-${author.localId}`}
                         type="email"
+                        autoComplete={`section-author-${index} email`}
+                        inputMode="email"
+                        spellCheck={false}
+                        maxLength={254}
+                        placeholder={t("submission.emailPlaceholder")}
                         value={author.email}
                         onChange={(event) => updateAuthor(index, { email: event.target.value })}
                       />

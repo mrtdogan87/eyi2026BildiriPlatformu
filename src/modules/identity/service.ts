@@ -7,33 +7,73 @@ import { AccessError } from '@/platform/http';
 import type { CongressRole } from '@prisma/client';
 import { hasIntervention } from '@/platform/intervention.mjs';
 import { effectiveRoles } from '@/platform/roles.mjs';
-export async function login(email: string, password: string) {
-  if (!email || !password || password.length > 256) throw new AccessError(400, 'E-posta ve parola gerekli.');
-  const existing = await prisma.platformUser.findUnique({ where: { email: email.trim().toLowerCase() }, select: { id: true } });
-  if (!existing) { verifyPassword(password, null); throw new AccessError(401, 'E-posta veya parola doğrulanamadı.'); }
+import { failedLogin, loginClientLimitFor, loginCooldownNotice, loginRetryAt } from './login-policy';
+import { nextRecoveryWindow, recoveryLimitKey } from './recovery-policy.mjs';
+
+export class LoginCooldownError extends AccessError {
+  constructor(public retryAt: Date) { super(429, loginCooldownNotice); }
+}
+
+export async function login(email: string, password: string, client = 'direct') {
+  const address = email.trim().toLowerCase();
+  if (!address || address.length > 254 || !password || password.length > 256) throw new AccessError(400, 'E-posta ve parola gerekli.');
+  const limitKey = recoveryLimitKey('login', address);
+  const clientRule = loginClientLimitFor(client);
   const token = newToken();
-  const result = await prisma.$transaction(async tx => {
+  const result = await prisma.$transaction<{ retryAt: Date } | { redirectTo: string } | null>(async tx => {
+    // Apply the client quota only to a single IP from the configured,
+    // overwriting proxy. Unidentified visitors must not share a global lockout.
+    if (clientRule) {
+      const clientKey = recoveryLimitKey('login-client', client);
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`login-limit:${clientKey}`}))`;
+      const clientNow = new Date();
+      const clientRecord = await tx.recoveryRateLimit.findUnique({ where: { key: clientKey } });
+      const clientWindow = nextRecoveryWindow(clientRecord, clientNow, clientRule);
+      const clientData = { windowStartedAt: clientWindow.windowStartedAt, attempts: clientWindow.attempts };
+      await tx.recoveryRateLimit.upsert({ where: { key: clientKey }, create: { key: clientKey, ...clientData }, update: clientData });
+      if (!clientWindow.allowed) return { retryAt: new Date(clientWindow.windowStartedAt.getTime() + clientRule.windowMs) };
+    }
+    // Unknown and known addresses share the same failure policy and response.
+    // Keep only a digest of the address in the existing rate-limit store.
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`login-limit:${limitKey}`}))`;
+    const existing = await tx.platformUser.findUnique({ where: { email: address }, select: { id: true } });
     // A login using an old password cannot create a session after a concurrent reset.
-    await tx.$queryRaw`SELECT id FROM "PlatformUser" WHERE id=${existing.id} FOR UPDATE`;
-    const user = await tx.platformUser.findUnique({ where: { id: existing.id } });
+    if (existing) await tx.$queryRaw`SELECT id FROM "PlatformUser" WHERE id=${existing.id} FOR UPDATE`;
+    const user = existing ? await tx.platformUser.findUnique({ where: { id: existing.id } }) : null;
     const valid = verifyPassword(password, user?.passwordHash ?? null);
-    if (!user?.active || !valid || (user.lockedUntil && user.lockedUntil > new Date())) {
+    const now = new Date();
+    const record = await tx.recoveryRateLimit.findUnique({ where: { key: limitKey } });
+    const retryAt = loginRetryAt(record, now);
+    if (retryAt) return { retryAt };
+    // Honor a pre-existing account wait, but disclose it only after credentials
+    // are verified. Failed credentials use the uniform address policy below.
+    if (user?.active && valid && user.lockedUntil && user.lockedUntil > now) return { retryAt: user.lockedUntil };
+    if (!user?.active || !valid) {
+      const next = failedLogin(record, now);
+      const data = { windowStartedAt: next.windowStartedAt, attempts: next.attempts };
+      await tx.recoveryRateLimit.upsert({ where: { key: limitKey }, create: { key: limitKey, ...data }, update: data });
       if (user) {
-        const updated = await tx.platformUser.update({ where: { id: user.id }, data: { failedLogins: { increment: 1 } } });
-        if (updated.failedLogins >= 5 && (!user.lockedUntil || user.lockedUntil <= new Date())) {
-          await tx.platformUser.update({ where: { id: user.id }, data: { lockedUntil: new Date(Date.now() + 10 * 60000) } });
-        }
+        await tx.platformUser.update({ where: { id: user.id }, data: { failedLogins: next.attempts, ...(next.retryAt ? { lockedUntil: next.retryAt } : {}) } });
       }
-      return null; // Commit failed-attempt counters before returning the generic error.
+      return next.retryAt ? { retryAt: next.retryAt } : null; // Commit failures before reporting them.
     }
     const contexts = await availableContexts(user.id);
     const institutionManager = !!await tx.organizationMembership.count({ where: { userId: user.id, active: true, organizer: true } });
     await tx.platformUser.update({ where: { id: user.id }, data: { failedLogins: 0, lockedUntil: null } });
+    await tx.recoveryRateLimit.deleteMany({ where: { key: limitKey } });
     await tx.platformSession.create({ data: { userId: user.id, tokenHash: hashToken(token), congressId: user.platformAdmin || contexts.length !== 1 || institutionManager ? null : contexts[0]?.id, expiresAt: new Date(Date.now() + 8 * 3600000) } });
     await tx.auditLog.create({ data: { actorId: user.id, action: 'session.login' } });
     return { redirectTo: user.platformAdmin ? '/admin/platform' : institutionManager ? '/admin/kurumlar' : contexts.length !== 1 ? '/admin/kongreler' : '/admin/panel' };
   });
+  // Anonymous addresses cannot log in to clear their counters. Keep only a day
+  // of inactive login history, in bounded batches outside authentication locks.
+  // SKIP LOCKED avoids blocking or changing a concurrently used counter.
+  try {
+    const staleBefore = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    await prisma.$executeRaw`DELETE FROM "RecoveryRateLimit" WHERE key IN (SELECT key FROM "RecoveryRateLimit" WHERE (key LIKE 'login:%' OR key LIKE 'login-client:%') AND "updatedAt" < ${staleBefore} ORDER BY "updatedAt" LIMIT 20 FOR UPDATE SKIP LOCKED)`;
+  } catch { console.warn('account.login.counter_cleanup_unavailable'); }
   if (!result) throw new AccessError(401, 'E-posta veya parola doğrulanamadı.');
+  if ('retryAt' in result) throw new LoginCooldownError(result.retryAt);
   await setSessionCookie(token);
   return result;
 }

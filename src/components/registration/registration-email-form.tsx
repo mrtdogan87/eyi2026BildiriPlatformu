@@ -56,12 +56,17 @@ export function RegistrationEmailForm({ congressSlug }: Props) {
           <input
             id="registration-email"
             type="email"
+            autoComplete="email"
+            inputMode="email"
+            spellCheck={false}
+            maxLength={254}
+            aria-describedby="registration-email-hint"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder={t("registration.emailPlaceholder")}
             required
           />
-          <span className="field-hint">{t("registration.emailHint")}</span>
+          <span className="field-hint" id="registration-email-hint">{t("registration.emailHint")}</span>
         </div>
       </div>
 

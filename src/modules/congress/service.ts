@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 import { actorSession, authorizeCongress, requireContext } from '@/platform/context';
 import {hasIntervention} from '@/platform/intervention.mjs';
 import { AccessError } from '@/platform/http';
+import { requireExpectedCongress } from '@/platform/expected-congress';
 import { auditData } from '@/platform/audit';
 import { clearTemplateDates, effectiveConfiguration, eventSettingsSchema } from './configuration';
 import { createFeeSchedule, copyFeeSchedule } from '@/integrations/congress/setup-fees';
@@ -98,7 +99,9 @@ export async function congressSettings() {
   return { id: c.id, slug: c.slug, configVersion: c.configVersion, settings: { name: c.name, year: c.year ?? new Date().getFullYear(), eventStartsAt: c.eventStartsAt?.toISOString() ?? null, eventEndsAt: c.eventEndsAt?.toISOString() ?? null, earlyDeadline: c.earlyDeadline?.toISOString() ?? null, lateDeadline: c.lateDeadline?.toISOString() ?? null, bankName: c.bankName ?? '', bankAccountHolder: c.bankAccountHolder ?? '', bankIban: c.bankIban ?? '', bankBranch: c.bankBranch ?? '', configuration, fees: { presenter: amount('PRESENTER', 'ACADEMIC'), student: amount('PRESENTER', 'STUDENT'), listener: amount('LISTENER', 'ACADEMIC'), currency: (['TRY', 'EUR', 'USD'].includes(tier[0]?.currency) ? tier[0].currency : 'TRY') as 'TRY' | 'EUR' | 'USD' } } };
 }
 export async function updateCongressSettings(raw: unknown) {
-  const context = await requireContext('settings'); const input = parsed(z.object({ configVersion: z.number().int().min(0), settings: eventSettingsSchema }).strict(), raw);
+  const context = await requireContext('settings');
+  requireExpectedCongress(raw,context.congress.id);
+  const input = parsed(z.object({ congressId: z.string().min(1), configVersion: z.number().int().min(0), settings: eventSettingsSchema }).strict(), raw);
   const data = input.settings;
   const current = await congressSettings();
   if (JSON.stringify(data.fees) !== JSON.stringify(current.settings.fees)) throw new AccessError(400, 'Ücret değişikliklerini Ücretler ekranında yapın.');

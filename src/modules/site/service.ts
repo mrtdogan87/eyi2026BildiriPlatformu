@@ -4,16 +4,18 @@ import { prisma } from '@/lib/prisma';
 import { requireContext } from '@/platform/context';
 import { auditData } from '@/platform/audit';
 import { AccessError } from '@/platform/http';
+import { requireExpectedCongress } from '@/platform/expected-congress';
 import { appearanceSchema, effectiveSite, siteSchema } from './configuration';
 import { effectiveConfiguration } from '@/modules/congress/configuration';
 export async function siteSettings() {
   const context=await requireContext('settings');const c=context.congress;const workflow=effectiveConfiguration(c.configuration);
   const assets=await prisma.siteAsset.findMany({where:{congressId:c.id},select:{kind:true,originalName:true,width:true,height:true,active:true,updatedAt:true}});
-  return {slug:c.slug,name:c.name,siteVersion:c.siteVersion,configVersion:c.configVersion,site:effectiveSite(c.siteConfiguration),appearance:{theme:workflow.theme,accent:workflow.accent},assets:assets.map(asset=>({...asset,updatedAt:asset.updatedAt.toISOString()}))};
+  return {id:c.id,slug:c.slug,name:c.name,siteVersion:c.siteVersion,configVersion:c.configVersion,site:effectiveSite(c.siteConfiguration),appearance:{theme:workflow.theme,accent:workflow.accent},assets:assets.map(asset=>({...asset,updatedAt:asset.updatedAt.toISOString()}))};
 }
 export async function updateSiteSettings(raw: unknown) {
   const context=await requireContext('settings');
-  const result=z.object({siteVersion:z.number().int().min(0),configVersion:z.number().int().min(0),site:siteSchema,appearance:appearanceSchema}).strict().safeParse(raw);
+  requireExpectedCongress(raw,context.congress.id);
+  const result=z.object({congressId:z.string().min(1),siteVersion:z.number().int().min(0),configVersion:z.number().int().min(0),site:siteSchema,appearance:appearanceSchema}).strict().safeParse(raw);
   if (!result.success) throw new AccessError(400,result.error.issues[0]?.message ?? 'Site ayarlarını kontrol edin.');
   const input=result.data;
   await prisma.$transaction(async tx=>{
@@ -28,6 +30,7 @@ export async function updateSiteSettings(raw: unknown) {
 function kindOf(kind: string) { if (kind!=='logo'&&kind!=='hero') throw new AccessError(404,'Görsel alanı bulunamadı.');return kind==='logo' ? 'LOGO' as const : 'HERO' as const; }
 export async function putSiteAsset(kind: string,request: Request) {
   const context=await requireContext('settings');const slot=kindOf(kind);const form=await request.formData();const file=form.get('file');const version=Number(form.get('siteVersion'));
+  requireExpectedCongress({congressId:form.get('congressId')},context.congress.id);
   if (!(file instanceof File) || !file.size || file.size>5*1024*1024 || !['image/png','image/jpeg','image/webp'].includes(file.type)) throw new AccessError(400,'PNG, JPEG veya WebP görseli yükleyin (en fazla 5 MB).');
   if (!Number.isInteger(version) || version<0 || form.get('siteVersion')===null) throw new AccessError(400,'Sayfayı yenileyin.');
   let bytes: Buffer;let width: number;let height: number;
@@ -39,7 +42,7 @@ export async function putSiteAsset(kind: string,request: Request) {
   });return {ok:true};
 }
 export async function setSiteAssetActive(kind:string,raw:unknown) {
-  const context=await requireContext('settings');const slot=kindOf(kind);const result=z.object({siteVersion:z.number().int().min(0),active:z.boolean()}).strict().safeParse(raw);if (!result.success) throw new AccessError(400,'Görsel durumunu kontrol edin.');
+  const context=await requireContext('settings');const slot=kindOf(kind);requireExpectedCongress(raw,context.congress.id);const result=z.object({congressId:z.string().min(1),siteVersion:z.number().int().min(0),active:z.boolean()}).strict().safeParse(raw);if (!result.success) throw new AccessError(400,'Görsel durumunu kontrol edin.');
   await prisma.$transaction(async tx=>{const asset=await tx.siteAsset.findUnique({where:{congressId_kind:{congressId:context.congress.id,kind:slot}}});if (!asset) throw new AccessError(404,'Görsel bulunamadı.');const changed=await tx.congress.updateMany({where:{id:context.congress.id,siteVersion:result.data.siteVersion},data:{siteVersion:{increment:1}}});if (!changed.count) throw new AccessError(409,'Görsel ayarları değişti. Sayfayı yenileyin.');await tx.siteAsset.update({where:{id:asset.id},data:{active:result.data.active}});await tx.auditLog.create({data:auditData(context,result.data.active ? 'site.asset.restore' : 'site.asset.hide',slot,{active:result.data.active})});});return {ok:true};
 }
 export async function publicSiteAsset(slug:string,kind:string) {

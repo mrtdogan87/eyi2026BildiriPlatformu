@@ -80,6 +80,11 @@ export async function resetPassword(token: string, password: string, client: str
     if (!existing) throw invalidLink();
     const passwordHash = hashPassword(password);
     await db.$transaction(async tx => {
+      const owner = await tx.platformUser.findUnique({ where: { id: existing.userId }, select: { email: true } });
+      if (!owner) throw invalidLink();
+      const loginKey = recoveryLimitKey('login', owner.email);
+      // Match login's lock order so a reset also clears its temporary wait.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${`login-limit:${loginKey}`}))`;
       // Serialize reset, new links, account closure and login against the same row.
       await tx.$queryRaw`SELECT id FROM "PlatformUser" WHERE id=${existing.userId} FOR UPDATE`;
       const record = await tx.passwordRecoveryToken.findUnique({ where: { id: existing.id }, include: { user: true } });
@@ -88,6 +93,7 @@ export async function resetPassword(token: string, password: string, client: str
       const claimed = await tx.passwordRecoveryToken.updateMany({ where: { id: record.id, usedAt: null, revokedAt: null, expiresAt: { gt: now } }, data: { usedAt: now } });
       if (claimed.count !== 1) throw invalidLink();
       await tx.platformUser.update({ where: { id: record.userId }, data: { passwordHash, failedLogins: 0, lockedUntil: null } });
+      await tx.recoveryRateLimit.deleteMany({ where: { key: loginKey } });
       await tx.passwordRecoveryToken.updateMany({ where: { userId: record.userId, usedAt: null, revokedAt: null }, data: { revokedAt: now } });
       await tx.platformSession.updateMany({ where: { userId: record.userId, revokedAt: null }, data: { revokedAt: now } });
       await tx.auditLog.create({ data: { actorId: record.userId, action: 'account.password_reset' } });

@@ -3,6 +3,8 @@ import {useUnsavedChanges} from '@/components/admin-ui/navigation-guard';
 import {uiFetch} from '@/components/admin-ui/mutation';
 import {RecordDirectory} from '@/components/admin-ui/record-directory';
 import {Workspace,WorkspacePanel} from '@/components/admin-ui/workspace';
+import { CongressDateField } from './congress-date-field';
+import { congressDateLabels, congressDateTimeIso, congressDateTimeValue, registrationDateDescriptions } from '@/modules/congress/dates';
 
 import { useMemo, useState } from "react";
 import type {
@@ -50,21 +52,8 @@ const PERIOD_LABELS: Record<string, string> = {
   LATE: "Geç Kayıt",
 };
 
-function toLocalInputValue(iso: string | null): string {
-  if (!iso) return "";
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  const tzOffset = date.getTimezoneOffset() * 60_000;
-  const local = new Date(date.getTime() - tzOffset);
-  return local.toISOString().slice(0, 16);
-}
-
-function fromLocalInputValue(value: string): string | null {
-  if (!value) return null;
-  const local = new Date(value);
-  if (Number.isNaN(local.getTime())) return null;
-  return local.toISOString();
-}
+const toLocalInputValue = congressDateTimeValue;
+const fromLocalInputValue = congressDateTimeIso;
 
 function settingsToDraft(settings: AdminCongressSettings): SettingsDraft {
   return {
@@ -247,8 +236,8 @@ export function PricingManager({ initialPayload }: Props) {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          earlyDeadline: fromLocalInputValue(settingsDraft.earlyDeadline),
-          lateDeadline: fromLocalInputValue(settingsDraft.lateDeadline),
+          earlyDeadline: fromLocalInputValue(settingsDraft.earlyDeadline, payload.congress.earlyDeadline),
+          lateDeadline: fromLocalInputValue(settingsDraft.lateDeadline, payload.congress.lateDeadline),
           galaFeeAmount: galaAmount,
           galaFeeCurrency: settingsDraft.galaFeeCurrency.trim().toUpperCase() || "EUR",
           galaFeeNote: settingsDraft.galaFeeNote,
@@ -292,7 +281,7 @@ export function PricingManager({ initialPayload }: Props) {
               </span>
             ) : (
               <span className="pricing-pill pricing-pill-warn">
-                Kayıt süresi sona erdi (geç kayıt tarihinden sonra).
+                Geç kayıt son tarihi geçti; ücretli yeni kayıt işlemleri kapalı.
               </span>
             )}
           </div>
@@ -300,38 +289,14 @@ export function PricingManager({ initialPayload }: Props) {
 
         <form className="pricing-grid" onSubmit={handleSettingsSave}>
           <div className="pricing-card">
-            <h3>Tarihler</h3>
-            <div className="field">
-              <label htmlFor="earlyDeadline">Erken Kayıt Son Tarih</label>
-              <input
-                id="earlyDeadline"
-                type="datetime-local"
-                value={settingsDraft.earlyDeadline}
-                onChange={(event) =>
-                  setSettingsDraft((current) => ({
-                    ...current,
-                    earlyDeadline: event.target.value,
-                  }))
-                }
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="lateDeadline">Geç Kayıt Son Tarih</label>
-              <input
-                id="lateDeadline"
-                type="datetime-local"
-                value={settingsDraft.lateDeadline}
-                onChange={(event) =>
-                  setSettingsDraft((current) => ({
-                    ...current,
-                    lateDeadline: event.target.value,
-                  }))
-                }
-              />
-              <span className="field-hint">
-                Bu tarihten sonra başvuru ve ödeme alınmaz. Boş bırakılırsa kayıt süresiz açık kalır.
-              </span>
-            </div>
+            <h3>Kayıt tarihleri ve tarife dönemleri</h3>
+            {(['earlyDeadline', 'lateDeadline'] as const).map(key => <CongressDateField
+              key={key}
+              label={congressDateLabels[key].tr}
+              value={fromLocalInputValue(settingsDraft[key])}
+              onChange={value => setSettingsDraft(current => ({ ...current, [key]: toLocalInputValue(value) }))}
+              hint={registrationDateDescriptions[key]}
+            />)}
           </div>
 
           <div className="pricing-card">

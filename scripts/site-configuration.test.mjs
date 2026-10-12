@@ -1,8 +1,30 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {defaultSiteConfiguration,siteSchema,appearanceSchema,actionHref,localized,readableAccent,contrast} from '../src/modules/site/configuration.ts';
+import {defaultSiteConfiguration,effectiveSite,siteSchema,appearanceSchema,actionHref,localized,readableAccent,contrast} from '../src/modules/site/configuration.ts';
 test('independent defaults are valid and do not carry old event identity',()=>{const a=defaultSiteConfiguration(),b=defaultSiteConfiguration();assert.ok(siteSchema.safeParse(a).success);a.shortName.tr='Changed';assert.equal(b.shortName.tr,'');assert.equal(b.venue.tr,'');assert.equal(b.contactEmail,'');});
 test('bounded multilingual content and strict schema',()=>{const c=defaultSiteConfiguration();for(const patch of [{headline:{tr:'x'.repeat(201),en:''}},{actions:[...c.actions,...c.actions]},{contactEmail:'invalid'},{html:'unsafe'}])assert.equal(siteSchema.safeParse({...c,...patch}).success,false);});
+test('legacy site records and payloads retain the original hero caption',()=>{
+  const legacy=defaultSiteConfiguration();delete legacy.heroCaption;legacy.headline.tr='Kongre başlığı';
+  const expected={tr:'Bilgiyle buluş.\nBirlikte düşün.',en:'Meet through knowledge.\nThink together.'};
+  const stored=effectiveSite(legacy),submitted=siteSchema.parse(legacy);
+  assert.deepEqual(stored.heroCaption,expected);assert.deepEqual(submitted.heroCaption,expected);
+  assert.equal(stored.headline.tr,'Kongre başlığı');assert.equal(Object.hasOwn(legacy,'heroCaption'),false);
+  stored.heroCaption.tr='Değişti';assert.deepEqual(effectiveSite(legacy).heroCaption,expected);
+  const fresh=defaultSiteConfiguration();fresh.heroCaption.en='Changed';assert.deepEqual(defaultSiteConfiguration().heroCaption,expected);
+});
+test('hero caption preserves multilingual line breaks and intentional empty values',()=>{
+  const c=defaultSiteConfiguration();
+  const customized=siteSchema.parse({...c,heroCaption:{tr:'Yeşil dönüşüm.\nBirlikte düşün.',en:'Green transition.\nThink together.'}});
+  assert.deepEqual(effectiveSite(JSON.parse(JSON.stringify(customized))).heroCaption,customized.heroCaption);
+  const hidden=effectiveSite({...c,heroCaption:{tr:' \n ',en:'English caption'}});
+  assert.deepEqual(hidden.heroCaption,{tr:'',en:'English caption'});
+  assert.deepEqual(effectiveSite({...c,heroCaption:{tr:'',en:''}}).heroCaption,{tr:'',en:''});
+});
+test('hero caption remains bounded and strict in both languages',()=>{
+  const c=defaultSiteConfiguration();
+  assert.equal(siteSchema.safeParse({...c,heroCaption:{tr:'x'.repeat(160),en:'y'.repeat(160)}}).success,true);
+  for(const heroCaption of [{tr:'x'.repeat(161),en:''},{tr:'',en:'x'.repeat(161)},{tr:'Only one language'},null,{tr:'',en:'',html:'unsafe'}])assert.equal(siteSchema.safeParse({...c,heroCaption}).success,false);
+});
 test('external links reject executable, insecure and credential-bearing URLs',()=>{const c=defaultSiteConfiguration();for(const url of ['javascript:alert(1)','http://example.invalid','https://user:pass@example.invalid','/admin','data:text/html,x'])assert.equal(siteSchema.safeParse({...c,actions:[{...c.actions[0],target:'EXTERNAL',url}]}).success,false);assert.ok(siteSchema.safeParse({...c,actions:[{...c.actions[0],target:'EXTERNAL',url:'https://example.invalid/info'}]}).success);});
 test('enabled actions require bilingual labels and external address',()=>{const c=defaultSiteConfiguration();assert.equal(siteSchema.safeParse({...c,actions:[{...c.actions[0],label:{tr:'',en:'Start'}}]}).success,false);assert.equal(siteSchema.safeParse({...c,actions:[{...c.actions[0],target:'EXTERNAL'}]}).success,false);});
 test('actions honor each congress module and contact availability',()=>{const c=defaultSiteConfiguration();assert.equal(actionHref(c.actions[0],'abc',{SUBMISSIONS:false,REGISTRATION:true}),null);assert.equal(actionHref(c.actions[1],'abc',{SUBMISSIONS:true,REGISTRATION:false}),null);assert.equal(actionHref({...c.actions[0],target:'CONTACT'},'abc',{SUBMISSIONS:true,REGISTRATION:true},false),null);assert.equal(actionHref({...c.actions[0],target:'ABOUT'},'abc',{SUBMISSIONS:false,REGISTRATION:false}),'/abc#kongre-hakkinda');});

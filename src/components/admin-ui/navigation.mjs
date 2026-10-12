@@ -3,7 +3,7 @@ export const congressNavigation = [
   {label:'Başvurular',items:[['bildiriler','Bildiriler','submissions.read','SUBMISSIONS'],['hakemlik','Hakemlik','reviews.read','REVIEWS'],['oduller','Ödüller','awards.read','AWARDS']]},
   {label:'Katılım',items:[['kayitlar','Kayıtlar','registrations.read','REGISTRATION'],['odemeler','Ödemeler','payments.read','REGISTRATION'],['ucretler','Ücretler','settings','REGISTRATION']]},
   {label:'Program',items:[['program','Oturumlar','program.read','PROGRAM'],['etkinlikler','Etkinlikler','activities.read','ACTIVITIES'],['yoklama','Yoklama','attendance.perform','ATTENDANCE']]},
-  {label:'Web sitesi',items:[['cms','Sayfalar','cms','CMS'],['icerik','Ortak içerikler','cms','CMS'],['cms/medya','Medya','cms','CMS'],['site-gorunumu','Görünüm','settings'],['cms/aktarim','Referans aktarımı','cms','CMS']]},
+  {label:'Web sitesi',items:[['cms','Sayfalar','cms','CMS'],['icerik','Ortak içerikler','cms','CMS'],['cms/medya','Medya','cms','CMS'],['site-gorunumu','Görünüm','settings'],['diller','Dil ve çeviriler','cms','CMS'],['cms/aktarim','Referans aktarımı','cms','CMS']]},
   {label:'Belgeler ve yayın',items:[['belgeler','Sertifikalar','certificates.read','CERTIFICATES'],['belgeler/uygunluk','Belge kuralları','certificates.read','CERTIFICATES'],['tanitim','Davet ve afiş','promotion.read','PROMOTION'],['yayinlar','Tam metinler','publications.read','PUBLICATIONS'],['kitaplar','Kitaplar','publications.read','PUBLICATIONS'],['arsiv','Arşiv ve kapanış','archive.read','ARCHIVE']]},
   {label:'Yönetim',items:[['kongre-ayarlari','Kongre ayarları','settings'],['moduller','Modüller','modules'],['ekip','Ekip ve yetkiler','members'],['teslim-istisnalari','Teslim istisnaları','settings'],['islem-gecmisi','İşlem geçmişi','audit']]},
   {label:'Görevlerim',items:[['hakemlik/gorevler','Hakem görevlerim','reviews.perform','REVIEWS'],['oduller/juri','Jüri görevlerim','awards.perform','AWARDS'],['program/gorevler','Başkan görevlerim','program.perform','PROGRAM'],['kayitlarim','Kendi kayıtlarım','own']]},
@@ -13,7 +13,10 @@ export const platformPaths = new Set(['platform','platform/gecmis','kongreler','
 const requiredModules={REVIEWS:['REVIEWS','SUBMISSIONS'],ATTENDANCE:['ATTENDANCE','PROGRAM']};
 export function visibleNavigation(actions,modules,closed=false,personalRoles) {
   const allowed=new Set(actions), enabled=new Set(modules);
-  return congressNavigation.map(group=>({label:group.label,items:group.items.filter(([, ,action,module])=>allowed.has(action)&&(!personalRoles||!['reviews.perform','awards.perform','program.perform'].includes(action)||personalRoles.includes(action==='program.perform'?'SESSION_CHAIR':'REVIEWER'))&&(!module||((requiredModules[module]??[module]).every(required=>enabled.has(required))&&(!closed||module==='ARCHIVE'))))})).filter(group=>group.items.length);
+  return congressNavigation.map(group=>({label:group.label,items:group.items.filter(([route, ,action,module])=>{
+    if(route==='diller')return allowed.has('settings')||(allowed.has('cms')&&enabled.has('CMS')&&!closed);
+    return allowed.has(action)&&(!personalRoles||!['reviews.perform','awards.perform','program.perform'].includes(action)||personalRoles.includes(action==='program.perform'?'SESSION_CHAIR':'REVIEWER'))&&(!module||((requiredModules[module]??[module]).every(required=>enabled.has(required))&&(!closed||module==='ARCHIVE')));
+  })})).filter(group=>group.items.length);
 }
 export function routeInfo(pathname) {
   const path=pathname.replace(/^\/admin\/?/,'');
